@@ -20,12 +20,6 @@ Currently, two official plugins are available:
 1. cd frontend in terminal
 2. `npm run dev`
 
-- For backend
-
-1. cd backend
-2. npm install
-3. npm start
-
 - PUSHING IN GITHUB DESKTOP
 
 1. choose branch

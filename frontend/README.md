@@ -20,6 +20,10 @@ Currently, two official plugins are available:
 1. cd frontend in terminal
 2. `npm run dev`
 
+- List dependencies you have installed
+
+1.
+
 - PUSHING IN GITHUB DESKTOP
 
 1. choose branch

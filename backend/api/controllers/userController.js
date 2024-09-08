@@ -58,14 +58,29 @@ exports.registerUser = async (req, res) => {
     // Format the birthday input to match CSV date format (YYYY-MM-DD)
     const formattedBirthday = formatDateToISO(birthday.trim());
 
-    // Find matching record in CSV file
-    const matchingRecord = csvData.find(
-      (row) =>
-        row.studentNum.trim() === studentNum.trim() &&
-        row.firstName.trim().toLowerCase() === firstName.trim().toLowerCase() &&
-        row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
-        row.birthday.trim() === formattedBirthday // Ensure date format matches
-    );
+    let matchingRecord;
+
+    // Validate based on whether studentNum is provided
+    if (studentNum && studentNum.trim() !== "") {
+      // Find matching record in CSV file using studentNum
+      matchingRecord = csvData.find(
+        (row) =>
+          row.studentNum.trim() === studentNum.trim() &&
+          row.firstName.trim().toLowerCase() ===
+            firstName.trim().toLowerCase() &&
+          row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
+          row.birthday.trim() === formattedBirthday // Ensure date format matches
+      );
+    } else {
+      // If no studentNum, validate only firstName, lastName, and birthday
+      matchingRecord = csvData.find(
+        (row) =>
+          row.firstName.trim().toLowerCase() ===
+            firstName.trim().toLowerCase() &&
+          row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
+          row.birthday.trim() === formattedBirthday // Ensure date format matches
+      );
+    }
 
     // Debugging: Log the matching record found (or not found)
     console.log("Matching Record:", matchingRecord);
@@ -86,7 +101,7 @@ exports.registerUser = async (req, res) => {
 
     // Save the new user
     const newUser = new User({
-      studentNum,
+      studentNum: studentNum || "N/A",
       firstName,
       lastName,
       birthday: formattedBirthday,

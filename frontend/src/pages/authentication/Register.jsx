@@ -39,7 +39,23 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
+    // Check if all required fields are filled
+    const { firstName, lastName, birthday, email, password, confirmPassword } =
+      formData;
+    if (
+      !firstName ||
+      !lastName ||
+      !birthday ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    // Check if passwords match
+    if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
@@ -48,8 +64,8 @@ function Register() {
       // Send registration data to the backend
       await axios.post("http://localhost:6001/users/register", formData);
 
-      // Save email to local storage
-      localStorage.setItem("userEmail", formData.email);
+      // Save email to session storage
+      sessionStorage.setItem("userEmail", formData.email);
 
       // Redirect to the OTP verification page
       navigate("/verifyaccount");
@@ -82,7 +98,7 @@ function Register() {
               </p>
             </div>
             {/* Error Message */}
-            {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
+            {error && <p className="text-red text-xs mb-2">{error}</p>}
 
             {/* Form Fields */}
             <label className="block mb-1 mt-2 text-xs font-medium">

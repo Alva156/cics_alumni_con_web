@@ -10,16 +10,17 @@ function VerifyAccount() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState(""); // State for email
   const navigate = useNavigate();
-  // Get email from local storage or any other source
+  // Get email from session  storage or any other source
   useEffect(() => {
-    const storedEmail = localStorage.getItem("userEmail"); // Retrieve email from local storage
+    const storedEmail = sessionStorage.getItem("userEmail"); // Retrieve email from session storage
     if (storedEmail) {
       setEmail(storedEmail);
     } else {
       // Handle case where email is not found
       alert("No email address found. Please register again.");
+      navigate("/register"); // Redirect to register page if no email
     }
-  }, []);
+  }, [navigate]);
 
   const handleOtpTypeSelection = (type) => {
     setOtpType(type);
@@ -67,6 +68,7 @@ function VerifyAccount() {
       if (response.data.msg === "User verified successfully") {
         navigate("/login");
         alert("OTP verified successfully");
+        sessionStorage.removeItem("userEmail");
         // Redirect to appropriate page or show success message
       } else {
         alert("Invalid OTP");

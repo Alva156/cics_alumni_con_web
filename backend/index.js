@@ -1,24 +1,33 @@
 const express = require("express");
-const app = express();
 const cors = require("cors");
-const port = process.env.PORT || 6001;
 const mongoose = require("mongoose");
 require("dotenv").config();
 
+const app = express();
+const port = process.env.PORT || 6001;
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// Database Connection
 mongoose
   .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cics-alumni-db.j2atd.mongodb.net/?retryWrites=true&w=majority&appName=cics-alumni-db`
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cics-alumni-db.j2atd.mongodb.net/cicsalumnicon?retryWrites=true&w=majority`
   )
   .then(() => console.log("MongoDB Connected Successfully"))
   .catch((error) => console.log("Error connecting to MongoDB", error));
 
+// Routes
+const userRoutes = require("./api/routes/userRoutes");
+app.use("/users", userRoutes);
+
+// Basic Route
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+// Start Server
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });

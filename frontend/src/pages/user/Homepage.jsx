@@ -9,6 +9,7 @@ import "../../App.css";
 
 const Homepage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const images = [
     { src: homepage1, title: "", text: "Welcome to CICS Alumni Connect!" },
     {
@@ -33,13 +34,31 @@ const Homepage = () => {
   };
 
   useEffect(() => {
+    const storedLoginStatus = localStorage.getItem("isLoggedIn");
+    setIsLoggedIn(storedLoginStatus === "true");
+
     const interval = setInterval(nextSlide, 8000);
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    let timer;
+    if (isLoggedIn) {
+      timer = setTimeout(() => {
+        setIsLoggedIn(false);
+        localStorage.setItem("isLoggedIn", "false");
+      }, 3000);
+    }
+    return () => clearTimeout(timer);
+  }, [isLoggedIn]);
   return (
     <div>
       <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
+        {isLoggedIn && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+            <p> Login success!</p>
+          </div>
+        )}
         <div
           className="flex transition-transform duration-700 ease-in-out"
           style={{

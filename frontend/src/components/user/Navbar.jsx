@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../App.css";
 import { MdOutlineLogout } from "react-icons/md";
 
@@ -6,14 +7,22 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
   const handleLogoutClick = () => {
     setModalVisible(true);
   };
 
+  const logout = () => {
+    localStorage.removeItem("isLoggedIn");
+    setModalVisible(false);
+    navigate("/login?logout=success");
+  };
+  
   const closeModal = () => {
     setModalVisible(false);
   };
@@ -169,10 +178,11 @@ const Navbar = () => {
                 <div className="modal-action">
                   <button
                     className="btn bg-green text-white w-20"
-                    onClick={closeModal}
+                    onClick={logout} // Call logout function on confirm
                   >
                     Yes
                   </button>
+
                   <button
                     className="btn bg-red text-white w-20"
                     onClick={closeModal}

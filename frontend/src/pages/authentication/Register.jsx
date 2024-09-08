@@ -4,10 +4,21 @@ import { useNavigate } from "react-router-dom";
 import signupImage from "../../assets/signup_image.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
 function Register() {
+  const [formData, setFormData] = useState({
+    studentNum: "",
+    firstName: "",
+    lastName: "",
+    birthday: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState(""); // State for error messages
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -16,6 +27,43 @@ function Register() {
 
   const toggleConfirmPasswordVisibility = () => {
     setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    try {
+      // Send registration data to the backend
+      await axios.post("http://localhost:6001/users/register", formData);
+
+      // Save email to local storage
+      localStorage.setItem("userEmail", formData.email);
+
+      // Redirect to the OTP verification page
+      navigate("/verifyaccount");
+    } catch (error) {
+      if (error.response) {
+        setError(
+          error.response.data.msg || "An error occurred during registration"
+        );
+      } else if (error.request) {
+        setError("No response from server");
+      } else {
+        setError("Error in request setup");
+      }
+    }
   };
 
   return (
@@ -33,6 +81,8 @@ function Register() {
                 Enter required user information and start connecting with us.
               </p>
             </div>
+            {/* Error Message */}
+            {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
 
             {/* Form Fields */}
             <label className="block mb-1 mt-2 text-xs font-medium">
@@ -40,17 +90,22 @@ function Register() {
             </label>
             <input
               type="text"
+              name="studentNum"
               placeholder="Enter your Student ID Number"
+              value={formData.studentNum}
+              onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "28px" }}
             />
-
             <label className="block mb-1 text-xs font-medium">
               First Name *
             </label>
             <input
               type="text"
+              name="firstName"
               placeholder="Enter your First Name"
+              value={formData.firstName}
+              onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "28px" }}
             />
@@ -60,7 +115,10 @@ function Register() {
             </label>
             <input
               type="text"
+              name="lastName"
               placeholder="Enter your Last Name"
+              value={formData.lastName}
+              onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "28px" }}
             />
@@ -68,7 +126,10 @@ function Register() {
             <label className="block mb-1 text-xs font-medium">Birthday *</label>
             <input
               type="date"
+              name="birthday"
               placeholder="Enter your Birthday"
+              value={formData.birthday}
+              onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "28px" }}
             />
@@ -76,17 +137,10 @@ function Register() {
             <label className="block mb-1 text-xs font-medium">Email *</label>
             <input
               type="email"
+              name="email"
               placeholder="Enter your email"
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "28px" }}
-            />
-
-            <label className="block mb-1 text-xs font-medium">
-              Contact Number *
-            </label>
-            <input
-              type="tel"
-              placeholder="Enter your Contact Number"
+              value={formData.email}
+              onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "28px" }}
             />
@@ -95,7 +149,10 @@ function Register() {
             <div className="relative mb-2">
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
                 placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
                 className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
                 style={{ height: "28px" }}
               />
@@ -116,7 +173,10 @@ function Register() {
             <div className="relative mb-5">
               <input
                 type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
                 placeholder="Confirm your password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
                 style={{ height: "28px" }}
               />
@@ -131,7 +191,11 @@ function Register() {
               </span>
             </div>
 
-            <button className="bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 transition duration-300 ease-in-out hover:bg-[#a10c2b]">
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
+            >
               SIGN UP
             </button>
 
@@ -148,11 +212,10 @@ function Register() {
         </div>
 
         {/* Right Image */}
-        <div className="relative w-full md:w-1/2 h-full flex-shrink-0 hidden md:block">
-          <div className="absolute inset-0 bg-[#5D0000] opacity-30"></div>
+        <div className="relative w-full md:w-1/2 bg-gray-200 flex items-center justify-center">
           <img
             src={signupImage}
-            alt="Sign up illustration"
+            alt="Sign Up"
             className="object-cover w-full h-full"
           />
         </div>

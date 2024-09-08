@@ -1,7 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
 
 function DataPrivacy() {
+  const navigate = useNavigate();
+  const [isChecked1, setIsChecked1] = useState(false);
+  const [isChecked2, setIsChecked2] = useState(false);
+  const handleCheckboxChange = (checkbox) => {
+    if (checkbox === 1) {
+      setIsChecked1(!isChecked1);
+    } else if (checkbox === 2) {
+      setIsChecked2(!isChecked2);
+    }
+  };
+
+  const isFormValid = isChecked1 && isChecked2;
   return (
     <>
       <Header />
@@ -248,6 +261,8 @@ function DataPrivacy() {
               type="checkbox"
               id="check1"
               className="mr-2"
+              checked={isChecked1}
+              onChange={() => handleCheckboxChange(1)}
               style={{ width: "1rem", height: "1rem" }}
             />
             <label htmlFor="check1" className="text-base font-normal">
@@ -260,6 +275,8 @@ function DataPrivacy() {
             <input
               type="checkbox"
               id="check2"
+              checked={isChecked2}
+              onChange={() => handleCheckboxChange(2)}
               className="mr-2"
               style={{ width: "1rem", height: "1rem" }}
             />
@@ -272,12 +289,19 @@ function DataPrivacy() {
 
         <div className="flex justify-center mt-8 space-x-3">
           <div className="">
-            <button className="btn md:w-44 w-52 bg-[#D9D9D9] text-black rounded-none transition duration-300 ease-in-out hover:bg-[#A8A8A8]">
+            <button
+              onClick={() => navigate("/login")}
+              className="btn md:w-44 w-52 bg-[#D9D9D9] text-black rounded-none transition duration-300 ease-in-out hover:bg-[#A8A8A8]"
+            >
               Cancel
             </button>
           </div>
           <div className="">
-            <button className="btn md:w-44 w-52 bg-[#056E34] text-white rounded-none transition duration-300 ease-in-out hover:bg-[#004A1C]">
+            <button
+              onClick={() => navigate("/register")}
+              disabled={!isFormValid}
+              className="btn md:w-44 w-52 bg-[#056E34] text-white rounded-none transition duration-300 ease-in-out hover:bg-[#004A1C]"
+            >
               Agree
             </button>
           </div>

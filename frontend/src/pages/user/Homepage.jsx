@@ -54,11 +54,11 @@ const Homepage = () => {
   return (
     <div>
       <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
-        {isLoggedIn && (
+        {/* {isLoggedIn && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
             <p> Login success!</p>
           </div>
-        )}
+        )} */}
         <div
           className="flex transition-transform duration-700 ease-in-out"
           style={{

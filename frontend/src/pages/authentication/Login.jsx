@@ -38,8 +38,17 @@ function Login() {
 
       if (response.data.success) {
         localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userRole", response.data.role); // Save user role
         console.log("Login successful. User is now logged in.");
-        navigate("/");
+
+        // Redirect based on role
+        if (response.data.role === "admin") {
+          console.log("Redirecting admin to admin-homepage");
+          navigate("/admin/homepage");
+        } else {
+          console.log("Redirecting user to homepage");
+          navigate("/");
+        }
       } else {
         console.log("Login failed:", response.data.msg);
         alert(response.data.msg);
@@ -50,13 +59,20 @@ function Login() {
     }
   };
   useEffect(() => {
-    const query = new URLSearchParams(location.search);
+    const query = new URLSearchParams(window.location.search);
     if (query.get("logout") === "success") {
-      setShowLogoutMessage(true);
+      // Check if the message has been shown before
+      if (!sessionStorage.getItem("logoutMessageShown")) {
+        setShowLogoutMessage(true);
+        sessionStorage.setItem("logoutMessageShown", "true"); // Set flag to indicate message has been shown
 
-      setTimeout(() => setShowLogoutMessage(false), 5000);
+        setTimeout(() => {
+          setShowLogoutMessage(false);
+          sessionStorage.removeItem("logoutMessageShown"); // Remove flag after timeout
+        }, 5000);
+      }
     }
-  }, [location.search]);
+  }, []);
 
   return (
     <>

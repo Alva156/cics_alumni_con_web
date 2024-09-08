@@ -7,6 +7,7 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 
+// Helper function to generate a 6-digit OTP
 function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000); // 6 digit OTP
 }
@@ -17,6 +18,58 @@ function formatDateToISO(dateString) {
   return `${year}-${month}-${day}`;
 }
 
+// Admin accounts
+const adminAccountsPlain = [
+  {
+    email: "cicsadmin@gmail.com",
+    password: "cics123",
+    role: "admin",
+  },
+  {
+    email: "cicsadmin2@gmail.com",
+    password: "cics123",
+    role: "admin",
+  },
+  {
+    email: "cicsadmi3@gmail.com",
+    password: "cics123",
+    role: "admin",
+  },
+];
+
+async function setupAdminAccounts() {
+  try {
+    const salt = await bcrypt.genSalt(10);
+
+    const hashedAdmins = await Promise.all(
+      adminAccountsPlain.map(async (account) => ({
+        email: account.email,
+        password: await bcrypt.hash(account.password, salt), // Hashing the password
+        role: account.role,
+        studentNum: "N/A",
+        firstName: "CICS",
+        lastName: "Admin",
+        birthday: "1000-01-01",
+        isVerified: true,
+      }))
+    );
+
+    for (const admin of hashedAdmins) {
+      await User.findOneAndUpdate(
+        { email: admin.email },
+        { $set: admin },
+        { upsert: true, new: true }
+      );
+    }
+
+    console.log("Admin accounts have been set up successfully");
+  } catch (err) {
+    console.error("Error setting up admin accounts:", err);
+  }
+}
+setupAdminAccounts();
+
+// User registration
 exports.registerUser = async (req, res) => {
   try {
     const {
@@ -36,7 +89,7 @@ exports.registerUser = async (req, res) => {
 
     const csvFilePath = path.join(__dirname, "../alumnilist.csv");
 
-    // Load and parse CSV data asynchronously
+    //  CSV chekcer rawr
     const csvData = await new Promise((resolve, reject) => {
       const results = [];
       fs.createReadStream(csvFilePath)
@@ -52,17 +105,15 @@ exports.registerUser = async (req, res) => {
         });
     });
 
-    // Debugging: Log the CSV data to check if it's loaded correctly
     console.log("CSV Data:", csvData);
 
-    // Format the birthday input to match CSV date format (YYYY-MM-DD)
+    // To Format birthday input to match CSV date format (YYYY-MM-DD)
     const formattedBirthday = formatDateToISO(birthday.trim());
 
     let matchingRecord;
 
-    // Validate based on whether studentNum is provided
+    // Mailagay ba studentNum?
     if (studentNum && studentNum.trim() !== "") {
-      // Find matching record in CSV file using studentNum
       matchingRecord = csvData.find(
         (row) =>
           row.studentNum.trim() === studentNum.trim() &&
@@ -72,7 +123,6 @@ exports.registerUser = async (req, res) => {
           row.birthday.trim() === formattedBirthday // Ensure date format matches
       );
     } else {
-      // If no studentNum, validate only firstName, lastName, and birthday
       matchingRecord = csvData.find(
         (row) =>
           row.firstName.trim().toLowerCase() ===
@@ -82,7 +132,6 @@ exports.registerUser = async (req, res) => {
       );
     }
 
-    // Debugging: Log the matching record found (or not found)
     console.log("Matching Record:", matchingRecord);
 
     if (!matchingRecord) {
@@ -116,22 +165,22 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+// Verify OTP
 exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
     const otpRecord = await OTP.findOne({ email, otp });
 
-    // Debugging: Log the OTP record found (or not found)
     console.log("OTP Record:", otpRecord);
 
     if (!otpRecord) {
       return res.status(400).json({ msg: "Invalid OTP" });
     }
 
-    // OTP is valid, update the user as verified
+    // OTP is valid, update the user to as verified
     await User.updateOne({ email }, { isVerified: true });
 
-    // Optionally, delete OTP after successful verification
+    // to delete otp after successful regis
     await OTP.deleteOne({ email, otp });
 
     res.status(200).json({ msg: "User verified successfully" });
@@ -140,6 +189,7 @@ exports.verifyOTP = async (req, res) => {
   }
 };
 
+// Send OTP
 exports.sendOTP = async (req, res) => {
   try {
     const { email, otpType } = req.body;
@@ -153,7 +203,6 @@ exports.sendOTP = async (req, res) => {
     const newOTP = new OTP({ email, otp });
     await newOTP.save();
 
-    // Log the OTP being sent
     console.log(`Sending OTP ${otp} to ${email}`);
 
     // Send OTP via email
@@ -186,30 +235,72 @@ exports.sendOTP = async (req, res) => {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
+
+// Login user
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log("Login attempt with email:", email);
+
+    // Check if email matches any hardcoded admin accounts
+    const adminAccount = adminAccountsPlain.find(
+      (account) => account.email === email
+    );
+
+    if (adminAccount) {
+      console.log("Admin account found:", adminAccount);
+
+      // Retrieve the admin account from the database
+      const dbAdmin = await User.findOne({ email });
+      if (!dbAdmin) {
+        console.log("Admin not found in database");
+        return res.status(400).json({ msg: "Invalid email or password" });
+      }
+
+      // Compare password with hashed password
+      const isMatch = await bcrypt.compare(password, dbAdmin.password);
+      if (!isMatch) {
+        console.log("Invalid password for admin account");
+        return res.status(400).json({ msg: "Invalid email or password" });
+      }
+
+      // Successful login for admin
+      return res.status(200).json({
+        success: true,
+        msg: "Login successful",
+        role: dbAdmin.role, 
+      });
+    }
+
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
+      console.log("User not found:", email);
       return res.status(400).json({ msg: "Invalid email or password" });
     }
 
     // Check if the user is verified
     if (!user.isVerified) {
+      console.log("User not verified:", email);
       return res.status(400).json({ msg: "Account not verified" });
     }
 
     // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log("Invalid password for user:", email);
       return res.status(400).json({ msg: "Invalid email or password" });
     }
 
     // Successful login
-    res.status(200).json({ success: true, msg: "Login successful" });
+    res.status(200).json({
+      success: true,
+      msg: "Login successful",
+      role: user.role,
+    });
   } catch (err) {
+    console.error("Server error in loginUser:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };

@@ -1,15 +1,50 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
-const UserSchema = new Schema({
-  studentNum: { type: String, required: true },
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
-  birthday: { type: Date, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  isVerified: { type: Boolean, default: false }, // Add a field to track if the user is verified
+const userSchema = new mongoose.Schema({
+  studentNum: {
+    type: String,
+    required: function () {
+      return this.role === "user";
+    }, // Only required for non-admin users and for first name, last name and birthday
+  },
+  firstName: {
+    type: String,
+    required: function () {
+      return this.role === "user";
+    }, 
+  },
+  lastName: {
+    type: String,
+    required: function () {
+      return this.role === "user";
+    }, 
+  },
+  birthday: {
+    type: String,
+    required: function () {
+      return this.role === "user";
+    }, 
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
 });
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model("User", userSchema);
 module.exports = User;

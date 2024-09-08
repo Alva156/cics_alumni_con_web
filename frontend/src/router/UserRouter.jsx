@@ -119,7 +119,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <Admin />,
+    element: (
+      <PrivateRoute>
+        <Admin />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "/admin/account",

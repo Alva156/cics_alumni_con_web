@@ -28,7 +28,7 @@ function AdminHomepage() {
   };
 
   useEffect(() => {
-    const interval = setInterval(nextSlide, 20000);
+    const interval = setInterval(nextSlide, 8000);
     return () => clearInterval(interval);
   }, []);
   return (

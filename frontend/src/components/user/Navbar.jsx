@@ -19,10 +19,11 @@ const Navbar = () => {
 
   const logout = () => {
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userRole");
     setModalVisible(false);
     navigate("/login?logout=success");
   };
-  
+
   const closeModal = () => {
     setModalVisible(false);
   };
@@ -178,7 +179,7 @@ const Navbar = () => {
                 <div className="modal-action">
                   <button
                     className="btn bg-green text-white w-20"
-                    onClick={logout} // Call logout function on confirm
+                    onClick={logout}
                   >
                     Yes
                   </button>

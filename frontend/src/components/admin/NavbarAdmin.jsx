@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../App.css";
 import { MdOutlineLogout } from "react-icons/md";
 
@@ -6,6 +7,7 @@ const NavbarAdmin = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -16,6 +18,13 @@ const NavbarAdmin = () => {
 
   const closeModal = () => {
     setModalVisible(false);
+  };
+  const logout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userRole");
+
+    setModalVisible(false);
+    navigate("/login?logout=success");
   };
 
   return (
@@ -50,52 +59,52 @@ const NavbarAdmin = () => {
                 className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow"
               >
                 <li className="p-2.5  border-b border-hgray last:border-b-0">
-                  <a href="/admin-home">Home</a>
+                  <a href="/admin/homepage">Home</a>
                 </li>
                 <li className="p-2.5  border-b border-hgray last:border-b-0">
-                  <a href="/admin-dashboard">Dashboard</a>
+                  <a href="/admin/dashboard">Dashboard</a>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/admin-surveytool">Survey Tool</a>
+                  <a href="/admin/surveytool">Survey Tool</a>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/admin-threads">Threads</a>
+                  <a href="/admin/threads">Threads</a>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <details>
                     <summary>Contents</summary>
                     <ul className="p-2.5 z-50">
                       <li className="p-1">
-                        <a href="/admin-companies">Companies</a>
+                        <a href="/admin/companies">Companies</a>
                       </li>
                       <li className="p-1">
-                        <a href="/admin-news">News</a>
+                        <a href="/admin/news">News</a>
                       </li>
                       <li className="p-1">
-                        <a href="/admin-events">Events</a>
+                        <a href="/admin/events">Events</a>
                       </li>
                       <li className="p-1">
-                        <a href="/admin-certifications">Certifications</a>
+                        <a href="/admin/certifications">Certifications</a>
                       </li>
                       <li className="p-1">
-                        <a href="/admin-documentrequest">
+                        <a href="/admin/documentrequest">
                           Document Request Steps
                         </a>
                       </li>
                       <li className="p-1">
-                        <a href="/admin-job">Job/Internship Referrals</a>
+                        <a href="/admin/job">Job/Internship Referrals</a>
                       </li>
                     </ul>
                   </details>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/admin-alumni">Alumni</a>
+                  <a href="/admin/alumni">Alumni</a>
                 </li>
                 <li className="p-2.5 ">
-                  <a href="/admin-reports">Reports</a>
+                  <a href="/admin/reports">Reports</a>
                 </li>
                 <li className="p-2.5 ">
-                  <a href="/admin-account">Account</a>
+                  <a href="/admin/account">Account</a>
                 </li>
               </ul>
             )}
@@ -104,50 +113,50 @@ const NavbarAdmin = () => {
         <div className="navbar-center hidden lg:flex py-1 ">
           <ul className="menu menu-horizontal px-1 ">
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin-home">Home</a>
+              <a href="/admin/homepage">Home</a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin-dashboard">Dashboard</a>
+              <a href="/admin/dashboard">Dashboard</a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin-surveytool">Survey Tool</a>
+              <a href="/admin/surveytool">Survey Tool</a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin-threads">Threads</a>
+              <a href="/admin/threads">Threads</a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
               <details>
                 <summary>Contents</summary>
                 <ul className="px-2.5 bg-white pr-1 z-20">
                   <li className="p-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin-companies">Companies</a>
+                    <a href="/admin/companies">Companies</a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin-news">News</a>
+                    <a href="/admin/news">News</a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin-events">Events</a>
+                    <a href="/admin/events">Events</a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin-certifications">Certifications</a>
+                    <a href="/admin/certifications">Certifications</a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin-documentrequest">Document Request Steps</a>
+                    <a href="/admin/documentrequest">Document Request Steps</a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin-job">Job/Internship Referrals</a>
+                    <a href="/admin/job">Job/Internship Referrals</a>
                   </li>
                 </ul>
               </details>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin-alumni">Alumni</a>
+              <a href="/admin/alumni">Alumni</a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8 ">
-              <a href="/admin-reports">Reports</a>
+              <a href="/admin/reports">Reports</a>
             </li>
             <li className="px-2.5 pr-16 xl:pr-20 ">
-              <a href="/admin-account">Account</a>
+              <a href="/admin/account">Account</a>
             </li>
           </ul>
         </div>
@@ -176,7 +185,7 @@ const NavbarAdmin = () => {
                 <div className="modal-action">
                   <button
                     className="btn bg-green text-white w-20"
-                    onClick={closeModal}
+                    onClick={logout}
                   >
                     Yes
                   </button>

@@ -31,7 +31,7 @@ const adminAccountsPlain = [
     role: "admin",
   },
   {
-    email: "cicsadmi3@gmail.com",
+    email: "cicsadmin3@gmail.com",
     password: "cics123",
     role: "admin",
   },
@@ -269,7 +269,7 @@ exports.loginUser = async (req, res) => {
       return res.status(200).json({
         success: true,
         msg: "Login successful",
-        role: dbAdmin.role, 
+        role: dbAdmin.role,
       });
     }
 

@@ -112,7 +112,7 @@ exports.registerUser = async (req, res) => {
 
     let matchingRecord;
 
-    // Mailagay ba studentNum?
+    // If user inputs with student num
     if (studentNum && studentNum.trim() !== "") {
       matchingRecord = csvData.find(
         (row) =>
@@ -120,7 +120,7 @@ exports.registerUser = async (req, res) => {
           row.firstName.trim().toLowerCase() ===
             firstName.trim().toLowerCase() &&
           row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
-          row.birthday.trim() === formattedBirthday // Ensure date format matches
+          row.birthday.trim() === formattedBirthday 
       );
     } else {
       matchingRecord = csvData.find(
@@ -128,7 +128,7 @@ exports.registerUser = async (req, res) => {
           row.firstName.trim().toLowerCase() ===
             firstName.trim().toLowerCase() &&
           row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
-          row.birthday.trim() === formattedBirthday // Ensure date format matches
+          row.birthday.trim() === formattedBirthday 
       );
     }
 

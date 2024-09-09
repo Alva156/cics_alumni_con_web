@@ -39,9 +39,9 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if all required fields are filled
     const { firstName, lastName, birthday, email, password, confirmPassword } =
       formData;
+
     if (
       !firstName ||
       !lastName ||
@@ -54,21 +54,30 @@ function Register() {
       return;
     }
 
-    // Check if passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
     try {
-      // Send registration data to the backend
-      await axios.post("http://localhost:6001/users/register", formData);
+      const response = await axios.post(
+        "http://localhost:6001/users/register",
+        formData
+      );
 
-      // Save email to session storage
-      sessionStorage.setItem("userEmail", formData.email);
+      if (response.status === 200) {
+        if (response.data.redirect) {
+          setError(response.data.msg); // Show the message
 
-      // Redirect to the OTP verification page
-      navigate("/verifyaccount");
+          setTimeout(() => {
+            sessionStorage.setItem("userEmail", email); // Save email to session storage
+            navigate(response.data.redirect); // Redirect to OTP verification page
+          }, 3000); // Redirect after 3 seconds
+        } else {
+          sessionStorage.setItem("userEmail", email); // Save email to session storage
+          navigate("/verifyaccount");
+        }
+      }
     } catch (error) {
       if (error.response) {
         setError(
@@ -81,7 +90,6 @@ function Register() {
       }
     }
   };
-
   return (
     <>
       <Header />

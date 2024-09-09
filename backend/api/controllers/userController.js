@@ -87,9 +87,26 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ msg: "Passwords do not match" });
     }
 
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      if (!existingUser.isVerified) {
+        // If the user exists but is not verified, redirect them back to OTP verification
+        return res.status(200).json({
+          msg: "User is already registered but not verified. Redirecting to OTP verification.",
+          redirect: "/verifyaccount",
+        });
+      } else {
+        return res
+          .status(400)
+          .json({ msg: "User already exists and is verified" });
+      }
+    }
+
     const csvFilePath = path.join(__dirname, "../alumnilist.csv");
 
-    //  CSV chekcer rawr
+    // Read and validate CSV data
     const csvData = await new Promise((resolve, reject) => {
       const results = [];
       fs.createReadStream(csvFilePath)
@@ -107,12 +124,13 @@ exports.registerUser = async (req, res) => {
 
     console.log("CSV Data:", csvData);
 
-    // To Format birthday input to match CSV date format (YYYY-MM-DD)
+    // Format birthday input to match CSV date format (YYYY-MM-DD)
     const formattedBirthday = formatDateToISO(birthday.trim());
 
+    // Match record in the CSV
     let matchingRecord;
 
-    // If user inputs with student num
+    // If student number is provided
     if (studentNum && studentNum.trim() !== "") {
       matchingRecord = csvData.find(
         (row) =>
@@ -120,15 +138,16 @@ exports.registerUser = async (req, res) => {
           row.firstName.trim().toLowerCase() ===
             firstName.trim().toLowerCase() &&
           row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
-          row.birthday.trim() === formattedBirthday 
+          row.birthday.trim() === formattedBirthday
       );
     } else {
+      // Match without student number
       matchingRecord = csvData.find(
         (row) =>
           row.firstName.trim().toLowerCase() ===
             firstName.trim().toLowerCase() &&
           row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
-          row.birthday.trim() === formattedBirthday 
+          row.birthday.trim() === formattedBirthday
       );
     }
 
@@ -136,12 +155,6 @@ exports.registerUser = async (req, res) => {
 
     if (!matchingRecord) {
       return res.status(400).json({ msg: "Invalid registration details" });
-    }
-
-    // Check if the user already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ msg: "User already exists" });
     }
 
     // Hash password
@@ -156,11 +169,16 @@ exports.registerUser = async (req, res) => {
       birthday: formattedBirthday,
       email,
       password: hashedPassword,
+      isVerified: false, // Assuming new users are not verified initially
     });
 
     await newUser.save();
+
+    // Here you could trigger sending OTP or any other post-registration logic
+
     res.status(201).json({ msg: "User registered successfully" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };

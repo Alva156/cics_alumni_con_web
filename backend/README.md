@@ -1,9 +1,10 @@
 - TO RUN Backend:
 
+1. Download Python
 1. Make an env file (refer .env.example)
-2. In terminal, 'cd backend'
-3. npm install
-4. npm start
+1. In terminal, 'cd backend'
+1. npm install
+1. npm start
 
 - PUSHING IN GITHUB DESKTOP
 

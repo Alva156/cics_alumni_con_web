@@ -65,18 +65,19 @@ function Register() {
         formData
       );
 
-      if (response.status === 200) {
-        if (response.data.redirect) {
-          setError(response.data.msg); // Show the message
+      // If user is already registered but not verified
+      if (response.status === 200 && response.data.redirect) {
+        setError(response.data.msg); // Show the message
 
-          setTimeout(() => {
-            sessionStorage.setItem("userEmail", email); // Save email to session storage
-            navigate(response.data.redirect); // Redirect to OTP verification page
-          }, 3000); // Redirect after 3 seconds
-        } else {
+        setTimeout(() => {
           sessionStorage.setItem("userEmail", email); // Save email to session storage
-          navigate("/verifyaccount");
-        }
+          navigate(response.data.redirect); // Redirect to OTP verification page
+        }, 3000); // Redirect after 3 seconds for unverified users
+      }
+
+      if (response.status === 201 && response.data.redirect) {
+        sessionStorage.setItem("userEmail", email); // Save email to session storage
+        navigate(response.data.redirect);
       }
     } catch (error) {
       if (error.response) {

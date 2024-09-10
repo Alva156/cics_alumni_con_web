@@ -174,9 +174,11 @@ exports.registerUser = async (req, res) => {
 
     await newUser.save();
 
-    // Here you could trigger sending OTP or any other post-registration logic
-
-    res.status(201).json({ msg: "User registered successfully" });
+    // After successful registration, redirect to OTP page
+    return res.status(201).json({
+      msg: "User registered successfully. Redirecting to OTP verification.",
+      redirect: "/verifyaccount",
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error", error: err.message });

@@ -43,19 +43,13 @@ function Login() {
 
         // Redirect based on role
         if (response.data.role === "admin") {
-          console.log("Redirecting admin to admin-homepage");
           navigate("/admin/homepage");
         } else {
-          console.log("Redirecting user to homepage");
           navigate("/");
         }
-      } else {
-        console.log("Login failed:", response.data.msg);
-        alert(response.data.msg);
       }
     } catch (error) {
-      console.error("Error logging in:", error);
-      alert("An error occurred during login");
+      console.error("Error during login:", error);
     }
   };
   useEffect(() => {

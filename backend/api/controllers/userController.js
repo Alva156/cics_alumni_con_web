@@ -257,70 +257,100 @@ exports.sendOTP = async (req, res) => {
 };
 
 // Login user
+
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     console.log("Login attempt with email:", email);
 
-    // Check if email matches any hardcoded admin accounts
-    const adminAccount = adminAccountsPlain.find(
-      (account) => account.email === email
-    );
-
-    if (adminAccount) {
-      console.log("Admin account found:", adminAccount);
-
-      // Retrieve the admin account from the database
-      const dbAdmin = await User.findOne({ email });
-      if (!dbAdmin) {
-        console.log("Admin not found in database");
-        return res.status(400).json({ msg: "Invalid email or password" });
-      }
-
-      // Compare password with hashed password
-      const isMatch = await bcrypt.compare(password, dbAdmin.password);
-      if (!isMatch) {
-        console.log("Invalid password for admin account");
-        return res.status(400).json({ msg: "Invalid email or password" });
-      }
-
-      // Successful login for admin
-      return res.status(200).json({
-        success: true,
-        msg: "Login successful",
-        role: dbAdmin.role,
-      });
-    }
-
-    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
-      console.log("User not found:", email);
       return res.status(400).json({ msg: "Invalid email or password" });
     }
 
-    // Check if the user is verified
     if (!user.isVerified) {
-      console.log("User not verified:", email);
       return res.status(400).json({ msg: "Account not verified" });
     }
 
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      console.log("Invalid password for user:", email);
       return res.status(400).json({ msg: "Invalid email or password" });
     }
 
-    // Successful login
-    res.status(200).json({
-      success: true,
-      msg: "Login successful",
-      role: user.role,
+    req.session.userId = user._id.toString();
+    req.session.userEmail = user.email;
+    req.session.userRole = user.role;
+
+    req.session.save((err) => {
+      if (err) {
+        console.error("Error saving session:", err);
+        return res
+          .status(500)
+          .json({ msg: "Error creating session", error: err });
+      }
+      console.log(
+        `Session created for user ${user._id.toString()}, ${user.email.toString()}, ${user.role.toString()}`
+      );
+      res.status(200).json({
+        success: true,
+        msg: "Login successful",
+      });
     });
   } catch (err) {
-    console.error("Server error in loginUser:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
+};
+
+// Logout user
+exports.logoutUser = async (req, res) => {
+  const sessionId = req.sessionID;
+
+  console.log(`Logout request received for session ID: ${sessionId}`);
+
+  // Destroy the session
+  req.session.destroy(async (err) => {
+    if (err) {
+      console.error("Error destroying session:", err);
+      return res
+        .status(500)
+        .json({ msg: "Error logging out", error: err.message });
+    }
+
+    // Clear the session cookie
+    res.clearCookie("connect.sid"); // Default name for the session cookie
+    console.log(`Session destroyed for session ID: ${sessionId}`);
+
+    // Verify immediate session deletion
+    try {
+      const remainingSessions = await new Promise((resolve, reject) => {
+        req.sessionStore.all((err, sessions) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(sessions);
+          }
+        });
+      });
+
+      // Check if the session is still in the store
+      const isSessionStillPresent = remainingSessions.some(
+        (session) => session.id === sessionId
+      );
+
+      if (isSessionStillPresent) {
+        console.log("Session still exists in the store.");
+        return res
+          .status(500)
+          .json({ msg: "Session still exists in the store" });
+      }
+
+      console.log("Logout successful. Session has been completely removed.");
+      res.status(200).json({ msg: "Logout successful" });
+    } catch (err) {
+      console.error("Error retrieving remaining sessions:", err);
+      res
+        .status(500)
+        .json({ msg: "Error checking remaining sessions", error: err.message });
+    }
+  });
 };

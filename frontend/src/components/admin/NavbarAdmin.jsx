@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../App.css";
 import { MdOutlineLogout } from "react-icons/md";
+import axios from "axios";
 
 const NavbarAdmin = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -19,12 +20,24 @@ const NavbarAdmin = () => {
   const closeModal = () => {
     setModalVisible(false);
   };
-  const logout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userRole");
+  const logout = async () => {
+    try {
+      const response = await axios.post("http://localhost:6001/users/logout");
+      console.log("Logout response:", response.data);
 
-    setModalVisible(false);
-    navigate("/login?logout=success");
+      if (response.status === 200) {
+        // Clear local storage
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userRole");
+
+        // Optionally, redirect or close modal
+        setTimeout(() => {
+          navigate("/login?logout=success"); // Redirect to login page with query parameter
+        }, 2000); // Show message for 2 seconds
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   return (

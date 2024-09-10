@@ -1,14 +1,34 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-require("dotenv").config();
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 
+require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 6001;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Session Middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cics-alumni-db.j2atd.mongodb.net/cicsalumnicon?retryWrites=true&w=majority`,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+      secure: process.env.NODE_ENV, // Set to true if using HTTPS in production
+      httpOnly: true,
+    },
+  })
+);
 
 // Database Connection
 mongoose

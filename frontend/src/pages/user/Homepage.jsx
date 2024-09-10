@@ -41,16 +41,6 @@ const Homepage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    let timer;
-    if (isLoggedIn) {
-      timer = setTimeout(() => {
-        setIsLoggedIn(false);
-        localStorage.setItem("isLoggedIn", "false");
-      }, 3000);
-    }
-    return () => clearTimeout(timer);
-  }, [isLoggedIn]);
   return (
     <div>
       <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">

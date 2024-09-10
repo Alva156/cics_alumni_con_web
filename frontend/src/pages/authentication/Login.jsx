@@ -37,8 +37,9 @@ function Login() {
       console.log("Login response:", response.data);
 
       if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
         localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", response.data.role); // Save user role
+        localStorage.setItem("userRole", response.data.role);
         console.log("Login successful. User is now logged in.");
 
         // Redirect based on role

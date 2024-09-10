@@ -22,18 +22,27 @@ const NavbarAdmin = () => {
   };
   const logout = async () => {
     try {
-      const response = await axios.post("http://localhost:6001/users/logout");
+      const response = await axios.post(
+        "http://localhost:6001/users/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure you're sending the token if required
+          },
+        }
+      );
       console.log("Logout response:", response.data);
 
       if (response.status === 200) {
         // Clear local storage
+        localStorage.removeItem("token");
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
 
         // Optionally, redirect or close modal
         setTimeout(() => {
-          navigate("/login?logout=success"); // Redirect to login page with query parameter
-        }, 2000); // Show message for 2 seconds
+          navigate("/login?logout=success");
+        }, 2000);
       }
     } catch (error) {
       console.error("Error during logout:", error);

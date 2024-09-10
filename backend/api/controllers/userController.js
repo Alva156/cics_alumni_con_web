@@ -6,6 +6,7 @@ const csv = require("csv-parser");
 const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 
 // Helper function to generate a 6-digit OTP
 function generateOTP() {
@@ -277,80 +278,44 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ msg: "Invalid email or password" });
     }
 
-    req.session.userId = user._id.toString();
-    req.session.userEmail = user.email;
-    req.session.userRole = user.role;
+    // Create JWT token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" } // Token expires in 1 day
+    );
 
-    req.session.save((err) => {
-      if (err) {
-        console.error("Error saving session:", err);
-        return res
-          .status(500)
-          .json({ msg: "Error creating session", error: err });
-      }
-      console.log(
-        `Session created for user ${user._id.toString()}, ${user.email.toString()}, ${user.role.toString()}`
-      );
-      res.status(200).json({
-        success: true,
-        msg: "Login successful",
-      });
+    // Log login event
+    console.log(`User logged in: ${user._id}, Email: ${user.email}`);
+
+    res.status(200).json({
+      success: true,
+      msg: "Login successful",
+      token, // Return the token
+      role: user.role, // Include role in the response
     });
   } catch (err) {
+    console.error("Server error:", err.message); // Added error logging
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
 
 // Logout user
 exports.logoutUser = async (req, res) => {
-  const sessionId = req.sessionID;
+  try {
+    // JWT is stateless, so to "log out", you simply tell the client to remove the token
+    console.log(`User logged out: ${req.user.id}, Email: ${req.user.email}`);
 
-  console.log(`Logout request received for session ID: ${sessionId}`);
-
-  // Destroy the session
-  req.session.destroy(async (err) => {
-    if (err) {
-      console.error("Error destroying session:", err);
-      return res
-        .status(500)
-        .json({ msg: "Error logging out", error: err.message });
-    }
-
-    // Clear the session cookie
-    res.clearCookie("connect.sid"); // Default name for the session cookie
-    console.log(`Session destroyed for session ID: ${sessionId}`);
-
-    // Verify immediate session deletion
-    try {
-      const remainingSessions = await new Promise((resolve, reject) => {
-        req.sessionStore.all((err, sessions) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(sessions);
-          }
-        });
-      });
-
-      // Check if the session is still in the store
-      const isSessionStillPresent = remainingSessions.some(
-        (session) => session.id === sessionId
-      );
-
-      if (isSessionStillPresent) {
-        console.log("Session still exists in the store.");
-        return res
-          .status(500)
-          .json({ msg: "Session still exists in the store" });
-      }
-
-      console.log("Logout successful. Session has been completely removed.");
-      res.status(200).json({ msg: "Logout successful" });
-    } catch (err) {
-      console.error("Error retrieving remaining sessions:", err);
-      res
-        .status(500)
-        .json({ msg: "Error checking remaining sessions", error: err.message });
-    }
-  });
+    res.status(200).json({
+      msg: "Logout successful. Please remove the token on the client side.",
+    });
+  } catch (err) {
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
 };

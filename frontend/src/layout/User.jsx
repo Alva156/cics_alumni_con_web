@@ -41,7 +41,6 @@ const User = () => {
   }, [navigate]);
 
   const logout = () => {
-    // Clear local storage and redirect to login
     console.log("User has been logged out due to token expiration.");
     localStorage.removeItem("token");
     localStorage.removeItem("isLoggedIn");

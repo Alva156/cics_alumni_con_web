@@ -19,7 +19,7 @@ function AdminHomepage() {
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Initialize isLoggedIn state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const totalSlides = images.length;
 

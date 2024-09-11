@@ -3,7 +3,6 @@ import homepage1 from "../../assets/homepage1.jpg";
 import homepage2 from "../../assets/homepage2.png";
 
 function AdminHomepage() {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const images = [
     { src: homepage1, title: "", text: "Welcome to CICS Alumni Connect!" },
     {
@@ -17,6 +16,11 @@ function AdminHomepage() {
       text: "To be the leading platform that bridges the gap between past and present CICS students, cultivating a global network of professionals who are committed to lifelong learning, collaboration, and the advancement of their respective fields. We envision a future where every CICS alumnus feels connected, valued, and inspired to make a difference.",
     },
   ];
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Initialize isLoggedIn state
+
   const totalSlides = images.length;
 
   const nextSlide = () => {
@@ -28,12 +32,32 @@ function AdminHomepage() {
   };
 
   useEffect(() => {
+    const storedLoginStatus = localStorage.getItem("isLoggedIn");
+    const messageShown = sessionStorage.getItem("loginMessageShown");
+
+    setIsLoggedIn(storedLoginStatus === "true");
+
+    if (storedLoginStatus === "true" && messageShown !== "true") {
+      setShowLoginMessage(true);
+      sessionStorage.setItem("loginMessageShown", "true");
+
+      setTimeout(() => {
+        setShowLoginMessage(false);
+      }, 5000);
+    }
+
     const interval = setInterval(nextSlide, 8000);
     return () => clearInterval(interval);
   }, []);
+
   return (
     <div>
       <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
+        {showLoginMessage && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+            <p>Login success!</p>
+          </div>
+        )}
         <div
           className="flex transition-transform duration-700 ease-in-out"
           style={{

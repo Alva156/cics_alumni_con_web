@@ -27,7 +27,7 @@ const NavbarAdmin = () => {
         {},
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure you're sending the token if required
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -39,7 +39,12 @@ const NavbarAdmin = () => {
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
 
-        // Optionally, redirect or close modal
+        console.log("User has been logged out.");
+
+        // Set flag to show message on login page
+        sessionStorage.setItem("logoutMessageShown", "true");
+
+        // Redirect to login page
         setTimeout(() => {
           navigate("/login?logout=success");
         }, 2000);

@@ -150,7 +150,7 @@ function VerifyAccount() {
   const handleCloseModal = () => {
     setModalVisible(false);
     sessionStorage.removeItem("userEmail");
-    navigate("/login"); // Navigate to login page when modal is closed
+    navigate("/login");
   };
   const handleCancelModal = () => {
     setModal2Visible(false);

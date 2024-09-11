@@ -54,16 +54,9 @@ function Login() {
       console.error("Error during login:", error);
       // Set the error message if login fails
       if (error.response && error.response.data.msg) {
-        if (error.response.data.msg === "Account not verified") {
-          setErrorMessage(
-            "Account not verified. Redirecting to verification page..."
-          );
-          setTimeout(() => {
-            navigate("/verifyaccount");
-          }, 3000); // Redirect after 3 seconds
-        } else {
-          setErrorMessage(error.response.data.msg);
-        }
+        setErrorMessage(error.response.data.msg);
+      } else {
+        setErrorMessage("An error occurred. Please try again.");
       }
       setTimeout(() => {
         setErrorMessage("");

@@ -90,7 +90,7 @@ exports.registerUser = async (req, res) => {
       if (!existingUser.isVerified) {
         // If the user exists but is not verified, redirect them back to OTP verification
         return res.status(200).json({
-          msg: "User is already registered but not verified. Redirecting to OTP verification.",
+          msg: "User found but not verified. Redirecting to OTP verification.",
           redirect: "/verifyaccount",
         });
       } else {
@@ -262,7 +262,9 @@ exports.loginUser = async (req, res) => {
     }
 
     if (!user.isVerified) {
-      return res.status(400).json({ msg: "Account not verified", redirect: "/verifyaccount" });
+      return res.status(400).json({
+        msg: "Account not verified. Register your account once again to get verified ",
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

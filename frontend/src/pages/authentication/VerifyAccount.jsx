@@ -231,7 +231,7 @@ function VerifyAccount() {
             </button>
 
             <button
-              onClick={modal2Visible}
+              onClick={() => setModal2Visible(true)}
               className="bg-[#C5C5C5] text-black text-lg py-2 px-6 w-64 transition duration-300 ease-in-out hover:bg-[#A8A8A8]"
             >
               Cancel
@@ -277,10 +277,17 @@ function VerifyAccount() {
               </p>
               <div className="modal-action">
                 <button
+                  className="btn bg-green text-white w-20"
                   onClick={handleCancelModal}
-                  className=" bg-red text-white py-2 px-4 rounded hover:bg-red"
                 >
-                  OK
+                  Yes
+                </button>
+
+                <button
+                  className="btn bg-red text-white w-20"
+                  onClick={() => setModal2Visible(false)}
+                >
+                  No
                 </button>
               </div>
             </div>

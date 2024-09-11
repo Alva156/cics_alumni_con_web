@@ -39,7 +39,10 @@ const Navbar = () => {
 
         console.log("User has been logged out.");
 
-        // Optionally, redirect or close modal
+        // Set flag to show message on login page
+        sessionStorage.setItem("logoutMessageShown", "true");
+
+        // Redirect to login page
         setTimeout(() => {
           navigate("/login?logout=success");
         }, 2000);
@@ -48,7 +51,6 @@ const Navbar = () => {
       console.error("Error during logout:", error);
     }
   };
-
   const closeModal = () => {
     setModalVisible(false);
   };

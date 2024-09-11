@@ -83,11 +83,6 @@ exports.registerUser = async (req, res) => {
       confirmPassword,
     } = req.body;
 
-    // Check if passwords match
-    if (password !== confirmPassword) {
-      return res.status(400).json({ msg: "Passwords do not match" });
-    }
-
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
 
@@ -99,9 +94,7 @@ exports.registerUser = async (req, res) => {
           redirect: "/verifyaccount",
         });
       } else {
-        return res
-          .status(400)
-          .json({ msg: "User already exists and is verified" });
+        return res.status(400).json({ msg: "User already exists" });
       }
     }
 
@@ -155,7 +148,9 @@ exports.registerUser = async (req, res) => {
     console.log("Matching Record:", matchingRecord);
 
     if (!matchingRecord) {
-      return res.status(400).json({ msg: "Invalid registration details" });
+      return res
+        .status(400)
+        .json({ msg: "No matching record found in the alumni list" });
     }
 
     // Hash password
@@ -177,7 +172,6 @@ exports.registerUser = async (req, res) => {
 
     // After successful registration, redirect to OTP page
     return res.status(201).json({
-      msg: "User registered successfully. Redirecting to OTP verification.",
       redirect: "/verifyaccount",
     });
   } catch (err) {
@@ -191,8 +185,6 @@ exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
     const otpRecord = await OTP.findOne({ email, otp });
-
-    console.log("OTP Record:", otpRecord);
 
     if (!otpRecord) {
       return res.status(400).json({ msg: "Invalid OTP" });
@@ -215,7 +207,7 @@ exports.sendOTP = async (req, res) => {
   try {
     const { email, otpType } = req.body;
     if (!email || !otpType) {
-      return res.status(400).json({ msg: "Email and OTP type are required" });
+      return res.status(400).json({ msg: "OTP type are required" });
     }
 
     const otp = generateOTP();
@@ -270,7 +262,7 @@ exports.loginUser = async (req, res) => {
     }
 
     if (!user.isVerified) {
-      return res.status(400).json({ msg: "Account not verified" });
+      return res.status(400).json({ msg: "Account not verified", redirect: "/verifyaccount" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);

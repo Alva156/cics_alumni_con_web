@@ -13,6 +13,7 @@ function Login() {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -40,6 +41,8 @@ function Login() {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userRole", response.data.role);
+        sessionStorage.setItem("logoutMessageShown", "false");
+        sessionStorage.setItem("loginMessageShown", "false");
 
         if (response.data.role === "admin") {
           navigate("/admin/homepage");
@@ -49,22 +52,39 @@ function Login() {
       }
     } catch (error) {
       console.error("Error during login:", error);
+      // Set the error message if login fails
+      if (error.response && error.response.data.msg) {
+        if (error.response.data.msg === "Account not verified") {
+          setErrorMessage(
+            "Account not verified. Redirecting to verification page..."
+          );
+          setTimeout(() => {
+            navigate("/verifyaccount");
+          }, 3000); // Redirect after 3 seconds
+        } else {
+          setErrorMessage(error.response.data.msg);
+        }
+      }
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 5000);
     }
   };
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-    if (query.get("logout") === "success") {
-      // Check if the message has been shown before
-      if (!sessionStorage.getItem("logoutMessageShown")) {
-        setShowLogoutMessage(true);
-        sessionStorage.setItem("logoutMessageShown", "true"); // Set flag to indicate message has been shown
+    if (
+      query.get("logout") === "success" &&
+      sessionStorage.getItem("logoutMessageShown") === "true"
+    ) {
+      setShowLogoutMessage(true);
+      // Clear flag after showing the message
+      sessionStorage.removeItem("logoutMessageShown");
+      sessionStorage.removeItem("loginMessageShown");
 
-        setTimeout(() => {
-          setShowLogoutMessage(false);
-          sessionStorage.removeItem("logoutMessageShown"); // Remove flag after timeout
-        }, 5000);
-      }
+      setTimeout(() => {
+        setShowLogoutMessage(false);
+      }, 5000);
     }
   }, []);
 
@@ -88,6 +108,10 @@ function Login() {
                 Enter user credentials and continue connecting with us.
               </p>
             </div>
+            {/* Display error message */}
+            {errorMessage && (
+              <div className="text-red text-sm">{errorMessage}</div>
+            )}
 
             <label className="block mb-2 mt-6 text-sm font-medium">
               Email *

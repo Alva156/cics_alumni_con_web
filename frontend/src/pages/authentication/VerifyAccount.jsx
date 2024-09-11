@@ -8,19 +8,48 @@ function VerifyAccount() {
   const [otpType, setOtpType] = useState(null);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState(""); // State for email
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [otpSent, setOtpSent] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modal2Visible, setModal2Visible] = useState(false);
   const navigate = useNavigate();
-  // Get email from session  storage or any other source
+
+  const clearErrorAfterDelay = () => {
+    setTimeout(() => setError(""), 5000);
+  };
+  const clearSuccessAfterDelay = () => {
+    setTimeout(() => setSuccess(""), 10000);
+  };
+
   useEffect(() => {
     const storedEmail = sessionStorage.getItem("userEmail"); // Retrieve email from session storage
     if (storedEmail) {
       setEmail(storedEmail);
     } else {
       // Handle case where email is not found
-      alert("No email address found. Please register again.");
-      navigate("/register"); // Redirect to register page if no email
+      setError("No email address found. Please register again.");
+      setTimeout(() => navigate("/register"), 3000); // Redirect after 3 seconds
     }
   }, [navigate]);
+
+  useEffect(() => {
+    if (timer > 0 && otpSent) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [timer, otpSent]);
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
 
   const handleOtpTypeSelection = (type) => {
     setOtpType(type);
@@ -29,6 +58,8 @@ function VerifyAccount() {
 
   const sendOtp = async (type) => {
     setLoading(true);
+    setError("");
+    setSuccess("");
     try {
       const response = await axios.post("http://localhost:6001/users/sendotp", {
         email: email,
@@ -36,14 +67,19 @@ function VerifyAccount() {
       });
 
       if (response.data.msg === "OTP sent successfully") {
-        alert("OTP sent successfully");
+        setOtpSent(true);
+        setSuccess("OTP sent successfully");
+        setTimer(300); // Set timer for 5 minutes (300 seconds)
+        clearSuccessAfterDelay();
       } else {
-        alert("Failed to send OTP");
+        setError("Failed to send OTP");
       }
     } catch (error) {
       console.error("Error sending OTP:", error);
-      alert("An error occurred while sending OTP");
+      setError("An error occurred while sending OTP");
+      clearErrorAfterDelay();
     }
+
     setLoading(false);
   };
 
@@ -54,10 +90,18 @@ function VerifyAccount() {
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     if (!otpType) {
-      alert("Please select an OTP type");
+      setError("Please select an OTP type");
+      clearErrorAfterDelay();
       return;
     }
+    if (!otp) {
+      setError("No OTP input");
+      clearErrorAfterDelay();
+      return;
+    }
+
     setLoading(true);
+    setError("");
 
     try {
       const response = await axios.post("http://localhost:6001/users/verify", {
@@ -66,28 +110,21 @@ function VerifyAccount() {
       });
 
       if (response.data.msg === "User verified successfully") {
-        navigate("/login");
-        alert("OTP verified successfully");
-        sessionStorage.removeItem("userEmail");
-        // Redirect to appropriate page or show success message
+        setModalVisible(true);
       } else {
-        alert("Invalid OTP");
+        setError("Invalid OTP");
+        clearErrorAfterDelay();
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      alert("An error occurred during OTP verification");
+      setError("An error occurred during OTP verification");
+      clearErrorAfterDelay();
     }
 
     setLoading(false);
   };
 
   const handleResendOtp = async () => {
-    if (!otpType) {
-      alert("Please select an OTP type");
-      return;
-    }
-    setLoading(true);
-
     try {
       const response = await axios.post("http://localhost:6001/users/sendotp", {
         email: email, // Pass email to backend
@@ -95,20 +132,30 @@ function VerifyAccount() {
       });
 
       if (response.data.msg === "OTP sent successfully") {
-        alert("OTP sent successfully");
+        setOtpSent(true);
+        setTimer(300); // Reset timer for 5 minutes
       } else {
-        alert("Failed to resend OTP");
+        setError("Failed to resend OTP");
+        clearErrorAfterDelay();
       }
     } catch (error) {
       console.error("Error resending OTP:", error);
-      alert("An error occurred while resending OTP");
+      setError("Choose OTP");
+      clearErrorAfterDelay();
     }
 
     setLoading(false);
   };
 
-  const handleCancel = () => {
-    // Implement navigation or logic for canceling the OTP verification process
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    sessionStorage.removeItem("userEmail");
+    navigate("/login"); // Navigate to login page when modal is closed
+  };
+  const handleCancelModal = () => {
+    setModal2Visible(false);
+    sessionStorage.removeItem("userEmail");
+    navigate("/login");
   };
   return (
     <>
@@ -125,6 +172,10 @@ function VerifyAccount() {
                 Verify your account using the OTP code to be sent to your mobile
                 number or personal email.
               </p>
+              <div className="text-red mb-4">
+                <p>{error}</p>
+              </div>
+
               <p className="text-left text-sm md:text-base">
                 Choose preferred platform to send OTP
               </p>
@@ -153,6 +204,16 @@ function VerifyAccount() {
               style={{ height: "40px" }}
               disabled={loading}
             />
+            <div className="text-green mb-4">
+              <p>{success}</p>
+            </div>
+            {otpSent && (
+              <div className="mb-4">
+                <p className="text-left text-sm md:text-base">
+                  OTP valid for: {formatTime(timer)}
+                </p>
+              </div>
+            )}
             <button
               onClick={handleOtpSubmit}
               className="bg-[#056E34] text-white text-lg py-2 px-6 w-64 mb-2 mt-0 transition duration-300 ease-in-out hover:bg-[#004A1C]"
@@ -170,7 +231,7 @@ function VerifyAccount() {
             </button>
 
             <button
-              onClick={handleCancel}
+              onClick={modal2Visible}
               className="bg-[#C5C5C5] text-black text-lg py-2 px-6 w-64 transition duration-300 ease-in-out hover:bg-[#A8A8A8]"
             >
               Cancel
@@ -187,6 +248,44 @@ function VerifyAccount() {
             className="object-cover w-full h-full"
           />
         </div>
+
+        {/* Modal */}
+        {modalVisible && (
+          <dialog id="my_modal_5" className="modal modal-middle " open>
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Verification Successful</h3>
+              <p className="py-4">
+                Your account has been verified successfully. You can now log in.
+              </p>
+              <div className="modal-action">
+                <button
+                  onClick={handleCloseModal}
+                  className=" bg-green text-white py-2 px-4 rounded hover:bg-red"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </dialog>
+        )}
+        {modal2Visible && (
+          <dialog id="my_modal_5" className="modal modal-middle " open>
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Warning!</h3>
+              <p className="py-4">
+                Are you sure you want to cancel verification process?
+              </p>
+              <div className="modal-action">
+                <button
+                  onClick={handleCancelModal}
+                  className=" bg-red text-white py-2 px-4 rounded hover:bg-red"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </dialog>
+        )}
       </div>
     </>
   );

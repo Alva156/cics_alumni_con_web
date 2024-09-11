@@ -37,6 +37,9 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
+    setTimeout(() => {
+      setError("");
+    }, 10000);
     e.preventDefault();
 
     const { firstName, lastName, birthday, email, password, confirmPassword } =
@@ -51,6 +54,14 @@ function Register() {
       !confirmPassword
     ) {
       setError("Please fill in all required fields");
+      return;
+    }
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError(
+        "Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character."
+      );
       return;
     }
 
@@ -191,8 +202,24 @@ function Register() {
                 />
               </span>
             </div>
+            <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
+              Password Requirements:
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              At least 8 characters long
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must contain at least one uppercase letter (A-Z)
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must contain at least one digit (0-9)
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must include at least one special character (e.g., !, @, #, $, %,
+              ^, &, *)
+            </p>
 
-            <label className="block mb-1 text-xs font-medium">
+            <label className="block mb-1 mt-4 text-xs font-medium">
               Confirm Password *
             </label>
             <div className="relative mb-5">

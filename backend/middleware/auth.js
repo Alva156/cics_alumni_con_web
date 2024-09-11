@@ -12,6 +12,12 @@ const authenticateJWT = (req, res, next) => {
     req.user = decoded; // User info from the token
     next();
   } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      // Token has expired, redirect to login
+      return res
+        .status(401)
+        .json({ msg: "Token has expired, please log in again" });
+    }
     res.status(401).json({ msg: "Token is not valid" });
   }
 };

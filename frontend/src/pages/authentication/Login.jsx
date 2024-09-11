@@ -40,9 +40,7 @@ function Login() {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userRole", response.data.role);
-        console.log("Login successful. User is now logged in.");
 
-        // Redirect based on role
         if (response.data.role === "admin") {
           navigate("/admin/homepage");
         } else {
@@ -53,6 +51,7 @@ function Login() {
       console.error("Error during login:", error);
     }
   };
+
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     if (query.get("logout") === "success") {

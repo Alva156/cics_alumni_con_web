@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../App.css";
 import { MdOutlineLogout } from "react-icons/md";
@@ -25,7 +25,7 @@ const Navbar = () => {
         {},
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Ensure you're sending the token if required
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -36,6 +36,8 @@ const Navbar = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
+
+        console.log("User has been logged out.");
 
         // Optionally, redirect or close modal
         setTimeout(() => {

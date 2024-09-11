@@ -288,8 +288,15 @@ exports.loginUser = async (req, res) => {
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" } // Token expires in 1 day
+      { expiresIn: "1d" } // Token expires in 1 day 1d
     );
+    const decodedToken = jwt.decode(token);
+    if (decodedToken) {
+      const { exp } = decodedToken;
+      const expiresAt = new Date(exp * 1000); // Convert exp to milliseconds
+      console.log(`Token contents:`, decodedToken);
+      console.log(`Token expires at:`, expiresAt.toString());
+    }
 
     // Log login event
     console.log(`User logged in: ${user._id}, Email: ${user.email}`);
@@ -297,11 +304,11 @@ exports.loginUser = async (req, res) => {
     res.status(200).json({
       success: true,
       msg: "Login successful",
-      token, // Return the token
-      role: user.role, // Include role in the response
+      token,
+      role: user.role,
     });
   } catch (err) {
-    console.error("Server error:", err.message); // Added error logging
+    console.error("Server error:", err.message);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };

@@ -8,8 +8,6 @@ import homepage2 from "../../assets/homepage2.png";
 import "../../App.css";
 
 const Homepage = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const images = [
     { src: homepage1, title: "", text: "Welcome to CICS Alumni Connect!" },
     {
@@ -23,6 +21,9 @@ const Homepage = () => {
       text: "To be the leading platform that bridges the gap between past and present CICS students, cultivating a global network of professionals who are committed to lifelong learning, collaboration, and the advancement of their respective fields. We envision a future where every CICS alumnus feels connected, valued, and inspired to make a difference.",
     },
   ];
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   const totalSlides = images.length;
 
   const nextSlide = () => {

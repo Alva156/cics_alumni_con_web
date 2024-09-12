@@ -83,18 +83,63 @@ exports.registerUser = async (req, res) => {
       confirmPassword,
     } = req.body;
 
-    // Check if the user already exists
+    // Check if the email already exists
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       if (!existingUser.isVerified) {
-        // If the user exists but is not verified, redirect them back to OTP verification
         return res.status(200).json({
           msg: "User found but not verified. Redirecting to OTP verification.",
           redirect: "/verifyaccount",
         });
       } else {
         return res.status(400).json({ msg: "User already exists" });
+      }
+    }
+
+    // To check if a user with the same name and birthday already exists (regardless of email)
+    const duplicateUser = await User.findOne({
+      firstName: firstName,
+      lastName: lastName,
+      birthday: birthday,
+    });
+
+    if (duplicateUser) {
+      if (duplicateUser.isVerified) {
+        return res.status(400).json({
+          msg: "An account with the same name and birthday already exists and is verified. Duplicate registration is not allowed.",
+        });
+      } else {
+        // Update the existing unverified user with the new email
+        duplicateUser.email = email;
+        duplicateUser.password = await bcrypt.hash(
+          password,
+          await bcrypt.genSalt(10)
+        );
+        await duplicateUser.save();
+
+        return res.status(200).json({
+          msg: "An unverified account with the same name and birthday exists. Redirecting to OTP verification.",
+          redirect: "/verifyaccount",
+        });
+      }
+    }
+
+    // Check if the email is already registered
+    const existingUserByEmail = await User.findOne({ email });
+
+    if (existingUserByEmail) {
+      // If the email is already associated with an unverified account
+      if (!existingUserByEmail.isVerified) {
+        return res.status(200).json({
+          msg: "User found but not verified. Redirecting to OTP verification.",
+          redirect: "/verifyaccount",
+        });
+      } else {
+        // If the email is associated with a verified account
+        return res
+          .status(400)
+          .json({ msg: "Email already registered and verified" });
       }
     }
 
@@ -116,15 +161,12 @@ exports.registerUser = async (req, res) => {
         });
     });
 
-    console.log("CSV Data:", csvData);
-
     // Format birthday input to match CSV date format (YYYY-MM-DD)
     const formattedBirthday = formatDateToISO(birthday.trim());
 
     // Match record in the CSV
     let matchingRecord;
 
-    // If student number is provided
     if (studentNum && studentNum.trim() !== "") {
       matchingRecord = csvData.find(
         (row) =>
@@ -135,7 +177,6 @@ exports.registerUser = async (req, res) => {
           row.birthday.trim() === formattedBirthday
       );
     } else {
-      // Match without student number
       matchingRecord = csvData.find(
         (row) =>
           row.firstName.trim().toLowerCase() ===
@@ -145,12 +186,10 @@ exports.registerUser = async (req, res) => {
       );
     }
 
-    console.log("Matching Record:", matchingRecord);
-
     if (!matchingRecord) {
-      return res
-        .status(400)
-        .json({ msg: "No matching record found in the alumni list" });
+      return res.status(400).json({
+        msg: "No matching record found in the alumni list",
+      });
     }
 
     // Hash password
@@ -165,12 +204,11 @@ exports.registerUser = async (req, res) => {
       birthday: formattedBirthday,
       email,
       password: hashedPassword,
-      isVerified: false, // Assuming new users are not verified initially
+      isVerified: false, // Users not yet verified
     });
 
     await newUser.save();
 
-    // After successful registration, redirect to OTP page
     return res.status(201).json({
       redirect: "/verifyaccount",
     });
@@ -184,16 +222,19 @@ exports.registerUser = async (req, res) => {
 exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
+
+    // Find the OTP record in the database using the email and OTP provided
     const otpRecord = await OTP.findOne({ email, otp });
 
     if (!otpRecord) {
+      // OTP does not match, send invalid OTP response
       return res.status(400).json({ msg: "Invalid OTP" });
     }
 
-    // OTP is valid, update the user to as verified
+    // OTP is valid, update the user's verification status
     await User.updateOne({ email }, { isVerified: true });
 
-    // to delete otp after successful regis
+    // Delete OTP after successful verification
     await OTP.deleteOne({ email, otp });
 
     res.status(200).json({ msg: "User verified successfully" });

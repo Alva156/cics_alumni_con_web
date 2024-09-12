@@ -89,11 +89,13 @@ function VerifyAccount() {
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
+
     if (!otpType) {
       setError("Please select an OTP type");
       clearErrorAfterDelay();
       return;
     }
+
     if (!otp) {
       setError("No OTP input");
       clearErrorAfterDelay();
@@ -104,36 +106,49 @@ function VerifyAccount() {
     setError("");
 
     try {
+      // Send OTP and email to backend for verification
       const response = await axios.post("http://localhost:6001/users/verify", {
-        email: email, // Ensure email is sent to the backend for verification
+        email,
         otp,
       });
 
-      if (response.data.msg === "User verified successfully") {
+      // Handle backend response for successful OTP verification
+      if (
+        response.status === 200 &&
+        response.data.msg === "User verified successfully"
+      ) {
         setModalVisible(true);
-      } else {
-        setError("Invalid OTP");
-        clearErrorAfterDelay();
       }
     } catch (error) {
-      console.error("Error verifying OTP:", error);
-      setError("An error occurred during OTP verification");
-      clearErrorAfterDelay();
+      // If the OTP is invalid, it should return a 400 status
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.msg === "Invalid OTP"
+      ) {
+        setError("Invalid OTP");
+      } else {
+        // Handle other errors, such as server issues
+        setError("An error occurred during OTP verification");
+        console.error("Error verifying OTP:", error);
+      }
     }
 
+    clearErrorAfterDelay();
     setLoading(false);
   };
 
   const handleResendOtp = async () => {
     try {
       const response = await axios.post("http://localhost:6001/users/sendotp", {
-        email: email, // Pass email to backend
+        email: email,
         otpType,
       });
 
       if (response.data.msg === "OTP sent successfully") {
-        setOtpSent(true);
-        setTimer(300); // Reset timer for 5 minutes
+        setSuccess("OTP sent successfully");
+        setTimer(300);
+        clearSuccessAfterDelay();
       } else {
         setError("Failed to resend OTP");
         clearErrorAfterDelay();

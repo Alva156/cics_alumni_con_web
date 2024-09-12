@@ -260,7 +260,7 @@ function VerifyAccount() {
               <div className="modal-action">
                 <button
                   onClick={handleCloseModal}
-                  className=" bg-green text-white py-2 px-4 rounded hover:bg-red"
+                  className=" bg-green text-white py-2 px-4 rounded hover:bg-green"
                 >
                   OK
                 </button>

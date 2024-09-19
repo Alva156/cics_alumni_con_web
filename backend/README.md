@@ -4,8 +4,8 @@
 2. Make an env file (refer .env.example)
 3. In terminal, 'cd backend'
 4. npm install
-5. Go to Netwrok Access in our MongoDB database and add your ip address
-6. npm start
+5. npm start
+6. Go to Netwrok Access in our MongoDB database and add your ip address
 
 - PUSHING IN GITHUB DESKTOP
 

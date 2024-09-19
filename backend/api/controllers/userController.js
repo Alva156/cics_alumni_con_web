@@ -83,13 +83,13 @@ exports.registerUser = async (req, res) => {
       confirmPassword,
     } = req.body;
 
-    // Check if the email already exists
+    // Check if the email already exists/registered
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       if (!existingUser.isVerified) {
         return res.status(200).json({
-          msg: "User found but not verified. Redirecting to OTP verification.",
+          msg: "User not verified. Redirecting to OTP verification.",
           redirect: "/verifyaccount",
         });
       } else {
@@ -107,7 +107,7 @@ exports.registerUser = async (req, res) => {
     if (duplicateUser) {
       if (duplicateUser.isVerified) {
         return res.status(400).json({
-          msg: "An account with the same name and birthday already exists and is verified. Duplicate registration is not allowed.",
+          msg: "Duplicate accounts is not allowed.",
         });
       } else {
         // Update the existing unverified user with the new email
@@ -122,24 +122,6 @@ exports.registerUser = async (req, res) => {
           msg: "An unverified account with the same name and birthday exists. Redirecting to OTP verification.",
           redirect: "/verifyaccount",
         });
-      }
-    }
-
-    // Check if the email is already registered
-    const existingUserByEmail = await User.findOne({ email });
-
-    if (existingUserByEmail) {
-      // If the email is already associated with an unverified account
-      if (!existingUserByEmail.isVerified) {
-        return res.status(200).json({
-          msg: "User found but not verified. Redirecting to OTP verification.",
-          redirect: "/verifyaccount",
-        });
-      } else {
-        // If the email is associated with a verified account
-        return res
-          .status(400)
-          .json({ msg: "Email already registered and verified" });
       }
     }
 

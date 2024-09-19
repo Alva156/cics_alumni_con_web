@@ -1,11 +1,16 @@
 - TO RUN Backend:
 
-1. Download Python
-2. Make an env file (refer .env.example)
-3. In terminal, 'cd backend'
-4. npm install
-5. npm start
-6. Go to Netwrok Access in our MongoDB database and add your ip address
+<!-- After cloning from git hub -->
+
+1. Make an env file (refer .env.example)
+2. In terminal, 'cd backend'
+3. npm install
+4. npm start
+5. Go to Netwrok Access in our MongoDB database and add your ip address
+
+<!-- After executing the steps above, the next time you will open the project, just execute the code below -->
+
+- npm start
 
 - PUSHING IN GITHUB DESKTOP
 

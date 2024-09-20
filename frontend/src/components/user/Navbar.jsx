@@ -23,29 +23,20 @@ const Navbar = () => {
       const response = await axios.post(
         "http://localhost:6001/users/logout",
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+        { withCredentials: true }
       );
-      console.log("Logout response:", response.data);
 
       if (response.status === 200) {
-        // Clear local storage
-        localStorage.removeItem("token");
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
+        sessionStorage.setItem("logoutMessageShown", "true");
 
         console.log("User has been logged out.");
 
-        // Set flag to show message on login page
-        sessionStorage.setItem("logoutMessageShown", "true");
-
-        // Redirect to login page
+        // Add a 3-second delay before redirecting
         setTimeout(() => {
           navigate("/login?logout=success");
-        }, 2000);
+        }, 2000); // 2000ms = 2 seconds
       }
     } catch (error) {
       console.error("Error during logout:", error);

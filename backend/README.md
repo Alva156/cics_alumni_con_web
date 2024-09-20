@@ -10,7 +10,12 @@
 
 <!-- After executing the steps above, the next time you will open the project, just execute the code below -->
 
-- npm start
+1. cd backend
+2. npm start
+
+<!-- New Installations, either do the commands below or just execute npm install -->
+
+- npm install cookie-parser Date Installed:21/09/2024
 
 - PUSHING IN GITHUB DESKTOP
 

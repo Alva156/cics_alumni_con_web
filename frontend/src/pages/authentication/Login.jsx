@@ -33,12 +33,13 @@ function Login() {
     try {
       const response = await axios.post(
         "http://localhost:6001/users/login",
-        formData
+        formData,
+        {
+          withCredentials: true,
+        }
       );
-      console.log("Login response:", response.data);
 
       if (response.data.success) {
-        localStorage.setItem("token", response.data.token);
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userRole", response.data.role);
         sessionStorage.setItem("logoutMessageShown", "false");
@@ -52,18 +53,14 @@ function Login() {
       }
     } catch (error) {
       console.error("Error during login:", error);
-      // Set the error message if login fails
-      if (error.response && error.response.data.msg) {
-        setErrorMessage(error.response.data.msg);
-      } else {
-        setErrorMessage("An error occurred. Please try again.");
-      }
+      setErrorMessage(
+        error.response?.data?.msg || "An error occurred. Please try again."
+      );
       setTimeout(() => {
         setErrorMessage("");
       }, 5000);
     }
   };
-
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     if (
@@ -71,7 +68,7 @@ function Login() {
       sessionStorage.getItem("logoutMessageShown") === "true"
     ) {
       setShowLogoutMessage(true);
-      // Clear flag after showing the message
+
       sessionStorage.removeItem("logoutMessageShown");
       sessionStorage.removeItem("loginMessageShown");
 

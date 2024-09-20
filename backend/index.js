@@ -2,14 +2,21 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken"); // Added for JWT
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 6001;
 
 // Middleware
-app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
+const corsOptions = {
+  origin: "http://localhost:5173", // Origin of the frontend
+  credentials: true, // Allow cookies and credentials to be sent
+};
+
+app.use(cors(corsOptions));
 
 // Database Connection
 mongoose

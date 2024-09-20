@@ -272,12 +272,9 @@ exports.sendOTP = async (req, res) => {
   }
 };
 
-// Login user
-
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log("Login attempt with email:", email);
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -286,7 +283,7 @@ exports.loginUser = async (req, res) => {
 
     if (!user.isVerified) {
       return res.status(400).json({
-        msg: "Account not verified. Register your account once again to get verified ",
+        msg: "Account not verified. Register your account once again to get verified",
       });
     }
 
@@ -305,23 +302,26 @@ exports.loginUser = async (req, res) => {
         role: user.role,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" } // Token expires in 1 day 1d
+      { expiresIn: "1d" }
     );
-    const decodedToken = jwt.decode(token);
-    if (decodedToken) {
-      const { exp } = decodedToken;
-      const expiresAt = new Date(exp * 1000); // Convert exp to milliseconds
-      console.log(`Token contents:`, decodedToken);
-      console.log(`Token expires at:`, expiresAt.toString());
-    }
 
-    // Log login event
-    console.log(`User logged in: ${user._id}, Email: ${user.email}`);
+    const decodedToken = jwt.decode(token);
+    const expirationTime = new Date(decodedToken.exp * 1000); // Convert to milliseconds
+
+    console.log("Token Contents:", decodedToken);
+    console.log("Token Expiration Time:", expirationTime.toLocaleString());
+
+    // Set token in HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true, // Secure cookie, not accessible via JavaScript
+      secure: process.env.NODE_ENV === "production", // Only send via HTTPS in production
+      sameSite: "strict", // Strict SameSite policy to prevent CSRF attacks
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
 
     res.status(200).json({
       success: true,
       msg: "Login successful",
-      token,
       role: user.role,
     });
   } catch (err) {
@@ -333,11 +333,11 @@ exports.loginUser = async (req, res) => {
 // Logout user
 exports.logoutUser = async (req, res) => {
   try {
-    // JWT is stateless, so to "log out", you simply tell the client to remove the token
+    res.clearCookie("token");
     console.log(`User logged out: ${req.user.id}, Email: ${req.user.email}`);
 
     res.status(200).json({
-      msg: "Logout successful. Please remove the token on the client side.",
+      msg: "Logout successful. Cookie cleared.",
     });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });

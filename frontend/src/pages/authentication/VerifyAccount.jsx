@@ -15,6 +15,7 @@ function VerifyAccount() {
   const [otpSent, setOtpSent] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modal2Visible, setModal2Visible] = useState(false);
+  const [modal3Visible, setModal3Visible] = useState(false);
   const navigate = useNavigate();
 
   const clearErrorAfterDelay = () => {
@@ -172,6 +173,32 @@ function VerifyAccount() {
     sessionStorage.removeItem("userEmail");
     navigate("/login");
   };
+  const handleReturnModal = () => {
+    setModal2Visible(false);
+    sessionStorage.removeItem("userEmail");
+    navigate("/register");
+  };
+  useEffect(() => {
+    const handlePopState = (event) => {
+      if (modal3Visible) {
+        // If the modal is visible, prevent default behavior and keep showing the modal
+        event.preventDefault();
+        setModal3Visible(true);
+      } else {
+        // If modal is not visible, show the modal instead of navigating back
+        setModal3Visible(true);
+        window.history.pushState(null, null, window.location.href); // Push the current state again to prevent going back
+      }
+    };
+
+    // Initial state push
+    window.history.pushState(null, null, window.location.href);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [modal2Visible]);
   return (
     <>
       <Header />
@@ -288,7 +315,8 @@ function VerifyAccount() {
             <div className="modal-box">
               <h3 className="font-bold text-lg">Warning!</h3>
               <p className="py-4">
-                Are you sure you want to cancel verification process?
+                Canceling the verification process will prevent the completion
+                of your account.
               </p>
               <div className="modal-action">
                 <button
@@ -301,6 +329,32 @@ function VerifyAccount() {
                 <button
                   className="btn bg-red text-white w-20"
                   onClick={() => setModal2Visible(false)}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </dialog>
+        )}
+        {modal3Visible && (
+          <dialog id="my_modal_5" className="modal modal-middle " open>
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Warning!</h3>
+              <p className="py-4">
+                Are you sure you want to go back to the Registration Page? Doing
+                so will cancel the process of completing your account.
+              </p>
+              <div className="modal-action">
+                <button
+                  className="btn bg-green text-white w-20"
+                  onClick={handleReturnModal}
+                >
+                  Yes
+                </button>
+
+                <button
+                  className="btn bg-red text-white w-20"
+                  onClick={() => setModal3Visible(false)}
                 >
                   No
                 </button>

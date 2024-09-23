@@ -205,20 +205,16 @@ exports.verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
-    // Find the OTP record in the database using the email and OTP provided
     const otpRecord = await OTP.findOne({ email, otp });
-
     if (!otpRecord) {
-      // OTP does not match, send invalid OTP response
       return res.status(400).json({ msg: "Invalid OTP" });
     }
 
-    // OTP is valid, update the user's verification status
     await User.updateOne({ email }, { isVerified: true });
-
-    // Delete OTP after successful verification
     await OTP.deleteOne({ email, otp });
 
+    // Remove email cookie on successful verification
+    res.clearCookie("userEmail");
     res.status(200).json({ msg: "User verified successfully" });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });

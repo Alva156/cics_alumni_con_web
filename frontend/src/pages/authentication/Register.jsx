@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Cookies from "js-cookie";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import signupImage from "../../assets/signup_image.jpg";
@@ -56,6 +57,7 @@ function Register() {
       setError("Please fill in all required fields");
       return;
     }
+
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     if (!passwordRegex.test(password)) {
@@ -76,30 +78,23 @@ function Register() {
         formData
       );
 
-      // If user is already registered but not verified
-      if (response.status === 200 && response.data.redirect) {
-        setError(response.data.msg); // Show the message
+      if (response.status === 200 || response.status === 201) {
+        setError(response.data.msg);
+        // Store email in cookies instead of session storage
+        Cookies.set("userEmail", email, {
+          secure: true, // Ensures the cookie is only sent over HTTPS
+          sameSite: "Strict", // Prevents the cookie from being sent in cross-site requests
+          expires: new Date(new Date().getTime() + 10 * 60 * 1000), // 10 minutes (1/144 of a day) 10 *60 * 1000
+        });
 
         setTimeout(() => {
-          sessionStorage.setItem("userEmail", email); // Save email to session storage
-          navigate(response.data.redirect); // Redirect to OTP verification page
-        }, 3000); // Redirect after 3 seconds for unverified users
-      }
-
-      if (response.status === 201 && response.data.redirect) {
-        sessionStorage.setItem("userEmail", email); // Save email to session storage
-        navigate(response.data.redirect);
+          navigate(response.data.redirect);
+        }, 3000);
       }
     } catch (error) {
-      if (error.response) {
-        setError(
-          error.response.data.msg || "An error occurred during registration"
-        );
-      } else if (error.request) {
-        setError("No response from server");
-      } else {
-        setError("Error in request setup");
-      }
+      setError(
+        error.response?.data?.msg || "An error occurred during registration"
+      );
     }
   };
   return (

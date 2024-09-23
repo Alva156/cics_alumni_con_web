@@ -3,6 +3,7 @@ import axios from "axios";
 import Header from "../../components/Header";
 import verifyaccountImage from "../../assets/verifyaccount_image.jpg";
 import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 function VerifyAccount() {
   const [otpType, setOtpType] = useState(null);
@@ -26,11 +27,10 @@ function VerifyAccount() {
   };
 
   useEffect(() => {
-    const storedEmail = sessionStorage.getItem("userEmail"); // Retrieve email from session storage
+    const storedEmail = Cookies.get("userEmail"); // Get email from cookies
     if (storedEmail) {
       setEmail(storedEmail);
     } else {
-      // Handle case where email is not found
       setError("No email address found. Please register again.");
       setTimeout(() => navigate("/register"), 3000); // Redirect after 3 seconds
     }
@@ -107,35 +107,20 @@ function VerifyAccount() {
     setError("");
 
     try {
-      // Send OTP and email to backend for verification
       const response = await axios.post("http://localhost:6001/users/verify", {
         email,
         otp,
       });
 
-      // Handle backend response for successful OTP verification
-      if (
-        response.status === 200 &&
-        response.data.msg === "User verified successfully"
-      ) {
-        setModalVisible(true);
+      if (response.status === 200) {
+        setSuccess("OTP verified successfully.");
+        setModalVisible(true); // Show modal on success
       }
     } catch (error) {
-      // If the OTP is invalid, it should return a 400 status
-      if (
-        error.response &&
-        error.response.status === 400 &&
-        error.response.data.msg === "Invalid OTP"
-      ) {
-        setError("Invalid OTP");
-      } else {
-        // Handle other errors, such as server issues
-        setError("An error occurred during OTP verification");
-        console.error("Error verifying OTP:", error);
-      }
+      setError("Invalid OTP");
+      clearErrorAfterDelay();
     }
 
-    clearErrorAfterDelay();
     setLoading(false);
   };
 
@@ -165,40 +150,40 @@ function VerifyAccount() {
 
   const handleCloseModal = () => {
     setModalVisible(false);
-    sessionStorage.removeItem("userEmail");
+    Cookies.remove("userEmail");
     navigate("/login");
   };
   const handleCancelModal = () => {
-    setModal2Visible(false);
-    sessionStorage.removeItem("userEmail");
+    console.log("Cancel button pressed");
+    Cookies.remove("userEmail");
+    console.log("Cookie removed, redirecting to login");
     navigate("/login");
   };
   const handleReturnModal = () => {
     setModal2Visible(false);
-    sessionStorage.removeItem("userEmail");
+    Cookies.remove("userEmail");
     navigate("/register");
   };
   useEffect(() => {
     const handlePopState = (event) => {
+      Cookies.remove("userEmail");
+
       if (modal3Visible) {
-        // If the modal is visible, prevent default behavior and keep showing the modal
         event.preventDefault();
         setModal3Visible(true);
       } else {
-        // If modal is not visible, show the modal instead of navigating back
         setModal3Visible(true);
-        window.history.pushState(null, null, window.location.href); // Push the current state again to prevent going back
+        window.history.pushState(null, null, window.location.href);
       }
     };
 
-    // Initial state push
     window.history.pushState(null, null, window.location.href);
     window.addEventListener("popstate", handlePopState);
 
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [modal2Visible]);
+  }, [modal3Visible]);
   return (
     <>
       <Header />

@@ -358,3 +358,101 @@ exports.logoutUser = async (req, res) => {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
+//FORGET PASS
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ msg: "Email not found" });
+    }
+
+    // Generate a new OTP and save it
+    const otp = generateOTP();
+    const otpEntry = await OTP.findOneAndUpdate(
+      { email },
+      { otp }, // Update existing OTP entry
+      { new: true, upsert: true } // Create if not exists
+    );
+
+    // Send OTP via email (using nodemailer)
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP Code for Password Reset",
+      text: `Your OTP code is ${otp}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`OTP sent to ${email}: ${otp}`); // Console log for OTP sent
+
+    return res.status(200).json({ msg: "OTP resent to email" });
+  } catch (err) {
+    return res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
+
+exports.verifyOTPPassword = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const otpRecord = await OTP.findOne({ email, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ msg: "Invalid OTP" });
+    }
+
+    // OTP is valid, delete OTP entry
+    await OTP.deleteOne({ email, otp });
+
+    // Set a secure cookie for email
+    res.cookie("userEmail", email, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+    });
+
+    // Respond with a success message
+    res.status(200).json({ msg: "OTP verified successfully" });
+  } catch (err) {
+    return res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  const email = req.cookies.userEmail;
+  const { newPassword } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ msg: "Email cookie not set" });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ msg: "User not found" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    // Clear the email cookie after the password is reset
+    res.clearCookie("userEmail");
+
+    return res.status(200).json({ msg: "Password reset successfully" });
+  } catch (err) {
+    return res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};

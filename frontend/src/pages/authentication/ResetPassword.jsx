@@ -1,15 +1,146 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie";
 import Header from "../../components/Header";
+import { useNavigate } from "react-router-dom";
 import resetpasswordImage from "../../assets/resetpassword_image.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 
 function ResetPassword() {
+  const [formData, setFormData] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modal2Visible, setModal2Visible] = useState(false);
+  const [modal3Visible, setModal3Visible] = useState(false);
+  const { newPassword, confirmPassword } = formData;
+
+  const clearErrorAfterDelay = () => {
+    setTimeout(() => setError(""), 5000);
+  };
+
+  const clearSuccessAfterDelay = () => {
+    setTimeout(() => setSuccess(""), 5000);
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      setError("Password must meet the complexity requirements.");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:6001/users/resetpassword",
+        { newPassword },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        setSuccess("Password reset successfully.");
+        setModalVisible(true); // Show modal on success
+      } else {
+        setError("Failed to reset password");
+        clearErrorAfterDelay();
+      }
+    } catch (err) {
+      console.error("Error resetting password:", err);
+      setError("Server error occurred");
+      clearErrorAfterDelay();
+    }
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    navigate("/login"); // Redirect to login after closing the modal
+  };
+
+  const handleCancelModal = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:6001/users/cancel",
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Error cancelling:", error);
+    }
+  };
+  const handleReturnModal = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:6001/users/cancel",
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        navigate("/forgotpassword");
+      }
+    } catch (error) {
+      console.error("Error cancelling:", error);
+    }
+  };
+  useEffect(() => {
+    const handlePopState = (event) => {
+      // Prevent default back behavior if modal is visible
+      event.preventDefault();
+
+      // Show the modal first
+      setModal3Visible(true);
+
+      // Push a new state to prevent the default back behavior
+      window.history.pushState(null, null, window.location.href);
+    };
+
+    // Push an initial state when component mounts
+    window.history.pushState(null, null, window.location.href);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [modal3Visible]);
 
   return (
     <>
@@ -26,6 +157,10 @@ function ResetPassword() {
                 Please provide a new password for your account.
               </p>
             </div>
+            <div className="mb-4">
+              {success && <p className="text-green">{success}</p>}
+              {error && <p className="text-red">{error}</p>}
+            </div>
 
             <label className="block mb-2 text-sm font-medium">
               New Password *
@@ -33,8 +168,11 @@ function ResetPassword() {
             <div className="relative mb-6">
               <input
                 type={showPassword ? "text" : "password"}
+                name="newPassword"
                 placeholder="Enter your new password"
                 className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                value={formData.newPassword}
+                onChange={handleChange}
                 style={{ height: "40px" }}
               />
               <span
@@ -47,33 +185,42 @@ function ResetPassword() {
                 />
               </span>
             </div>
-
-            <label className="block mb-2 text-sm font-medium">
+            {/* Password requirements here */}
+            <label className="block mb-1 mt-4 text-sm font-medium">
               Confirm New Password *
             </label>
             <div className="relative mb-6">
               <input
-                type={showPassword ? "text" : "password"}
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
                 placeholder="Confirm your new password"
                 className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                value={formData.confirmPassword}
+                onChange={handleChange}
                 style={{ height: "40px" }}
               />
               <span
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-                onClick={togglePasswordVisibility}
+                onClick={toggleConfirmPasswordVisibility}
               >
                 <FontAwesomeIcon
-                  icon={showPassword ? faEye : faEyeSlash}
+                  icon={showConfirmPassword ? faEye : faEyeSlash}
                   className="text-black"
                 />
               </span>
             </div>
 
-            <button className="bg-[#056E34] text-white text-lg py-2 px-6 w-64 mb-2 mt-0 transition duration-300 ease-in-out hover:bg-[#004A1C]">
+            <button
+              onClick={handleSubmit}
+              className="bg-[#056E34] text-white text-lg py-2 px-6 w-64 mb-2 mt-0 transition duration-300 ease-in-out hover:bg-[#004A1C]"
+            >
               Confirm
             </button>
 
-            <button className="bg-[#C5C5C5] text-black text-lg py-2 px-6 w-64 transition duration-300 ease-in-out hover:bg-[#A8A8A8]">
+            <button
+              onClick={() => setModal2Visible(true)}
+              className="bg-[#C5C5C5] text-black text-lg py-2 px-6 w-64 transition duration-300 ease-in-out hover:bg-[#A8A8A8]"
+            >
               Cancel
             </button>
           </div>
@@ -88,6 +235,75 @@ function ResetPassword() {
             className="object-cover w-full h-full"
           />
         </div>
+
+        {modalVisible && (
+          <dialog id="my_modal_5" className="modal modal-middle" open>
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Reset Password Successful</h3>
+              <p className="py-4">You can now log in with your new password.</p>
+              <div className="modal-action">
+                <button
+                  onClick={handleCloseModal}
+                  className="bg-green text-white py-2 px-4 rounded hover:bg-green"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </dialog>
+        )}
+
+        {modal2Visible && (
+          <dialog id="my_modal_5" className="modal modal-middle" open>
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Warning!</h3>
+              <p className="py-4">
+                Canceling the reset password process will prevent the completion
+                of your account.
+              </p>
+              <div className="modal-action">
+                <button
+                  className="btn bg-green text-white w-20"
+                  onClick={handleCancelModal}
+                >
+                  Yes
+                </button>
+                <button
+                  className="btn bg-red text-white w-20"
+                  onClick={() => setModal2Visible(false)}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </dialog>
+        )}
+        {modal3Visible && (
+          <dialog id="my_modal_5" className="modal modal-middle " open>
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Warning!</h3>
+              <p className="py-4">
+                Are you sure you want to go back to the OTP page? Doing so will
+                cancel the process of completing your account.
+              </p>
+              <div className="modal-action">
+                <button
+                  className="btn bg-green text-white w-20"
+                  onClick={handleReturnModal}
+                >
+                  Yes
+                </button>
+
+                <button
+                  className="btn bg-red text-white w-20"
+                  onClick={() => setModal3Visible(false)}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </dialog>
+        )}
       </div>
     </>
   );

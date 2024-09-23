@@ -8,6 +8,9 @@ router.post("/verify", userController.verifyOTP);
 router.post("/sendotp", userController.sendOTP);
 router.post("/login", userController.loginUser);
 router.post("/cancel", userController.cancel);
+router.post("/forget", userController.forgotPassword);
+router.post("/verifypassword", userController.verifyOTPPassword);
+router.post("/resetpassword", userController.resetPassword);
 router.post("/logout", authenticateJWT, userController.logoutUser);
 
 router.get("/protected", authenticateJWT, (req, res) => {

@@ -31,7 +31,7 @@ function VerifyAccount() {
     if (storedEmail) {
       setEmail(storedEmail);
     } else {
-      setError("No email address found. Please register again.");
+      setError("Session expired. Register again");
       setTimeout(() => navigate("/register"), 3000); // Redirect after 3 seconds
     }
   }, [navigate]);
@@ -148,35 +148,68 @@ function VerifyAccount() {
     setLoading(false);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
     setModalVisible(false);
-    Cookies.remove("userEmail");
-    navigate("/login");
+    try {
+      // Make a request to the backend to remove the cookie
+      const response = await axios.post("http://localhost:6001/users/cancel");
+
+      if (response.status === 200) {
+        // Remove the cookie on the client side
+        Cookies.remove("userEmail");
+
+        // Redirect to the desired page
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Error cancelling:", error);
+    }
   };
-  const handleCancelModal = () => {
-    console.log("Cancel button pressed");
-    Cookies.remove("userEmail");
-    console.log("Cookie removed, redirecting to login");
-    navigate("/login");
+  const handleCancelModal = async () => {
+    try {
+      // Make a request to the backend to remove the cookie
+      const response = await axios.post("http://localhost:6001/users/cancel");
+
+      if (response.status === 200) {
+        // Immediately remove the cookie on the client side
+        Cookies.remove("userEmail");
+
+        // Redirect to the login page
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Error cancelling:", error);
+    }
   };
-  const handleReturnModal = () => {
-    setModal2Visible(false);
-    Cookies.remove("userEmail");
-    navigate("/register");
+  const handleReturnModal = async () => {
+    try {
+      // Make a request to the backend to remove the cookie
+      const response = await axios.post("http://localhost:6001/users/cancel");
+
+      if (response.status === 200) {
+        // Remove the cookie on the client side
+        Cookies.remove("userEmail");
+
+        // Redirect to the desired page
+        navigate("/register");
+      }
+    } catch (error) {
+      console.error("Error cancelling:", error);
+    }
   };
   useEffect(() => {
     const handlePopState = (event) => {
-      Cookies.remove("userEmail");
+      // Prevent default back behavior if modal is visible
+      event.preventDefault();
 
-      if (modal3Visible) {
-        event.preventDefault();
-        setModal3Visible(true);
-      } else {
-        setModal3Visible(true);
-        window.history.pushState(null, null, window.location.href);
-      }
+      // Show the modal first
+      setModal3Visible(true);
+
+      // Push a new state to prevent the default back behavior
+      window.history.pushState(null, null, window.location.href);
     };
 
+    // Push an initial state when component mounts
     window.history.pushState(null, null, window.location.href);
     window.addEventListener("popstate", handlePopState);
 

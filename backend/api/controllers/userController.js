@@ -191,6 +191,14 @@ exports.registerUser = async (req, res) => {
 
     await newUser.save();
 
+    // Set a secure cookie for email
+    res.cookie("userEmail", email, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Only true in production
+      sameSite: "Strict", // Only sent in same-site requests
+      maxAge: 10 * 60 * 1000, // 10 minutes
+    });
+
     return res.status(201).json({
       redirect: "/verifyaccount",
     });
@@ -215,6 +223,7 @@ exports.verifyOTP = async (req, res) => {
 
     // Remove email cookie on successful verification
     res.clearCookie("userEmail");
+
     res.status(200).json({ msg: "User verified successfully" });
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
@@ -266,6 +275,16 @@ exports.sendOTP = async (req, res) => {
   } catch (err) {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
+};
+
+// if the user cancel or return to the regis page
+exports.cancel = (req, res) => {
+  res.clearCookie("userEmail", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+  });
+  res.status(200).json({ msg: "Cancelled, cookie removed" });
 };
 
 exports.loginUser = async (req, res) => {

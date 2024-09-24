@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
 
 function AdminCompanies() {
   const [selectedCompany, setSelectedCompany] = useState(null);
@@ -7,31 +8,28 @@ function AdminCompanies() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [companies, setCompanies] = useState([]);
   const modalRef = useRef(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const companies = [
-    {
-      name: "Company Name",
-      address: "Address",
-      image: "",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      contact: "Contact Details",
-    },
-    {
-      name: "Company Name",
-      address: "Address",
-      image: "",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      contact: "Contact Details",
-    },
-    {
-      name: "Company Name",
-      address: "Address",
-      image: "",
-      description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      contact: "Contact Details",
-    },
-  ];
+  // Fetch all companies from the server
+  const fetchCompanies = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:6001/companies/companies",
+        {
+          withCredentials: true,
+        }
+      );
+      setCompanies(response.data);
+    } catch (error) {
+      console.error("Error fetching companies:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanies();
+  }, []);
 
   const openViewModal = (company) => {
     setSelectedCompany(company);
@@ -55,19 +53,89 @@ function AdminCompanies() {
     setSelectedCompany(null);
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        closeModal();
-      }
+  const handleDeleteCompany = async () => {
+    if (!selectedCompany) {
+      console.log("No company selected for deletion.");
+      return;
+    }
+
+    console.log("Deleting company with ID:", selectedCompany._id); // Debugging line
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:6001/companies/delete-companies/${selectedCompany._id}`,
+        { withCredentials: true }
+      );
+
+      console.log("Delete response:", response.data); // Debugging line
+      fetchCompanies(); // Refresh company list
+      closeModal(); // Close modal after deleting
+    } catch (error) {
+      console.error(
+        "Error deleting company:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
+
+  const handleUpdateCompany = async () => {
+    if (!selectedCompany) return;
+
+    try {
+      const response = await axios.put(
+        `http://localhost:6001/companies/update-companies/${selectedCompany._id}`,
+        {
+          name: selectedCompany.name,
+          address: selectedCompany.address,
+          image: selectedCompany.image,
+          description: selectedCompany.description,
+          contact: selectedCompany.contact,
+        },
+        { withCredentials: true }
+      );
+
+      setCompanies((prevCompanies) =>
+        prevCompanies.map((company) =>
+          company._id === selectedCompany._id ? response.data : company
+        )
+      );
+
+      closeModal(); // Close modal after updating
+    } catch (error) {
+      console.error("Error updating company:", error);
+    }
+  };
+
+  const handleCreateCompany = async () => {
+    const companyData = {
+      name: document.getElementById("company-name").value,
+      address: document.getElementById("company-address").value,
+      image: "", // Handle image upload separately
+      description: document.getElementById("company-description").value,
+      contact: document.getElementById("company-contact").value,
     };
 
-    if (isViewModalOpen || isEditModalOpen || isAddModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
+    try {
+      const response = await axios.post(
+        "http://localhost:6001/companies/create-companies",
+        companyData,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setCompanies([...companies, response.data]); // Update companies list
+      setSelectedCompany(null); // Clear selected company
+      setIsAddModalOpen(false); // Close the modal
+      // Optionally reset input fields if necessary
+      document.getElementById("company-name").value = "";
+      document.getElementById("company-address").value = "";
+      document.getElementById("company-description").value = "";
+      document.getElementById("company-contact").value = "";
+    } catch (error) {
+      console.error("Error creating company:", error);
     }
-  }, [isViewModalOpen, isEditModalOpen, isAddModalOpen]);
+  };
 
   const filteredCompanies = companies.filter((company) =>
     company.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -113,9 +181,9 @@ function AdminCompanies() {
 
       <hr className="mb-6 border-black" />
 
-      {filteredCompanies.map((company, index) => (
+      {filteredCompanies.map((company) => (
         <div
-          key={index}
+          key={company._id}
           className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
           onClick={() => openViewModal(company)}
         >
@@ -128,7 +196,8 @@ function AdminCompanies() {
               className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-4 relative group"
               onClick={(e) => {
                 e.stopPropagation();
-                console.log("Delete action");
+                setSelectedCompany(company); // Set the company to delete
+                setIsDeleteModalOpen(true); // Open the delete modal
               }}
             >
               <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
@@ -180,10 +249,10 @@ function AdminCompanies() {
               {selectedCompany.contact}
             </div>
             <a
-              href={`mailto:company@gmail.com`}
+              href={`mailto:${selectedCompany.contact}`}
               className="block text-sm text-blue-600 underline"
             >
-              company@gmail.com
+              {selectedCompany.contact}
             </a>
           </div>
         </div>
@@ -211,7 +280,13 @@ function AdminCompanies() {
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                defaultValue={selectedCompany.name}
+                value={selectedCompany.name}
+                onChange={(e) =>
+                  setSelectedCompany({
+                    ...selectedCompany,
+                    name: e.target.value,
+                  })
+                }
               />
             </div>
             <div className="mb-4">
@@ -219,55 +294,90 @@ function AdminCompanies() {
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                defaultValue={selectedCompany.address}
+                value={selectedCompany.address}
+                onChange={(e) =>
+                  setSelectedCompany({
+                    ...selectedCompany,
+                    address: e.target.value,
+                  })
+                }
               />
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-1">Company Image</label>
-              <div className="relative w-full border border-black bg-gray-100 rounded-lg px-4 py-2 text-sm">
-                <input
-                  type="file"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              <div className="relative w-full border border-black rounded-lg">
+                <img
+                  src={selectedCompany.image}
+                  alt={selectedCompany.name}
+                  className="mb-2 w-full h-48 object-cover rounded"
                 />
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Attach file...</span>
-                  <i className="fas fa-paperclip text-gray-500"></i>
-                </div>
               </div>
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Company Description</label>
+              <label className="block text-sm mb-1">Description</label>
               <textarea
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                defaultValue={selectedCompany.description}
-                rows="7"
+                value={selectedCompany.description}
+                onChange={(e) =>
+                  setSelectedCompany({
+                    ...selectedCompany,
+                    description: e.target.value,
+                  })
+                }
               />
             </div>
-
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact Details</label>
+              <label className="block text-sm mb-1">Contact</label>
               <input
                 type="text"
-                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm mb-4"
-                defaultValue={selectedCompany.contact}
+                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+                value={selectedCompany.contact}
+                onChange={(e) =>
+                  setSelectedCompany({
+                    ...selectedCompany,
+                    contact: e.target.value,
+                  })
+                }
               />
             </div>
-
-            <div className="flex flex-col md:flex-row justify-center gap-4 mb-4">
+            <div className="flex justify-end">
               <button
-                className="btn bg-zinc-800 text-white w-full md:w-64 py-2 rounded-lg"
+                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
-                className="btn bg-green text-white w-full md:w-64 py-2 rounded-lg"
-                onClick={() => {
-                  console.log("Save action");
-                  closeModal();
-                }}
+                onClick={handleUpdateCompany}
+                className="bg-green-500 text-white px-4 py-2 rounded"
               >
                 Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Company</h2>
+            <p>Are you sure you want to delete this company?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={() => {
+                  handleDeleteCompany(); // Call the delete function
+                  setIsDeleteModalOpen(false); // Close the modal after deletion
+                }}
+              >
+                Delete
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
               </button>
             </div>
           </div>
@@ -290,67 +400,56 @@ function AdminCompanies() {
             >
               &times;
             </button>
-            <div className="text-xl mb-3">Add Company</div>
+            <div className="text-xl mb-3">Add New Company</div>
             <div className="mb-4">
               <label className="block text-sm mb-1">Company Name</label>
               <input
+                id="company-name"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter company name"
               />
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-1">Address</label>
               <input
+                id="company-address"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter company address"
               />
             </div>
             <div className="mb-4">
               <label className="block text-sm mb-1">Company Image</label>
-              <div className="relative w-full border border-black bg-gray-100 rounded-lg px-4 py-2 text-sm">
-                <input
-                  type="file"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Attach file...</span>
-                  <i className="fas fa-paperclip text-gray-500"></i>
-                </div>
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm mb-1">Company Description</label>
-              <textarea
-                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter company description"
-                rows="7"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm mb-1">Contact Details</label>
               <input
-                type="text"
-                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm mb-4"
-                placeholder="Enter contact details"
+                type="file"
+                accept="image/*"
+                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
               />
             </div>
-
-            <div className="flex flex-col md:flex-row justify-center gap-4 mb-4">
+            <div className="mb-4">
+              <label className="block text-sm mb-1">Description</label>
+              <textarea
+                id="company-description"
+                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm mb-1">Contact</label>
+              <input
+                id="company-contact"
+                type="text"
+                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+              />
+            </div>
+            <div className="flex justify-end">
               <button
-                className="btn bg-zinc-800 text-white w-full md:w-64 py-2 rounded-lg"
+                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
-                className="btn bg-green text-white w-full md:w-64 py-2 rounded-lg"
-                onClick={() => {
-                  console.log("Add action");
-                  closeModal();
-                }}
+                className="bg-green-500 text-white px-4 py-2 rounded"
+                onClick={handleCreateCompany}
               >
                 Add
               </button>

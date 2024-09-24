@@ -3,7 +3,6 @@ import axios from "axios";
 import Header from "../../components/Header";
 import verifyaccountImage from "../../assets/verifyaccount_image.jpg";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 
 function VerifyAccount() {
   const [otpType, setOtpType] = useState(null);
@@ -27,13 +26,28 @@ function VerifyAccount() {
   };
 
   useEffect(() => {
-    const storedEmail = Cookies.get("userEmail"); // Get email from cookies
-    if (storedEmail) {
-      setEmail(storedEmail);
-    } else {
-      setError("Session expired. Register again");
-      setTimeout(() => navigate("/register"), 3000); // Redirect after 3 seconds
-    }
+    const fetchEmail = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:6001/users/getemail",
+          {
+            withCredentials: true, // Include this to ensure cookies are sent
+          }
+        );
+        if (response.data.email) {
+          setEmail(response.data.email);
+        } else {
+          setError("Session expired. Register again");
+          setTimeout(() => navigate("/register"), 3000); // Redirect after 3 seconds
+        }
+      } catch (error) {
+        console.error("Error retrieving email:", error);
+        setError("Session expired. Register again");
+        setTimeout(() => navigate("/register"), 3000);
+      }
+    };
+
+    fetchEmail();
   }, [navigate]);
 
   useEffect(() => {
@@ -149,32 +163,30 @@ function VerifyAccount() {
   };
 
   const handleCloseModal = async () => {
-    setModalVisible(false);
     try {
-      // Make a request to the backend to remove the cookie
-      const response = await axios.post("http://localhost:6001/users/cancel");
+      const response = await axios.post(
+        "http://localhost:6001/users/cancel",
+        {},
+        { withCredentials: true }
+      );
 
       if (response.status === 200) {
-        // Remove the cookie on the client side
-        Cookies.remove("userEmail");
-
-        // Redirect to the desired page
         navigate("/login");
       }
     } catch (error) {
       console.error("Error cancelling:", error);
     }
   };
+
   const handleCancelModal = async () => {
     try {
-      // Make a request to the backend to remove the cookie
-      const response = await axios.post("http://localhost:6001/users/cancel");
+      const response = await axios.post(
+        "http://localhost:6001/users/cancel",
+        {},
+        { withCredentials: true }
+      );
 
       if (response.status === 200) {
-        // Immediately remove the cookie on the client side
-        Cookies.remove("userEmail");
-
-        // Redirect to the login page
         navigate("/login");
       }
     } catch (error) {
@@ -183,14 +195,13 @@ function VerifyAccount() {
   };
   const handleReturnModal = async () => {
     try {
-      // Make a request to the backend to remove the cookie
-      const response = await axios.post("http://localhost:6001/users/cancel");
+      const response = await axios.post(
+        "http://localhost:6001/users/cancel",
+        {},
+        { withCredentials: true }
+      );
 
       if (response.status === 200) {
-        // Remove the cookie on the client side
-        Cookies.remove("userEmail");
-
-        // Redirect to the desired page
         navigate("/register");
       }
     } catch (error) {

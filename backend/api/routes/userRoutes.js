@@ -12,8 +12,8 @@ router.post("/forget", userController.forgotPassword);
 router.post("/verifypassword", userController.verifyOTPPassword);
 router.post("/resetpassword", userController.resetPassword);
 router.post("/logout", authenticateJWT, userController.logoutUser);
-
 router.get("/protected", authenticateJWT, (req, res) => {
   res.status(200).json({ msg: "Token is valid" });
 });
+router.get("/getemail", userController.getEmailFromCookie);
 module.exports = router;

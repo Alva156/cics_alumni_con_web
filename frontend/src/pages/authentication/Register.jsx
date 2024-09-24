@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Cookies from "js-cookie";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import signupImage from "../../assets/signup_image.jpg";
@@ -38,9 +37,6 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
-    setTimeout(() => {
-      setError("");
-    }, 10000);
     e.preventDefault();
 
     const { firstName, lastName, birthday, email, password, confirmPassword } =
@@ -58,15 +54,6 @@ function Register() {
       return;
     }
 
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      setError(
-        "Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character."
-      );
-      return;
-    }
-
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -75,21 +62,17 @@ function Register() {
     try {
       const response = await axios.post(
         "http://localhost:6001/users/register",
-        formData
+        formData,
+        { withCredentials: true } // Ensure credentials are sent for cookie setting
       );
 
-      if (response.status === 200 || response.status === 201) {
+      if (response.status === 200) {
         setError(response.data.msg);
-        // Store email in cookies instead of session storage
-        Cookies.set("userEmail", email, {
-          secure: true, // Ensures the cookie is only sent over HTTPS
-          sameSite: "Strict", // Prevents the cookie from being sent in cross-site requests
-          expires: new Date(new Date().getTime() + 10 * 60 * 1000), // 10 minutes (1/144 of a day) 10 *60 * 1000
-        });
-
         setTimeout(() => {
-          navigate(response.data.redirect);
+          navigate("/verifyaccount");
         }, 3000);
+      } else {
+        setError(response.data.msg || "An error occurred during registration");
       }
     } catch (error) {
       setError(
@@ -97,6 +80,7 @@ function Register() {
       );
     }
   };
+
   return (
     <>
       <Header />

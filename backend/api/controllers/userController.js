@@ -88,6 +88,15 @@ exports.registerUser = async (req, res) => {
 
     if (existingUser) {
       if (!existingUser.isVerified) {
+        // Set email in cookie
+        console.log("Attempting to set cookie for email:", email);
+        res.cookie("userEmail", email, {
+          httpOnly: true, // Set to false so frontend can access it
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 10 * 60 * 1000, // 1 day expiration
+        });
+
         return res.status(200).json({
           msg: "User not verified. Redirecting to OTP verification.",
           redirect: "/verifyaccount",
@@ -97,26 +106,31 @@ exports.registerUser = async (req, res) => {
       }
     }
 
-    // To check if a user with the same name and birthday already exists (regardless of email)
+    // Check for duplicate user by name and birthday
     const duplicateUser = await User.findOne({
-      firstName: firstName,
-      lastName: lastName,
-      birthday: birthday,
+      firstName,
+      lastName,
+      birthday,
     });
 
     if (duplicateUser) {
       if (duplicateUser.isVerified) {
-        return res.status(400).json({
-          msg: "Duplicate accounts is not allowed.",
-        });
+        return res.status(400).json({ msg: "Duplicate accounts not allowed." });
       } else {
-        // Update the existing unverified user with the new email
         duplicateUser.email = email;
         duplicateUser.password = await bcrypt.hash(
           password,
           await bcrypt.genSalt(10)
         );
         await duplicateUser.save();
+
+        console.log("Attempting to set cookie for email:", email);
+        res.cookie("userEmail", email, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 10 * 60 * 1000,
+        });
 
         return res.status(200).json({
           msg: "An unverified account with the same name and birthday exists. Redirecting to OTP verification.",
@@ -143,10 +157,7 @@ exports.registerUser = async (req, res) => {
         });
     });
 
-    // Format birthday input to match CSV date format (YYYY-MM-DD)
     const formattedBirthday = formatDateToISO(birthday.trim());
-
-    // Match record in the CSV
     let matchingRecord;
 
     if (studentNum && studentNum.trim() !== "") {
@@ -174,11 +185,9 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Save the new user
     const newUser = new User({
       studentNum: studentNum || "N/A",
       firstName,
@@ -186,25 +195,40 @@ exports.registerUser = async (req, res) => {
       birthday: formattedBirthday,
       email,
       password: hashedPassword,
-      isVerified: false, // Users not yet verified
+      isVerified: false,
     });
 
     await newUser.save();
 
-    // Set a secure cookie for email
-    res.cookie("userEmail", email, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only true in production
-      sameSite: "Strict", // Only sent in same-site requests
-      maxAge: 10 * 60 * 1000, // 10 minutes
-    });
+    try {
+      console.log("Attempting to set cookie for email:", email);
+      res.cookie("userEmail", email, {
+        httpOnly: true, // Set to false so frontend can access it
+        secure: process.env.NODE_ENV === "production", // Only set cookies over HTTPS in production
+        sameSite: "strict", // Can adjust depending on CORS setup
+        maxAge: 10 * 60 * 1000, // 10min expiration for example
+      });
 
-    return res.status(201).json({
-      redirect: "/verifyaccount",
-    });
+      console.log("Cookie set successfully for email:", email);
+
+      res.status(200).json({
+        redirect: "/verifyaccount",
+      });
+    } catch (error) {
+      console.error("Failed to set cookie:", error);
+      return res.status(500).json({ msg: "Internal Server Error" });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
+exports.getEmailFromCookie = (req, res) => {
+  const email = req.cookies.userEmail; // Retrieve the email from the cookie
+  if (email) {
+    return res.status(200).json({ email });
+  } else {
+    return res.status(400).json({ msg: "Session expired" });
   }
 };
 
@@ -221,7 +245,6 @@ exports.verifyOTP = async (req, res) => {
     await User.updateOne({ email }, { isVerified: true });
     await OTP.deleteOne({ email, otp });
 
-    // Remove email cookie on successful verification
     res.clearCookie("userEmail");
 
     res.status(200).json({ msg: "User verified successfully" });

@@ -29,6 +29,8 @@ mongoose
 // Routes
 const userRoutes = require("./api/routes/userRoutes");
 app.use("/users", userRoutes);
+const threadsRoutes = require("./api/routes/threadsRoutes");
+app.use("/threads", threadsRoutes);
 
 // Basic Route
 app.get("/", (req, res) => {

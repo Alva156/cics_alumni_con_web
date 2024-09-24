@@ -9,6 +9,7 @@ function AdminCompanies() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [companies, setCompanies] = useState([]);
+  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
   const modalRef = useRef(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -141,6 +142,16 @@ function AdminCompanies() {
     company.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Sort companies based on selected criteria
+  const sortedCompanies = filteredCompanies.sort((a, b) => {
+    if (sortCriteria === "Name (A-Z)") {
+      return a.name.localeCompare(b.name);
+    } else if (sortCriteria === "Name (Z-A)") {
+      return b.name.localeCompare(a.name);
+    }
+    return 0;
+  });
+
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       <h1 className="text-xl mb-4">Companies</h1>
@@ -163,7 +174,11 @@ function AdminCompanies() {
 
       <div className="mb-6">
         <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortCriteria}
+          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+        >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
         </select>
@@ -245,9 +260,7 @@ function AdminCompanies() {
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
             <div className="text-sm mb-4">{selectedCompany.description}</div>
-            <div className="text-sm font-medium mb-2">
-              {selectedCompany.contact}
-            </div>
+            <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
               href={`mailto:${selectedCompany.contact}`}
               className="block text-sm text-blue-600 underline"
@@ -280,6 +293,7 @@ function AdminCompanies() {
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+                placeholder="Company Name"
                 value={selectedCompany.name}
                 onChange={(e) =>
                   setSelectedCompany({
@@ -303,16 +317,16 @@ function AdminCompanies() {
                 }
               />
             </div>
+
             <div className="mb-4">
               <label className="block text-sm mb-1">Company Image</label>
-              <div className="relative w-full border border-black rounded-lg">
-                <img
-                  src={selectedCompany.image}
-                  alt={selectedCompany.name}
-                  className="mb-2 w-full h-48 object-cover rounded"
-                />
-              </div>
+              <input
+                type="file"
+                accept="image/*"
+                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+              />
             </div>
+
             <div className="mb-4">
               <label className="block text-sm mb-1">Description</label>
               <textarea
@@ -340,16 +354,16 @@ function AdminCompanies() {
                 }
               />
             </div>
-            <div className="flex justify-end">
+            <div className="flex flex-col md:flex-row justify-center gap-4 mb-4">
               <button
-                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                className="btn bg-zinc-800 text-white w-full md:w-64 py-2 rounded-lg"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateCompany}
-                className="bg-green-500 text-white px-4 py-2 rounded"
+                className="btn bg-green text-white w-full md:w-64 py-2 rounded-lg"
               >
                 Save
               </button>
@@ -407,6 +421,7 @@ function AdminCompanies() {
                 id="company-name"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+                placeholder="Enter Company Name"
               />
             </div>
             <div className="mb-4">
@@ -415,6 +430,7 @@ function AdminCompanies() {
                 id="company-address"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+                placeholder="Enter Company Address"
               />
             </div>
             <div className="mb-4">
@@ -430,25 +446,27 @@ function AdminCompanies() {
               <textarea
                 id="company-description"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+                placeholder="Enter Company Description"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact</label>
+              <label className="block text-sm mb-1">Contact Details</label>
               <input
                 id="company-contact"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+                placeholder="Enter Company Details"
               />
             </div>
-            <div className="flex justify-end">
+            <div className="flex flex-col md:flex-row justify-center gap-4 mb-4">
               <button
-                className="bg-red-500 text-white px-4 py-2 rounded mr-2"
+                className="btn bg-zinc-800 text-white w-full md:w-64 py-2 rounded-lg"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
-                className="bg-green-500 text-white px-4 py-2 rounded"
+                className="btn bg-green text-white w-full md:w-64 py-2 rounded-lg"
                 onClick={handleCreateCompany}
               >
                 Add

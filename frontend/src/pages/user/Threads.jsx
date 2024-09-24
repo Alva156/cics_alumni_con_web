@@ -3,29 +3,55 @@ import axios from "axios";
 import sampleidpic from "../../assets/sampleidpic.jpg";
 
 function Threads() {
-  const [threads, setThreads] = useState([]);
+  const [myThreads, setMyThreads] = useState([]);
+  const [allThreads, setAllThreads] = useState([]);
   const [newThread, setNewThread] = useState({ title: "", content: "" });
   const [selectedThread, setSelectedThread] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [threadToDelete, setThreadToDelete] = useState(null); // Add this state for delete
+  const [threadToDelete, setThreadToDelete] = useState(null);
+  const [validationMessage, setValidationMessage] = useState("");
+  const [showValidationMessage, setShowValidationMessage] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const showValidation = (message) => {
+    setValidationMessage(message);
+    setShowValidationMessage(true);
+    setTimeout(() => {
+      setShowValidationMessage(false);
+    }, 3000); // Hide the message after 3 seconds
+  };
+
   useEffect(() => {
-    const fetchThreads = async () => {
+    const fetchAllThreads = async () => {
       try {
         const response = await axios.get("http://localhost:6001/threads/get", {
-          withCredentials: true, // Ensure cookies are sent with the request
+          withCredentials: true,
         });
-        setThreads(response.data); // Set the fetched threads into state
+        setAllThreads(response.data);
       } catch (error) {
-        console.error("Error fetching threads:", error); // Log any errors
+        console.error("Error fetching all threads:", error);
       }
     };
 
-    fetchThreads(); // Invoke the fetch function
+    const fetchMyThreads = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:6001/threads/my-threads",
+          {
+            withCredentials: true,
+          }
+        );
+        setMyThreads(response.data);
+      } catch (error) {
+        console.error("Error fetching my threads:", error);
+      }
+    };
+
+    fetchAllThreads();
+    fetchMyThreads();
   }, []);
 
   const handleCreateThread = async () => {
@@ -36,11 +62,13 @@ function Threads() {
           title: newThread.title,
           content: newThread.content,
         },
-        { withCredentials: true } // <-- Ensure cookies are sent with the request
+        { withCredentials: true }
       );
-      setThreads([...threads, response.data.thread]);
+      setMyThreads([...myThreads, response.data.thread]); // Update myThreads
+      setAllThreads([...allThreads, response.data.thread]); // Update allThreads
       setNewThread({ title: "", content: "" });
       setIsAddModalOpen(false);
+      showValidation("Thread created successfully!");
     } catch (error) {
       console.error("Error creating thread:", error);
     }
@@ -56,34 +84,46 @@ function Threads() {
           title: selectedThread.title,
           content: selectedThread.content,
         },
-        { withCredentials: true } // <-- Ensure cookies are sent with the request
+        { withCredentials: true }
       );
-      setThreads(
-        threads.map((thread) =>
+      setMyThreads(
+        myThreads.map((thread) =>
+          thread._id === selectedThread._id ? response.data.thread : thread
+        )
+      );
+      setAllThreads(
+        allThreads.map((thread) =>
           thread._id === selectedThread._id ? response.data.thread : thread
         )
       );
       setSelectedThread(null);
       setIsEditModalOpen(false);
+      showValidation("Thread updated successfully!");
     } catch (error) {
       console.error("Error updating thread:", error);
     }
   };
 
   const handleDeleteThread = async () => {
-    if (!threadToDelete) return; // Ensure there's a thread selected for deletion
+    if (!threadToDelete) return;
     try {
       await axios.delete(
         `http://localhost:6001/threads/delete/${threadToDelete._id}`,
         {
-          withCredentials: true, // Ensure cookies are sent with the request
+          withCredentials: true,
         }
       );
 
       // Update the threads state to remove the deleted thread
-      setThreads(threads.filter((thread) => thread._id !== threadToDelete._id));
+      setMyThreads(
+        myThreads.filter((thread) => thread._id !== threadToDelete._id)
+      );
+      setAllThreads(
+        allThreads.filter((thread) => thread._id !== threadToDelete._id)
+      );
       setThreadToDelete(null);
-      setIsDeleteModalOpen(false); // Close the delete modal
+      setIsDeleteModalOpen(false);
+      showValidation("Thread deleted successfully!");
     } catch (error) {
       console.error("Error deleting thread:", error);
     }
@@ -119,12 +159,19 @@ function Threads() {
   };
 
   // Filter threads based on search term
-  const filteredThreads = threads.filter((thread) =>
+  const filteredThreads = myThreads.filter((thread) =>
     thread.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+      <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
+        {showValidationMessage && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+            <p>{validationMessage}</p>
+          </div>
+        )}
+      </div>
       <h1 className="text-xl mb-4">Threads</h1>
       <div className="mb-4 relative">
         <input
@@ -160,46 +207,46 @@ function Threads() {
       </div>
 
       <hr className="mb-6 border-black" />
-
-      {filteredThreads.map((thread, index) => (
-        <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openViewModal(thread)}
-        >
-          <div>
-            <div className="text-md font-medium mb-1">{thread.title}</div>
-            <div className="text-sm text-black-600">999 replies</div>
-          </div>
-          <div className="flex items-center">
-            <div
-              className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                openDeleteModal(thread);
-              }}
-            >
-              <span
-                onClick={() => setIsDeleteModalOpen(true)}
-                className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1"
+      {myThreads.length === 0 ? (
+        <div>No threads created yet.</div>
+      ) : (
+        myThreads.map((thread) => (
+          <div
+            key={thread._id}
+            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+            onClick={() => openViewModal(thread)}
+          >
+            <div>
+              <div className="text-md font-medium mb-1">{thread.title}</div>
+              <div className="text-sm text-black-600">999 replies</div>
+            </div>
+            <div className="flex items-center">
+              <div
+                className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDeleteModal(thread);
+                }}
               >
-                Delete
-              </span>
-            </div>
-            <div
-              className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                openEditModal(thread);
-              }}
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Edit
-              </span>
+                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                  Delete
+                </span>
+              </div>
+              <div
+                className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openEditModal(thread);
+                }}
+              >
+                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                  Edit
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
 
       <div className="flex justify-between items-center mb-4 mt-12">
         <div className="text-lg">All Threads</div>
@@ -207,19 +254,22 @@ function Threads() {
 
       <hr className="mb-6 border-black" />
 
-      {filteredThreads.map((thread, index) => (
-        <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openViewModal(thread)}
-        >
-          <div>
-            <div className="text-md font-medium mb-1">{thread.title}</div>
-            <div className="text-sm text-black-600">999 replies</div>
+      {allThreads.length === 0 ? (
+        <div>No threads created yet.</div>
+      ) : (
+        allThreads.map((thread) => (
+          <div
+            key={thread._id}
+            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+            onClick={() => openViewModal(thread)}
+          >
+            <div>
+              <div className="text-md font-medium mb-1">{thread.title}</div>
+              <div className="text-sm text-black-600">999 replies</div>
+            </div>
           </div>
-        </div>
-      ))}
-
+        ))
+      )}
       {isViewModalOpen && selectedThread && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] relative mx-4">

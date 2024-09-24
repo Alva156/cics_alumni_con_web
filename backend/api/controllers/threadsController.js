@@ -32,6 +32,27 @@ exports.createThread = async (req, res) => {
     res.status(500).json({ error: "Failed to create thread" });
   }
 };
+exports.getUserThreads = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized, token missing." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    // Find threads created by the logged-in user
+    const userThreads = await Thread.find({ userId }).populate(
+      "userId",
+      "firstName lastName"
+    );
+
+    res.status(200).json(userThreads);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user threads", error });
+  }
+};
 
 // Get all threads
 exports.getAllThreads = async (req, res) => {

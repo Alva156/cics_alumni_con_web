@@ -108,14 +108,16 @@ exports.registerUser = async (req, res) => {
 
     // Check for duplicate user by name and birthday
     const duplicateUser = await User.findOne({
-      firstName,
-      lastName,
-      birthday,
+      firstName: firstName,
+      lastName: lastName,
+      birthday: birthday,
     });
 
     if (duplicateUser) {
       if (duplicateUser.isVerified) {
-        return res.status(400).json({ msg: "Duplicate accounts not allowed." });
+        return res
+          .status(400)
+          .json({ msg: "Duplicate accounts are not allowed." });
       } else {
         duplicateUser.email = email;
         duplicateUser.password = await bcrypt.hash(
@@ -133,7 +135,7 @@ exports.registerUser = async (req, res) => {
         });
 
         return res.status(200).json({
-          msg: "An unverified account with the same name and birthday exists. Redirecting to OTP verification.",
+          msg: "User not verified. Redirecting to OTP verification.",
           redirect: "/verifyaccount",
         });
       }

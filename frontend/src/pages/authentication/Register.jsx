@@ -35,6 +35,26 @@ function Register() {
       [e.target.name]: e.target.value,
     });
   };
+  const validatePassword = (password) => {
+    const minLength = /.{8,}/; // At least 8 characters
+    const upperCase = /[A-Z]/; // At least one uppercase letter
+    const digit = /[0-9]/; // At least one digit
+    const specialChar = /[!@#$%^&*(),.?":{}|<>]/; // At least one special character
+
+    if (!minLength.test(password)) {
+      return "Password must be at least 8 characters long";
+    }
+    if (!upperCase.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    if (!digit.test(password)) {
+      return "Password must contain at least one digit";
+    }
+    if (!specialChar.test(password)) {
+      return "Password must contain at least one special character";
+    }
+    return null; // No validation error
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,14 +71,21 @@ function Register() {
       !confirmPassword
     ) {
       setError("Please fill in all required fields");
+      setTimeout(() => setError(""), 5000);
       return;
     }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      setTimeout(() => setError(""), 5000);
       return;
     }
-
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      setTimeout(() => setError(""), 5000);
+      return;
+    }
     try {
       const response = await axios.post(
         "http://localhost:6001/users/register",
@@ -73,11 +100,13 @@ function Register() {
         }, 3000);
       } else {
         setError(response.data.msg || "An error occurred during registration");
+        setTimeout(() => setError(""), 5000);
       }
     } catch (error) {
       setError(
         error.response?.data?.msg || "An error occurred during registration"
       );
+      setTimeout(() => setError(""), 5000);
     }
   };
 

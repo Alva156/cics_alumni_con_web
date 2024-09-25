@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const OTP = require("../models/otpModel");
+const UserProfile = require("../models/userProfileModel");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const csv = require("csv-parser");
@@ -93,33 +94,7 @@ exports.registerUser = async (req, res) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      if (!existingUser.isVerified) {
-        // Set email in cookie
-        console.log("Attempting to set cookie for email:", email);
-        res.cookie("userEmail", email, {
-          httpOnly: true, // Set to false so frontend can access it
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 10 * 60 * 1000,
-        });
-        console.log(
-          "Attempting to set cookie for Mobile Number:",
-          mobileNumber
-        );
-        res.cookie("userMobile", mobileNumber, {
-          httpOnly: true, // Set to true for backend-only access
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 10 * 60 * 1000,
-        });
-
-        return res.status(200).json({
-          msg: "User not verified. Redirecting to OTP verification.",
-          redirect: "/verifyaccount",
-        });
-      } else {
-        return res.status(400).json({ msg: "User already exists" });
-      }
+      return res.status(400).json({ msg: "User already exists" });
     }
 
     // Check for duplicate user by name and birthday
@@ -130,43 +105,9 @@ exports.registerUser = async (req, res) => {
     });
 
     if (duplicateUser) {
-      if (duplicateUser.isVerified) {
-        return res
-          .status(400)
-          .json({ msg: "Duplicate accounts are not allowed." });
-      } else {
-        duplicateUser.email = email;
-        duplicateUser.mobileNumber = mobileNumber;
-        duplicateUser.password = await bcrypt.hash(
-          password,
-          await bcrypt.genSalt(10)
-        );
-        await duplicateUser.save();
-
-        console.log("Attempting to set cookie for email:", email);
-        res.cookie("userEmail", email, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 10 * 60 * 1000,
-        });
-
-        console.log(
-          "Attempting to set cookie for Mobile Number:",
-          mobileNumber
-        );
-        res.cookie("userMobile", mobileNumber, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 10 * 60 * 1000, // 10 minutes expiration
-        });
-
-        return res.status(200).json({
-          msg: "User not verified. Redirecting to OTP verification.",
-          redirect: "/verifyaccount",
-        });
-      }
+      return res
+        .status(400)
+        .json({ msg: "Duplicate accounts are not allowed." });
     }
 
     const csvFilePath = path.join(__dirname, "../alumnilist.csv");
@@ -277,14 +218,27 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ msg: "Invalid OTP" });
     }
 
-    await User.updateOne({ email }, { isVerified: true });
+    // Mark the user as verified
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      { isVerified: true },
+      { new: true }
+    );
+
+    if (updatedUser) {
+      console.log("User verified successfully:", updatedUser.email);
+    }
+
+    // Clean up OTP records
     await OTP.deleteOne({ email, otp });
 
+    // Clear cookies
     res.clearCookie("userEmail");
     res.clearCookie("userMobile");
 
     res.status(200).json({ msg: "User verified successfully" });
   } catch (err) {
+    console.error("Error verifying OTP:", err);
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
@@ -337,20 +291,46 @@ exports.sendOTP = async (req, res) => {
 };
 
 // if the user cancel or return to the regis page
-exports.cancel = (req, res) => {
-  res.clearCookie("userEmail", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
-  });
-  res.clearCookie("userMobile", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
-  });
-  res.status(200).json({ msg: "Cancelled, cookie removed" });
-};
+exports.cancel = async (req, res) => {
+  const email = req.cookies.userEmail; // Get email from the cookie
+  try {
+    if (email) {
+      // Find the user by email
+      const user = await User.findOne({ email, isVerified: false });
 
+      if (user) {
+        const userId = user._id;
+
+        // Delete the user record if not verified
+        await User.findByIdAndDelete(userId);
+        console.log("Unverified user deleted:", email);
+
+        // Delete the associated user profile
+        await UserProfile.findOneAndDelete({ userId });
+        console.log("Associated user profile deleted for:", email);
+      }
+    }
+
+    // Clear cookies
+    res.clearCookie("userEmail", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+    });
+    res.clearCookie("userMobile", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+    });
+
+    res.status(200).json({
+      msg: "Verification cancelled, unverified user and profile deleted, cookies removed",
+    });
+  } catch (error) {
+    console.error("Error in cancel process:", error);
+    res.status(500).json({ msg: "Server error", error: error.message });
+  }
+};
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;

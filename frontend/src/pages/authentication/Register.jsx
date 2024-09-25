@@ -113,8 +113,6 @@ function Register() {
           formData,
           { withCredentials: true }
         );
-
-
       } else {
         setError(response.data.msg || "An error occurred during registration");
         setTimeout(() => setError(""), 5000);

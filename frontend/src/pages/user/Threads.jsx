@@ -274,10 +274,34 @@ function Threads() {
 
   const handleDeleteReply = async (replyId) => {
     try {
+      // First, identify the thread to which the reply belongs
+      const threadId = selectedThread._id; // Get the current selected thread ID
+
+      // Send the delete request to the server
       await axios.delete(`http://localhost:6001/replies/delete/${replyId}`, {
         withCredentials: true,
       });
+
+      // Update the replies state to remove the deleted reply
       setReplies(replies.filter((reply) => reply._id !== replyId));
+
+      // Decrement the reply count for the thread
+      setMyThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === threadId
+            ? { ...thread, replyCount: thread.replyCount - 1 }
+            : thread
+        )
+      );
+
+      setAllThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === threadId
+            ? { ...thread, replyCount: thread.replyCount - 1 }
+            : thread
+        )
+      );
+
       showValidation("Reply deleted successfully!");
     } catch (error) {
       console.error("Error deleting reply:", error);

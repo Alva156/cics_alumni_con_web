@@ -197,7 +197,10 @@ function Threads() {
   }, [selectedThread]);
 
   const handleCreateReply = async () => {
-    if (!newReply.trim()) return;
+    if (!newReply.trim()) {
+      showError("Reply content cannot be empty.");
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -225,7 +228,10 @@ function Threads() {
   };
 
   const handleUpdateReply = async (replyId) => {
-    if (!selectedReply.content.trim()) return; // Prevent saving empty content
+    if (!selectedReply.content.trim()) {
+      showError("Reply content cannot be empty.");
+      return;
+    }
 
     try {
       const response = await axios.put(
@@ -243,10 +249,6 @@ function Threads() {
     } catch (error) {
       console.error("Error updating reply:", error);
     }
-  };
-  const openDeleteReplyModal = (reply) => {
-    setReplyToDelete(reply); // Set the reply to be deleted
-    setIsDeleteReplyModalOpen(true); // Open the delete modal
   };
 
   const handleDeleteReply = async (replyId) => {
@@ -299,6 +301,11 @@ function Threads() {
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
+        {showErrorMessage && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
+            <p>{errorMessage}</p>
+          </div>
+        )}
         {showValidationMessage && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-[80]">
             <p>{validationMessage}</p>
@@ -474,7 +481,6 @@ function Threads() {
                 className="btn btn-sm w-24 bg-green text-white mr-2"
                 onClick={() => {
                   handleUpdateReply(selectedReply._id); // Call the update handler
-                  setIsEditReplyModalOpen(false); // Close the modal
                 }}
               >
                 Save
@@ -634,11 +640,6 @@ function Threads() {
       )}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          {showErrorMessage && (
-            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
-              <p>{errorMessage}</p>
-            </div>
-          )}
           <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
             <button
               onClick={closeModal}
@@ -725,7 +726,7 @@ function Threads() {
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           {showErrorMessage && (
-            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
               <p>{errorMessage}</p>
             </div>
           )}

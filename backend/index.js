@@ -1,18 +1,20 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken"); // Added for JWT
 const cookieParser = require("cookie-parser");
-
 require("dotenv").config();
+
+const authenticateJWT = require("./middleware/auth"); // Middleware for JWT auth
+
 const app = express();
 const port = process.env.PORT || 6001;
 
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
+
 const corsOptions = {
-  origin: "http://localhost:5173", // Origin of the frontend
+  origin: "http://localhost:5173", // Frontend origin
   credentials: true, // Allow cookies and credentials to be sent
 };
 
@@ -28,11 +30,15 @@ mongoose
 
 // Routes
 const userRoutes = require("./api/routes/userRoutes");
-app.use("/users", userRoutes);
+const adminCompaniesRoutes = require("./api/routes/adminCompaniesRoutes"); // Company routes
+const userProfileRoutes = require("./api/routes/userProfileRoutes"); // Company routes
 const threadsRoutes = require("./api/routes/threadsRoutes");
-app.use("/threads", threadsRoutes);
 const repliesRoutes = require("./api/routes/repliesRoutes");
+app.use("/companies", adminCompaniesRoutes); // Protected routes for AdminCompanies
+app.use("/profile", userProfileRoutes); // Protected routes for AdminCompanies
+app.use("/threads", threadsRoutes);
 app.use("/replies", repliesRoutes);
+app.use("/users", userRoutes);
 
 // Basic Route
 app.get("/", (req, res) => {

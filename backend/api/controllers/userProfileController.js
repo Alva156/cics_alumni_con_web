@@ -98,9 +98,6 @@ exports.createProfile = async (req, res) => {
 };
 
 
-
-
-
 exports.updateProfile = async (req, res) => {
     try {
         // Extract the token from cookies

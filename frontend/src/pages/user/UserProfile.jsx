@@ -205,6 +205,12 @@ function UserProfile() {
         // If profile doesn't exist, create a new one
         await axios.post("http://localhost:6001/profile/createprofile", userData, { withCredentials: true });
         console.log("Profile created successfully!");
+        setValidationMessage("Profile created successfully!");
+        setShowValidationMessage(true);
+
+        setTimeout(() => {
+        setShowValidationMessage(false);
+      }, 3000);
       } else {
         console.error("Error saving profile:", error.response ? error.response.data : error.message);
         setErrorMessage("Error saving profile. Please try again.");

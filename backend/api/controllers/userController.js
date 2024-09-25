@@ -25,16 +25,19 @@ const adminAccountsPlain = [
     email: "cicsadmin@gmail.com",
     password: "cics123",
     role: "admin",
+    mobileNumber: "00000000000",
   },
   {
     email: "cicsadmin2@gmail.com",
     password: "cics123",
     role: "admin",
+    mobileNumber: "00000000000",
   },
   {
     email: "cicsadmin3@gmail.com",
     password: "cics123",
     role: "admin",
+    mobileNumber: "00000000000",
   },
 ];
 
@@ -51,7 +54,9 @@ async function setupAdminAccounts() {
         firstName: "CICS",
         lastName: "Admin",
         birthday: "1000-01-01",
+        mobileNumber: account.mobileNumber,
         isVerified: true,
+        createdAt: Date.now(),
       }))
     );
 
@@ -79,6 +84,7 @@ exports.registerUser = async (req, res) => {
       lastName,
       birthday,
       email,
+      mobileNumber,
       password,
       confirmPassword,
     } = req.body;
@@ -94,7 +100,17 @@ exports.registerUser = async (req, res) => {
           httpOnly: true, // Set to false so frontend can access it
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
-          maxAge: 10 * 60 * 1000, // 1 day expiration
+          maxAge: 10 * 60 * 1000,
+        });
+        console.log(
+          "Attempting to set cookie for Mobile Number:",
+          mobileNumber
+        );
+        res.cookie("userMobile", mobileNumber, {
+          httpOnly: true, // Set to true for backend-only access
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 10 * 60 * 1000,
         });
 
         return res.status(200).json({
@@ -120,6 +136,7 @@ exports.registerUser = async (req, res) => {
           .json({ msg: "Duplicate accounts are not allowed." });
       } else {
         duplicateUser.email = email;
+        duplicateUser.mobileNumber = mobileNumber;
         duplicateUser.password = await bcrypt.hash(
           password,
           await bcrypt.genSalt(10)
@@ -132,6 +149,17 @@ exports.registerUser = async (req, res) => {
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
           maxAge: 10 * 60 * 1000,
+        });
+
+        console.log(
+          "Attempting to set cookie for Mobile Number:",
+          mobileNumber
+        );
+        res.cookie("userMobile", mobileNumber, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 10 * 60 * 1000, // 10 minutes expiration
         });
 
         return res.status(200).json({
@@ -196,6 +224,7 @@ exports.registerUser = async (req, res) => {
       lastName,
       birthday: formattedBirthday,
       email,
+      mobileNumber,
       password: hashedPassword,
       isVerified: false,
     });
@@ -210,9 +239,13 @@ exports.registerUser = async (req, res) => {
         sameSite: "strict", // Can adjust depending on CORS setup
         maxAge: 10 * 60 * 1000, // 10min expiration for example
       });
-
-      console.log("Cookie set successfully for email:", email);
-
+      console.log("Attempting to set cookie for mobileNumber:", mobileNumber);
+      res.cookie("userMobile", mobileNumber, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 10 * 60 * 1000, // 10 minutes
+      });
       res.status(200).json({
         redirect: "/verifyaccount",
       });
@@ -248,6 +281,7 @@ exports.verifyOTP = async (req, res) => {
     await OTP.deleteOne({ email, otp });
 
     res.clearCookie("userEmail");
+    res.clearCookie("userMobile");
 
     res.status(200).json({ msg: "User verified successfully" });
   } catch (err) {
@@ -305,6 +339,11 @@ exports.sendOTP = async (req, res) => {
 // if the user cancel or return to the regis page
 exports.cancel = (req, res) => {
   res.clearCookie("userEmail", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+  });
+  res.clearCookie("userMobile", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "Strict",

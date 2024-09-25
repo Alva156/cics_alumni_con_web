@@ -1,4 +1,5 @@
 const UserProfile = require("../models/userProfileModel");
+const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
 
@@ -97,6 +98,50 @@ exports.createProfile = async (req, res) => {
     }
 };
 
+exports.createUserProfile = async (req, res) => {
+    try {   
+
+        const { firstName, lastName, birthday } = req.body;
+
+        console.log('fname:' + firstName);
+        console.log('lname:' + lastName);
+
+        const user = await User.findOne({ firstName, lastName });
+        if (!user) {
+            console.log('User not found');
+        }
+        const userId = user._id;
+        console.log('userid: ' + userId);
+
+        // Check if a profile already exists for the user
+        const existingProfile = await UserProfile.findOne({ userId });
+        if (existingProfile) {
+            return res.status(400).json({ error: "Profile already exists. Please update your profile instead." });
+        }
+
+        // Extract profile details from request body
+        const profileData = {
+            userId,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            birthday: req.body.birthday,
+            contactInformation: {
+                emailAddress: req.body.email,
+                mobileNumber: req.body.mobileNumber,
+            }
+        };
+
+        // Create a new UserProfile instance
+        const newProfile = new UserProfile(profileData);
+
+        // Save the profile
+        await newProfile.save();
+
+    } catch (error) {
+        console.error("Error creating profile:", error); // Log the error for debugging
+        res.status(500).json({ error: "Failed to create profile", details: error.message });
+    }
+};
 
 exports.updateProfile = async (req, res) => {
     try {

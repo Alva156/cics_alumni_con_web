@@ -127,7 +127,6 @@ function VerifyAccount() {
       });
 
       if (response.status === 200) {
-        setSuccess("OTP verified successfully.");
         setModalVisible(true); // Show modal on success
       }
     } catch (error) {

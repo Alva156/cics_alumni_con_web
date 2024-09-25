@@ -31,6 +31,8 @@ const userRoutes = require("./api/routes/userRoutes");
 app.use("/users", userRoutes);
 const threadsRoutes = require("./api/routes/threadsRoutes");
 app.use("/threads", threadsRoutes);
+const repliesRoutes = require("./api/routes/repliesRoutes");
+app.use("/replies", repliesRoutes);
 
 // Basic Route
 app.get("/", (req, res) => {

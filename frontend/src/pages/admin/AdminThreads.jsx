@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import sampleidpic from "../../assets/sampleidpic.jpg";
 
-function AdminThreads() {
+function Threads() {
   const [myThreads, setMyThreads] = useState([]);
   const [allThreads, setAllThreads] = useState([]);
   const [newThread, setNewThread] = useState({ title: "", content: "" });
@@ -17,6 +17,12 @@ function AdminThreads() {
   const [showValidationMessage, setShowValidationMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  // replies
+
+  const [newReply, setNewReply] = useState("");
+  const [editingReplyId, setEditingReplyId] = useState(null);
+  const [editingReplyContent, setEditingReplyContent] = useState("");
+  const [replies, setReplies] = useState([]); // Correct initialization
 
   const showValidation = (message) => {
     setValidationMessage(message);
@@ -34,6 +40,13 @@ function AdminThreads() {
       setShowErrorMessage(false);
     }, 3000); // Hide the message after 3 seconds
   };
+
+  // Call this function whenever the modal is opened or a new reply is created
+  useEffect(() => {
+    if (selectedThread) {
+      fetchReplies();
+    }
+  }, [selectedThread]);
 
   useEffect(() => {
     const fetchAllThreads = async () => {
@@ -79,8 +92,12 @@ function AdminThreads() {
         },
         { withCredentials: true }
       );
-      setMyThreads([...myThreads, response.data.thread]); // Update myThreads
-      setAllThreads([...allThreads, response.data.thread]); // Update allThreads
+
+      // Manually set `isOwner` to true for the newly created thread
+      const createdThread = { ...response.data.thread, isOwner: true };
+
+      setMyThreads([...myThreads, createdThread]); // Update myThreads
+      setAllThreads([...allThreads, createdThread]); // Update allThreads
       setNewThread({ title: "", content: "" });
       setIsAddModalOpen(false);
       showValidation("Thread created successfully!");
@@ -88,7 +105,6 @@ function AdminThreads() {
       console.error("Error creating thread:", error);
     }
   };
-
   const handleUpdateThread = async () => {
     if (!selectedThread.title || !selectedThread.content) {
       showError("Please fill in both the title and content fields.");
@@ -154,10 +170,84 @@ function AdminThreads() {
       console.error("Error deleting thread:", error);
     }
   };
+  const fetchReplies = async (threadId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:6001/replies/thread/${threadId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      setReplies(response.data); // Update replies state with the fetched data
+    } catch (error) {
+      console.error("Error fetching replies:", error);
+      setReplies([]); // Reset replies on error
+    }
+  };
+
+  // Fetch replies when the selected thread changes
+  useEffect(() => {
+    if (selectedThread) {
+      fetchReplies(selectedThread._id);
+    }
+  }, [selectedThread]);
+
+  const handleCreateReply = async () => {
+    if (!newReply.trim()) return;
+
+    try {
+      const response = await axios.post(
+        `http://localhost:6001/replies/create`,
+        { threadId: selectedThread._id, reply: newReply },
+        { withCredentials: true }
+      );
+
+      // Fetch updated replies after a new reply is created
+      await fetchReplies(selectedThread._id); // Ensure we fetch fresh replies
+
+      // Clear the reply input
+      setNewReply("");
+    } catch (error) {
+      console.error("Error creating reply:", error);
+    }
+  };
+
+  const handleUpdateReply = async (replyId) => {
+    if (!editingReplyContent.trim()) return;
+
+    try {
+      const response = await axios.put(
+        `http://localhost:6001/replies/update/${replyId}`,
+        { reply: editingReplyContent }, // Use 'reply' as the field name
+        { withCredentials: true }
+      );
+      setReplies(
+        replies.map((reply) =>
+          reply._id === replyId ? response.data.reply : reply
+        )
+      );
+      setEditingReplyId(null); // Exit edit mode
+      setEditingReplyContent("");
+    } catch (error) {
+      console.error("Error updating reply:", error);
+    }
+  };
+
+  const handleDeleteReply = async (replyId) => {
+    try {
+      await axios.delete(`http://localhost:6001/replies/delete/${replyId}`, {
+        withCredentials: true,
+      });
+      setReplies(replies.filter((reply) => reply._id !== replyId));
+    } catch (error) {
+      console.error("Error deleting reply:", error);
+    }
+  };
 
   const openViewModal = (thread) => {
     setSelectedThread(thread);
     setIsViewModalOpen(true);
+    fetchReplies(thread._id);
   };
 
   const openEditModal = (thread) => {
@@ -335,7 +425,7 @@ function AdminThreads() {
                   className="w-14 h-14 mr-3"
                 />
                 <div>
-                  <h2 className="text-xl font-semibold">
+                  <h2 className="text-md lg:text-xl font-semibold">
                     {`${selectedThread.userId.firstName} ${selectedThread.userId.lastName}`}
                   </h2>
                   <p className="text-gray-500">
@@ -385,45 +475,82 @@ function AdminThreads() {
 
             {/* Comments Section */}
             <div className="space-y-4 max-h-64 overflow-y-auto">
-              <div className="p-4 border border-black rounded-lg flex items-start mb-2">
-                <img
-                  src={sampleidpic}
-                  alt="User Avatar"
-                  className="w-10 h-10 mr-3"
+              {replies.map((reply) => (
+                <div
+                  key={reply._id}
+                  className="p-4 border border-black rounded-lg flex items-start mb-2"
+                >
+                  <img
+                    src={sampleidpic}
+                    alt="User Avatar"
+                    className="w-10 h-10 mr-3"
+                  />
+                  <div className="flex-grow">
+                    <h4 className="font-semibold text-sm">{`${reply.userId.firstName} ${reply.userId.lastName}`}</h4>
+
+                    <p className="text-gray-500 text-xs mb-2">
+                      {reply.createdAt
+                        ? new Date(reply.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )
+                        : ""}{" "}
+                      {/* Only render an empty string if createdAt is not available */}
+                    </p>
+                    <p>{reply.reply}</p>
+                    {editingReplyId === reply._id ? (
+                      <textarea
+                        value={editingReplyContent}
+                        onChange={(e) => setEditingReplyContent(e.target.value)}
+                        className="w-full border border-black rounded-lg p-2"
+                      />
+                    ) : (
+                      <p className="text-gray-700">{reply.content}</p>
+                    )}
+                  </div>
+                  {reply.isOwner && (
+                    <div className="flex space-x-2">
+                      <div
+                        className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
+                        onClick={() => handleDeleteReply(reply._id)}
+                      >
+                        <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100">
+                          Delete
+                        </span>
+                      </div>
+                      <div
+                        className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+                        onClick={() => {
+                          setEditingReplyId(reply._id);
+                          setEditingReplyContent(reply.content);
+                        }}
+                      >
+                        <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100">
+                          Edit
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              <div className="mt-4">
+                <textarea
+                  value={newReply}
+                  onChange={(e) => setNewReply(e.target.value)}
+                  className="w-full border border-black h-[8vh] rounded-lg p-2"
+                  placeholder="Add reply here..."
                 />
-                <div className="flex-grow">
-                  <h4 className="font-semibold text-sm">James Lorenz Santos</h4>
-                  <p className="text-gray-500 text-xs mb-2">
-                    Software Developer • Posted on July 5, 2024
-                  </p>
-                  <p className="text-gray-700">
-                    What is your capstone all about? Maybe I can help you.
-                  </p>
-                </div>
-                <div className="flex space-x-2">
-                  <div
-                    className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditModal(thread);
-                    }}
-                  >
-                    <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50">
-                      Delete
-                    </span>
-                  </div>
-                  <div
-                    className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditModal(comment); // Handle comment edit
-                    }}
-                  >
-                    <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50">
-                      Edit
-                    </span>
-                  </div>
-                </div>
+                <button
+                  onClick={handleCreateReply}
+                  className="btn px-20 bg-[#1458BE] text-white"
+                >
+                  Send
+                </button>
               </div>
             </div>
           </div>
@@ -586,4 +713,4 @@ function AdminThreads() {
   );
 }
 
-export default AdminThreads;
+export default Threads;

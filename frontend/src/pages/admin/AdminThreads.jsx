@@ -212,6 +212,23 @@ function AdminThreads() {
       // Fetch updated replies after a new reply is created
       await fetchReplies(selectedThread._id); // Ensure we fetch fresh replies
 
+      // Update replyCount for the corresponding thread
+      setMyThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === selectedThread._id
+            ? { ...thread, replyCount: thread.replyCount + 1 }
+            : thread
+        )
+      );
+
+      setAllThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === selectedThread._id
+            ? { ...thread, replyCount: thread.replyCount + 1 }
+            : thread
+        )
+      );
+
       // Clear the reply input
       setNewReply("");
       showValidation("Reply created successfully!");
@@ -249,6 +266,10 @@ function AdminThreads() {
     } catch (error) {
       console.error("Error updating reply:", error);
     }
+  };
+  const openDeleteReplyModal = (reply) => {
+    setReplyToDelete(reply); // Set the reply to delete
+    setIsDeleteReplyModalOpen(true); // Open the delete modal
   };
 
   const handleDeleteReply = async (replyId) => {
@@ -358,7 +379,9 @@ function AdminThreads() {
           >
             <div>
               <div className="text-md font-medium mb-1">{thread.title}</div>
-              <div className="text-sm text-black-600">999 replies</div>
+              <div className="text-sm text-black-600">
+                Replies: {thread.replyCount || 0}
+              </div>
             </div>
             <div className="flex items-center">
               <div
@@ -405,7 +428,9 @@ function AdminThreads() {
           >
             <div>
               <div className="text-md font-medium mb-1">{thread.title}</div>
-              <div className="text-sm text-black-600">999 replies</div>
+              <div className="text-sm text-black-600">
+                Replies: {thread.replyCount || 0}
+              </div>
             </div>
             {/* Only show buttons if the logged-in user is the owner of the thread */}
             {thread.isOwner && (
@@ -445,8 +470,8 @@ function AdminThreads() {
             <div className="flex justify-end mt-4">
               <button
                 onClick={() => {
-                  handleDeleteReply(replyToDelete._id);
-                  setIsDeleteReplyModalOpen(false);
+                  handleDeleteReply(replyToDelete._id); // Delete the reply
+                  setIsDeleteReplyModalOpen(false); // Close the modal
                 }}
                 className="btn btn-sm w-24 bg-red text-white mr-2"
               >

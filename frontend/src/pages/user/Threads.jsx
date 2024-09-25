@@ -23,6 +23,10 @@ function Threads() {
   const [editingReplyId, setEditingReplyId] = useState(null);
   const [editingReplyContent, setEditingReplyContent] = useState("");
   const [replies, setReplies] = useState([]); // Correct initialization
+  const [isEditReplyModalOpen, setIsEditReplyModalOpen] = useState(false);
+  const [selectedReply, setSelectedReply] = useState(null);
+  const [isDeleteReplyModalOpen, setIsDeleteReplyModalOpen] = useState(false);
+  const [replyToDelete, setReplyToDelete] = useState(null);
 
   const showValidation = (message) => {
     setValidationMessage(message);
@@ -207,30 +211,42 @@ function Threads() {
 
       // Clear the reply input
       setNewReply("");
+      showValidation("Reply created successfully!");
     } catch (error) {
       console.error("Error creating reply:", error);
     }
   };
+  const handleEditReply = (reply) => {
+    setSelectedReply({
+      ...reply,
+      content: reply.reply || "", // Ensure the content is set, even if it's an empty string
+    });
+    setIsEditReplyModalOpen(true); // Open the edit modal
+  };
 
   const handleUpdateReply = async (replyId) => {
-    if (!editingReplyContent.trim()) return;
+    if (!selectedReply.content.trim()) return; // Prevent saving empty content
 
     try {
       const response = await axios.put(
         `http://localhost:6001/replies/update/${replyId}`,
-        { reply: editingReplyContent }, // Use 'reply' as the field name
+        { reply: selectedReply.content }, // Use 'reply' as the field name
         { withCredentials: true }
       );
-      setReplies(
-        replies.map((reply) =>
-          reply._id === replyId ? response.data.reply : reply
-        )
-      );
-      setEditingReplyId(null); // Exit edit mode
-      setEditingReplyContent("");
+
+      // Refetch replies after update to ensure buttons are updated
+      await fetchReplies(selectedThread._id);
+
+      setIsEditReplyModalOpen(false); // Close the modal after update
+      setSelectedReply(null); // Clear selected reply
+      showValidation("Reply updated successfully!");
     } catch (error) {
       console.error("Error updating reply:", error);
     }
+  };
+  const openDeleteReplyModal = (reply) => {
+    setReplyToDelete(reply); // Set the reply to be deleted
+    setIsDeleteReplyModalOpen(true); // Open the delete modal
   };
 
   const handleDeleteReply = async (replyId) => {
@@ -239,6 +255,7 @@ function Threads() {
         withCredentials: true,
       });
       setReplies(replies.filter((reply) => reply._id !== replyId));
+      showValidation("Reply deleted successfully!");
     } catch (error) {
       console.error("Error deleting reply:", error);
     }
@@ -283,7 +300,7 @@ function Threads() {
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
         {showValidationMessage && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-[80]">
             <p>{validationMessage}</p>
           </div>
         )}
@@ -413,6 +430,66 @@ function Threads() {
           </div>
         ))
       )}
+      {isDeleteReplyModalOpen && replyToDelete && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Reply</h2>
+            <p>Are you sure you want to delete this reply?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => {
+                  handleDeleteReply(replyToDelete._id);
+                  setIsDeleteReplyModalOpen(false);
+                }}
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+              >
+                Yes
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteReplyModalOpen(false)} // Close modal without deleting
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isEditReplyModalOpen && selectedReply && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 className="text-2xl mb-4">Edit Reply</h2>
+            <textarea
+              className="w-full border border-black rounded-lg px-4 py-2"
+              value={selectedReply.content || ""} // Corrected: Use `content` instead of `reply`
+              onChange={(e) =>
+                setSelectedReply({
+                  ...selectedReply,
+                  content: e.target.value, // Update `content` correctly
+                })
+              }
+            />
+            <div className="flex justify-center gap-2 mt-4">
+              <button
+                className="btn btn-sm w-24 bg-green text-white mr-2"
+                onClick={() => {
+                  handleUpdateReply(selectedReply._id); // Call the update handler
+                  setIsEditReplyModalOpen(false); // Close the modal
+                }}
+              >
+                Save
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsEditReplyModalOpen(false)} // Close the modal
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isViewModalOpen && selectedThread && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] relative mx-4">
@@ -516,7 +593,9 @@ function Threads() {
                     <div className="flex space-x-2">
                       <div
                         className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
-                        onClick={() => handleDeleteReply(reply._id)}
+                        onClick={(e) => {
+                          openDeleteReplyModal(reply); // Open delete modal for the specific reply
+                        }}
                       >
                         <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100">
                           Delete
@@ -524,10 +603,7 @@ function Threads() {
                       </div>
                       <div
                         className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
-                        onClick={() => {
-                          setEditingReplyId(reply._id);
-                          setEditingReplyContent(reply.content);
-                        }}
+                        onClick={() => handleEditReply(reply)}
                       >
                         <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100">
                           Edit

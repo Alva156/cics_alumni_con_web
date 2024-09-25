@@ -72,12 +72,17 @@ exports.updateReply = async (req, res) => {
     }
 
     existingReply.reply = reply;
-
     const updatedReply = await existingReply.save();
+
+    // Populate the user details
+    const populatedReply = await Reply.findById(updatedReply._id).populate(
+      "userId",
+      "firstName lastName"
+    );
 
     res.status(200).json({
       message: "Reply updated successfully",
-      reply: updatedReply,
+      reply: populatedReply,
     });
   } catch (error) {
     res.status(500).json({ message: "Error updating reply", error });

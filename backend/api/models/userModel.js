@@ -12,24 +12,28 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: function () {
       return this.role === "user";
-    }, 
+    },
   },
   lastName: {
     type: String,
     required: function () {
       return this.role === "user";
-    }, 
+    },
   },
   birthday: {
     type: String,
     required: function () {
       return this.role === "user";
-    }, 
+    },
   },
   email: {
     type: String,
     required: true,
     unique: true,
+  },
+  mobileNumber: {
+    type: String,
+    required: true,
   },
   password: {
     type: String,
@@ -43,6 +47,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["user", "admin"],
     default: "user",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

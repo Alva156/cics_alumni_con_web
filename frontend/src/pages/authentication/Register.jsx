@@ -13,6 +13,7 @@ function Register() {
     lastName: "",
     birthday: "",
     email: "",
+    mobileNumber: "",
     password: "",
     confirmPassword: "",
   });
@@ -59,14 +60,22 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { firstName, lastName, birthday, email, password, confirmPassword } =
-      formData;
+    const {
+      firstName,
+      lastName,
+      birthday,
+      email,
+      mobileNumber,
+      password,
+      confirmPassword,
+    } = formData;
 
     if (
       !firstName ||
       !lastName ||
       !birthday ||
       !email ||
+      !mobileNumber ||
       !password ||
       !confirmPassword
     ) {
@@ -184,6 +193,18 @@ function Register() {
               name="email"
               placeholder="Enter your email"
               value={formData.email}
+              onChange={handleChange}
+              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
+              style={{ height: "28px" }}
+            />
+            <label className="block mb-1 text-xs font-medium">
+              Mobile Number *
+            </label>
+            <input
+              type="number"
+              name="mobileNumber"
+              placeholder="Enter your mobile number"
+              value={formData.mobileNumber}
               onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "28px" }}

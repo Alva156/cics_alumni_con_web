@@ -1,17 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "../../App.css";
 import axios from "axios";
-import { uniqueId } from "lodash"; // Ensure lodash is imported
+import { uniqueId } from "lodash"; // Make sure you import uniqueId
+import imageCompression from 'browser-image-compression';
 
 function UserProfile() {
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [users, setUsers] = useState([]); // Assuming you want to manage multiple user profiles
-  const modalRef = useRef(null);
+  const [showValidationMessage, setShowValidationMessage] = useState(false);
+  const [validationMessage, setValidationMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // States for form data
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthday, setBirthday] = useState("");
@@ -27,7 +25,7 @@ function UserProfile() {
   const [maritalStatus, setMaritalStatus] = useState("");
   const [salaryRange, setSalaryRange] = useState("");
   const [placeOfEmployment, setPlaceOfEmployment] = useState("");
-  const [linkedIn, setLinkedIn] = useState("");
+  const [linkedIn, setLinkedIn] = useState(""); // Fixed state name here
   const [facebook, setFacebook] = useState("");
   const [instagram, setInstagram] = useState("");
   const [email, setEmail] = useState("");
@@ -38,74 +36,45 @@ function UserProfile() {
 
   const [secondaryEducationSections, setSecondaryEducationSections] = useState([{ schoolName: "", yearStarted: "", yearEnded: "" }]);
   const [tertiaryEducationSections, setTertiaryEducationSections] = useState([{ schoolName: "", program: "", yearStarted: "", yearEnded: "" }]);
+
   const [companySections, setCompanySections] = useState([{ id: uniqueId(), companyName: "", position: "", yearStarted: "", yearEnded: "" }]);
 
-  // Fetch all users from the server
-  const fetchUsers = async () => {
-    try {
-      const response = await axios.get("http://localhost:6001/users", {
-        withCredentials: true,
-      });
-      setUsers(response.data);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
+  const [attachments, setAttachments] = useState([{ id: 1 }]);
+
+  const addAttachment = () => {
+    setAttachments((prev) => [...prev, { id: prev.length + 1 }]);
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const openAddModal = () => {
-    setSelectedUser(null);
-    setIsAddModalOpen(true);
+  const addSecondaryEducationSection = () => {
+    setSecondaryEducationSections([...secondaryEducationSections, { schoolName: "", yearStarted: "", yearEnded: "" }]);
   };
 
-  const openEditModal = (user) => {
-    setSelectedUser(user);
-    setIsEditModalOpen(true);
-    // Populate form fields for editing
-    setFirstName(user.firstName);
-    setLastName(user.lastName);
-    setBirthday(user.birthday);
-    setProfession(user.profession);
-    setCollegeProgram(user.collegeProgram);
-    setSpecialization(user.specialization);
-    setYearStartedCollege(user.yearStartedCollege);
-    setYearGraduatedCollege(user.yearGraduatedCollege);
-    setTimeToJob(user.timeToJob);
-    setEmploymentStatus(user.employmentStatus);
-    setWorkIndustry(user.workIndustry);
-    setProfessionAlignment(user.professionAlignment);
-    setMaritalStatus(user.maritalStatus);
-    setSalaryRange(user.salaryRange);
-    setPlaceOfEmployment(user.placeOfEmployment);
-    setLinkedIn(user.linkedIn);
-    setFacebook(user.facebook);
-    setInstagram(user.instagram);
-    setEmail(user.email);
-    setMobileNumber(user.mobileNumber);
-    setOtherContact(user.otherContact);
-    setProfileImage(user.profileImage);
-    setSecondaryEducationSections(user.secondaryEducation || []);
-    setTertiaryEducationSections(user.tertiaryEducation || []);
-    setCompanySections(user.careerBackground || []);
+  const addTertiaryEducationSection = () => {
+    setTertiaryEducationSections([...tertiaryEducationSections, { schoolName: "", program: "", yearStarted: "", yearEnded: "" }]);
   };
 
-  const closeModal = () => {
-    setIsEditModalOpen(false);
-    setIsAddModalOpen(false);
-    setSelectedUser(null);
+  const addCompanySection = () => {
+    setCompanySections([...companySections, { id: uniqueId(), companyName: "", position: "", yearStarted: "", yearEnded: "" }]);
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const options = {
+          maxSizeMB: 1,  // Limit to 1MB
+          maxWidthOrHeight: 500,  // Adjust dimensions to limit size
+          useWebWorker: true,
+        };
+        const compressedFile = await imageCompression(file, options);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setProfileImage(reader.result); // This will set the base64 string of the compressed image
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error("Error compressing image:", error);
+      }
     }
   };
 
@@ -128,7 +97,7 @@ function UserProfile() {
       case "maritalStatus": setMaritalStatus(value); break;
       case "salaryRange": setSalaryRange(value); break;
       case "placeOfEmployment": setPlaceOfEmployment(value); break;
-      case "linkedIn": setLinkedIn(value); break;
+      case "linkedIn": setLinkedIn(value); break; // Fixed state name here
       case "facebook": setFacebook(value); break;
       case "instagram": setInstagram(value); break;
       case "email": setEmail(value); break;
@@ -138,20 +107,53 @@ function UserProfile() {
     }
   };
 
-  const addSecondaryEducationSection = () => {
-    setSecondaryEducationSections([...secondaryEducationSections, { schoolName: "", yearStarted: "", yearEnded: "" }]);
+  // Handle changes for secondary education, tertiary education, and company sections
+  const handleSecondaryEducationChange = (index, e) => {
+    const newSections = [...secondaryEducationSections];
+    newSections[index][e.target.name] = e.target.value;
+    setSecondaryEducationSections(newSections);
   };
 
-  const addTertiaryEducationSection = () => {
-    setTertiaryEducationSections([...tertiaryEducationSections, { schoolName: "", program: "", yearStarted: "", yearEnded: "" }]);
+  const handleTertiaryEducationChange = (index, e) => {
+    const newSections = [...tertiaryEducationSections];
+    newSections[index][e.target.name] = e.target.value;
+    setTertiaryEducationSections(newSections);
   };
 
-  const addCompanySection = () => {
-    setCompanySections([...companySections, { id: uniqueId(), companyName: "", position: "", yearStarted: "", yearEnded: "" }]);
+  const handleCompanyChange = (index, e) => {
+    const newSections = [...companySections];
+    newSections[index][e.target.name] = e.target.value;
+    setCompanySections(newSections);
   };
 
+
+  const handleSave = (e) => {
+    console.log('saved');
+    e.preventDefault(); // Prevent default form submission
+    handleSubmit(e);     // Call the handleSubmit function to save the form data
+  };
+
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!firstName || !lastName) {
+      setValidationMessage("First Name and Last Name are required.");
+      setShowValidationMessage(true);
+
+      setTimeout(() => {
+        setShowValidationMessage(false);
+      }, 3000);
+
+
+      return; // Prevent submission
+    }
+
+    // Reset the validation message when inputs are valid
+    setShowErrorMessage(false);
+
+
     const userData = {
       firstName,
       lastName,
@@ -169,6 +171,7 @@ function UserProfile() {
       salaryRange,
       placeOfEmployment,
       profileImage,
+      attachments,
       secondaryEducation: secondaryEducationSections,
       tertiaryEducation: tertiaryEducationSections,
       careerBackground: companySections,
@@ -183,21 +186,102 @@ function UserProfile() {
     };
 
     try {
-      if (!accountEmail) {
-        await registerUser(userData); // Assuming this function exists for registration
-      } else {
-        await updateUserProfile(userData); // Assuming this function exists for updating
-      }
-      fetchUsers(); // Refresh user list after add/update
-      closeModal();
+      // Try to fetch profile to check if it exists
+      const profileResponse = await axios.get("http://localhost:6001/profile/userprofile", { withCredentials: true });
+
+      // If profile exists, update it
+      await axios.put("http://localhost:6001/profile/updateprofile", userData, { withCredentials: true });
+      console.log("Profile updated successfully!");
+
+      setValidationMessage("Profile saved successfully!");
+      setShowValidationMessage(true);
+
+      setTimeout(() => {
+        setShowValidationMessage(false);
+      }, 3000);
+
     } catch (error) {
-      console.error("Error saving user data:", error);
+      if (error.response && error.response.status === 404) {
+        // If profile doesn't exist, create a new one
+        await axios.post("http://localhost:6001/profile/createprofile", userData, { withCredentials: true });
+        console.log("Profile created successfully!");
+      } else {
+        console.error("Error saving profile:", error.response ? error.response.data : error.message);
+        setErrorMessage("Error saving profile. Please try again.");
+        setShowErrorMessage(true);
+        setTimeout(() => {
+          setShowErrorMessage(false);
+        }, 3000);
+      }
     }
   };
-  
+
+
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        console.log("Sending request to fetch profile...");
+        const response = await axios.get("http://localhost:6001/profile/userprofile", { withCredentials: true });
+
+        console.log("Profile fetched:", response.data);
+
+        const profileData = response.data;
+
+        // Check if profile data is populated and set the form values
+        if (profileData) {
+          setFirstName(profileData.firstName || "");
+          setLastName(profileData.lastName || "");
+          setProfession(profileData.profession || "");
+          setCollegeProgram(profileData.collegeProgram || "");
+          setSpecialization(profileData.specialization || "");
+          setYearStartedCollege(profileData.yearStartedCollege || "");
+          setYearGraduatedCollege(profileData.yearGraduatedCollege || "");
+          setTimeToJob(profileData.timeToJob || "");
+          setEmploymentStatus(profileData.employmentStatus || "");
+          setWorkIndustry(profileData.workIndustry || "");
+          setProfessionAlignment(profileData.professionAlignment || "");
+          setMaritalStatus(profileData.maritalStatus || "");
+          setSalaryRange(profileData.salaryRange || "");
+          setPlaceOfEmployment(profileData.placeOfEmployment || "");
+          setLinkedIn(profileData.contactInformation?.linkedIn || "");
+          setFacebook(profileData.contactInformation?.facebook || "");
+          setInstagram(profileData.contactInformation?.instagram || "");
+          setEmail(profileData.contactInformation?.emailAddress || "");
+          setMobileNumber(profileData.contactInformation?.mobileNumber || "");
+          setOtherContact(profileData.contactInformation?.other || "");
+          setProfileImage(profileData.profileImage || "");
+
+          // Convert birthday to "yyyy-MM-dd" format if available
+          if (profileData.birthday) {
+            const birthdayDate = new Date(profileData.birthday).toISOString().substring(0, 10);
+            setBirthday(birthdayDate);
+          }
+        } else {
+          console.error("User profile not found");
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error.response ? error.response.data : error.message);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+
 
   return (
     <>
+      {showErrorMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+          <p>{errorMessage}</p>
+        </div>
+      )}
+      {showValidationMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+          <p>{validationMessage}</p>
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
           <div className="page-title">User Profile</div>
@@ -232,7 +316,7 @@ function UserProfile() {
                       required
                       name="firstName"
                       value={firstName}
-                      onChange={handleChange}
+                      onChange={(e) => setFirstName(e.target.value)}
                     />
                   </div>
 
@@ -245,7 +329,7 @@ function UserProfile() {
                       required
                       name="lastName"
                       value={lastName}
-                      onChange={handleChange}
+                      onChange={(e) => setLastName(e.target.value)}
                     />
                   </div>
 
@@ -258,7 +342,7 @@ function UserProfile() {
                       required
                       name="birthday"
                       value={birthday}
-                      onChange={handleChange}
+                      onChange={(e) => setBirthday(e.target.value)}
                     />
                   </div>
 
@@ -270,7 +354,7 @@ function UserProfile() {
                       className="input input-sm input-bordered w-full h-10"
                       name="profession"
                       value={profession}
-                      onChange={handleChange}
+                      onChange={(e) => setProfession(e.target.value)}
                     />
                   </div>
 
@@ -278,9 +362,10 @@ function UserProfile() {
                     <label className="pt-4 pb-2 text-sm">College Program</label>
                     <select
                       className="select select-bordered select-sm border-2 w-full h-10"
-                      onChange={handleChange}
+                      onChange={(e) => setCollegeProgram(e.target.value)}
                       name="collegeProgram"
                       value={collegeProgram}
+
                     >
                       <option value="" disabled>
                         Choose
@@ -299,7 +384,7 @@ function UserProfile() {
                       className="input input-sm input-bordered w-full h-10"
                       name="specialization"
                       value={specialization}
-                      onChange={handleChange}
+                      onChange={(e) => setSpecialization(e.target.value)}
                     />
                   </div>
 
@@ -311,7 +396,7 @@ function UserProfile() {
                       className="input input-sm input-bordered w-full h-10"
                       name="yearStartedCollege"
                       value={yearStartedCollege}
-                      onChange={handleChange}
+                      onChange={(e) => setYearStartedCollege(e.target.value)}
                     />
                   </div>
 
@@ -323,7 +408,7 @@ function UserProfile() {
                       className="input input-sm input-bordered w-full h-10"
                       name="yearGraduatedCollege"
                       value={yearGraduatedCollege}
-                      onChange={handleChange}
+                      onChange={(e) => setYearGraduatedCollege(e.target.value)}
                     />
                   </div>
 
@@ -335,7 +420,7 @@ function UserProfile() {
                       className="input input-sm input-bordered w-full h-10"
                       name="timeToJob"
                       value={timeToJob}
-                      onChange={handleChange}
+                      onChange={(e) => setTimeToJob(e.target.value)}
                     />
                   </div>
                 </div>
@@ -359,7 +444,7 @@ function UserProfile() {
                   <select
                     name="employmentStatus"
                     className="select select-bordered select-sm border-2 w-full h-10"
-                    onChange={handleChange}
+                    onChange={(e) => setEmploymentStatus(e.target.value)}
                     value={employmentStatus}
                   >
                     <option value="" disabled>
@@ -377,7 +462,7 @@ function UserProfile() {
                   <select
                     name="workIndustry"
                     className="select select-bordered select-sm border-2 w-full h-10"
-                    onChange={handleChange}
+                    onChange={(e) => setWorkIndustry(e.target.value)}
                     value={workIndustry}
                   >
                     <option value="" disabled>
@@ -393,7 +478,7 @@ function UserProfile() {
                   <select
                     name="professionAlignment"
                     className="select select-bordered select-sm border-2 w-full h-10"
-                    onChange={handleChange}
+                    onChange={(e) => setProfessionAlignment(e.target.value)}
                     value={professionAlignment}
                   >
                     <option value="" disabled>
@@ -409,7 +494,7 @@ function UserProfile() {
                   <select
                     name="maritalStatus"
                     className="select select-bordered select-sm border-2 w-full h-10"
-                    onChange={handleChange}
+                    onChange={(e) => setMaritalStatus(e.target.value)}
                     value={maritalStatus}
                   >
                     <option value="" disabled>
@@ -427,14 +512,17 @@ function UserProfile() {
                   <select
                     name="salaryRange"
                     className="select select-bordered select-sm border-2 w-full h-10"
-                    onChange={handleChange}
+                    onChange={(e) => setSalaryRange(e.target.value)}
                     value={salaryRange}
                   >
                     <option value="" disabled>
                       Choose
                     </option>
-                    <option>Local</option>
-                    <option>International</option>
+                    <option>14K below</option>
+                    <option>15-30K</option>
+                    <option>31-60K</option>
+                    <option>61-100K</option>
+                    <option>100K above</option>
                   </select>
                 </div>
 
@@ -443,7 +531,7 @@ function UserProfile() {
                   <select
                     name="placeOfEmployment"
                     className="select select-bordered select-sm border-2 w-full h-10"
-                    onChange={handleChange}
+                    onChange={(e) => setPlaceOfEmployment(e.target.value)}
                     value={placeOfEmployment}
                   >
                     <option value="" disabled>
@@ -476,7 +564,7 @@ function UserProfile() {
                     className="input input-sm input-bordered w-full h-10"
                     name="linkedIn"
                     value={linkedIn}
-                    onChange={handleChange}
+                    onChange={(e) => setLinkedIn(e.target.value)}
                   />
                 </div>
 
@@ -488,7 +576,7 @@ function UserProfile() {
                     className="input input-sm input-bordered w-full h-10"
                     name="facebook"
                     value={facebook}
-                    onChange={handleChange}
+                    onChange={(e) => setFacebook(e.target.value)}
                   />
                 </div>
 
@@ -500,7 +588,7 @@ function UserProfile() {
                     className="input input-sm input-bordered w-full h-10"
                     name="instagram"
                     value={instagram}
-                    onChange={handleChange}
+                    onChange={(e) => setInstagram(e.target.value)}
                   />
                 </div>
 
@@ -512,7 +600,7 @@ function UserProfile() {
                     className="input input-sm input-bordered w-full h-10"
                     name="email"
                     value={email}
-                    onChange={handleChange}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
 
@@ -524,7 +612,7 @@ function UserProfile() {
                     className="input input-sm input-bordered w-full h-10"
                     name="mobileNumber"
                     value={mobileNumber}
-                    onChange={handleChange}
+                    onChange={(e) => setMobileNumber(e.target.value)}
                   />
                 </div>
 
@@ -536,7 +624,7 @@ function UserProfile() {
                     className="input input-sm input-bordered w-full h-10"
                     name="otherContact"
                     value={otherContact}
-                    onChange={handleChange}
+                    onChange={(e) => setOtherContact(e.target.value)}
                   />
                 </div>
               </div>
@@ -617,7 +705,7 @@ function UserProfile() {
                   <div
                     key={index}
                     className="w-full border-2 rounded py-2 px-4 mt-2"
-                    
+
                   >
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">School Name</label>
@@ -671,7 +759,7 @@ function UserProfile() {
                   <div
                     key={index}
                     className="w-full border-2 rounded py-2 px-4 mt-2"
-                    
+
                   >
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">School Name</label>
@@ -750,7 +838,7 @@ function UserProfile() {
                   <div
                     key={section.id}
                     className="w-full border-2 rounded py-2 px-4 mt-2"
-                    
+
                   >
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Company Name</label>
@@ -820,12 +908,11 @@ function UserProfile() {
                   <label className="pt-4 pb-2 text-sm">Account Email *</label>
                   <input
                     type="email" // Changed type to email for better validation
-                    name="accountEmail" // Added name attribute
-                    value={accountEmail} // Set the value to state
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="Type here"
                     className="input input-sm input-bordered w-full h-10"
-                    required
-                    onChange={handleChange} // Ensure this updates the state
                   />
                 </div>
 
@@ -842,15 +929,7 @@ function UserProfile() {
 
           {/* BOTTOM BUTTONS */}
           <div className="flex justify-center mt-16 space-x-3">
-            <div>
-              <button
-                className="btn md:w-64 w-52 bg-fgray text-white"
-                onClick={handleCancel} // Add a function to handle cancellation
-                aria-label="Cancel" // Added aria-label for accessibility
-              >
-                Cancel
-              </button>
-            </div>
+
             <div>
               <button
                 className="btn md:w-64 w-52 bg-green text-white"

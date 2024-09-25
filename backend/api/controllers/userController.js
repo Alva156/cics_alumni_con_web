@@ -94,7 +94,33 @@ exports.registerUser = async (req, res) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      return res.status(400).json({ msg: "User already exists" });
+      if (!existingUser.isVerified) {
+        // Set email in cookie
+        console.log("Attempting to set cookie for email:", email);
+        res.cookie("userEmail", email, {
+          httpOnly: true, // Set to false so frontend can access it
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 10 * 60 * 1000,
+        });
+        console.log(
+          "Attempting to set cookie for Mobile Number:",
+          mobileNumber
+        );
+        res.cookie("userMobile", mobileNumber, {
+          httpOnly: true, // Set to true for backend-only access
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 10 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+          msg: "User not verified. Redirecting to OTP verification.",
+          redirect: "/verifyaccount",
+        });
+      } else {
+        return res.status(400).json({ msg: "User already exists" });
+      }
     }
 
     // Check for duplicate user by name and birthday
@@ -105,11 +131,44 @@ exports.registerUser = async (req, res) => {
     });
 
     if (duplicateUser) {
-      return res
-        .status(400)
-        .json({ msg: "Duplicate accounts are not allowed." });
-    }
+      if (duplicateUser.isVerified) {
+        return res
+          .status(400)
+          .json({ msg: "Duplicate accounts are not allowed." });
+      } else {
+        duplicateUser.email = email;
+        duplicateUser.mobileNumber = mobileNumber;
+        duplicateUser.password = await bcrypt.hash(
+          password,
+          await bcrypt.genSalt(10)
+        );
+        await duplicateUser.save();
 
+        console.log("Attempting to set cookie for email:", email);
+        res.cookie("userEmail", email, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 10 * 60 * 1000,
+        });
+
+        console.log(
+          "Attempting to set cookie for Mobile Number:",
+          mobileNumber
+        );
+        res.cookie("userMobile", mobileNumber, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 10 * 60 * 1000, // 10 minutes expiration
+        });
+
+        return res.status(200).json({
+          msg: "User not verified. Redirecting to OTP verification.",
+          redirect: "/verifyaccount",
+        });
+      }
+    }
     const csvFilePath = path.join(__dirname, "../alumnilist.csv");
 
     // Read and validate CSV data

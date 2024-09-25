@@ -103,15 +103,12 @@ exports.createUserProfile = async (req, res) => {
 
         const { firstName, lastName, birthday } = req.body;
 
-        console.log('fname:' + firstName);
-        console.log('lname:' + lastName);
 
-        const user = await User.findOne({ firstName, lastName });
+        const user = await User.findOne({ firstName, lastName, birthday });
         if (!user) {
             console.log('User not found');
         }
         const userId = user._id;
-        console.log('userid: ' + userId);
 
         // Check if a profile already exists for the user
         const existingProfile = await UserProfile.findOne({ userId });

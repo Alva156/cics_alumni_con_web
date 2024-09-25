@@ -13,7 +13,9 @@ function Threads() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [threadToDelete, setThreadToDelete] = useState(null);
   const [validationMessage, setValidationMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [showValidationMessage, setShowValidationMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const showValidation = (message) => {
@@ -21,6 +23,15 @@ function Threads() {
     setShowValidationMessage(true);
     setTimeout(() => {
       setShowValidationMessage(false);
+    }, 3000); // Hide the message after 3 seconds
+  };
+
+  // Function to show error messages
+  const showError = (message) => {
+    setErrorMessage(message);
+    setShowErrorMessage(true);
+    setTimeout(() => {
+      setShowErrorMessage(false);
     }, 3000); // Hide the message after 3 seconds
   };
 
@@ -55,6 +66,10 @@ function Threads() {
   }, []);
 
   const handleCreateThread = async () => {
+    if (!newThread.title || !newThread.content) {
+      showError("Please fill in both the title and content fields.");
+      return;
+    }
     try {
       const response = await axios.post(
         "http://localhost:6001/threads/create",
@@ -64,8 +79,12 @@ function Threads() {
         },
         { withCredentials: true }
       );
-      setMyThreads([...myThreads, response.data.thread]); // Update myThreads
-      setAllThreads([...allThreads, response.data.thread]); // Update allThreads
+
+      // Manually set `isOwner` to true for the newly created thread
+      const createdThread = { ...response.data.thread, isOwner: true };
+
+      setMyThreads([...myThreads, createdThread]); // Update myThreads
+      setAllThreads([...allThreads, createdThread]); // Update allThreads
       setNewThread({ title: "", content: "" });
       setIsAddModalOpen(false);
       showValidation("Thread created successfully!");
@@ -73,8 +92,11 @@ function Threads() {
       console.error("Error creating thread:", error);
     }
   };
-
   const handleUpdateThread = async () => {
+    if (!selectedThread.title || !selectedThread.content) {
+      showError("Please fill in both the title and content fields.");
+      return;
+    }
     if (!selectedThread) return;
 
     try {
@@ -86,16 +108,23 @@ function Threads() {
         },
         { withCredentials: true }
       );
+
+      // Update the `myThreads` state
       setMyThreads(
         myThreads.map((thread) =>
           thread._id === selectedThread._id ? response.data.thread : thread
         )
       );
+
+      // Update the `allThreads` state and ensure the `isOwner` field is preserved
       setAllThreads(
         allThreads.map((thread) =>
-          thread._id === selectedThread._id ? response.data.thread : thread
+          thread._id === selectedThread._id
+            ? { ...response.data.thread, isOwner: thread.isOwner } // Keep `isOwner` field
+            : thread
         )
       );
+
       setSelectedThread(null);
       setIsEditModalOpen(false);
       showValidation("Thread updated successfully!");
@@ -267,6 +296,33 @@ function Threads() {
               <div className="text-md font-medium mb-1">{thread.title}</div>
               <div className="text-sm text-black-600">999 replies</div>
             </div>
+            {/* Only show buttons if the logged-in user is the owner of the thread */}
+            {thread.isOwner && (
+              <div className="flex items-center">
+                <div
+                  className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openDeleteModal(thread);
+                  }}
+                >
+                  <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                    Delete
+                  </span>
+                </div>
+                <div
+                  className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEditModal(thread);
+                  }}
+                >
+                  <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                    Edit
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         ))
       )}
@@ -378,6 +434,11 @@ function Threads() {
       )}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          {showErrorMessage && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{errorMessage}</p>
+            </div>
+          )}
           <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
             <button
               onClick={closeModal}
@@ -463,6 +524,11 @@ function Threads() {
       )}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          {showErrorMessage && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{errorMessage}</p>
+            </div>
+          )}
           <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
             <button
               onClick={closeModal}

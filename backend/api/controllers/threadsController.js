@@ -57,13 +57,27 @@ exports.getUserThreads = async (req, res) => {
 // Get all threads
 exports.getAllThreads = async (req, res) => {
   try {
-    // Populate the userId with the user's firstName and lastName
+    const token = req.cookies.token;
+    let userId = null;
+
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      userId = decoded.id;
+    }
+
+    // Fetch all threads and populate the user's details
     const threads = await Thread.find().populate(
       "userId",
       "firstName lastName"
     );
 
-    res.status(200).json(threads);
+    // Add an `isOwner` field to indicate if the current user is the thread owner
+    const threadsWithOwnership = threads.map((thread) => ({
+      ...thread.toObject(),
+      isOwner: userId && thread.userId._id.toString() === userId.toString(),
+    }));
+
+    res.status(200).json(threadsWithOwnership);
   } catch (error) {
     res.status(500).json({ message: "Error fetching threads", error });
   }

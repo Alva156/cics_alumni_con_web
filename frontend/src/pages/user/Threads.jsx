@@ -358,7 +358,9 @@ function Threads() {
           >
             <div>
               <div className="text-md font-medium mb-1">{thread.title}</div>
-              <div className="text-sm text-black-600">999 replies</div>
+              <div className="text-sm text-black-600">
+                Replies: {thread.replyCount}
+              </div>
             </div>
             <div className="flex items-center">
               <div
@@ -405,7 +407,9 @@ function Threads() {
           >
             <div>
               <div className="text-md font-medium mb-1">{thread.title}</div>
-              <div className="text-sm text-black-600">999 replies</div>
+              <div className="text-sm text-black-600">
+                Replies: {thread.replyCount}
+              </div>
             </div>
             {/* Only show buttons if the logged-in user is the owner of the thread */}
             {thread.isOwner && (

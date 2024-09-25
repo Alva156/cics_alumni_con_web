@@ -1,5 +1,6 @@
 const Thread = require("../models/threadsModel");
 const jwt = require("jsonwebtoken");
+const Reply = require("../models/replyModel");
 
 // Create a new thread
 exports.createThread = async (req, res) => {
@@ -42,13 +43,20 @@ exports.getUserThreads = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
 
-    // Find threads created by the logged-in user
-    const userThreads = await Thread.find({ userId }).populate(
-      "userId",
-      "firstName lastName"
+    // Find threads created by the logged-in user and also count replies for each thread
+    const userThreads = await Thread.find({ userId })
+      .populate("userId", "firstName lastName")
+      .lean(); // Use lean to get plain objects
+
+    // Count replies for each thread
+    const threadsWithReplyCount = await Promise.all(
+      userThreads.map(async (thread) => {
+        const replyCount = await Reply.countDocuments({ threadId: thread._id });
+        return { ...thread, replyCount };
+      })
     );
 
-    res.status(200).json(userThreads);
+    res.status(200).json(threadsWithReplyCount);
   } catch (error) {
     res.status(500).json({ message: "Error fetching user threads", error });
   }
@@ -66,18 +74,23 @@ exports.getAllThreads = async (req, res) => {
     }
 
     // Fetch all threads and populate the user's details
-    const threads = await Thread.find().populate(
-      "userId",
-      "firstName lastName"
+    const threads = await Thread.find()
+      .populate("userId", "firstName lastName")
+      .lean();
+
+    // Count replies for each thread
+    const threadsWithReplyCount = await Promise.all(
+      threads.map(async (thread) => {
+        const replyCount = await Reply.countDocuments({ threadId: thread._id });
+        return {
+          ...thread,
+          replyCount,
+          isOwner: userId && thread.userId._id.toString() === userId.toString(),
+        };
+      })
     );
 
-    // Add an `isOwner` field to indicate if the current user is the thread owner
-    const threadsWithOwnership = threads.map((thread) => ({
-      ...thread.toObject(),
-      isOwner: userId && thread.userId._id.toString() === userId.toString(),
-    }));
-
-    res.status(200).json(threadsWithOwnership);
+    res.status(200).json(threadsWithReplyCount);
   } catch (error) {
     res.status(500).json({ message: "Error fetching threads", error });
   }

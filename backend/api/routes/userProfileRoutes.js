@@ -16,6 +16,11 @@ router.post(
     userProfileController.createProfile
 );
 
+router.post(
+    "/createuserprofile",
+    userProfileController.createUserProfile
+);
+
 
 router.put(
     "/updateprofile",

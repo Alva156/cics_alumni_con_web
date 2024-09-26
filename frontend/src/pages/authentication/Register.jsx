@@ -107,12 +107,6 @@ function Register() {
         setTimeout(() => {
           navigate("/verifyaccount");
         }, 3000);
-
-        const profileResponse = await axios.post(
-          "http://localhost:6001/profile/createuserprofile",
-          formData,
-          { withCredentials: true }
-        );
       } else {
         setError(response.data.msg || "An error occurred during registration");
         setTimeout(() => setError(""), 5000);

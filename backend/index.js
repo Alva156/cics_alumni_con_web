@@ -4,8 +4,6 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
-const authenticateJWT = require("./middleware/auth"); // Middleware for JWT auth
-
 const app = express();
 const port = process.env.PORT || 6001;
 

@@ -157,7 +157,14 @@ exports.registerUser = async (req, res) => {
     }
 
     // Generate JWT token with user details
-    const tokenPayload = { firstName, lastName, birthday, email, mobileNumber };
+    const tokenPayload = {
+      firstName,
+      lastName,
+      birthday,
+      email,
+      mobileNumber,
+      password,
+    };
     const jwtToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
       expiresIn: "10m", // Set token expiry time
     });
@@ -233,7 +240,7 @@ exports.sendOTP = async (req, res) => {
 // Verify OTP
 exports.verifyOTP = async (req, res) => {
   try {
-    const { otp } = req.body;
+    const { otp } = req.body; // OTP coming in the body
 
     // Get the token from the cookies
     const token = req.cookies.userToken;
@@ -243,7 +250,8 @@ exports.verifyOTP = async (req, res) => {
 
     // Decode the token to get user details
     const userDetails = jwt.verify(token, process.env.JWT_SECRET);
-    const { firstName, lastName, birthday, email, mobileNumber } = userDetails;
+    const { firstName, lastName, birthday, email, mobileNumber, password } =
+      userDetails; // Extract password
 
     // Validate OTP
     const otpRecord = await OTP.findOne({ email, otp });
@@ -251,11 +259,8 @@ exports.verifyOTP = async (req, res) => {
       return res.status(400).json({ msg: "Invalid OTP" });
     }
 
-    // Hash password or use a default
-    const hashedPassword = await bcrypt.hash(
-      req.body.password || "defaultPassword",
-      10
-    );
+    // Hash the password from the cookie
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Check if the user already exists to avoid duplicate records
     const existingUser = await User.findOne({ email });

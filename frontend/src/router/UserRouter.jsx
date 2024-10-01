@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Homepage from "../pages/User/homepage";
 import Survey from "../pages/User/Survey";
 import User from "../layout/user";
-import UserProfile from "../pages/User/UserProfile";
+import UserProfile from "../pages/user/UserProfile";
 import Threads from "../pages/User/Threads";
 import Chatbot from "../pages/User/Chatbot";
 import Alumni from "../pages/User/Alumni";

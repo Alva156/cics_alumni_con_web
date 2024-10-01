@@ -142,6 +142,11 @@ exports.createUserProfile = async (req, res) => {
     console.log(
       `User profile for ${profileData.firstName} ${profileData.lastName} created successfully.`
     );
+
+    // Return a success message
+    res.status(200).json({
+      msg: `Profile for ${profileData.firstName} ${profileData.lastName} created successfully.`,
+    });
   } catch (error) {
     console.error("Error creating profile:", error); // Log the error for debugging
     res

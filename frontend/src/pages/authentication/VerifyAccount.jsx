@@ -101,7 +101,7 @@ function VerifyAccount() {
     try {
       const response = await axios.post(
         "http://localhost:6001/users/verify",
-        { otp }, // Include password if needed
+        { otp },
         { withCredentials: true }
       );
 
@@ -127,9 +127,9 @@ function VerifyAccount() {
         );
 
         if (profileResponse.status === 200) {
-          setSuccess(response.data.msg); // Set success message
+          setSuccess(response.data.msg);
           console.log("Verification successful, showing modal");
-          setModalVisible(true); // Show the modal
+          setModalVisible(true);
         }
 
         // Clear the OTP input after successful submission

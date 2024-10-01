@@ -171,7 +171,7 @@ exports.registerUser = async (req, res) => {
     });
 
     return res.status(200).json({
-      msg: "Alumni verified. Proceed to OTP verification.",
+      msg: "Alumni verified. Proceeding to OTP verification...",
       redirect: "/verifyaccount",
     });
   } catch (err) {
@@ -280,7 +280,6 @@ exports.verifyOTP = async (req, res) => {
 
     // Send success response along with user details
     return res.status(200).json({
-      msg: "User verified and registered successfully",
       user: { firstName, lastName, email, mobileNumber, birthday },
     });
   } catch (err) {

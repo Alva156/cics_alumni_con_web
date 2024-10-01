@@ -139,12 +139,7 @@ exports.createUserProfile = async (req, res) => {
 
     // Save the profile
     await newProfile.save();
-    console.log(
-      `User profile for ${profileData.firstName} ${profileData.lastName} created successfully.`
-    );
-
-    // Return a success message
-    res.status(200).json({
+    res.status(201).json({
       msg: `Profile for ${profileData.firstName} ${profileData.lastName} created successfully.`,
     });
   } catch (error) {

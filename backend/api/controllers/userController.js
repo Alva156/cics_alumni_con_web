@@ -156,44 +156,31 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = new User({
-      studentNum: studentNum || "N/A",
+    // Generate JWT token with user details
+    const tokenPayload = {
       firstName,
       lastName,
-      birthday: formattedBirthday,
+      birthday,
       email,
       mobileNumber,
-      password: hashedPassword,
-      isVerified: false,
+      password,
+    };
+    const jwtToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: "10m", // Set token expiry time
     });
 
-    await newUser.save();
+    // Set JWT token in cookies
+    res.cookie("userToken", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Only secure in production
+      sameSite: "strict",
+      maxAge: 10 * 60 * 1000, // 10 minutes expiration
+    });
 
-    try {
-      console.log("Attempting to set cookie for email:", email);
-      res.cookie("userEmail", email, {
-        httpOnly: true, // Set to false so frontend can access it
-        secure: process.env.NODE_ENV === "production", // Only set cookies over HTTPS in production
-        sameSite: "strict", // Can adjust depending on CORS setup
-        maxAge: 10 * 60 * 1000, // 10min expiration for example
-      });
-      console.log("Attempting to set cookie for mobileNumber:", mobileNumber);
-      res.cookie("userMobile", mobileNumber, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-        maxAge: 10 * 60 * 1000, // 10 minutes
-      });
-      res.status(200).json({
-        redirect: "/verifyaccount",
-      });
-    } catch (error) {
-      console.error("Failed to set cookie:", error);
-      return res.status(500).json({ msg: "Internal Server Error" });
-    }
+    return res.status(200).json({
+      msg: "Alumni verified. Proceeding to OTP verification...",
+      redirect: "/verifyaccount",
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ msg: "Server error", error: err.message });
@@ -240,15 +227,65 @@ exports.sendOTP = async (req, res) => {
       text: `Your OTP code is ${otp}`,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending OTP:", error);
-        return res
-          .status(500)
-          .json({ msg: "Error sending OTP", error: error.message });
-      }
-      console.log("OTP sent successfully:", info.response);
-      res.status(200).json({ msg: "OTP sent successfully" });
+    await transporter.sendMail(mailOptions);
+
+    // Respond with success message
+    res.status(200).json({ msg: "OTP sent successfully" });
+  } catch (err) {
+    console.error("Error sending OTP:", err);
+    return res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
+
+// Verify OTP
+exports.verifyOTP = async (req, res) => {
+  try {
+    const { otp } = req.body; // OTP coming in the body
+
+    // Get the token from the cookies
+    const token = req.cookies.userToken;
+    if (!token) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Decode the token to get user details
+    const userDetails = jwt.verify(token, process.env.JWT_SECRET);
+    const { firstName, lastName, birthday, email, mobileNumber, password } =
+      userDetails; // Extract password
+
+    // Validate OTP
+    const otpRecord = await OTP.findOne({ email, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ msg: "Invalid OTP" });
+    }
+
+    // Hash the password from the cookie
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Check if the user already exists to avoid duplicate records
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ msg: "User already registered" });
+    }
+
+    // Create a new user record
+    const newUser = new User({
+      studentNum: "N/A", // If applicable, change based on real logic
+      firstName,
+      lastName,
+      birthday,
+      email,
+      mobileNumber,
+      password: hashedPassword,
+      isVerified: true,
+    });
+
+    await newUser.save();
+    await OTP.deleteOne({ email, otp }); // Clean up OTP records
+
+    // Send success response along with user details
+    return res.status(200).json({
+      user: { firstName, lastName, email, mobileNumber, birthday },
     });
   } catch (err) {
     console.error("Error verifying OTP:", err);

@@ -8,7 +8,6 @@ function VerifyAccount() {
   const [otpType, setOtpType] = useState(null);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [timer, setTimer] = useState(0);
@@ -24,31 +23,6 @@ function VerifyAccount() {
   const clearSuccessAfterDelay = () => {
     setTimeout(() => setSuccess(""), 10000);
   };
-
-  useEffect(() => {
-    const fetchEmail = async () => {
-      try {
-        const response = await axios.get(
-          "http://localhost:6001/users/getemail",
-          {
-            withCredentials: true, // Include this to ensure cookies are sent
-          }
-        );
-        if (response.data.email) {
-          setEmail(response.data.email);
-        } else {
-          setError("Session expired. Register again");
-          setTimeout(() => navigate("/register"), 3000); // Redirect after 3 seconds
-        }
-      } catch (error) {
-        console.error("Error retrieving email:", error);
-        setError("Session expired. Register again");
-        setTimeout(() => navigate("/register"), 3000);
-      }
-    };
-
-    fetchEmail();
-  }, [navigate]);
 
   useEffect(() => {
     if (timer > 0 && otpSent) {
@@ -75,11 +49,15 @@ function VerifyAccount() {
     setLoading(true);
     setError("");
     setSuccess("");
+
     try {
-      const response = await axios.post("http://localhost:6001/users/sendotp", {
-        email: email,
-        otpType: type,
-      });
+      const response = await axios.post(
+        "http://localhost:6001/users/sendotp",
+        { otpType: type },
+        {
+          withCredentials: true, // Ensure cookies are sent
+        }
+      );
 
       if (response.data.msg === "OTP sent successfully") {
         setOtpSent(true);
@@ -121,16 +99,47 @@ function VerifyAccount() {
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:6001/users/verify", {
-        email,
-        otp,
-      });
+      const response = await axios.post(
+        "http://localhost:6001/users/verify",
+        { otp },
+        { withCredentials: true }
+      );
 
       if (response.status === 200) {
-        setSuccess("OTP verified successfully.");
-        setModalVisible(true); // Show modal on success
+        const { firstName, lastName, email, mobileNumber, birthday } =
+          response.data.user;
+
+        // Optionally, store these details in state to use later for profile creation
+        const formData = {
+          firstName,
+          lastName,
+          email,
+          mobileNumber,
+          birthday,
+          // Add any other fields required for profile creation
+        };
+
+        // Call the profile creation API
+        const profileResponse = await axios.post(
+          "http://localhost:6001/profile/createuserprofile",
+          formData,
+          { withCredentials: true }
+        );
+
+        if (profileResponse.status === 200) {
+          setSuccess(response.data.msg);
+          console.log("Verification successful, showing modal");
+          setModalVisible(true);
+        }
+
+        // Clear the OTP input after successful submission
+        setOtp("");
+      } else {
+        setError("Failed to verify OTP");
+        clearErrorAfterDelay();
       }
     } catch (error) {
+      console.error("Error during OTP verification:", error);
       setError("Invalid OTP");
       clearErrorAfterDelay();
     }
@@ -139,27 +148,33 @@ function VerifyAccount() {
   };
 
   const handleResendOtp = async () => {
+    setLoading(true); // Start loading
+    setError("");
+    setSuccess("");
+
     try {
-      const response = await axios.post("http://localhost:6001/users/sendotp", {
-        email: email,
-        otpType,
-      });
+      const response = await axios.post(
+        "http://localhost:6001/users/sendotp",
+        {}, // No need to send any data, email is retrieved from the token
+        {
+          withCredentials: true, // Ensure cookies are sent
+        }
+      );
 
       if (response.data.msg === "OTP sent successfully") {
-        setSuccess("OTP sent successfully");
-        setTimer(300);
+        setSuccess("OTP resent successfully");
+        setTimer(300); // Reset the timer for 5 minutes
         clearSuccessAfterDelay();
       } else {
         setError("Failed to resend OTP");
-        clearErrorAfterDelay();
       }
     } catch (error) {
       console.error("Error resending OTP:", error);
-      setError("Choose OTP");
+      setError("Error occurred while resending OTP");
       clearErrorAfterDelay();
     }
 
-    setLoading(false);
+    setLoading(false); // Stop loading
   };
 
   const handleCloseModal = async () => {

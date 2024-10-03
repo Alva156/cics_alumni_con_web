@@ -20,61 +20,10 @@ function formatDateToISO(dateString) {
   return `${year}-${month}-${day}`;
 }
 
-// Admin accounts
-const adminAccountsPlain = [
-  {
-    email: "cicsadmin@gmail.com",
-    password: "cics123",
-    role: "admin",
-    mobileNumber: "00000000000",
-  },
-  {
-    email: "cicsadmin2@gmail.com",
-    password: "cics123",
-    role: "admin",
-    mobileNumber: "00000000000",
-  },
-  {
-    email: "cicsadmin3@gmail.com",
-    password: "cics123",
-    role: "admin",
-    mobileNumber: "00000000000",
-  },
-];
-
-async function setupAdminAccounts() {
-  try {
-    const salt = await bcrypt.genSalt(10);
-
-    const hashedAdmins = await Promise.all(
-      adminAccountsPlain.map(async (account) => ({
-        email: account.email,
-        password: await bcrypt.hash(account.password, salt), // Hashing the password
-        role: account.role,
-        studentNum: "N/A",
-        firstName: "CICS",
-        lastName: "Admin",
-        birthday: "1000-01-01",
-        mobileNumber: account.mobileNumber,
-        isVerified: true,
-        createdAt: Date.now(),
-      }))
-    );
-
-    for (const admin of hashedAdmins) {
-      await User.findOneAndUpdate(
-        { email: admin.email },
-        { $set: admin },
-        { upsert: true, new: true }
-      );
-    }
-
-    console.log("Admin accounts have been set up successfully");
-  } catch (err) {
-    console.error("Error setting up admin accounts:", err);
-  }
-}
-setupAdminAccounts();
+// Admin Accounts
+// Email: cicsadmin@gmail.com - Password: Cics@123
+// Email: cicsadmin2@gmail.com - Password: Cics@123
+// Email: cicsadmin3@gmail.com - Password: Cics@123
 
 // User registration
 exports.registerUser = async (req, res) => {
@@ -376,6 +325,27 @@ exports.loginUser = async (req, res) => {
   } catch (err) {
     console.error("Server error:", err.message);
     res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
+
+exports.checkAuth = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res.status(401).json({ success: false, msg: "Not authenticated" });
+    }
+
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Return success with user role
+    return res.status(200).json({
+      success: true,
+      role: decoded.role, // Include role in the response
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, msg: "Server error" });
   }
 };
 

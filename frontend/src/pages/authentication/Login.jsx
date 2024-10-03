@@ -41,7 +41,6 @@ function Login() {
 
       if (response.data.success) {
         localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userRole", response.data.role);
         sessionStorage.setItem("logoutMessageShown", "false");
         sessionStorage.setItem("loginMessageShown", "false");
 

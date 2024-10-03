@@ -21,9 +21,9 @@ function formatDateToISO(dateString) {
 }
 
 // Admin Accounts
-// Email: cicsadmin@gmail.com - Password: Cics@123
-// Email: cicsadmin2@gmail.com - Password: Cics@123
-// Email: cicsadmin3@gmail.com - Password: Cics@123
+// Email: cicsadmin@gmail.com - Password: Cics@@123
+// Email: cicsadmin2@gmail.com - Password: Cics@@123
+// Email: cicsadmin3@gmail.com - Password: Cics@@123
 
 // User registration
 exports.registerUser = async (req, res) => {
@@ -273,6 +273,7 @@ exports.cancel = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(`Login attempt: Email: ${email}, Password: ${password}`);
 
     const user = await User.findOne({ email });
     if (!user) {

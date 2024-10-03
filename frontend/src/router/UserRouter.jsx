@@ -1,8 +1,8 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Homepage from "../pages/User/homepage";
 import Survey from "../pages/User/Survey";
 import User from "../layout/user";
-import UserProfile from "../pages/User/UserProfile";
+import UserProfile from "../pages/user/UserProfile";
 import Threads from "../pages/User/Threads";
 import Chatbot from "../pages/User/Chatbot";
 import Alumni from "../pages/User/Alumni";
@@ -33,6 +33,11 @@ import ResetPassword from "../pages/authentication/ResetPassword";
 import VerifyAccount from "../pages/authentication/VerifyAccount";
 import DataPrivacy from "../pages/authentication/DataPrivacy";
 import PrivateRoute from "../components/PrivateRoute";
+import ErrorPage from "../components/ErrorPage";
+
+const ErrorFallback = () => {
+  return <ErrorPage />;
+};
 
 const router = createBrowserRouter([
   {
@@ -62,7 +67,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <PrivateRoute>
+      <PrivateRoute requiredRole="user" onAuthError={() => <ErrorFallback />}>
         <User />
       </PrivateRoute>
     ),
@@ -116,11 +121,12 @@ const router = createBrowserRouter([
         element: <News />,
       },
     ],
+    errorElement: <ErrorFallback />,
   },
   {
     path: "/admin",
     element: (
-      <PrivateRoute>
+      <PrivateRoute requiredRole="admin" onAuthError={() => <ErrorFallback />}>
         <Admin />
       </PrivateRoute>
     ),
@@ -178,6 +184,7 @@ const router = createBrowserRouter([
         element: <AdminNews />,
       },
     ],
+    errorElement: <ErrorFallback />,
   },
 ]);
 

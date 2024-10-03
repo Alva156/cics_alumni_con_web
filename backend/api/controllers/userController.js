@@ -1,5 +1,6 @@
 const User = require("../models/userModel");
 const OTP = require("../models/otpModel");
+const UserProfile = require("../models/userProfileModel");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const csv = require("csv-parser");
@@ -19,56 +20,10 @@ function formatDateToISO(dateString) {
   return `${year}-${month}-${day}`;
 }
 
-// Admin accounts
-const adminAccountsPlain = [
-  {
-    email: "cicsadmin@gmail.com",
-    password: "cics123",
-    role: "admin",
-  },
-  {
-    email: "cicsadmin2@gmail.com",
-    password: "cics123",
-    role: "admin",
-  },
-  {
-    email: "cicsadmin3@gmail.com",
-    password: "cics123",
-    role: "admin",
-  },
-];
-
-async function setupAdminAccounts() {
-  try {
-    const salt = await bcrypt.genSalt(10);
-
-    const hashedAdmins = await Promise.all(
-      adminAccountsPlain.map(async (account) => ({
-        email: account.email,
-        password: await bcrypt.hash(account.password, salt), // Hashing the password
-        role: account.role,
-        studentNum: "N/A",
-        firstName: "CICS",
-        lastName: "Admin",
-        birthday: "1000-01-01",
-        isVerified: true,
-      }))
-    );
-
-    for (const admin of hashedAdmins) {
-      await User.findOneAndUpdate(
-        { email: admin.email },
-        { $set: admin },
-        { upsert: true, new: true }
-      );
-    }
-
-    console.log("Admin accounts have been set up successfully");
-  } catch (err) {
-    console.error("Error setting up admin accounts:", err);
-  }
-}
-setupAdminAccounts();
+// Admin Accounts
+// Email: cicsadmin@gmail.com - Password: Cics@@123
+// Email: cicsadmin2@gmail.com - Password: Cics@@123
+// Email: cicsadmin3@gmail.com - Password: Cics@@123
 
 // User registration
 exports.registerUser = async (req, res) => {
@@ -79,6 +34,7 @@ exports.registerUser = async (req, res) => {
       lastName,
       birthday,
       email,
+      mobileNumber,
       password,
       confirmPassword,
     } = req.body;
@@ -87,23 +43,7 @@ exports.registerUser = async (req, res) => {
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
-      if (!existingUser.isVerified) {
-        // Set email in cookie
-        console.log("Attempting to set cookie for email:", email);
-        res.cookie("userEmail", email, {
-          httpOnly: true, // Set to false so frontend can access it
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 10 * 60 * 1000, // 1 day expiration
-        });
-
-        return res.status(200).json({
-          msg: "User not verified. Redirecting to OTP verification.",
-          redirect: "/verifyaccount",
-        });
-      } else {
-        return res.status(400).json({ msg: "User already exists" });
-      }
+      return res.status(400).json({ msg: "User already exists" });
     }
 
     // Check for duplicate user by name and birthday
@@ -114,31 +54,9 @@ exports.registerUser = async (req, res) => {
     });
 
     if (duplicateUser) {
-      if (duplicateUser.isVerified) {
-        return res
-          .status(400)
-          .json({ msg: "Duplicate accounts are not allowed." });
-      } else {
-        duplicateUser.email = email;
-        duplicateUser.password = await bcrypt.hash(
-          password,
-          await bcrypt.genSalt(10)
-        );
-        await duplicateUser.save();
-
-        console.log("Attempting to set cookie for email:", email);
-        res.cookie("userEmail", email, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-          maxAge: 10 * 60 * 1000,
-        });
-
-        return res.status(200).json({
-          msg: "User not verified. Redirecting to OTP verification.",
-          redirect: "/verifyaccount",
-        });
-      }
+      return res
+        .status(400)
+        .json({ msg: "Duplicate accounts are not allowed." });
     }
 
     const csvFilePath = path.join(__dirname, "../alumnilist.csv");
@@ -187,89 +105,60 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = new User({
-      studentNum: studentNum || "N/A",
+    // Generate JWT token with user details
+    const tokenPayload = {
       firstName,
       lastName,
-      birthday: formattedBirthday,
+      birthday,
       email,
-      password: hashedPassword,
-      isVerified: false,
+      mobileNumber,
+      password,
+    };
+    const jwtToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: "10m", // Set token expiry time
     });
 
-    await newUser.save();
+    // Set JWT token in cookies
+    res.cookie("userToken", jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Only secure in production
+      sameSite: "strict",
+      maxAge: 10 * 60 * 1000, // 10 minutes expiration
+    });
 
-    try {
-      console.log("Attempting to set cookie for email:", email);
-      res.cookie("userEmail", email, {
-        httpOnly: true, // Set to false so frontend can access it
-        secure: process.env.NODE_ENV === "production", // Only set cookies over HTTPS in production
-        sameSite: "strict", // Can adjust depending on CORS setup
-        maxAge: 10 * 60 * 1000, // 10min expiration for example
-      });
-
-      console.log("Cookie set successfully for email:", email);
-
-      res.status(200).json({
-        redirect: "/verifyaccount",
-      });
-    } catch (error) {
-      console.error("Failed to set cookie:", error);
-      return res.status(500).json({ msg: "Internal Server Error" });
-    }
+    return res.status(200).json({
+      msg: "Alumni verified. Proceeding to OTP verification...",
+      redirect: "/verifyaccount",
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ msg: "Server error", error: err.message });
+    return res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
-exports.getEmailFromCookie = (req, res) => {
-  const email = req.cookies.userEmail; // Retrieve the email from the cookie
-  if (email) {
-    return res.status(200).json({ email });
-  } else {
-    return res.status(400).json({ msg: "Session expired" });
-  }
-};
-
-// Verify OTP
-exports.verifyOTP = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-
-    const otpRecord = await OTP.findOne({ email, otp });
-    if (!otpRecord) {
-      return res.status(400).json({ msg: "Invalid OTP" });
-    }
-
-    await User.updateOne({ email }, { isVerified: true });
-    await OTP.deleteOne({ email, otp });
-
-    res.clearCookie("userEmail");
-
-    res.status(200).json({ msg: "User verified successfully" });
-  } catch (err) {
-    res.status(500).json({ msg: "Server error", error: err.message });
-  }
-};
-
 // Send OTP
 exports.sendOTP = async (req, res) => {
   try {
-    const { email, otpType } = req.body;
-    if (!email || !otpType) {
-      return res.status(400).json({ msg: "OTP type are required" });
+    // Get the token from the cookies
+    const token = req.cookies.userToken;
+
+    if (!token) {
+      console.error("Token missing in request");
+      return res.status(401).json({ msg: "Unauthorized, token missing" });
     }
 
-    const otp = generateOTP();
+    // Decode the token to get the user details (specifically email)
+    const { email } = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Save OTP to the database
+    if (!email) {
+      return res.status(400).json({ msg: "Email is required for OTP" });
+    }
+
+    // Generate OTP and save it associated with the user's email
+    const otp = generateOTP();
     const newOTP = new OTP({ email, otp });
     await newOTP.save();
 
-    console.log(`Sending OTP ${otp} to ${email}`);
+    console.log(`Sending OTP ${otp} to email: ${email}`);
 
     // Send OTP via email
     const transporter = nodemailer.createTransport({
@@ -287,31 +176,100 @@ exports.sendOTP = async (req, res) => {
       text: `Your OTP code is ${otp}`,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending OTP:", error);
-        return res
-          .status(500)
-          .json({ msg: "Error sending OTP", error: error.message });
-      }
-      console.log("OTP sent successfully:", info.response);
-      res.status(200).json({ msg: "OTP sent successfully" });
-    });
+    await transporter.sendMail(mailOptions);
+
+    // Respond with success message
+    res.status(200).json({ msg: "OTP sent successfully" });
   } catch (err) {
-    res.status(500).json({ msg: "Server error", error: err.message });
+    console.error("Error sending OTP:", err);
+    return res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
 
-// if the user cancel or return to the regis page
-exports.cancel = (req, res) => {
-  res.clearCookie("userEmail", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
-  });
-  res.status(200).json({ msg: "Cancelled, cookie removed" });
+// Verify OTP
+exports.verifyOTP = async (req, res) => {
+  try {
+    const { otp } = req.body; // OTP coming in the body
+
+    // Get the token from the cookies
+    const token = req.cookies.userToken;
+    if (!token) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Decode the token to get user details
+    const userDetails = jwt.verify(token, process.env.JWT_SECRET);
+    const { firstName, lastName, birthday, email, mobileNumber, password } =
+      userDetails; // Extract password
+
+    // Validate OTP
+    const otpRecord = await OTP.findOne({ email, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ msg: "Invalid OTP" });
+    }
+
+    // Hash the password from the cookie
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Check if the user already exists to avoid duplicate records
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ msg: "User already registered" });
+    }
+
+    // Create a new user record
+    const newUser = new User({
+      studentNum: "N/A", // If applicable, change based on real logic
+      firstName,
+      lastName,
+      birthday,
+      email,
+      mobileNumber,
+      password: hashedPassword,
+      isVerified: true,
+    });
+
+    await newUser.save();
+    await OTP.deleteOne({ email, otp }); // Clean up OTP records
+
+    // Send success response along with user details
+    return res.status(200).json({
+      user: { firstName, lastName, email, mobileNumber, birthday },
+    });
+  } catch (err) {
+    console.error("Error verifying OTP:", err);
+    return res.status(500).json({ msg: "Server error", error: err.message });
+  }
 };
 
+exports.cancel = async (req, res) => {
+  try {
+    // Clear the cookies
+    res.clearCookie("userToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+    });
+    res.clearCookie("userEmail", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+    });
+    res.clearCookie("userMobile", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+    });
+
+    // Send response to indicate success
+    res.status(200).json({ msg: "Cookies cleared, process canceled" });
+  } catch (error) {
+    console.error("Error clearing cookies:", error);
+    res
+      .status(500)
+      .json({ msg: "Error canceling process", error: error.message });
+  }
+};
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -367,6 +325,27 @@ exports.loginUser = async (req, res) => {
   } catch (err) {
     console.error("Server error:", err.message);
     res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
+
+exports.checkAuth = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+
+    if (!token) {
+      return res.status(401).json({ success: false, msg: "Not authenticated" });
+    }
+
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Return success with user role
+    return res.status(200).json({
+      success: true,
+      role: decoded.role, // Include role in the response
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, msg: "Server error" });
   }
 };
 

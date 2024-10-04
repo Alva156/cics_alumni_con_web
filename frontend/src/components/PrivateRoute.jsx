@@ -1,40 +1,51 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import ErrorPage from "../components/ErrorPage";
 
-const PrivateRoute = ({ children, requiredRole, onAuthError }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
-  const [hasPermission, setHasPermission] = useState(null);
+const ErrorFallback = () => {
+  return <ErrorPage />;
+};
+
+const PrivateRoute = ({ children, requiredRole }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const response = await fetch("http://localhost:6001/users/check-auth", {
-          credentials: "include",
+          method: "GET",
+          credentials: "include", // Ensures cookies are sent with the request
         });
 
         const data = await response.json();
-        if (data.success) {
+
+        if (response.ok && data.success) {
           setIsAuthenticated(true);
-          const userRole = data.role;
-          setHasPermission(!requiredRole || userRole === requiredRole);
-        } else {
-          setIsAuthenticated(false);
+          setUserRole(data.role); // Set user role
         }
       } catch (error) {
         console.error("Error checking authentication:", error);
-        setIsAuthenticated(false);
+      } finally {
+        setLoading(false);
       }
     };
 
     checkAuth();
-  }, [requiredRole]);
+  }, []);
 
-  if (isAuthenticated === null || hasPermission === null) {
-    return null;
+  if (loading) {
+    return null; // You can replace this with a loading spinner or skeleton
   }
 
-  if (!isAuthenticated || !hasPermission) {
-    return onAuthError();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  if (requiredRole && userRole !== requiredRole) {
+    return <ErrorFallback />;
   }
 
   return children;
@@ -42,8 +53,7 @@ const PrivateRoute = ({ children, requiredRole, onAuthError }) => {
 
 PrivateRoute.propTypes = {
   children: PropTypes.element.isRequired,
-  requiredRole: PropTypes.string,
-  onAuthError: PropTypes.func.isRequired,
+  requiredRole: PropTypes.string, // Optional: specify the role needed for this route
 };
 
 export default PrivateRoute;

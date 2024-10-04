@@ -185,8 +185,24 @@ function ResetPassword() {
                 />
               </span>
             </div>
-            {/* Password requirements here */}
-            <label className="block mb-1 mt-4 text-sm font-medium">
+            <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
+              Password Requirements:
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              At least 8 characters long
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must contain at least one uppercase letter (A-Z)
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must contain at least one digit (0-9)
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must include at least one special character (e.g., !, @, #, $, %,
+              ^, &, *)
+            </p>
+
+            <label className="block mb-1 mt-6 text-sm font-medium">
               Confirm New Password *
             </label>
             <div className="relative mb-6">

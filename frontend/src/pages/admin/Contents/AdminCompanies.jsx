@@ -12,6 +12,9 @@ function AdminCompanies() {
   const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
   const modalRef = useRef(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [showSuccessMessage, setSuccessMessage] = useState(false);
+  const [showErrorMessage, setErrorMessage] = useState(false);
+  const [showMessage, setshowMessage] = useState("");
 
   // Fetch all companies from the server
   const fetchCompanies = async () => {
@@ -68,6 +71,11 @@ function AdminCompanies() {
       console.log("Delete response:", response.data); // Debugging line
       fetchCompanies(); // Refresh company list
       closeModal(); // Close modal after deleting
+      setshowMessage("Company deleted successfully!");
+      setSuccessMessage(true);
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
     } catch (error) {
       console.error(
         "Error deleting company:",
@@ -78,6 +86,17 @@ function AdminCompanies() {
 
   const handleUpdateCompany = async () => {
     if (!selectedCompany) return;
+    if (
+      !selectedCompany.name ||
+      !selectedCompany.address ||
+      !selectedCompany.description ||
+      !selectedCompany.contact
+    ) {
+      setshowMessage("Please fill in all required fields.");
+      setErrorMessage(true);
+      setTimeout(() => setErrorMessage(false), 3000);
+      return;
+    }
 
     try {
       const response = await axios.put(
@@ -98,7 +117,12 @@ function AdminCompanies() {
         )
       );
 
-      closeModal(); // Close modal after updating
+      closeModal();
+      setshowMessage("Company updated successfully!");
+      setSuccessMessage(true);
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
     } catch (error) {
       console.error("Error updating company:", error);
     }
@@ -112,6 +136,17 @@ function AdminCompanies() {
       description: document.getElementById("company-description").value,
       contact: document.getElementById("company-contact").value,
     };
+    if (
+      !companyData.name ||
+      !companyData.address ||
+      !companyData.description ||
+      !companyData.contact
+    ) {
+      setshowMessage("Please fill in all required fields.");
+      setErrorMessage(true); // Ensure to set this to true
+      setTimeout(() => setErrorMessage(false), 3000);
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -125,11 +160,16 @@ function AdminCompanies() {
       setCompanies([...companies, response.data]); // Update companies list
       setSelectedCompany(null); // Clear selected company
       setIsAddModalOpen(false); // Close the modal
+      setshowMessage("Company created successfully!");
+      setSuccessMessage(true);
       // Optionally reset input fields if necessary
       document.getElementById("company-name").value = "";
       document.getElementById("company-address").value = "";
       document.getElementById("company-description").value = "";
       document.getElementById("company-contact").value = "";
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
     } catch (error) {
       console.error("Error creating company:", error);
     }
@@ -151,7 +191,11 @@ function AdminCompanies() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-xl mb-4">Companies</h1>
+      {showSuccessMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+          <p>{showMessage}</p>
+        </div>
+      )}
 
       <div className="mb-4 relative">
         <input
@@ -278,6 +322,11 @@ function AdminCompanies() {
             ref={modalRef}
             className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
           >
+            {showErrorMessage && (
+              <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[70]">
+                <p>{showMessage}</p>
+              </div>
+            )}
             <button
               className="absolute top-4 right-4 text-black text-2xl"
               onClick={closeModal}
@@ -405,6 +454,11 @@ function AdminCompanies() {
             ref={modalRef}
             className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
           >
+            {showErrorMessage && (
+              <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[70]">
+                <p>{showMessage}</p>
+              </div>
+            )}
             <button
               className="absolute top-4 right-4 text-black text-2xl"
               onClick={closeModal}

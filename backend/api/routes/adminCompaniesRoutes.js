@@ -11,15 +11,11 @@ router.post(
 );
 
 // Get all companies for a user
-router.get(
-  "/companies",
-  authenticateJWT,
-  adminCompaniesController.getCompanies
-);
+router.get("/view", authenticateJWT, adminCompaniesController.getCompanies);
 
 // Get a specific company by ID
 router.get(
-  "/companies/:id",
+  "/view/:id",
   authenticateJWT,
   adminCompaniesController.getCompanyById
 );

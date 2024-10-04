@@ -33,9 +33,8 @@ exports.createCompany = async (req, res) => {
 // Get all companies for a specific user
 exports.getCompanies = async (req, res) => {
   try {
-    const userId = req.user.id; // You can fetch this from the JWT if you're using it in the middleware
-    const companies = await Company.find({ userId });
-
+    // Fetch all companies without filtering by userId
+    const companies = await Company.find();
     res.status(200).json(companies);
   } catch (error) {
     res.status(500).json({ msg: "Server Error", error: error.message });

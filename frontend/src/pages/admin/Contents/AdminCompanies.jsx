@@ -16,12 +16,9 @@ function AdminCompanies() {
   // Fetch all companies from the server
   const fetchCompanies = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:6001/companies/companies",
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.get("http://localhost:6001/companies/view", {
+        withCredentials: true,
+      });
       setCompanies(response.data);
     } catch (error) {
       console.error("Error fetching companies:", error);

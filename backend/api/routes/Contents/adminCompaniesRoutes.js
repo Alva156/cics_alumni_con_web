@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const authenticateJWT = require("../../middleware/auth");
-const adminCompaniesController = require("../controllers/adminCompaniesController");
+const authenticateJWT = require("../../../middleware/auth");
+const adminCompaniesController = require("../../controllers/Contents/adminCompaniesController");
 
 // Create a company
 router.post(

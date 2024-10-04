@@ -1,4 +1,4 @@
-const Company = require("../models/companyModel");
+const Company = require("../../models/Contents/companyModel");
 const jwt = require("jsonwebtoken"); // Add this line
 
 // Create new company

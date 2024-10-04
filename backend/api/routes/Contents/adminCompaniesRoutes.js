@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const authenticateJWT = require("../../middleware/auth");
-const adminCompaniesController = require("../controllers/adminCompaniesController");
+const authenticateJWT = require("../../../middleware/auth");
+const adminCompaniesController = require("../../controllers/Contents/adminCompaniesController");
 
 // Create a company
 router.post(
@@ -11,15 +11,11 @@ router.post(
 );
 
 // Get all companies for a user
-router.get(
-  "/companies",
-  authenticateJWT,
-  adminCompaniesController.getCompanies
-);
+router.get("/view", authenticateJWT, adminCompaniesController.getCompanies);
 
 // Get a specific company by ID
 router.get(
-  "/companies/:id",
+  "/view/:id",
   authenticateJWT,
   adminCompaniesController.getCompanyById
 );

@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
+const authenticateJWT = require("./middleware/auth"); // Middleware for JWT auth
+
 const app = express();
 const port = process.env.PORT || 6001;
 
@@ -30,13 +32,13 @@ mongoose
 const userRoutes = require("./api/routes/userRoutes");
 const adminCompaniesRoutes = require("./api/routes/adminCompaniesRoutes"); // Company routes
 const userProfileRoutes = require("./api/routes/userProfileRoutes"); // Company routes
-const threadsRoutes = require("./api/routes/threadsRoutes");
-const repliesRoutes = require("./api/routes/repliesRoutes");
+
+app.use("/users", userRoutes);
 app.use("/companies", adminCompaniesRoutes); // Protected routes for AdminCompanies
 app.use("/profile", userProfileRoutes); // Protected routes for AdminCompanies
-app.use("/threads", threadsRoutes);
-app.use("/replies", repliesRoutes);
-app.use("/users", userRoutes);
+
+app.use(express.json({ limit: "10mb" })); // Increase to 10MB for JSON data
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 // Basic Route
 app.get("/", (req, res) => {

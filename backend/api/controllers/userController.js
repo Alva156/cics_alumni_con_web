@@ -250,12 +250,7 @@ exports.cancel = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
     });
-    res.clearCookie("userEmail", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-    });
-    res.clearCookie("userMobile", {
+    res.clearCookie("resetToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
@@ -417,12 +412,17 @@ exports.verifyOTPPassword = async (req, res) => {
     // OTP is valid, delete OTP entry
     await OTP.deleteOne({ email, otp });
 
-    // Set a secure cookie for email
-    res.cookie("userEmail", email, {
+    // Create JWT token with email
+    const token = jwt.sign({ email }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    // Set a secure cookie for the JWT token
+    res.cookie("resetToken", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
+      maxAge: 10 * 60 * 1000, // 10mins
     });
 
     // Respond with a success message
@@ -433,14 +433,18 @@ exports.verifyOTPPassword = async (req, res) => {
 };
 
 exports.resetPassword = async (req, res) => {
-  const email = req.cookies.userEmail;
-  const { newPassword } = req.body;
+  const token = req.cookies.resetToken;
 
-  if (!email) {
-    return res.status(400).json({ msg: "Email cookie not set" });
+  if (!token) {
+    return res.status(400).json({ msg: "JWT token not set" });
   }
 
   try {
+    // Verify the JWT token and extract the email
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const email = decoded.email; // Extract email from token
+    const { newPassword } = req.body;
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ msg: "User not found" });
@@ -452,8 +456,8 @@ exports.resetPassword = async (req, res) => {
     user.password = hashedPassword;
     await user.save();
 
-    // Clear the email cookie after the password is reset
-    res.clearCookie("userEmail");
+    // Clear the JWT token cookie after the password is reset
+    res.clearCookie("resetToken");
 
     return res.status(200).json({ msg: "Password reset successfully" });
   } catch (err) {

@@ -64,10 +64,11 @@ const router = createBrowserRouter([
     path: "/dataprivacy",
     element: <DataPrivacy />,
   },
+
   {
     path: "/",
     element: (
-      <PrivateRoute requiredRole="user" onAuthError={() => <ErrorFallback />}>
+      <PrivateRoute requiredRole="user">
         <User />
       </PrivateRoute>
     ),
@@ -126,7 +127,7 @@ const router = createBrowserRouter([
   {
     path: "/admin",
     element: (
-      <PrivateRoute requiredRole="admin" onAuthError={() => <ErrorFallback />}>
+      <PrivateRoute requiredRole="admin">
         <Admin />
       </PrivateRoute>
     ),

@@ -19,6 +19,9 @@ const userProfileSchema = new Schema({
         type: Date,
         required: true,
     },
+    accountEmail: {
+        type: String,
+    },
     profession: {
         type: String,
     },
@@ -92,7 +95,7 @@ const userProfileSchema = new Schema({
         linkedIn: String,
         facebook: String,
         instagram: String,
-        emailAddress: {
+        email: {
             type: String,
         },
         mobileNumber: {

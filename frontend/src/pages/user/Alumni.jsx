@@ -6,6 +6,8 @@ function Alumni() {
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedProgram, setSelectedProgram] = useState("");
   const modalRef = useRef(null);
 
   // Fetch alumni data from the backend
@@ -52,12 +54,25 @@ function Alumni() {
     }
   }, [isModalOpen]);
 
-  // Filter alumni based on the search term
-  const filteredAlumni = alumni.filter((alumni) =>
-    `${alumni.firstName} ${alumni.lastName}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  // Filter alumni based on the search term and selected program
+  const filteredAlumni = alumni
+    .filter((alumni) =>
+      `${alumni.firstName} ${alumni.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    )
+    .filter((alumni) =>
+      selectedProgram ? alumni.collegeProgram === selectedProgram : true
+    );
+  // Sort alumni based on selected order
+  const sortedAlumni = [...filteredAlumni].sort((a, b) => {
+    const nameA = `${a.firstName} ${a.lastName}`;
+    const nameB = `${b.firstName} ${b.lastName}`;
+
+    return sortOrder === "asc"
+      ? nameA.localeCompare(nameB)
+      : nameB.localeCompare(nameA);
+  });
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -82,17 +97,28 @@ function Alumni() {
       <div className="flex md:flex-row">
         <div className="mb-6">
           <span className="text-sm">Sort by:</span>
-          <select className="ml-2 border border-black rounded px-3 py-1 text-sm mr-10">
-            <option>Name (A-Z)</option>
-            <option>Name (Z-A)</option>
+          <select
+            className="ml-2 border border-black rounded px-3 py-1 text-sm mr-10"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="asc">Name (A-Z)</option>
+            <option value="desc">Name (Z-A)</option>
           </select>
         </div>
         <div className="mb-6">
           <span className="text-sm">Filter:</span>
-          <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
-            <option>Computer Science</option>
-            <option>Information Systems</option>
-            <option>Information Technology</option>
+          <select
+            className="ml-2 border border-black rounded px-3 py-1 text-sm"
+            value={selectedProgram}
+            onChange={(e) => setSelectedProgram(e.target.value)}
+          >
+            <option value="">All Programs</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Information Systems">Information Systems</option>
+            <option value="Information Technology">
+              Information Technology
+            </option>
           </select>
         </div>
       </div>
@@ -101,8 +127,8 @@ function Alumni() {
 
       <hr className="mb-6 border-black" />
 
-      {filteredAlumni.length > 0 ? (
-        filteredAlumni.map((alumni, index) => (
+      {sortedAlumni.length > 0 ? (
+        sortedAlumni.map((alumni, index) => (
           <div
             key={index}
             className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
@@ -208,31 +234,31 @@ function Alumni() {
                   <h1 className="text-xl mb-4 mt-6">Secondary Information</h1>
                   <p className="text-xs mb-1/2">Employment Status</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.employmentstatus}
+                    {selectedAlumni.employmentStatus || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">Work Industry</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.workindustry}
+                    {selectedAlumni.workIndustry || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">
                     Is current profession in line with college degree
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.currentprofession}
+                    {selectedAlumni.professionAlignment || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">Marital Status</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.maritalstatus}
+                    {selectedAlumni.maritalStatus || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">Salary range (PHP)</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.salaryrange}
+                    {selectedAlumni.salaryRange || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">
                     Place of employment (Local or International)
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.employmentplace}
+                    {selectedAlumni.placeOfEmployment || "N/A"}
                   </p>
                 </div>
                 <div className="order-4 sm:order-4">

@@ -32,12 +32,14 @@ mongoose
 const userRoutes = require("./api/routes/userRoutes");
 const adminCompaniesRoutes = require("./api/routes/Contents/adminCompaniesRoutes"); // Company routes
 const userProfileRoutes = require("./api/routes/userProfileRoutes"); // Company routes
-const adminNewsRoutes = require("./api/routes/Contents/adminNewsRoutes"); //
+const adminNewsRoutes = require("./api/routes/Contents/adminNewsRoutes"); 
+const adminEventsRoutes = require("./api/routes/Contents/adminEventsRoutes");
 
 app.use("/users", userRoutes);
 app.use("/companies", adminCompaniesRoutes); // Protected routes for AdminCompanies
 app.use("/profile", userProfileRoutes); // Protected routes for AdminCompanies
-app.use("/news", adminNewsRoutes); //
+app.use("/news", adminNewsRoutes); 
+app.use("/events", adminEventsRoutes); 
 
 app.use(express.json({ limit: "10mb" })); // Increase to 10MB for JSON data
 app.use(express.urlencoded({ limit: "10mb", extended: true }));

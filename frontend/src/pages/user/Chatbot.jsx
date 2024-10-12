@@ -5,7 +5,6 @@ function Chatbot() {
   const [conversation, setConversation] = useState([]);
   const [stepHistory, setStepHistory] = useState([]);
   const [currentOptions, setCurrentOptions] = useState([]);
-  const [resultText, setResultText] = useState("");
 
   // Ref for chat container
   const chatContainerRef = useRef(null);
@@ -13,16 +12,35 @@ function Chatbot() {
   // Define custom results for each option
   const results = {
     // Navigation
-    Home: "Sample result for Home",
-    Alumni: "Sample result for Alumni",
-    Survey: "Sample result for Survey",
-    Content: "Sample result for Content",
-    Chatbot: "Sample result for Chatbot",
+    Home: [
+      "1. Sign In: Enter your registered credentials (username and password) to log in to the system.",
+      "2. Navigate to Home Page: Click on the 'Home' tab in the navigation bar.",
+      "3. View the Landing Page: The homepage will display the platform's Mission & Vision statements, along with links to the various pages available.",
+    ],
 
-    // Documents
-    // "Available Documents": "Sample result for Available Documents",
-    // "How to Request": "Sample result for How to Request",
-    // "Contact Details": "Sample result for Contact Details",
+    Alumni: [
+      "1. Sign In: Enter your registered credentials (username and password) to log in to the system.",
+      "2. Navigate to Alumni Page: Click on the 'Alumni' tab in the navigation bar or scroll through the home page to find the “Alumni” link.",
+      "3. View the Alumni Page: You may search, sort, and filter the list of alumni according to your preferences. In this page, the primary information, secondary information, educational background, career background, contact information, and attachment/s of alumni are available.",
+    ],
+
+    Survey: [
+      "1. Sign In: Enter your registered credentials (username and password) to log in to the system.",
+      "2. Navigate to Survey Page: Click on the 'Survey' tab in the navigation bar or scroll through the home page to find the “Survey” link.",
+      "3. View the Survey Page: You can view and answer the survey questions published by the admins.",
+    ],
+
+    Content: [
+      "1. Sign In: Enter your registered credentials (username and password) to log in to the system.",
+      "2. Navigate to Contents Page: Click on the 'Contents' tab in the navigation bar, which will display a dropdown menu including: Companies, News, Events, Certifications, Document Request Steps, and Job/Internship Referrals or scroll through the home page to find links for each content.",
+      "3. View the Contents Page: Each content page will include information such as the name, description, address, image, and contact details for the Company, News, Event, Certification, Document, or Job.",
+    ],
+
+    Chatbot: [
+      "1. Sign In: Enter your registered credentials (username and password) to log in to the system.",
+      "2. Navigate to Chatbot Page: Click on the 'Chatbot' tab in the navigation bar or scroll through the home page to find the “Chatbot” link.",
+      "3. View the Chatbot Page: Click the 'Get Started' button, and the inquiry options will be displayed. You can inquire about platform navigation, documents, certifications, and jobs; however, there will be no option to chat live with an administrator.",
+    ],
 
     // Certifications
     "Computer Science Certification":
@@ -60,12 +78,7 @@ function Chatbot() {
       // Display options based on previous step
       if (previousStep === 2) {
         addChatMessage("chatbot", "Hi! Please choose an option:");
-        addChatMessage("chatbot", [
-          "Navigation",
-          // "Documents",
-          "Certifications",
-          "Jobs",
-        ]);
+        addChatMessage("chatbot", ["Navigation", "Certifications", "Jobs"]);
       } else if (previousStep === 3) {
         addChatMessage("chatbot", "You chose:");
         addChatMessage("chatbot", currentOptions); // Restore options from Step 3
@@ -76,12 +89,7 @@ function Chatbot() {
   const handleGetStarted = () => {
     addChatMessage("user", "Get Started");
     addChatMessage("chatbot", "Hello CICS Alumni! Please choose an option:");
-    addChatMessage("chatbot", [
-      "Navigation",
-      // "Documents",
-      "Certifications",
-      "Jobs",
-    ]);
+    addChatMessage("chatbot", ["Navigation", "Certifications", "Jobs"]);
     setStepHistory([1]);
     setStep(2);
   };
@@ -96,13 +104,6 @@ function Chatbot() {
       let options = [];
       if (option === "Navigation") {
         options = ["Home", "Alumni", "Survey", "Content", "Chatbot", "Go back"];
-        // } else if (option === "Documents") {
-        //   options = [
-        //     "Available Documents",
-        //     "How to Request",
-        //     "Contact Details",
-        //     "Go back",
-        //   ];
       } else if (option === "Certifications") {
         options = [
           "Computer Science Certification",
@@ -136,14 +137,19 @@ function Chatbot() {
     // Determine the result text based on the selected option
     const result = results[subOption] || `No result found for ${subOption}`;
 
-    // Add messages after updating state
     setTimeout(() => {
       // Display result text as a chatbot message
       addChatMessage(
         "chatbot",
         `You selected ${subOption}. Here are your results:`
       );
-      addChatMessage("chatbot", result); // Ensure result is not empty
+
+      // If the result is an array, join it with <br /> for line breaks
+      const formattedResult = Array.isArray(result)
+        ? result.join("<br />")
+        : result;
+
+      addChatMessage("chatbot", formattedResult); // Ensure result is displayed properly
       addChatMessage("chatbot", ["Go back"]); // Add "Go back" button
     }, 500);
   };
@@ -198,11 +204,7 @@ function Chatbot() {
                   {chat.message.map((option, idx) => (
                     <button
                       key={idx}
-                      className={`btn w-full ${
-                        step === 4 && option === "Go back"
-                          ? "bg-blue text-white py-2 rounded-lg"
-                          : "bg-blue text-white py-2 rounded-lg"
-                      }`}
+                      className={`btn w-full bg-blue text-white py-2 rounded-lg`}
                       onClick={
                         step === 2
                           ? () => handleMainOptionClick(option)
@@ -214,7 +216,7 @@ function Chatbot() {
                   ))}
                 </div>
               ) : (
-                chat.message
+                <div dangerouslySetInnerHTML={{ __html: chat.message }} />
               )}
             </div>
           </div>

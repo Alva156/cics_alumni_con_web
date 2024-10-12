@@ -285,6 +285,11 @@ exports.loginUser = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid email or password" });
     }
+    // Fetch the userProfile to get the profileId
+    const userProfile = await UserProfile.findOne({ userId: user._id });
+    if (!userProfile) {
+      return res.status(400).json({ msg: "UserProfile not found" });
+    }
 
     // Create JWT token
     const token = jwt.sign(
@@ -294,6 +299,7 @@ exports.loginUser = async (req, res) => {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        profileId: userProfile._id,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }

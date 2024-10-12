@@ -7,6 +7,11 @@ const replySchema = new mongoose.Schema({
     ref: "Thread",
   },
   userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
+  userProfileId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "UserProfile",
+  },
   reply: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });

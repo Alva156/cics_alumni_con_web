@@ -8,26 +8,28 @@ exports.createThread = async (req, res) => {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
+    const userProfileId = decoded.profileId; // Assuming profileId is included in the JWT
 
     const { title, content } = req.body;
 
     const newThread = new Thread({
-      userId, // Add userId to the thread
+      userId,
+      userProfileId, // Use userProfileId
       title,
       content,
     });
 
     await newThread.save();
 
-    // Populate the user details for the response
+    // Populate the user profile details for the response
     const populatedThread = await Thread.findById(newThread._id).populate(
-      "userId",
-      "firstName lastName"
+      "userProfileId",
+      "firstName lastName profileImage profession"
     );
 
     res.status(201).json({
       message: "Thread created successfully!",
-      thread: populatedThread, // Return the populated thread
+      thread: populatedThread,
     });
   } catch (error) {
     res.status(500).json({ error: "Failed to create thread" });
@@ -41,12 +43,11 @@ exports.getUserThreads = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const userProfileId = decoded.profileId;
 
-    // Find threads created by the logged-in user and also count replies for each thread
-    const userThreads = await Thread.find({ userId })
-      .populate("userId", "firstName lastName")
-      .lean(); // Use lean to get plain objects
+    const userThreads = await Thread.find({ userProfileId })
+      .populate("userProfileId", "firstName lastName profileImage profession")
+      .lean();
 
     // Count replies for each thread
     const threadsWithReplyCount = await Promise.all(
@@ -63,19 +64,20 @@ exports.getUserThreads = async (req, res) => {
 };
 
 // Get all threads
+// Get all threads
 exports.getAllThreads = async (req, res) => {
   try {
     const token = req.cookies.token;
-    let userId = null;
+    let userId = null; // Initialize userId
 
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      userId = decoded.id;
+      userId = decoded.id; // Assign userId from the decoded token
     }
 
     // Fetch all threads and populate the user's details
     const threads = await Thread.find()
-      .populate("userId", "firstName lastName")
+      .populate("userProfileId", "firstName lastName profileImage profession")
       .lean();
 
     // Count replies for each thread
@@ -85,7 +87,7 @@ exports.getAllThreads = async (req, res) => {
         return {
           ...thread,
           replyCount,
-          isOwner: userId && thread.userId._id.toString() === userId.toString(),
+          isOwner: userId && thread.userId.toString() === userId.toString(), // Compare thread's userId with logged-in user's id
         };
       })
     );
@@ -110,6 +112,7 @@ exports.getThreadById = async (req, res) => {
 };
 
 // Update a thread (only the owner can update)
+// Update a thread (only the owner can update)
 exports.updateThread = async (req, res) => {
   try {
     const token = req.cookies.token;
@@ -133,22 +136,23 @@ exports.updateThread = async (req, res) => {
 
     const updatedThread = await thread.save();
 
-    // Populate the user details for the response
-    const populatedThread = await Thread.findById(updatedThread._id).populate(
-      "userId",
-      "firstName lastName"
-    );
+    // Populate the user profile details for the response
+    const populatedThread = await Thread.findById(updatedThread._id)
+      .populate("userProfileId", "firstName lastName profileImage profession")
+      .lean();
 
+    // Fetch the reply count for this thread
+    const replyCount = await Reply.countDocuments({ threadId: thread._id });
+
+    // Send the response including the reply count
     res.status(200).json({
       message: "Thread updated successfully",
-      thread: populatedThread, // Return the populated thread
+      thread: { ...populatedThread, replyCount }, // Return the populated thread with the reply count
     });
   } catch (error) {
     res.status(500).json({ message: "Error updating thread", error });
   }
 };
-
-// Delete a thread (only the owner can delete)
 
 // Delete a thread (only the owner can delete)
 exports.deleteThread = async (req, res) => {

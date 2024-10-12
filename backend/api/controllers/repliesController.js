@@ -7,21 +7,23 @@ exports.createReply = async (req, res) => {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
+    const userProfileId = decoded.profileId; // Assuming profileId is included in the JWT
 
     const { threadId, reply } = req.body;
 
     const newReply = new Reply({
       threadId,
       userId,
+      userProfileId, // Use userProfileId for consistency
       reply,
     });
 
     await newReply.save();
 
-    // Populate the user details for the response
+    // Populate the user profile details for the response
     const populatedReply = await Reply.findById(newReply._id).populate(
-      "userId",
-      "firstName lastName"
+      "userProfileId",
+      "firstName lastName profileImage profession"
     );
 
     res.status(201).json({
@@ -36,15 +38,18 @@ exports.createReply = async (req, res) => {
 // Get replies for a thread
 exports.getRepliesByThreadId = async (req, res) => {
   try {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userProfileId = decoded.profileId; // Use profileId from the JWT token
+
     const replies = await Reply.find({
       threadId: req.params.threadId,
-    }).populate("userId", "firstName lastName");
+    }).populate("userProfileId", "firstName lastName profileImage profession");
 
-    const userId = req.user.id; // Assuming authenticateJWT adds user info to req.user
-
+    // Check if the current user's profileId matches the profileId of the reply's creator
     const repliesWithOwnership = replies.map((reply) => ({
       ...reply.toObject(),
-      isOwner: reply.userId._id.toString() === userId.toString(),
+      isOwner: reply.userProfileId._id.toString() === userProfileId.toString(),
     }));
 
     res.status(200).json(repliesWithOwnership);
@@ -58,7 +63,7 @@ exports.updateReply = async (req, res) => {
   try {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const userProfileId = decoded.profileId;
 
     const { reply } = req.body;
     const existingReply = await Reply.findById(req.params.id);
@@ -67,7 +72,7 @@ exports.updateReply = async (req, res) => {
       return res.status(404).json({ message: "Reply not found" });
     }
 
-    if (existingReply.userId.toString() !== userId) {
+    if (existingReply.userProfileId.toString() !== userProfileId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
@@ -76,8 +81,8 @@ exports.updateReply = async (req, res) => {
 
     // Populate the user details
     const populatedReply = await Reply.findById(updatedReply._id).populate(
-      "userId",
-      "firstName lastName"
+      "userProfileId",
+      "firstName lastName profileImage profession"
     );
 
     res.status(200).json({
@@ -94,7 +99,7 @@ exports.deleteReply = async (req, res) => {
   try {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const userProfileId = decoded.profileId;
 
     const reply = await Reply.findById(req.params.id);
 
@@ -102,7 +107,7 @@ exports.deleteReply = async (req, res) => {
       return res.status(404).json({ message: "Reply not found" });
     }
 
-    if (reply.userId.toString() !== userId) {
+    if (reply.userProfileId.toString() !== userProfileId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 

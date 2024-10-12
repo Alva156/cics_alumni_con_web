@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import sampleidpic from "../../assets/sampleidpic.jpg";
+import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function AdminThreads() {
   const [myThreads, setMyThreads] = useState([]);
@@ -274,10 +275,34 @@ function AdminThreads() {
 
   const handleDeleteReply = async (replyId) => {
     try {
+      // First, identify the thread to which the reply belongs
+      const threadId = selectedThread._id; // Get the current selected thread ID
+
+      // Send the delete request to the server
       await axios.delete(`http://localhost:6001/replies/delete/${replyId}`, {
         withCredentials: true,
       });
+
+      // Update the replies state to remove the deleted reply
       setReplies(replies.filter((reply) => reply._id !== replyId));
+
+      // Decrement the reply count for the thread
+      setMyThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === threadId
+            ? { ...thread, replyCount: thread.replyCount - 1 }
+            : thread
+        )
+      );
+
+      setAllThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === threadId
+            ? { ...thread, replyCount: thread.replyCount - 1 }
+            : thread
+        )
+      );
+
       showValidation("Reply deleted successfully!");
     } catch (error) {
       console.error("Error deleting reply:", error);
@@ -528,16 +553,18 @@ function AdminThreads() {
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center">
                 <img
-                  src={sampleidpic} // Replace with dynamic user avatar
+                  src={
+                    selectedThread.userProfileId.profileImage || blankprofilepic
+                  } // Replace with dynamic user avatar
                   alt="User Avatar"
                   className="w-14 h-14 mr-3"
                 />
                 <div>
                   <h2 className="text-md lg:text-xl font-semibold">
-                    {`${selectedThread.userId.firstName} ${selectedThread.userId.lastName}`}
+                    {`${selectedThread.userProfileId.firstName} ${selectedThread.userProfileId.lastName}`}
                   </h2>
                   <p className="text-gray-500">
-                    {selectedThread.userRole || "Software Engineer"}
+                    {selectedThread.userProfileId.profession}
                   </p>
                   <p className="text-gray-400 text-sm">
                     Posted on{" "}
@@ -589,12 +616,12 @@ function AdminThreads() {
                   className="p-4 border border-black rounded-lg flex items-start mb-2"
                 >
                   <img
-                    src={sampleidpic}
+                    src={reply.userProfileId.profileImage || blankprofilepic}
                     alt="User Avatar"
                     className="w-10 h-10 mr-3"
                   />
                   <div className="flex-grow">
-                    <h4 className="font-semibold text-sm">{`${reply.userId.firstName} ${reply.userId.lastName}`}</h4>
+                    <h4 className="font-semibold text-sm">{`${reply.userProfileId.firstName} ${reply.userProfileId.lastName}`}</h4>
 
                     <p className="text-gray-500 text-xs mb-2">
                       {reply.createdAt

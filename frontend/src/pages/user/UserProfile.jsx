@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../App.css";
 import axios from "axios";
 import { uniqueId } from "lodash"; // Make sure you import uniqueId
-import imageCompression from 'browser-image-compression';
+import imageCompression from "browser-image-compression";
 
 function UserProfile() {
   const [showValidationMessage, setShowValidationMessage] = useState(false);
@@ -34,10 +34,22 @@ function UserProfile() {
   const [profileImage, setProfileImage] = useState("");
   const [accountEmail, setAccountEmail] = useState("");
 
-  const [secondaryEducationSections, setSecondaryEducationSections] = useState([{ schoolName: "", yearStarted: "", yearEnded: "" }]);
-  const [tertiaryEducationSections, setTertiaryEducationSections] = useState([{ schoolName: "", program: "", yearStarted: "", yearEnded: "" }]);
+  const [secondaryEducationSections, setSecondaryEducationSections] = useState([
+    { schoolName: "", yearStarted: "", yearEnded: "" },
+  ]);
+  const [tertiaryEducationSections, setTertiaryEducationSections] = useState([
+    { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
+  ]);
 
-  const [companySections, setCompanySections] = useState([{ id: uniqueId(), companyName: "", position: "", yearStarted: "", yearEnded: "" }]);
+  const [companySections, setCompanySections] = useState([
+    {
+      id: uniqueId(),
+      companyName: "",
+      position: "",
+      yearStarted: "",
+      yearEnded: "",
+    },
+  ]);
 
   const [attachments, setAttachments] = useState([{ id: 1 }]);
 
@@ -46,15 +58,30 @@ function UserProfile() {
   };
 
   const addSecondaryEducationSection = () => {
-    setSecondaryEducationSections([...secondaryEducationSections, { schoolName: "", yearStarted: "", yearEnded: "" }]);
+    setSecondaryEducationSections([
+      ...secondaryEducationSections,
+      { schoolName: "", yearStarted: "", yearEnded: "" },
+    ]);
   };
 
   const addTertiaryEducationSection = () => {
-    setTertiaryEducationSections([...tertiaryEducationSections, { schoolName: "", program: "", yearStarted: "", yearEnded: "" }]);
+    setTertiaryEducationSections([
+      ...tertiaryEducationSections,
+      { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
+    ]);
   };
 
   const addCompanySection = () => {
-    setCompanySections([...companySections, { id: uniqueId(), companyName: "", position: "", yearStarted: "", yearEnded: "" }]);
+    setCompanySections([
+      ...companySections,
+      {
+        id: uniqueId(),
+        companyName: "",
+        position: "",
+        yearStarted: "",
+        yearEnded: "",
+      },
+    ]);
   };
 
   const handleImageChange = async (e) => {
@@ -62,8 +89,8 @@ function UserProfile() {
     if (file) {
       try {
         const options = {
-          maxSizeMB: 1,  // Limit to 1MB
-          maxWidthOrHeight: 500,  // Adjust dimensions to limit size
+          maxSizeMB: 1, // Limit to 1MB
+          maxWidthOrHeight: 500, // Adjust dimensions to limit size
           useWebWorker: true,
         };
         const compressedFile = await imageCompression(file, options);
@@ -81,29 +108,74 @@ function UserProfile() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     switch (name) {
-      case "accountEmail": setAccountEmail(value); break;
-      case "firstName": setFirstName(value); break;
-      case "lastName": setLastName(value); break;
-      case "birthday": setBirthday(value); break;
-      case "profession": setProfession(value); break;
-      case "collegeProgram": setCollegeProgram(value); break;
-      case "specialization": setSpecialization(value); break;
-      case "yearStartedCollege": setYearStartedCollege(value); break;
-      case "yearGraduatedCollege": setYearGraduatedCollege(value); break;
-      case "timeToJob": setTimeToJob(value); break;
-      case "employmentStatus": setEmploymentStatus(value); break;
-      case "professionAlignment": setProfessionAlignment(value); break;
-      case "workIndustry": setWorkIndustry(value); break;
-      case "maritalStatus": setMaritalStatus(value); break;
-      case "salaryRange": setSalaryRange(value); break;
-      case "placeOfEmployment": setPlaceOfEmployment(value); break;
-      case "linkedIn": setLinkedIn(value); break; // Fixed state name here
-      case "facebook": setFacebook(value); break;
-      case "instagram": setInstagram(value); break;
-      case "email": setEmail(value); break;
-      case "mobileNumber": setMobileNumber(value); break;
-      case "otherContact": setOtherContact(value); break;
-      default: break;
+      case "accountEmail":
+        setAccountEmail(value);
+        break;
+      case "firstName":
+        setFirstName(value);
+        break;
+      case "lastName":
+        setLastName(value);
+        break;
+      case "birthday":
+        setBirthday(value);
+        break;
+      case "profession":
+        setProfession(value);
+        break;
+      case "collegeProgram":
+        setCollegeProgram(value);
+        break;
+      case "specialization":
+        setSpecialization(value);
+        break;
+      case "yearStartedCollege":
+        setYearStartedCollege(value);
+        break;
+      case "yearGraduatedCollege":
+        setYearGraduatedCollege(value);
+        break;
+      case "timeToJob":
+        setTimeToJob(value);
+        break;
+      case "employmentStatus":
+        setEmploymentStatus(value);
+        break;
+      case "professionAlignment":
+        setProfessionAlignment(value);
+        break;
+      case "workIndustry":
+        setWorkIndustry(value);
+        break;
+      case "maritalStatus":
+        setMaritalStatus(value);
+        break;
+      case "salaryRange":
+        setSalaryRange(value);
+        break;
+      case "placeOfEmployment":
+        setPlaceOfEmployment(value);
+        break;
+      case "linkedIn":
+        setLinkedIn(value);
+        break; // Fixed state name here
+      case "facebook":
+        setFacebook(value);
+        break;
+      case "instagram":
+        setInstagram(value);
+        break;
+      case "email":
+        setEmail(value);
+        break;
+      case "mobileNumber":
+        setMobileNumber(value);
+        break;
+      case "otherContact":
+        setOtherContact(value);
+        break;
+      default:
+        break;
     }
   };
 
@@ -126,13 +198,11 @@ function UserProfile() {
     setCompanySections(newSections);
   };
 
-
   const handleSave = (e) => {
-    console.log('saved');
+    console.log("saved");
     e.preventDefault(); // Prevent default form submission
-    handleSubmit(e);     // Call the handleSubmit function to save the form data
+    handleSubmit(e); // Call the handleSubmit function to save the form data
   };
-
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -146,13 +216,11 @@ function UserProfile() {
         setShowValidationMessage(false);
       }, 3000);
 
-
       return; // Prevent submission
     }
 
     // Reset the validation message when inputs are valid
     setShowErrorMessage(false);
-
 
     const userData = {
       firstName,
@@ -187,10 +255,15 @@ function UserProfile() {
 
     try {
       // Try to fetch profile to check if it exists
-      const profileResponse = await axios.get("http://localhost:6001/profile/userprofile", { withCredentials: true });
+      const profileResponse = await axios.get(
+        "http://localhost:6001/profile/userprofile",
+        { withCredentials: true }
+      );
 
       // If profile exists, update it
-      await axios.put("http://localhost:6001/profile/updateprofile", userData, { withCredentials: true });
+      await axios.put("http://localhost:6001/profile/updateprofile", userData, {
+        withCredentials: true,
+      });
       console.log("Profile updated successfully!");
 
       setValidationMessage("Profile saved successfully!");
@@ -199,20 +272,26 @@ function UserProfile() {
       setTimeout(() => {
         setShowValidationMessage(false);
       }, 3000);
-
     } catch (error) {
       if (error.response && error.response.status === 404) {
         // If profile doesn't exist, create a new one
-        await axios.post("http://localhost:6001/profile/createprofile", userData, { withCredentials: true });
+        await axios.post(
+          "http://localhost:6001/profile/createprofile",
+          userData,
+          { withCredentials: true }
+        );
         console.log("Profile created successfully!");
         setValidationMessage("Profile created successfully!");
         setShowValidationMessage(true);
 
         setTimeout(() => {
-        setShowValidationMessage(false);
-      }, 3000);
+          setShowValidationMessage(false);
+        }, 3000);
       } else {
-        console.error("Error saving profile:", error.response ? error.response.data : error.message);
+        console.error(
+          "Error saving profile:",
+          error.response ? error.response.data : error.message
+        );
         setErrorMessage("Error saving profile. Please try again.");
         setShowErrorMessage(true);
         setTimeout(() => {
@@ -222,13 +301,14 @@ function UserProfile() {
     }
   };
 
-
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         console.log("Sending request to fetch profile...");
-        const response = await axios.get("http://localhost:6001/profile/userprofile", { withCredentials: true });
+        const response = await axios.get(
+          "http://localhost:6001/profile/userprofile",
+          { withCredentials: true }
+        );
 
         console.log("Profile fetched:", response.data);
 
@@ -260,21 +340,24 @@ function UserProfile() {
 
           // Convert birthday to "yyyy-MM-dd" format if available
           if (profileData.birthday) {
-            const birthdayDate = new Date(profileData.birthday).toISOString().substring(0, 10);
+            const birthdayDate = new Date(profileData.birthday)
+              .toISOString()
+              .substring(0, 10);
             setBirthday(birthdayDate);
           }
         } else {
           console.error("User profile not found");
         }
       } catch (error) {
-        console.error("Error fetching profile:", error.response ? error.response.data : error.message);
+        console.error(
+          "Error fetching profile:",
+          error.response ? error.response.data : error.message
+        );
       }
     };
 
     fetchProfile();
   }, []);
-
-
 
   return (
     <>
@@ -293,15 +376,32 @@ function UserProfile() {
           <div className="page-title">User Profile</div>
 
           {/* TABS */}
-          <div role="tablist" className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg">
-            <input type="radio" name="my_tabs_2" role="tab" className="tab" aria-label="Primary" defaultChecked />
-            <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6 tab-active">
+          <div
+            role="tablist"
+            className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg"
+          >
+            <input
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="Primary"
+              defaultChecked
+            />
+            <div
+              role="tabpanel"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6 tab-active"
+            >
               <div>
                 <div className="text-black font-light">
                   {/* PRIMARY INFORMATION */}
                   <div className="text-xl py-4">Primary Information</div>
 
-                  <img src={profileImage} alt="Profile" className="h-40 w-40 border-2" />
+                  <img
+                    src={profileImage}
+                    alt="Profile"
+                    className="h-40 w-40 border-2"
+                  />
 
                   <div className="mt-4">
                     <label className="pt-4 pb-2 text-sm">Profile Picture</label>
@@ -371,7 +471,6 @@ function UserProfile() {
                       onChange={(e) => setCollegeProgram(e.target.value)}
                       name="collegeProgram"
                       value={collegeProgram}
-
                     >
                       <option value="" disabled>
                         Choose
@@ -395,7 +494,9 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">Year Started on College Program</label>
+                    <label className="pt-4 pb-2 text-sm">
+                      Year Started on College Program
+                    </label>
                     <input
                       type="date"
                       placeholder="Type here"
@@ -407,7 +508,9 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">Year Graduated on College Program</label>
+                    <label className="pt-4 pb-2 text-sm">
+                      Year Graduated on College Program
+                    </label>
                     <input
                       type="date"
                       placeholder="Type here"
@@ -419,7 +522,9 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">Time it took to land a job after graduation (Months)</label>
+                    <label className="pt-4 pb-2 text-sm">
+                      Time it took to land a job after graduation (Months)
+                    </label>
                     <input
                       type="text"
                       placeholder="Type here"
@@ -441,7 +546,10 @@ function UserProfile() {
               className="tab"
               aria-label="Secondary"
             />
-            <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
+            <div
+              role="tabpanel"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+            >
               <div>
                 <div className="text-xl py-4 mt-4">Secondary Information</div>
 
@@ -480,7 +588,9 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Is current profession in line with college degree?</label>
+                  <label className="pt-4 pb-2 text-sm">
+                    Is current profession in line with college degree?
+                  </label>
                   <select
                     name="professionAlignment"
                     className="select select-bordered select-sm border-2 w-full h-10"
@@ -514,7 +624,9 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Salary Range (PHP)</label>
+                  <label className="pt-4 pb-2 text-sm">
+                    Salary Range (PHP)
+                  </label>
                   <select
                     name="salaryRange"
                     className="select select-bordered select-sm border-2 w-full h-10"
@@ -533,7 +645,9 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Place of Employment</label>
+                  <label className="pt-4 pb-2 text-sm">
+                    Place of Employment
+                  </label>
                   <select
                     name="placeOfEmployment"
                     className="select select-bordered select-sm border-2 w-full h-10"
@@ -558,7 +672,10 @@ function UserProfile() {
               className="tab"
               aria-label="Contacts"
             />
-            <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
+            <div
+              role="tabpanel"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+            >
               <div>
                 <div className="text-xl py-4 mt-4">Contact Information</div>
 
@@ -636,8 +753,6 @@ function UserProfile() {
               </div>
             </div>
 
-
-
             <input
               type="radio"
               name="my_tabs_2"
@@ -692,7 +807,9 @@ function UserProfile() {
             >
               <div>
                 {/* EDUCATIONAL BACKGROUND */}
-                <div className="text-xl py-4 mt-4 w-1/2">Educational Background</div>
+                <div className="text-xl py-4 mt-4 w-1/2">
+                  Educational Background
+                </div>
 
                 {/* SECONDARY EDUCATION */}
                 <div className="flex items-center">
@@ -711,7 +828,6 @@ function UserProfile() {
                   <div
                     key={index}
                     className="w-full border-2 rounded py-2 px-4 mt-2"
-
                   >
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">School Name</label>
@@ -720,7 +836,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.schoolName}
-                        onChange={(e) => handleSecondaryEducationChange(index, e)}
+                        onChange={(e) =>
+                          handleSecondaryEducationChange(index, e)
+                        }
                       />
                     </div>
 
@@ -731,7 +849,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
-                        onChange={(e) => handleSecondaryEducationChange(index, e)}
+                        onChange={(e) =>
+                          handleSecondaryEducationChange(index, e)
+                        }
                       />
                     </div>
 
@@ -742,7 +862,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
-                        onChange={(e) => handleSecondaryEducationChange(index, e)}
+                        onChange={(e) =>
+                          handleSecondaryEducationChange(index, e)
+                        }
                       />
                     </div>
                   </div>
@@ -765,7 +887,6 @@ function UserProfile() {
                   <div
                     key={index}
                     className="w-full border-2 rounded py-2 px-4 mt-2"
-
                   >
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">School Name</label>
@@ -774,7 +895,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.schoolName}
-                        onChange={(e) => handleTertiaryEducationChange(index, e)}
+                        onChange={(e) =>
+                          handleTertiaryEducationChange(index, e)
+                        }
                       />
                     </div>
 
@@ -785,7 +908,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.program}
-                        onChange={(e) => handleTertiaryEducationChange(index, e)}
+                        onChange={(e) =>
+                          handleTertiaryEducationChange(index, e)
+                        }
                       />
                     </div>
 
@@ -796,7 +921,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
-                        onChange={(e) => handleTertiaryEducationChange(index, e)}
+                        onChange={(e) =>
+                          handleTertiaryEducationChange(index, e)
+                        }
                       />
                     </div>
 
@@ -807,7 +934,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
-                        onChange={(e) => handleTertiaryEducationChange(index, e)}
+                        onChange={(e) =>
+                          handleTertiaryEducationChange(index, e)
+                        }
                       />
                     </div>
                   </div>
@@ -829,7 +958,9 @@ function UserProfile() {
               <div>
                 {/* CAREER */}
                 <div className="flex items-center">
-                  <div className="text-xl py-4 mt-4 w-1/2">Career Background</div>
+                  <div className="text-xl py-4 mt-4 w-1/2">
+                    Career Background
+                  </div>
                   <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
                       className="btn btn-sm w-36 bg-green text-white"
@@ -844,7 +975,6 @@ function UserProfile() {
                   <div
                     key={section.id}
                     className="w-full border-2 rounded py-2 px-4 mt-2"
-
                   >
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Company Name</label>
@@ -894,7 +1024,6 @@ function UserProfile() {
               </div>
             </div>
 
-
             <input
               type="radio"
               name="my_tabs_2"
@@ -923,7 +1052,7 @@ function UserProfile() {
                 </div>
 
                 <div className="mt-4">
-                  <button className="btn md:w-64 w-full bg-fgray text-white" >
+                  <button className="btn md:w-64 w-full bg-fgray text-white">
                     Reset Password
                   </button>
                 </div>
@@ -935,7 +1064,6 @@ function UserProfile() {
 
           {/* BOTTOM BUTTONS */}
           <div className="flex justify-center mt-16 space-x-3">
-
             <div>
               <button
                 className="btn md:w-64 w-52 bg-green text-white"
@@ -949,7 +1077,6 @@ function UserProfile() {
           {/* END OF BOTTOM BUTTONS */}
         </div>
       </form>
-
     </>
   );
 }

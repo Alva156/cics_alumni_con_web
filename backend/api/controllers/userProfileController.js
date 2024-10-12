@@ -227,3 +227,25 @@ exports.updateProfile = async (req, res) => {
       .json({ error: "Failed to update profile", details: error.message });
   }
 };
+
+// Get all alumni profiles
+
+exports.getAllAlumni = async (req, res) => {
+  try {
+    const alumniProfiles = await UserProfile.find().populate({
+      path: "userId",
+      match: { role: "user" },
+    });
+
+    const filteredAlumni = alumniProfiles.filter((profile) => profile.userId);
+
+    // Send the retrieved and filtered alumni profiles in the response
+    res.status(200).json({ alumni: filteredAlumni });
+  } catch (error) {
+    console.error("Error fetching alumni profiles:", error);
+    res.status(500).json({
+      error: "Failed to fetch alumni profiles",
+      message: error.message,
+    });
+  }
+};

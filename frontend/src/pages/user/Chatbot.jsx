@@ -20,9 +20,9 @@ function Chatbot() {
     Chatbot: "Sample result for Chatbot",
 
     // Documents
-    "Available Documents": "Sample result for Available Documents",
-    "How to Request": "Sample result for How to Request",
-    "Contact Details": "Sample result for Contact Details",
+    // "Available Documents": "Sample result for Available Documents",
+    // "How to Request": "Sample result for How to Request",
+    // "Contact Details": "Sample result for Contact Details",
 
     // Certifications
     "Computer Science Certification":
@@ -62,7 +62,7 @@ function Chatbot() {
         addChatMessage("chatbot", "Hi! Please choose an option:");
         addChatMessage("chatbot", [
           "Navigation",
-          "Documents",
+          // "Documents",
           "Certifications",
           "Jobs",
         ]);
@@ -78,7 +78,7 @@ function Chatbot() {
     addChatMessage("chatbot", "Hello CICS Alumni! Please choose an option:");
     addChatMessage("chatbot", [
       "Navigation",
-      "Documents",
+      // "Documents",
       "Certifications",
       "Jobs",
     ]);
@@ -96,13 +96,13 @@ function Chatbot() {
       let options = [];
       if (option === "Navigation") {
         options = ["Home", "Alumni", "Survey", "Content", "Chatbot", "Go back"];
-      } else if (option === "Documents") {
-        options = [
-          "Available Documents",
-          "How to Request",
-          "Contact Details",
-          "Go back",
-        ];
+        // } else if (option === "Documents") {
+        //   options = [
+        //     "Available Documents",
+        //     "How to Request",
+        //     "Contact Details",
+        //     "Go back",
+        //   ];
       } else if (option === "Certifications") {
         options = [
           "Computer Science Certification",

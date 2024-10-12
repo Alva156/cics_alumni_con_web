@@ -6,7 +6,6 @@ const replySchema = new mongoose.Schema({
     required: true,
     ref: "Thread",
   },
-  userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
   userProfileId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

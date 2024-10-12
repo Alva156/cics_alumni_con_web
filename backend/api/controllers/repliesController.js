@@ -6,14 +6,12 @@ exports.createReply = async (req, res) => {
   try {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
-    const userProfileId = decoded.profileId; // Assuming profileId is included in the JWT
+    const userProfileId = decoded.profileId; // Use profileId from the JWT
 
     const { threadId, reply } = req.body;
 
     const newReply = new Reply({
       threadId,
-      userId,
       userProfileId, // Use userProfileId for consistency
       reply,
     });
@@ -40,7 +38,7 @@ exports.getRepliesByThreadId = async (req, res) => {
   try {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userProfileId = decoded.profileId; // Use profileId from the JWT token
+    const userProfileId = decoded.profileId; // Use profileId from the JWT
 
     const replies = await Reply.find({
       threadId: req.params.threadId,

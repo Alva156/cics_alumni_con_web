@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const threadSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
   userProfileId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

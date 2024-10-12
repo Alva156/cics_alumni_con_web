@@ -7,13 +7,11 @@ exports.createThread = async (req, res) => {
   try {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
     const userProfileId = decoded.profileId; // Assuming profileId is included in the JWT
 
     const { title, content } = req.body;
 
     const newThread = new Thread({
-      userId,
       userProfileId, // Use userProfileId
       title,
       content,
@@ -63,31 +61,29 @@ exports.getUserThreads = async (req, res) => {
   }
 };
 
-// Get all threads
-// Get all threads
 exports.getAllThreads = async (req, res) => {
   try {
     const token = req.cookies.token;
-    let userId = null; // Initialize userId
+    let userProfileId = null;
 
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      userId = decoded.id; // Assign userId from the decoded token
+      userProfileId = decoded.profileId; // Ensure the correct property is used
     }
 
-    // Fetch all threads and populate the user's details
     const threads = await Thread.find()
       .populate("userProfileId", "firstName lastName profileImage profession")
       .lean();
 
-    // Count replies for each thread
     const threadsWithReplyCount = await Promise.all(
       threads.map(async (thread) => {
         const replyCount = await Reply.countDocuments({ threadId: thread._id });
         return {
           ...thread,
           replyCount,
-          isOwner: userId && thread.userId.toString() === userId.toString(), // Compare thread's userId with logged-in user's id
+          isOwner:
+            userProfileId &&
+            thread.userProfileId._id.toString() === userProfileId.toString(),
         };
       })
     );
@@ -112,12 +108,11 @@ exports.getThreadById = async (req, res) => {
 };
 
 // Update a thread (only the owner can update)
-// Update a thread (only the owner can update)
 exports.updateThread = async (req, res) => {
   try {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const userProfileId = decoded.profileId;
 
     const { title, content } = req.body;
     const thread = await Thread.findById(req.params.id);
@@ -126,7 +121,7 @@ exports.updateThread = async (req, res) => {
       return res.status(404).json({ message: "Thread not found" });
     }
 
-    if (thread.userId.toString() !== userId) {
+    if (thread.userProfileId.toString() !== userProfileId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
@@ -144,10 +139,9 @@ exports.updateThread = async (req, res) => {
     // Fetch the reply count for this thread
     const replyCount = await Reply.countDocuments({ threadId: thread._id });
 
-    // Send the response including the reply count
     res.status(200).json({
       message: "Thread updated successfully",
-      thread: { ...populatedThread, replyCount }, // Return the populated thread with the reply count
+      thread: { ...populatedThread, replyCount },
     });
   } catch (error) {
     res.status(500).json({ message: "Error updating thread", error });
@@ -163,7 +157,7 @@ exports.deleteThread = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id;
+    const userProfileId = decoded.profileId;
 
     // Find the thread by ID
     const thread = await Thread.findById(req.params.id);
@@ -172,15 +166,15 @@ exports.deleteThread = async (req, res) => {
     }
 
     // Check if the user is the owner of the thread
-    if (thread.userId.toString() !== userId) {
+    if (thread.userProfileId.toString() !== userProfileId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    // Remove the thread using .remove() or .deleteOne()
+    // Remove the thread
     await Thread.deleteOne({ _id: req.params.id });
     res.status(200).json({ message: "Thread deleted successfully" });
   } catch (error) {
-    console.error("Error deleting thread:", error); // Log the error for debugging
+    console.error("Error deleting thread:", error);
     res
       .status(500)
       .json({ message: "Error deleting thread", error: error.message });

@@ -227,6 +227,7 @@ function UserProfile() {
       lastName,
       birthday,
       profession,
+      accountEmail,
       collegeProgram,
       specialization,
       yearStartedCollege,
@@ -247,7 +248,7 @@ function UserProfile() {
         linkedIn,
         facebook,
         instagram,
-        emailAddress: email,
+        email,
         mobileNumber,
         other: otherContact,
       },
@@ -333,7 +334,8 @@ function UserProfile() {
           setLinkedIn(profileData.contactInformation?.linkedIn || "");
           setFacebook(profileData.contactInformation?.facebook || "");
           setInstagram(profileData.contactInformation?.instagram || "");
-          setEmail(profileData.contactInformation?.emailAddress || "");
+          setEmail(profileData.contactInformation?.email || "");
+          setAccountEmail(profileData.accountEmail || "");
           setMobileNumber(profileData.contactInformation?.mobileNumber || "");
           setOtherContact(profileData.contactInformation?.other || "");
           setProfileImage(profileData.profileImage || "");
@@ -1043,9 +1045,9 @@ function UserProfile() {
                   <label className="pt-4 pb-2 text-sm">Account Email *</label>
                   <input
                     type="email" // Changed type to email for better validation
-                    name="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    name="accountEmail"
+                    value={accountEmail}
+                    onChange={(e) => setAccountEmail(e.target.value)}
                     placeholder="Type here"
                     className="input input-sm input-bordered w-full h-10"
                   />

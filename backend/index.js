@@ -37,6 +37,8 @@ const adminEventsRoutes = require("./api/routes/Contents/adminEventsRoutes");
 const adminCertificationsRoutes = require("./api/routes/Contents/adminCertificationsRoutes");
 const adminDocumentsRoutes = require("./api/routes/Contents/adminDocumentsRoutes");
 const adminJobsRoutes = require("./api/routes/Contents/adminJobsRoutes");
+const threadsRoutes = require("./api/routes/threadsRoutes");
+const repliesRoutes = require("./api/routes/repliesRoutes");
 
 app.use("/companies", adminCompaniesRoutes);
 app.use("/profile", userProfileRoutes);

@@ -32,14 +32,24 @@ mongoose
 const userRoutes = require("./api/routes/userRoutes");
 const adminCompaniesRoutes = require("./api/routes/Contents/adminCompaniesRoutes");
 const userProfileRoutes = require("./api/routes/userProfileRoutes");
-const threadsRoutes = require("./api/routes/threadsRoutes");
-const repliesRoutes = require("./api/routes/repliesRoutes");
+const adminNewsRoutes = require("./api/routes/Contents/adminNewsRoutes");
+const adminEventsRoutes = require("./api/routes/Contents/adminEventsRoutes");
+const adminCertificationsRoutes = require("./api/routes/Contents/adminCertificationsRoutes");
+const adminDocumentsRoutes = require("./api/routes/Contents/adminDocumentsRoutes");
+const adminJobsRoutes = require("./api/routes/Contents/adminJobsRoutes");
 
 app.use("/companies", adminCompaniesRoutes);
 app.use("/profile", userProfileRoutes);
 app.use("/threads", threadsRoutes);
 app.use("/replies", repliesRoutes);
 app.use("/users", userRoutes);
+app.use("/companies", adminCompaniesRoutes);
+app.use("/profile", userProfileRoutes);
+app.use("/news", adminNewsRoutes);
+app.use("/events", adminEventsRoutes);
+app.use("/certifications", adminCertificationsRoutes);
+app.use("/documents", adminDocumentsRoutes);
+app.use("/jobs", adminJobsRoutes);
 
 app.use(express.json({ limit: "10mb" })); // Increase to 10MB for JSON data
 app.use(express.urlencoded({ limit: "10mb", extended: true }));

@@ -1,61 +1,54 @@
 import React, { useState, useEffect, useRef } from "react";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
 
 function News() {
   const [selectedNews, setSelectedNews] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [news, setNews] = useState([]);
+  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
   const modalRef = useRef(null);
 
-  const newsArticles = [
-    {
-      title: "News Title",
-      date: "Date",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-    {
-      title: "News Title",
-      date: "Date",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-    {
-      title: "News Title",
-      date: "Date",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-  ];
-
-  const openModal = (news) => {
-    setSelectedNews(news);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedNews(null);
+  // Fetch all news from the server
+  const fetchNews = async () => {
+    try {
+      const response = await axios.get("http://localhost:6001/news/view", {
+        withCredentials: true,
+      });
+      setNews(response.data);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+    }
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        closeModal();
-      }
-    };
+    fetchNews();
+  }, []);
 
-    if (isModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
+  const openViewModal = (news) => {
+    setSelectedNews(news);
+    setIsViewModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedNews(null);
+  };
+
+  const filteredNews = news.filter((news) =>
+    news.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Sort news based on selected criteria
+  const sortedNews = filteredNews.sort((a, b) => {
+    if (sortCriteria === "Name (A-Z)") {
+      return a.name.localeCompare(b.name);
+    } else if (sortCriteria === "Name (Z-A)") {
+      return b.name.localeCompare(a.name);
     }
-  }, [isModalOpen]);
+    return 0;
+  });
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -66,37 +59,50 @@ function News() {
           type="text"
           placeholder="Search News"
           className="w-full border border-black rounded-lg px-4 py-2"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <span className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer">
+        <span
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+          onClick={() => setSearchTerm("")}
+        >
           X
         </span>
       </div>
 
       <div className="mb-6">
         <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
-          <option>Date (Newest First)</option>
-          <option>Date (Oldest First)</option>
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortCriteria}
+          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+        >
+          <option>Name (A-Z)</option>
+          <option>Name (Z-A)</option>
         </select>
       </div>
 
-      <div className="text-lg mb-4">All News</div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="text-lg">News Lists</div>
+      </div>
 
       <hr className="mb-6 border-black" />
 
-      {newsArticles.map((news, index) => (
+      {filteredNews.map((news) => (
         <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openModal(news)}
+          key={news._id}
+          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
+          onClick={() => openViewModal(news)}
         >
-          <div className="text-md font-medium mb-1">{news.title}</div>
-          <div className="text-sm text-black-600">{news.date}</div>
+          <div>
+            <div className="text-md font-medium mb-1">{news.name}</div>
+            <div className="text-sm text-black-600">{news.address}</div>
+          </div>
         </div>
       ))}
 
-      {/* Modal */}
-      {isModalOpen && selectedNews && (
+      {/* View Modal */}
+      {isViewModalOpen && selectedNews && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
           style={{ zIndex: 9999 }}
@@ -112,23 +118,21 @@ function News() {
               &times;
             </button>
             <div className="text-2xl font-medium mb-2">
-              {selectedNews.title}
+              {selectedNews.name}
             </div>
-            <div className="text-md mb-2">{selectedNews.date}</div>
+            <div className="text-md mb-2">{selectedNews.address}</div>
             <img
               src={selectedNews.image}
-              alt={selectedNews.title}
+              alt={selectedNews.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
             <div className="text-sm mb-4">{selectedNews.description}</div>
-            <div className="text-sm font-medium mb-2">
-              {selectedNews.contact}
-            </div>
+            <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
-              href={`mailto:news@example.com`}
+              href={`mailto:${selectedNews.contact}`}
               className="block text-sm text-blue-600 underline"
             >
-              news@example.com
+              {selectedNews.contact}
             </a>
           </div>
         </div>

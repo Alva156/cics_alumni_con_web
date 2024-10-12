@@ -1,140 +1,335 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import sampleidpic from "../../assets/sampleidpic.jpg";
+import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function AdminThreads() {
-  const [threads, setThreads] = useState([
-    {
-      id: 1,
-      author: "Denise Valdivieso",
-      img: sampleidpic,
-      role: "Software Engineer",
-      date: "June 5, 2024",
-      title: "Capstone Help",
-      replies: "999 replies",
-      content: `We are currently doing a Capstone project and it is quite hard.
-            Any tips on how to pass the Capstone project without having any
-            stress? Thank you.`,
-      active: false,
-      posts: [
-        {
-          id: 1,
-          post: "Post 1",
-          img: sampleidpic,
-          author: "James Santos",
-          role: "Software Engineer",
-          date: "June 5, 2024",
-          content: "Hello world, this is the first post!",
-          postType: "text",
-        },
-        {
-          id: 2,
-          post: "Post 2",
-          img: sampleidpic,
-          author: "Andrei Alvarico",
-          role: "Software Engineer",
-          date: "June 5, 2024",
-          content: "Hello world, this is the first post!",
-          postType: "text",
-        },
-        {
-          id: 3,
-          post: "Post 3",
-          img: sampleidpic,
-          author: "Alessandra Claire Cruz",
-          role: "Software Engineer",
-          date: "June 5, 2024",
-          content: "Hello world, this is the first post!",
-          postType: "text",
-        },
-      ],
-    },
-    {
-      id: 2,
-      img: sampleidpic,
-      author: "Alessandra Claire Cruz",
-      role: "Software Engineer",
-      date: "June 5, 2024",
-      title: "Blah Blah",
-      replies: "999 replies",
-      content: `Blah Blah Blah`,
-      active: true,
-      posts: [
-        {
-          id: 1,
-          post: "Post 1",
-          img: sampleidpic,
-          author: "Andrei Alvarico",
-          role: "Software Engineer",
-          date: "June 5, 2024",
-          content: "Luh!",
-          postType: "text",
-        },
-        {
-          id: 2,
-          post: "Post 2",
-          img: sampleidpic,
-          author: "Denise Valdivieso",
-          role: "Software Engineer",
-          date: "June 5, 2024",
-          content: "Hello world, this is the first post!",
-          postType: "text",
-        },
-        {
-          id: 3,
-          post: "Post 3",
-          img: sampleidpic,
-          author: "James Santos",
-          role: "Software Engineer",
-          date: "June 5, 2024",
-          content: "Hello world, this is the first post!",
-          postType: "text",
-        },
-      ],
-    },
-  ]);
-
+  const [myThreads, setMyThreads] = useState([]);
+  const [allThreads, setAllThreads] = useState([]);
+  const [newThread, setNewThread] = useState({ title: "", content: "" });
   const [selectedThread, setSelectedThread] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isEditReplyModalOpen, setIsEditReplyModalOpen] = useState(false);
-  const [selectedReply, setSelectedReply] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [threadToDelete, setThreadToDelete] = useState(null);
-  const [isDeleteReplyModalOpen, setIsDeleteReplyModalOpen] = useState(false);
-  const [posts, setPosts] = useState([{ postText: "", postType: "text" }]);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showAddReply, setshowAddReply] = useState(false);
-  const [deleteConfirmationMessage, setDeleteConfirmationMessage] =
-    useState("");
+  const [validationMessage, setValidationMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showValidationMessage, setShowValidationMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredThreads, setFilteredThreads] = useState([]);
+  const [sortOption, setSortOption] = useState("Title (A-Z)");
 
-  const modalRef = useRef(null);
+  // replies
+
+  const [newReply, setNewReply] = useState("");
+  const [editingReplyId, setEditingReplyId] = useState(null);
+  const [editingReplyContent, setEditingReplyContent] = useState("");
+  const [replies, setReplies] = useState([]); // Correct initialization
+  const [isEditReplyModalOpen, setIsEditReplyModalOpen] = useState(false);
+  const [selectedReply, setSelectedReply] = useState(null);
+  const [isDeleteReplyModalOpen, setIsDeleteReplyModalOpen] = useState(false);
+  const [replyToDelete, setReplyToDelete] = useState(null);
+
+  const showValidation = (message) => {
+    setValidationMessage(message);
+    setShowValidationMessage(true);
+    setTimeout(() => {
+      setShowValidationMessage(false);
+    }, 3000); // Hide the message after 3 seconds
+  };
+
+  // Function to show error messages
+  const showError = (message) => {
+    setErrorMessage(message);
+    setShowErrorMessage(true);
+    setTimeout(() => {
+      setShowErrorMessage(false);
+    }, 3000); // Hide the message after 3 seconds
+  };
+
+  // Call this function whenever the modal is opened or a new reply is created
+  useEffect(() => {
+    if (selectedThread) {
+      fetchReplies();
+    }
+  }, [selectedThread]);
+
+  useEffect(() => {
+    const fetchAllThreads = async () => {
+      try {
+        const response = await axios.get("http://localhost:6001/threads/get", {
+          withCredentials: true,
+        });
+        setAllThreads(response.data);
+      } catch (error) {
+        console.error("Error fetching all threads:", error);
+      }
+    };
+
+    const fetchMyThreads = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:6001/threads/my-threads",
+          {
+            withCredentials: true,
+          }
+        );
+        setMyThreads(response.data);
+      } catch (error) {
+        console.error("Error fetching my threads:", error);
+      }
+    };
+
+    fetchAllThreads();
+    fetchMyThreads();
+  }, []);
+
+  const handleCreateThread = async () => {
+    if (!newThread.title || !newThread.content) {
+      showError("Please fill in both the title and content fields.");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        "http://localhost:6001/threads/create",
+        {
+          title: newThread.title,
+          content: newThread.content,
+        },
+        { withCredentials: true }
+      );
+
+      // Manually set `isOwner` to true for the newly created thread
+      const createdThread = { ...response.data.thread, isOwner: true };
+
+      setMyThreads([...myThreads, createdThread]); // Update myThreads
+      setAllThreads([...allThreads, createdThread]); // Update allThreads
+      setNewThread({ title: "", content: "" });
+      setIsAddModalOpen(false);
+      showValidation("Thread created successfully!");
+    } catch (error) {
+      console.error("Error creating thread:", error);
+    }
+  };
+  const handleUpdateThread = async () => {
+    if (!selectedThread.title || !selectedThread.content) {
+      showError("Please fill in both the title and content fields.");
+      return;
+    }
+    if (!selectedThread) return;
+
+    try {
+      const response = await axios.put(
+        `http://localhost:6001/threads/update/${selectedThread._id}`,
+        {
+          title: selectedThread.title,
+          content: selectedThread.content,
+        },
+        { withCredentials: true }
+      );
+
+      // Update the `myThreads` state
+      setMyThreads(
+        myThreads.map((thread) =>
+          thread._id === selectedThread._id ? response.data.thread : thread
+        )
+      );
+
+      // Update the `allThreads` state and ensure the `isOwner` field is preserved
+      setAllThreads(
+        allThreads.map((thread) =>
+          thread._id === selectedThread._id
+            ? { ...response.data.thread, isOwner: thread.isOwner } // Keep `isOwner` field
+            : thread
+        )
+      );
+
+      setSelectedThread(null);
+      setIsEditModalOpen(false);
+      showValidation("Thread updated successfully!");
+    } catch (error) {
+      console.error("Error updating thread:", error);
+    }
+  };
+
+  const handleDeleteThread = async () => {
+    if (!threadToDelete) return;
+    try {
+      await axios.delete(
+        `http://localhost:6001/threads/delete/${threadToDelete._id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      // Update the threads state to remove the deleted thread
+      setMyThreads(
+        myThreads.filter((thread) => thread._id !== threadToDelete._id)
+      );
+      setAllThreads(
+        allThreads.filter((thread) => thread._id !== threadToDelete._id)
+      );
+      setThreadToDelete(null);
+      setIsDeleteModalOpen(false);
+      showValidation("Thread deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting thread:", error);
+    }
+  };
+  const fetchReplies = async (threadId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:6001/replies/thread/${threadId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      setReplies(response.data); // Update replies state with the fetched data
+    } catch (error) {
+      console.error("Error fetching replies:", error);
+      setReplies([]); // Reset replies on error
+    }
+  };
+
+  // Fetch replies when the selected thread changes
+  useEffect(() => {
+    if (selectedThread) {
+      fetchReplies(selectedThread._id);
+    }
+  }, [selectedThread]);
+
+  const handleCreateReply = async () => {
+    if (!newReply.trim()) {
+      showError("Reply content cannot be empty.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `http://localhost:6001/replies/create`,
+        { threadId: selectedThread._id, reply: newReply },
+        { withCredentials: true }
+      );
+
+      // Fetch updated replies after a new reply is created
+      await fetchReplies(selectedThread._id); // Ensure we fetch fresh replies
+
+      // Update replyCount for the corresponding thread
+      setMyThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === selectedThread._id
+            ? { ...thread, replyCount: thread.replyCount + 1 }
+            : thread
+        )
+      );
+
+      setAllThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === selectedThread._id
+            ? { ...thread, replyCount: thread.replyCount + 1 }
+            : thread
+        )
+      );
+
+      // Clear the reply input
+      setNewReply("");
+      showValidation("Reply created successfully!");
+    } catch (error) {
+      console.error("Error creating reply:", error);
+    }
+  };
+  const handleEditReply = (reply) => {
+    setSelectedReply({
+      ...reply,
+      content: reply.reply || "", // Ensure the content is set, even if it's an empty string
+    });
+    setIsEditReplyModalOpen(true); // Open the edit modal
+  };
+
+  const handleUpdateReply = async (replyId) => {
+    if (!selectedReply.content.trim()) {
+      showError("Reply content cannot be empty.");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `http://localhost:6001/replies/update/${replyId}`,
+        { reply: selectedReply.content }, // Use 'reply' as the field name
+        { withCredentials: true }
+      );
+
+      // Refetch replies after update to ensure buttons are updated
+      await fetchReplies(selectedThread._id);
+
+      setIsEditReplyModalOpen(false); // Close the modal after update
+      setSelectedReply(null); // Clear selected reply
+      showValidation("Reply updated successfully!");
+    } catch (error) {
+      console.error("Error updating reply:", error);
+    }
+  };
+  const openDeleteReplyModal = (reply) => {
+    setReplyToDelete(reply); // Set the reply to delete
+    setIsDeleteReplyModalOpen(true); // Open the delete modal
+  };
+
+  const handleDeleteReply = async (replyId) => {
+    try {
+      // First, identify the thread to which the reply belongs
+      const threadId = selectedThread._id; // Get the current selected thread ID
+
+      // Send the delete request to the server
+      await axios.delete(`http://localhost:6001/replies/delete/${replyId}`, {
+        withCredentials: true,
+      });
+
+      // Update the replies state to remove the deleted reply
+      setReplies(replies.filter((reply) => reply._id !== replyId));
+
+      // Decrement the reply count for the thread
+      setMyThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === threadId
+            ? { ...thread, replyCount: thread.replyCount - 1 }
+            : thread
+        )
+      );
+
+      setAllThreads((prevThreads) =>
+        prevThreads.map((thread) =>
+          thread._id === threadId
+            ? { ...thread, replyCount: thread.replyCount - 1 }
+            : thread
+        )
+      );
+
+      showValidation("Reply deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting reply:", error);
+    }
+  };
 
   const openViewModal = (thread) => {
     setSelectedThread(thread);
     setIsViewModalOpen(true);
+    fetchReplies(thread._id);
   };
 
   const openEditModal = (thread) => {
     setSelectedThread(thread);
-    setPosts(
-      thread.posts.map((post) => ({
-        ...post,
-      }))
-    );
     setIsEditModalOpen(true);
   };
 
-  const openEditReplyModal = (thread, reply) => {
-    setSelectedThread(thread);
-    setSelectedReply(reply);
-    setIsEditReplyModalOpen(true);
+  const openDeleteModal = (thread) => {
+    setThreadToDelete(thread);
+    setIsDeleteModalOpen(true);
   };
 
   const openAddModal = () => {
-    setSelectedThread(null);
-    setPosts([{ postText: "", postType: "text" }]);
+    setNewThread({ title: "", content: "" });
     setIsAddModalOpen(true);
   };
 
@@ -142,203 +337,62 @@ function AdminThreads() {
     setIsViewModalOpen(false);
     setIsEditModalOpen(false);
     setIsAddModalOpen(false);
-    setSelectedThread(null);
-  };
-
-  const closeEditReplyModal = () => {
-    setIsEditReplyModalOpen(false);
-  };
-
-  const closeDeleteModal = () => {
-    setIsDeleteReplyModalOpen(false);
-    setIsViewModalOpen(true);
-    setSelectedReply(null);
-  };
-
-  const handlePostChange = (postIndex, value) => {
-    const newPosts = [...posts];
-    newPosts[postIndex].postText = value;
-    setPosts(newPosts);
-  };
-
-  const handleDeleteThread = (thread) => {
-    setThreadToDelete(thread);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (threadToDelete) {
-      setThreads((prevThreads) =>
-        prevThreads.filter((thread) => thread.id !== threadToDelete.id)
-      );
-      setDeleteConfirmationMessage("Thread deleted successfully!");
-      setThreadToDelete(null);
-      setTimeout(() => {
-        setDeleteConfirmationMessage("");
-      }, 2000);
-    }
     setIsDeleteModalOpen(false);
+    setSelectedThread(null);
+    setThreadToDelete(null);
   };
-
-  const handleToggleThread = (id) => {
-    setThreads((prevThreads) =>
-      prevThreads.map((thread) =>
-        thread.id === id ? { ...thread, active: !thread.active } : thread
-      )
-    );
-  };
-
-  const handleDeleteReply = () => {
-    if (!selectedThread || !selectedReply) return;
-
-    const updatedThreads = threads.map((thread) => {
-      if (thread.id === selectedThread.id) {
-        return {
-          ...thread,
-          posts: thread.posts.filter((post) => post.id !== selectedReply.id),
-        };
-      }
-      return thread;
-    });
-
-    setThreads(updatedThreads);
-
-    setSelectedThread((prevThread) => ({
-      ...prevThread,
-      posts: prevThread.posts.filter((post) => post.id !== selectedReply.id),
-    }));
-
-    setDeleteConfirmationMessage("Reply deleted successfully!");
-
-    setTimeout(() => {
-      setDeleteConfirmationMessage("");
-    }, 2000); // Message will disappear after 2 seconds
-
-    closeDeleteModal();
-  };
-
-  const renderPostContent = (post, index, isActive) => {
-    return (
-      <div key={index} className="mb-4 space-y-4 max-h-64 overflow-y-auto">
-        <div className="p-4 border border-black rounded-lg flex items-start mb-2">
-          <img src={post.img} alt="User Avatar" className="w-10 h-10 mr-3" />
-          <div className="flex-grow">
-            <h4 className="font-semibold text-sm">{post.author}</h4>
-            <p className="text-gray-500 text-xs mb-2">
-              {post.role}• Posted on {post.date}
-            </p>
-            <p className="text-gray-700">{post.content}</p>
-          </div>
-          {!isActive && ( // Conditionally render edit and delete buttons
-            <div className="flex justify-end mt-2">
-              <div
-                className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-                onClick={() => {
-                  setSelectedReply(post);
-                  setIsDeleteReplyModalOpen(true);
-                }}
-              >
-                <span className="hidden group-hover:block absolute top-5 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Delete
-                </span>
-              </div>
-
-              <div
-                className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-                onClick={() => openEditReplyModal(selectedThread, post)}
-              >
-                <span className="hidden group-hover:block absolute top-5 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Edit
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const handleSave = () => {
-    setThreads((prevThreads) =>
-      prevThreads.map((thread) =>
-        thread.id === selectedThread.id
-          ? {
-              ...thread,
-              title: selectedThread.title,
-              content: selectedThread.content,
-              posts: posts.map((post) => ({
-                ...post,
-              })),
-            }
-          : thread
-      )
-    );
-    setShowConfirmation(true);
-    closeModal();
-
-    setTimeout(() => {
-      setShowConfirmation(false);
-    }, 2000);
-  };
-  const handleAddPost = () => {
-    if (posts.length === 1 && posts[0].postText === "") return;
-    setPosts([{ postText: "", postType: "text" }]);
-  };
-  const handleReplySave = () => {
-    setThreads((prevThreads) =>
-      prevThreads.map((thread) =>
-        thread.id === selectedThread.id
-          ? {
-              ...thread,
-              posts: thread.posts.map((post) =>
-                post.content === selectedReply.content ? selectedReply : post
-              ),
-            }
-          : thread
-      )
-    );
-    setShowConfirmation(true);
-    closeEditReplyModal();
-
-    setTimeout(() => {
-      setShowConfirmation(false);
-    }, 2000); // Adjust the delay as needed
-  };
-
-  const inactiveThreads = threads
-    .filter((thread) => !thread.active)
-    .filter((thread) =>
-      thread.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-  const activeThreads = threads
-    .filter((thread) => thread.active)
-    .filter((thread) =>
-      thread.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        closeModal();
-      }
-    };
+    if (searchTerm.trim() === "") {
+      setFilteredThreads([]);
+    } else {
+      const filtered = [...myThreads, ...allThreads]
+        .filter((thread, index, self) => {
+          // Check if the user owns the thread
+          const isOwned = myThreads.some(
+            (myThread) => myThread._id === thread._id
+          );
 
-    if (
-      isViewModalOpen ||
-      isEditModalOpen ||
-      isAddModalOpen ||
-      isEditReplyModalOpen
-    ) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      };
+          // If the thread is owned, only include the one from myThreads
+          if (isOwned) {
+            return thread.isOwner;
+          }
+
+          // Otherwise, include the thread from allThreads
+          return !self.find((t) => t._id === thread._id && t.isOwner);
+        })
+        .filter((thread) =>
+          thread.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      setFilteredThreads(filtered);
     }
-  }, [isViewModalOpen, isEditModalOpen, isAddModalOpen, isEditReplyModalOpen]);
+  }, [searchTerm, myThreads, allThreads]);
+
+  const sortThreads = (threads) => {
+    return threads.sort((a, b) => {
+      if (sortOption === "Title (A-Z)") {
+        return a.title.localeCompare(b.title);
+      } else if (sortOption === "Title (Z-A)") {
+        return b.title.localeCompare(a.title);
+      }
+      return 0;
+    });
+  };
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+      <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
+        {showErrorMessage && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
+            <p>{errorMessage}</p>
+          </div>
+        )}
+        {showValidationMessage && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-[80]">
+            <p>{validationMessage}</p>
+          </div>
+        )}
+      </div>
       <h1 className="text-xl mb-4">Threads</h1>
       <div className="mb-4 relative">
         <input
@@ -357,91 +411,267 @@ function AdminThreads() {
       </div>
       <div className="mb-6">
         <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
           <option>Title (A-Z)</option>
           <option>Title (Z-A)</option>
         </select>
       </div>
-      <div className="flex justify-between items-center mb-4">
-        <div className="text-lg">My Posts</div>
+
+      <div className="flex justify-between items-center mb-4 mt-12">
+        {searchTerm.trim() ? (
+          <div className="text-lg">Search Results:</div>
+        ) : (
+          <div className="text-lg">My Threads</div>
+        )}
         <button
           className="btn btn-sm w-36 bg-green text-white"
           onClick={openAddModal}
         >
-          +
+          + New Thread
         </button>
       </div>
+
       <hr className="mb-6 border-black" />
-      {inactiveThreads.map((thread, index) => (
-        <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openViewModal(thread)}
-        >
-          <div>
-            <div className="text-md font-medium mb-1">{thread.title}</div>
-            <div className="text-sm text-black-600">{thread.replies}</div>
-          </div>
-          <div className="flex items-center">
+
+      {searchTerm.trim() ? (
+        filteredThreads.length === 0 ? (
+          <div>No threads match your search.</div>
+        ) : (
+          sortThreads(filteredThreads).map((thread) => (
             <div
-              className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteThread(thread);
-              }}
+              key={thread._id}
+              className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+              onClick={() => openViewModal(thread)}
             >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Delete
-              </span>
+              <div>
+                <div className="text-md font-medium mb-1">{thread.title}</div>
+                <div className="text-sm text-black-600">
+                  Replies: {thread.replyCount || 0}
+                </div>
+              </div>
+              {thread.isOwner && (
+                <div className="flex items-center">
+                  <div
+                    className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openDeleteModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Delete
+                    </span>
+                  </div>
+                  <div
+                    className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Edit
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
-            <div
-              className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                openEditModal(thread);
-              }}
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Edit
-              </span>
+          ))
+        )
+      ) : (
+        <>
+          {/* My Threads Section */}
+          {myThreads.length === 0 ? (
+            <div>No threads created yet.</div>
+          ) : (
+            sortThreads(myThreads).map((thread) => (
+              <div
+                key={thread._id}
+                className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+                onClick={() => openViewModal(thread)}
+              >
+                <div>
+                  <div className="text-md font-medium mb-1">{thread.title}</div>
+                  <div className="text-sm text-black-600">
+                    Replies: {thread.replyCount || 0}
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <div
+                    className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openDeleteModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Delete
+                    </span>
+                  </div>
+                  <div
+                    className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Edit
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+
+          {/* All Threads Section */}
+          <div className="flex justify-between items-center mb-4 mt-12">
+            <div className="text-lg">All Threads</div>
+          </div>
+
+          <hr className="mb-6 border-black" />
+
+          {allThreads.length === 0 ? (
+            <div>No threads created yet.</div>
+          ) : (
+            sortThreads(allThreads).map((thread) => (
+              <div
+                key={thread._id}
+                className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+                onClick={() => openViewModal(thread)}
+              >
+                <div>
+                  <div className="text-md font-medium mb-1">{thread.title}</div>
+                  <div className="text-sm text-black-600">
+                    Replies: {thread.replyCount || 0}
+                  </div>
+                </div>
+                {thread.isOwner && (
+                  <div className="flex items-center">
+                    <div
+                      className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openDeleteModal(thread);
+                      }}
+                    >
+                      <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                        Delete
+                      </span>
+                    </div>
+                    <div
+                      className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditModal(thread);
+                      }}
+                    >
+                      <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                        Edit
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </>
+      )}
+      {isDeleteReplyModalOpen && replyToDelete && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Reply</h2>
+            <p>Are you sure you want to delete this reply?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => {
+                  handleDeleteReply(replyToDelete._id); // Delete the reply
+                  setIsDeleteReplyModalOpen(false); // Close the modal
+                }}
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+              >
+                Yes
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteReplyModalOpen(false)} // Close modal without deleting
+              >
+                No
+              </button>
             </div>
           </div>
         </div>
-      ))}
-      <div className="text-lg mb-4">All Threads</div>
-      <hr className="mb-6 border-black" />
-      {activeThreads.map((thread) => (
-        <div
-          key={thread.id}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openViewModal(thread)}
-        >
-          <div>
-            <div className="text-md font-medium mb-1">{thread.title}</div>
-            <div className="text-sm text-black-600">{thread.replies}</div>
+      )}
+      {isEditReplyModalOpen && selectedReply && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 className="text-2xl mb-4">Edit Reply</h2>
+            <textarea
+              className="w-full border border-black rounded-lg px-4 py-2"
+              value={selectedReply.content || ""} // Corrected: Use `content` instead of `reply`
+              onChange={(e) =>
+                setSelectedReply({
+                  ...selectedReply,
+                  content: e.target.value, // Update `content` correctly
+                })
+              }
+            />
+            <div className="flex justify-center gap-2 mt-4">
+              <button
+                className="btn btn-sm w-24 bg-green text-white mr-2"
+                onClick={() => {
+                  handleUpdateReply(selectedReply._id); // Call the update handler
+                }}
+              >
+                Save
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsEditReplyModalOpen(false)} // Close the modal
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
-      ))}
+      )}
+
       {isViewModalOpen && selectedThread && (
-        <div
-          ref={modalRef}
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] relative mx-4">
+            {/* Header section */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center">
                 <img
-                  src={selectedThread.img}
+                  src={
+                    selectedThread.userProfileId.profileImage || blankprofilepic
+                  } // Replace with dynamic user avatar
                   alt="User Avatar"
                   className="w-14 h-14 mr-3"
                 />
                 <div>
-                  <h2 className="text-xl font-semibold">
-                    {selectedThread.author}
+                  <h2 className="text-md lg:text-xl font-semibold">
+                    {`${selectedThread.userProfileId.firstName} ${selectedThread.userProfileId.lastName}`}
                   </h2>
-                  <p className="text-gray-500">{selectedThread.role}</p>
+                  <p className="text-gray-500">
+                    {selectedThread.userProfileId.profession}
+                  </p>
                   <p className="text-gray-400 text-sm">
-                    Posted on {selectedThread.date}.
+                    Posted on{" "}
+                    {selectedThread.createdAt
+                      ? new Date(selectedThread.createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )
+                      : null}
                   </p>
                 </div>
               </div>
@@ -466,43 +696,96 @@ function AdminThreads() {
               </button>
             </div>
 
+            {/* Thread content */}
             <div className="border-b border-black mb-4 pb-2">
               <h3 className="text-lg font-medium">{selectedThread.title}</h3>
               <p className="mt-2 text-black">{selectedThread.content}</p>
             </div>
-            <div className="text-sm mb-4">Replies</div>
-            {selectedThread.posts.map((post, index) => (
-              <div key={index} className="mb-4">
-                {renderPostContent(post, index, selectedThread.active)}
-              </div>
-            ))}
 
-            <div className="mt-4">
-              <textarea
-                className="w-full border border-black h-[8vh] rounded-lg p-2"
-                placeholder="Add reply here..."
-                rows="3"
-              ></textarea>
-              <button
-                className="btn px-20 bg-[#1458BE] text-white"
-                onClick={() => {
-                  setshowAddReply(true);
-                  setTimeout(() => {
-                    setshowAddReply(false);
-                  }, 2000);
-                }}
-              >
-                Send
-              </button>
+            {/* Comments Section */}
+            <div className="space-y-4 max-h-64 overflow-y-auto">
+              {replies.map((reply) => (
+                <div
+                  key={reply._id}
+                  className="p-4 border border-black rounded-lg flex items-start mb-2"
+                >
+                  <img
+                    src={reply.userProfileId.profileImage || blankprofilepic}
+                    alt="User Avatar"
+                    className="w-10 h-10 mr-3"
+                  />
+                  <div className="flex-grow">
+                    <h4 className="font-semibold text-sm">{`${reply.userProfileId.firstName} ${reply.userProfileId.lastName}`}</h4>
+
+                    <p className="text-gray-500 text-xs mb-2">
+                      {reply.createdAt
+                        ? new Date(reply.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )
+                        : ""}{" "}
+                      {/* Only render an empty string if createdAt is not available */}
+                    </p>
+                    <p>{reply.reply}</p>
+                    {editingReplyId === reply._id ? (
+                      <textarea
+                        value={editingReplyContent}
+                        onChange={(e) => setEditingReplyContent(e.target.value)}
+                        className="w-full border border-black rounded-lg p-2"
+                      />
+                    ) : (
+                      <p className="text-gray-700">{reply.content}</p>
+                    )}
+                  </div>
+                  {reply.isOwner && (
+                    <div className="flex space-x-2">
+                      <div
+                        className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
+                        onClick={(e) => {
+                          openDeleteReplyModal(reply); // Open delete modal for the specific reply
+                        }}
+                      >
+                        <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100">
+                          Delete
+                        </span>
+                      </div>
+                      <div
+                        className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+                        onClick={() => handleEditReply(reply)}
+                      >
+                        <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100">
+                          Edit
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              <div className="mt-4">
+                <textarea
+                  value={newReply}
+                  onChange={(e) => setNewReply(e.target.value)}
+                  className="w-full border border-black h-[8vh] rounded-lg p-2"
+                  placeholder="Add reply here..."
+                />
+                <button
+                  onClick={handleCreateReply}
+                  className="btn px-20 bg-[#1458BE] text-white"
+                >
+                  Send
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
-      {isEditModalOpen && selectedThread && (
-        <div
-          ref={modalRef}
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-        >
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
             <button
               onClick={closeModal}
@@ -523,14 +806,9 @@ function AdminThreads() {
                 ></path>
               </svg>
             </button>
-
             <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium">
-                Edit Discussion Title
-              </label>
               <input
                 type="text"
-                className="w-full border border-black rounded-lg px-4 py-2 mb-4 mt-4"
                 value={selectedThread.title}
                 onChange={(e) =>
                   setSelectedThread({
@@ -538,14 +816,9 @@ function AdminThreads() {
                     title: e.target.value,
                   })
                 }
+                className="w-full border border-black rounded-lg px-4 py-2 mb-4 mt-4"
               />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-medium">
-                Edit Discussion Content
-              </label>
               <textarea
-                className="w-full border border-black rounded-lg px-4 py-2 h-64"
                 value={selectedThread.content}
                 onChange={(e) =>
                   setSelectedThread({
@@ -553,158 +826,23 @@ function AdminThreads() {
                     content: e.target.value,
                   })
                 }
+                className="w-full border border-black rounded-lg px-4 py-2 h-80"
               />
-            </div>
-            <div className="flex justify-center gap-2 mt-4">
-              <button
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
-                onClick={handleSave} // Updated handler
-              >
-                Save
-              </button>
-              <button
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
-                onClick={closeModal}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {isEditReplyModalOpen && selectedReply && (
-        <div
-          ref={modalRef}
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-        >
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 className="text-2xl mb-4">Edit Reply</h2>
-            <textarea
-              className="w-full border border-black rounded-lg px-4 py-2"
-              value={selectedReply.content}
-              onChange={(e) =>
-                setSelectedReply({
-                  ...selectedReply,
-                  content: e.target.value,
-                })
-              }
-            />
-            <div className="flex justify-center gap-2 mt-4">
-              <button
-                className="btn btn-sm w-24 bg-green text-white mr-2"
-                onClick={handleReplySave}
-              >
-                Save
-              </button>
-              <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={closeEditReplyModal}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <div className="flex justify-center gap-2 mt-4">
+                <button
+                  onClick={closeModal}
+                  className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+                >
+                  Cancel
+                </button>
 
-      {isAddModalOpen && (
-        <div
-          ref={modalRef}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
-        >
-          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
-            >
-              <svg
-                className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
-
-            <div className="mb-4">
-              <label className="block mb-1 text-sm font-light">
-                Discussion Title
-              </label>
-              <input
-                type="text"
-                className="w-full border border-black rounded-lg px-4 py-2 mb-4 mt-4"
-                value={selectedThread ? selectedThread.title : ""}
-                onChange={(e) =>
-                  setSelectedThread({
-                    ...selectedThread,
-                    title: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2 text-sm font-light">
-                Discussion Content
-              </label>
-              <div className="mb-4">
-                <textarea
-                  className="w-full border border-black rounded-lg px-4 py-2 h-64"
-                  value={posts[0].postText}
-                  onChange={(e) => handlePostChange(0, e.target.value)}
-                />
+                <button
+                  onClick={handleUpdateThread}
+                  className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+                >
+                  Save
+                </button>
               </div>
-            </div>
-            <div className="flex justify-center gap-2 mt-4">
-              <button
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
-                onClick={() => {
-                  setThreads([
-                    ...threads,
-                    {
-                      id: threads.length + 1,
-                      author: "Alessandra Claire Cruz",
-                      img: sampleidpic,
-                      role: "Software Engineer",
-                      date: "June 5,2024",
-                      title: selectedThread.title,
-                      replies: "0 replies",
-                      active: false,
-                      posts: [],
-                    },
-                    {
-                      id: threads.length + 1,
-                      author: "Alessandra Claire Cruz",
-                      img: sampleidpic,
-                      role: "Software Engineer",
-                      date: "June 5,2024",
-                      title: selectedThread.title,
-                      replies: "0 replies",
-                      active: true,
-                      posts: [],
-                    },
-                  ]);
-                  setShowConfirmation(true);
-                  closeModal();
-                  setTimeout(() => {
-                    setShowConfirmation(false);
-                  }, 2000);
-                }}
-              >
-                Add
-              </button>
-              <button
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
-                onClick={closeModal}
-              >
-                Cancel
-              </button>
             </div>
           </div>
         </div>
@@ -716,8 +854,8 @@ function AdminThreads() {
             <p>Are you sure you want to delete this thread?</p>
             <div className="flex justify-end mt-4">
               <button
+                onClick={handleDeleteThread}
                 className="btn btn-sm w-24 bg-red text-white mr-2"
-                onClick={handleConfirmDelete}
               >
                 Delete
               </button>
@@ -731,44 +869,67 @@ function AdminThreads() {
           </div>
         </div>
       )}
-      {isDeleteReplyModalOpen && selectedReply && (
-        <div
-          ref={modalRef}
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-        >
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-            <h2 className="text-2xl mb-4">Delete Reply</h2>
-            <p>Are you sure you want to delete this reply?</p>
-            <div className="flex justify-end mt-4">
-              <button
-                className="btn btn-sm w-24 bg-red text-white mr-2"
-                onClick={handleDeleteReply}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+          {showErrorMessage && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
+              <p>{errorMessage}</p>
+            </div>
+          )}
+          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                Delete
-              </button>
-              <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={closeDeleteModal}
-              >
-                Cancel
-              </button>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Discussion Title"
+                value={newThread.title}
+                onChange={(e) =>
+                  setNewThread({ ...newThread, title: e.target.value })
+                }
+                className="w-full border border-black rounded-lg px-4 py-2 mb-4 mt-4"
+              />
+              <textarea
+                placeholder="Discussion Content"
+                value={newThread.content}
+                onChange={(e) =>
+                  setNewThread({ ...newThread, content: e.target.value })
+                }
+                className="w-full border border-black rounded-lg px-4 py-2 h-80"
+              />
+              <div className="flex justify-center gap-2 mt-4">
+                <button
+                  onClick={closeModal}
+                  className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateThread}
+                  className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-      {showConfirmation && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg">
-          <p> Saved successfully!</p>
-        </div>
-      )}
-      {showAddReply && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg">
-          <p> Reply Sent!</p>
-        </div>
-      )}
-      {deleteConfirmationMessage && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg">
-          {deleteConfirmationMessage}
         </div>
       )}
     </div>

@@ -1,19 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../App.css";
 import { MdOutlineLogout } from "react-icons/md";
+import axios from "axios";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
 
+  const navigate = useNavigate();
+
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
   const handleLogoutClick = () => {
     setModalVisible(true);
   };
+  const logout = async () => {
+    try {
+      const response = await axios.post(
+        "http://localhost:6001/users/logout",
+        {},
+        { withCredentials: true }
+      );
 
+      if (response.status === 200) {
+        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("userRole");
+        sessionStorage.setItem("logoutMessageShown", "true");
+
+        console.log("User has been logged out.");
+
+        // Add a 3-second delay before redirecting
+        setTimeout(() => {
+          navigate("/login?logout=success");
+        }, 2000); // 2000ms = 2 seconds
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
   const closeModal = () => {
     setModalVisible(false);
   };
@@ -169,10 +197,11 @@ const Navbar = () => {
                 <div className="modal-action">
                   <button
                     className="btn bg-green text-white w-20"
-                    onClick={closeModal}
+                    onClick={logout}
                   >
                     Yes
                   </button>
+
                   <button
                     className="btn bg-red text-white w-20"
                     onClick={closeModal}

@@ -1,8 +1,8 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import Homepage from "../pages/User/homepage";
 import Survey from "../pages/User/Survey";
 import User from "../layout/user";
-import UserProfile from "../pages/User/UserProfile";
+import UserProfile from "../pages/user/UserProfile";
 import Threads from "../pages/User/Threads";
 import Chatbot from "../pages/User/Chatbot";
 import Alumni from "../pages/User/Alumni";
@@ -32,11 +32,46 @@ import ForgotPassword from "../pages/authentication/ForgotPassword";
 import ResetPassword from "../pages/authentication/ResetPassword";
 import VerifyAccount from "../pages/authentication/VerifyAccount";
 import DataPrivacy from "../pages/authentication/DataPrivacy";
+import PrivateRoute from "../components/PrivateRoute";
+import ErrorPage from "../components/ErrorPage";
+
+const ErrorFallback = () => {
+  return <ErrorPage />;
+};
 
 const router = createBrowserRouter([
   {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  {
+    path: "/forgotpassword",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/resetpassword",
+    element: <ResetPassword />,
+  },
+  {
+    path: "/verifyaccount",
+    element: <VerifyAccount />,
+  },
+  {
+    path: "/dataprivacy",
+    element: <DataPrivacy />,
+  },
+
+  {
     path: "/",
-    element: <User />,
+    element: (
+      <PrivateRoute requiredRole="user">
+        <User />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "/",
@@ -87,88 +122,70 @@ const router = createBrowserRouter([
         element: <News />,
       },
     ],
+    errorElement: <ErrorFallback />,
   },
   {
-    path: "/",
-    element: <Admin />,
+    path: "/admin",
+    element: (
+      <PrivateRoute requiredRole="admin">
+        <Admin />
+      </PrivateRoute>
+    ),
     children: [
       {
-        path: "/admin-account",
+        path: "/admin/account",
         element: <AdminAccount />,
       },
       {
-        path: "/admin-alumni",
+        path: "/admin/alumni",
         element: <AdminAlumni />,
       },
       {
-        path: "/admin-dashboard",
+        path: "/admin/dashboard",
         element: <AdminDashboard />,
       },
       {
-        path: "/admin-home",
+        path: "/admin/homepage",
         element: <AdminHomepage />,
       },
       {
-        path: "/admin-reports",
+        path: "/admin/reports",
         element: <AdminReports />,
       },
       {
-        path: "/admin-surveytool",
+        path: "/admin/surveytool",
         element: <AdminSurveyTool />,
       },
       {
-        path: "/admin-threads",
+        path: "/admin/threads",
         element: <AdminThreads />,
       },
       {
-        path: "/admin-certifications",
+        path: "/admin/certifications",
         element: <AdminCertifications />,
       },
       {
-        path: "/admin-companies",
+        path: "/admin/companies",
         element: <AdminCompanies />,
       },
       {
-        path: "/admin-documentrequest",
+        path: "/admin/documentrequest",
         element: <AdminDocumentRequest />,
       },
       {
-        path: "/admin-events",
+        path: "/admin/events",
         element: <AdminEvents />,
       },
       {
-        path: "/admin-job",
+        path: "/admin/job",
         element: <AdminJob />,
       },
       {
-        path: "/admin-news",
+        path: "/admin/news",
         element: <AdminNews />,
       },
     ],
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/register",
-    element: <Register />,
-  },
-  {
-    path: "/forgotpassword",
-    element: <ForgotPassword />,
-  },
-  {
-    path: "/resetpassword",
-    element: <ResetPassword />,
-  },
-  {
-    path: "/verifyaccount",
-    element: <VerifyAccount />,
-  },
-  {
-    path: "/dataprivacy",
-    element: <DataPrivacy />,
+    errorElement: <ErrorFallback />,
   },
 ]);
 

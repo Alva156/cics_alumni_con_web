@@ -18,6 +18,9 @@ function AdminThreads() {
   const [showValidationMessage, setShowValidationMessage] = useState(false);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filteredThreads, setFilteredThreads] = useState([]);
+  const [sortOption, setSortOption] = useState("Title (A-Z)");
+
   // replies
 
   const [newReply, setNewReply] = useState("");
@@ -339,10 +342,42 @@ function AdminThreads() {
     setThreadToDelete(null);
   };
 
-  // Filter threads based on search term
-  const filteredThreads = myThreads.filter((thread) =>
-    thread.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredThreads([]);
+    } else {
+      const filtered = [...myThreads, ...allThreads]
+        .filter((thread, index, self) => {
+          // Check if the user owns the thread
+          const isOwned = myThreads.some(
+            (myThread) => myThread._id === thread._id
+          );
+
+          // If the thread is owned, only include the one from myThreads
+          if (isOwned) {
+            return thread.isOwner;
+          }
+
+          // Otherwise, include the thread from allThreads
+          return !self.find((t) => t._id === thread._id && t.isOwner);
+        })
+        .filter((thread) =>
+          thread.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      setFilteredThreads(filtered);
+    }
+  }, [searchTerm, myThreads, allThreads]);
+
+  const sortThreads = (threads) => {
+    return threads.sort((a, b) => {
+      if (sortOption === "Title (A-Z)") {
+        return a.title.localeCompare(b.title);
+      } else if (sortOption === "Title (Z-A)") {
+        return b.title.localeCompare(a.title);
+      }
+      return 0;
+    });
+  };
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -376,14 +411,22 @@ function AdminThreads() {
       </div>
       <div className="mb-6">
         <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
           <option>Title (A-Z)</option>
           <option>Title (Z-A)</option>
         </select>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="text-lg">My Threads</div>
+      <div className="flex justify-between items-center mb-4 mt-12">
+        {searchTerm.trim() ? (
+          <div className="text-lg">Search Results:</div>
+        ) : (
+          <div className="text-lg">My Threads</div>
+        )}
         <button
           className="btn btn-sm w-36 bg-green text-white"
           onClick={openAddModal}
@@ -393,99 +436,150 @@ function AdminThreads() {
       </div>
 
       <hr className="mb-6 border-black" />
-      {myThreads.length === 0 ? (
-        <div>No threads created yet.</div>
-      ) : (
-        myThreads.map((thread) => (
-          <div
-            key={thread._id}
-            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-            onClick={() => openViewModal(thread)}
-          >
-            <div>
-              <div className="text-md font-medium mb-1">{thread.title}</div>
-              <div className="text-sm text-black-600">
-                Replies: {thread.replyCount || 0}
-              </div>
-            </div>
-            <div className="flex items-center">
-              <div
-                className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openDeleteModal(thread);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Delete
-                </span>
-              </div>
-              <div
-                className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEditModal(thread);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Edit
-                </span>
-              </div>
-            </div>
-          </div>
-        ))
-      )}
 
-      <div className="flex justify-between items-center mb-4 mt-12">
-        <div className="text-lg">All Threads</div>
-      </div>
-
-      <hr className="mb-6 border-black" />
-
-      {allThreads.length === 0 ? (
-        <div>No threads created yet.</div>
-      ) : (
-        allThreads.map((thread) => (
-          <div
-            key={thread._id}
-            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-            onClick={() => openViewModal(thread)}
-          >
-            <div>
-              <div className="text-md font-medium mb-1">{thread.title}</div>
-              <div className="text-sm text-black-600">
-                Replies: {thread.replyCount || 0}
-              </div>
-            </div>
-            {/* Only show buttons if the logged-in user is the owner of the thread */}
-            {thread.isOwner && (
-              <div className="flex items-center">
-                <div
-                  className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openDeleteModal(thread);
-                  }}
-                >
-                  <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                    Delete
-                  </span>
-                </div>
-                <div
-                  className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openEditModal(thread);
-                  }}
-                >
-                  <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                    Edit
-                  </span>
+      {searchTerm.trim() ? (
+        filteredThreads.length === 0 ? (
+          <div>No threads match your search.</div>
+        ) : (
+          sortThreads(filteredThreads).map((thread) => (
+            <div
+              key={thread._id}
+              className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+              onClick={() => openViewModal(thread)}
+            >
+              <div>
+                <div className="text-md font-medium mb-1">{thread.title}</div>
+                <div className="text-sm text-black-600">
+                  Replies: {thread.replyCount || 0}
                 </div>
               </div>
-            )}
+              {thread.isOwner && (
+                <div className="flex items-center">
+                  <div
+                    className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openDeleteModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Delete
+                    </span>
+                  </div>
+                  <div
+                    className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Edit
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        )
+      ) : (
+        <>
+          {/* My Threads Section */}
+          {myThreads.length === 0 ? (
+            <div>No threads created yet.</div>
+          ) : (
+            sortThreads(myThreads).map((thread) => (
+              <div
+                key={thread._id}
+                className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+                onClick={() => openViewModal(thread)}
+              >
+                <div>
+                  <div className="text-md font-medium mb-1">{thread.title}</div>
+                  <div className="text-sm text-black-600">
+                    Replies: {thread.replyCount || 0}
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <div
+                    className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openDeleteModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Delete
+                    </span>
+                  </div>
+                  <div
+                    className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Edit
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+
+          {/* All Threads Section */}
+          <div className="flex justify-between items-center mb-4 mt-12">
+            <div className="text-lg">All Threads</div>
           </div>
-        ))
+
+          <hr className="mb-6 border-black" />
+
+          {allThreads.length === 0 ? (
+            <div>No threads created yet.</div>
+          ) : (
+            sortThreads(allThreads).map((thread) => (
+              <div
+                key={thread._id}
+                className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+                onClick={() => openViewModal(thread)}
+              >
+                <div>
+                  <div className="text-md font-medium mb-1">{thread.title}</div>
+                  <div className="text-sm text-black-600">
+                    Replies: {thread.replyCount || 0}
+                  </div>
+                </div>
+                {thread.isOwner && (
+                  <div className="flex items-center">
+                    <div
+                      className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openDeleteModal(thread);
+                      }}
+                    >
+                      <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                        Delete
+                      </span>
+                    </div>
+                    <div
+                      className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditModal(thread);
+                      }}
+                    >
+                      <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                        Edit
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </>
       )}
       {isDeleteReplyModalOpen && replyToDelete && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">

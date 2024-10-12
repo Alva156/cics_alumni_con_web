@@ -1,66 +1,54 @@
 import React, { useState, useEffect, useRef } from "react";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
 
-function DocumentRequest() {
-  const [selectedDocument, setSelectedDocument] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+function Documents() {
+  const [selectedDocuments, setSelectedDocuments] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [documents, setDocuments] = useState([]);
+  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
   const modalRef = useRef(null);
 
-  const documents = [
-    {
-      name: "Document",
-      briefdescription: "Brief Description",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-    {
-      name: "Document",
-      briefdescription: "Brief Description",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-    {
-      name: "Document",
-      briefdescription: "Brief Description",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-  ];
-
-  const openModal = (document) => {
-    setSelectedDocument(document);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedDocument(null);
+  // Fetch all documents from the server
+  const fetchDocuments = async () => {
+    try {
+      const response = await axios.get("http://localhost:6001/documents/view", {
+        withCredentials: true,
+      });
+      setDocuments(response.data);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    }
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        closeModal();
-      }
-    };
+    fetchDocuments();
+  }, []);
 
-    if (isModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [isModalOpen]);
+  const openViewModal = (documents) => {
+    setSelectedDocuments(documents);
+    setIsViewModalOpen(true);
+  };
 
-  const filteredDocumentRequest = documents.filter((document) =>
-    document.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const closeModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedDocuments(null);
+  };
+
+  const filteredDocuments = documents.filter((documents) =>
+    documents.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Sort documents based on selected criteria
+  const sortedDocuments = filteredDocuments.sort((a, b) => {
+    if (sortCriteria === "Name (A-Z)") {
+      return a.name.localeCompare(b.name);
+    } else if (sortCriteria === "Name (Z-A)") {
+      return b.name.localeCompare(a.name);
+    }
+    return 0;
+  });
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -69,7 +57,7 @@ function DocumentRequest() {
       <div className="mb-4 relative">
         <input
           type="text"
-          placeholder="Search Document"
+          placeholder="Search Documents"
           className="w-full border border-black rounded-lg px-4 py-2"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -84,31 +72,37 @@ function DocumentRequest() {
 
       <div className="mb-6">
         <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortCriteria}
+          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+        >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
         </select>
       </div>
 
-      <div className="text-lg mb-4">All Documents</div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="text-lg">Documents Lists</div>
+      </div>
 
       <hr className="mb-6 border-black" />
 
-      {filteredDocumentRequest.map((document, index) => (
+      {filteredDocuments.map((documents) => (
         <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openModal(document)}
+          key={documents._id}
+          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
+          onClick={() => openViewModal(documents)}
         >
-          <div className="text-md font-medium mb-1">{document.name}</div>
-          <div className="text-sm text-black-600">
-            {document.briefdescription}
+          <div>
+            <div className="text-md font-medium mb-1">{documents.name}</div>
+            <div className="text-sm text-black-600">{documents.address}</div>
           </div>
         </div>
       ))}
 
-      {/* Modal */}
-      {isModalOpen && selectedDocument && (
+      {/* View Modal */}
+      {isViewModalOpen && selectedDocuments && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
           style={{ zIndex: 9999 }}
@@ -124,25 +118,21 @@ function DocumentRequest() {
               &times;
             </button>
             <div className="text-2xl font-medium mb-2">
-              {selectedDocument.name}
+              {selectedDocuments.name}
             </div>
-            <div className="text-md mb-2">
-              {selectedDocument.briefdescription}
-            </div>
+            <div className="text-md mb-2">{selectedDocuments.address}</div>
             <img
-              src={selectedDocument.image}
-              alt={selectedDocument.name}
+              src={selectedDocuments.image}
+              alt={selectedDocuments.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
-            <div className="text-sm mb-4">{selectedDocument.description}</div>
-            <div className="text-sm font-medium mb-2">
-              {selectedDocument.contact}
-            </div>
+            <div className="text-sm mb-4">{selectedDocuments.description}</div>
+            <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
-              href={`mailto:document@gmail.com`}
+              href={`mailto:${selectedDocuments.contact}`}
               className="block text-sm text-blue-600 underline"
             >
-              document@gmail.com
+              {selectedDocuments.contact}
             </a>
           </div>
         </div>
@@ -151,4 +141,4 @@ function DocumentRequest() {
   );
 }
 
-export default DocumentRequest;
+export default Documents;

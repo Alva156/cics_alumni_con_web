@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function AdminEvents() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedEvents, setSelectedEvents] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -19,7 +20,7 @@ function AdminEvents() {
   // Fetch all events from the server
   const fetchEvents = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/events/view", {
+      const response = await axios.get(`${backendUrl}/events/view`, {
         withCredentials: true,
       });
       setEvents(response.data);
@@ -64,7 +65,7 @@ function AdminEvents() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:6001/events/delete-events/${selectedEvents._id}`,
+        `${backendUrl}/events/delete-events/${selectedEvents._id}`,
         { withCredentials: true }
       );
 
@@ -100,7 +101,7 @@ function AdminEvents() {
 
     try {
       const response = await axios.put(
-        `http://localhost:6001/events/update-events/${selectedEvents._id}`,
+        `${backendUrl}/events/update-events/${selectedEvents._id}`,
         {
           name: selectedEvents.name,
           address: selectedEvents.address,
@@ -150,7 +151,7 @@ function AdminEvents() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/events/create-events",
+        `${backendUrl}/events/create-events`,
         eventsData,
         {
           withCredentials: true,

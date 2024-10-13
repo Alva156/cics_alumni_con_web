@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function Events() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedEvents, setSelectedEvents] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ function Events() {
   // Fetch all events from the server
   const fetchEvents = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/events/view", {
+      const response = await axios.get(`${backendUrl}/events/view`, {
         withCredentials: true,
       });
       setEvents(response.data);

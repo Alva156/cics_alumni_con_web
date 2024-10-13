@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function AdminCompanies() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -19,7 +20,7 @@ function AdminCompanies() {
   // Fetch all companies from the server
   const fetchCompanies = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/companies/view", {
+      const response = await axios.get(`${backendUrl}/companies/view`, {
         withCredentials: true,
       });
       setCompanies(response.data);
@@ -64,7 +65,7 @@ function AdminCompanies() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:6001/companies/delete-companies/${selectedCompany._id}`,
+        `${backendUrl}/companies/delete-companies/${selectedCompany._id}`,
         { withCredentials: true }
       );
 
@@ -100,7 +101,7 @@ function AdminCompanies() {
 
     try {
       const response = await axios.put(
-        `http://localhost:6001/companies/update-companies/${selectedCompany._id}`,
+        `${backendUrl}/companies/update-companies/${selectedCompany._id}`,
         {
           name: selectedCompany.name,
           address: selectedCompany.address,
@@ -150,7 +151,7 @@ function AdminCompanies() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/companies/create-companies",
+        `${backendUrl}/companies/create-companies`,
         companyData,
         {
           withCredentials: true,

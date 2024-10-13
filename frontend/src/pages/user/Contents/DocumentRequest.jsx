@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function Documents() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedDocuments, setSelectedDocuments] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ function Documents() {
   // Fetch all documents from the server
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/documents/view", {
+      const response = await axios.get(`${backendUrl}/documents/view`, {
         withCredentials: true,
       });
       setDocuments(response.data);

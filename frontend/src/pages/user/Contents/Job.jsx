@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function Jobs() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedJobs, setSelectedJobs] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ function Jobs() {
   // Fetch all jobs from the server
   const fetchJobs = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/jobs/view", {
+      const response = await axios.get(`${backendUrl}/jobs/view`, {
         withCredentials: true,
       });
       setJobs(response.data);
@@ -117,9 +118,7 @@ function Jobs() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedJobs.name}
-            </div>
+            <div className="text-2xl font-medium mb-2">{selectedJobs.name}</div>
             <div className="text-md mb-2">{selectedJobs.address}</div>
             <img
               src={selectedJobs.image}

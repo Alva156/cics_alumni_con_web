@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function AdminDocuments() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedDocuments, setSelectedDocuments] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -19,7 +20,7 @@ function AdminDocuments() {
   // Fetch all documents from the server
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/documents/view", {
+      const response = await axios.get(`${backendUrl}/documents/view`, {
         withCredentials: true,
       });
       setDocuments(response.data);
@@ -64,7 +65,7 @@ function AdminDocuments() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:6001/documents/delete-documents/${selectedDocuments._id}`,
+        `${backendUrl}/documents/delete-documents/${selectedDocuments._id}`,
         { withCredentials: true }
       );
 
@@ -100,7 +101,7 @@ function AdminDocuments() {
 
     try {
       const response = await axios.put(
-        `http://localhost:6001/documents/update-documents/${selectedDocuments._id}`,
+        `${backendUrl}/documents/update-documents/${selectedDocuments._id}`,
         {
           name: selectedDocuments.name,
           address: selectedDocuments.address,
@@ -150,7 +151,7 @@ function AdminDocuments() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/documents/create-documents",
+        `${backendUrl}/documents/create-documents`,
         documentsData,
         {
           withCredentials: true,

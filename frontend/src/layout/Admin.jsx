@@ -7,12 +7,13 @@ import { Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Admin = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
 
   useEffect(() => {
     const checkTokenExpiration = async () => {
       try {
-        await axios.get("http://localhost:6001/users/protected", {
+        await axios.get(`${backendUrl}/users/protected`, {
           withCredentials: true,
         });
       } catch (error) {
@@ -40,7 +41,7 @@ const Admin = () => {
   const logout = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/logout",
+        `${backendUrl}/users/logout`,
         {},
         { withCredentials: true }
       );

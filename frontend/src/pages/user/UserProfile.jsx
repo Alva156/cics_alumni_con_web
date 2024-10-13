@@ -52,10 +52,77 @@ function UserProfile() {
     },
   ]);
 
-  const [attachments, setAttachments] = useState([{ id: 1 }]);
+  // Initialize attachments state
+  const [attachments, setAttachments] = useState([
+    { id: uniqueId(), filename: "", filepath: "" },
+  ]);
 
+  // Handler for file selection
+
+  const handleFileChange = (e, index) => {
+    const file = e.target.files[0];
+    const newAttachments = [...attachments]; // Copy the current attachments array
+  
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+  
+      axios
+        .post(`${backendUrl}/profile/uploadfile`, formData, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          // Assuming the backend responds with the correct file path and filename
+          newAttachments[index] = {
+            ...newAttachments[index],
+            id: newAttachments[index].id, // Keep the same ID
+            filename: file.name,          // Filename from the uploaded file
+            filepath: response.data.filepath, // File path from the server response
+          };
+          setAttachments(newAttachments); // Update the state with the new attachment data
+        })
+        .catch((error) => console.error("Error uploading file:", error));
+    }
+  };
+  
+
+  // Function to add a new attachment field
   const addAttachment = () => {
-    setAttachments((prev) => [...prev, { id: prev.length + 1 }]);
+    setAttachments((prev) => [
+      ...prev,
+      { id: uniqueId(), file: null, fileName: "" }, // Initialize with a unique ID and empty values
+    ]);
+  };
+
+  const handleAttachmentChange = async (e, id) => {
+    const file = e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await axios.post(
+          `${backendUrl}/uploadAttachment`,
+          formData,
+          {
+            withCredentials: true,
+          }
+        );
+
+        // Add the response data (which includes fileName and filePath) to the attachments state
+        setAttachments((prev) => [
+          ...prev,
+          {
+            id: response.data.id,
+            fileName: response.data.fileName,
+            filePath: response.data.filePath,
+            file: null,
+          },
+        ]);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      }
+    }
   };
 
   const addSecondaryEducationSection = () => {
@@ -209,18 +276,15 @@ function UserProfile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate required fields
     if (!firstName || !lastName) {
       setValidationMessage("First Name and Last Name are required.");
       setShowValidationMessage(true);
-
-      setTimeout(() => {
-        setShowValidationMessage(false);
-      }, 3000);
-
+      setTimeout(() => setShowValidationMessage(false), 3000);
       return; // Prevent submission
     }
 
-    // Reset the validation message when inputs are valid
+    // Reset error messages when inputs are valid
     setShowErrorMessage(false);
 
     const userData = {
@@ -241,7 +305,10 @@ function UserProfile() {
       salaryRange,
       placeOfEmployment,
       profileImage,
-      attachments,
+      attachments: attachments.map((attachment) => ({
+        fileName: attachment.fileName,
+        file: attachment.file, // include the file object here
+      })),
       secondaryEducation: secondaryEducationSections,
       tertiaryEducation: tertiaryEducationSections,
       careerBackground: companySections,
@@ -256,49 +323,35 @@ function UserProfile() {
     };
 
     try {
-      // Try to fetch profile to check if it exists
-      const profileResponse = await axios.get(
-        `${backendUrl}/profile/userprofile`,
-        { withCredentials: true }
-      );
+      // Check if the profile exists
+      await axios.get(`${backendUrl}/profile/userprofile`, { withCredentials: true });
 
-      // If profile exists, update it
+      // Update the existing profile
       await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
         withCredentials: true,
       });
       console.log("Profile updated successfully!");
-
       setValidationMessage("Profile saved successfully!");
-      setShowValidationMessage(true);
-
-      setTimeout(() => {
-        setShowValidationMessage(false);
-      }, 3000);
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        // If profile doesn't exist, create a new one
+        // Create a new profile if it doesn't exist
         await axios.post(`${backendUrl}/profile/createprofile`, userData, {
           withCredentials: true,
         });
         console.log("Profile created successfully!");
         setValidationMessage("Profile created successfully!");
-        setShowValidationMessage(true);
-
-        setTimeout(() => {
-          setShowValidationMessage(false);
-        }, 3000);
       } else {
-        console.error(
-          "Error saving profile:",
-          error.response ? error.response.data : error.message
-        );
+        // Handle errors during save
+        console.error("Error saving profile:", error.response ? error.response.data : error.message);
         setErrorMessage("Error saving profile. Please try again.");
         setShowErrorMessage(true);
-        setTimeout(() => {
-          setShowErrorMessage(false);
-        }, 3000);
+        setTimeout(() => setShowErrorMessage(false), 3000);
       }
     }
+
+    // Show validation message for successful save
+    setShowValidationMessage(true);
+    setTimeout(() => setShowValidationMessage(false), 3000);
   };
 
   useEffect(() => {
@@ -337,6 +390,15 @@ function UserProfile() {
           setMobileNumber(profileData.contactInformation?.mobileNumber || "");
           setOtherContact(profileData.contactInformation?.other || "");
           setProfileImage(profileData.profileImage || "");
+          // Set secondary education, tertiary education, company sections, and attachments
+          setSecondaryEducationSections(
+            profileData.secondaryEducationSections || []
+          );
+          setTertiaryEducationSections(
+            profileData.tertiaryEducationSections || []
+          );
+          setCompanySections(profileData.companySections || []);
+          setAttachments(profileData.attachments || []); // Fetch attachments
 
           // Convert birthday to "yyyy-MM-dd" format if available
           if (profileData.birthday) {
@@ -779,18 +841,26 @@ function UserProfile() {
                   </div>
                 </div>
 
-                {attachments.map((attachment) => (
-                  <div key={attachment.id}>
-                    <label className="pt-4 pb-2 text-sm">
-                      Attachment {attachment.id}
-                    </label>
-                    <input
-                      type="file"
-                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
-                      onChange={(e) => handleAttachmentChange(e, attachment.id)} // Handle file change
-                    />
-                  </div>
-                ))}
+                {attachments.length > 0 ? (
+                  attachments.map((attachment) => (
+                    <div key={attachment.id}>
+                      <label className="pt-4 pb-2 text-sm">
+                        Attachment {attachment.id}
+                      </label>
+                      <div className="text-sm text-gray-600">
+                        {attachment.fileName || "No file uploaded."}
+                      </div>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
+                        onChange={(e) => handleFileChange(e, index)} // Handle file change
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <p>No attachments available.</p>
+                )}
               </div>
             </div>
 

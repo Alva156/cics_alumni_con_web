@@ -66,6 +66,14 @@ const userProfileSchema = new Schema({
             id: {
                 type: Number,
             },
+            fileName: {
+                type: String, // The original file name
+                required: true,
+            },
+            filePath: {
+                type: String, // The path where the file is stored
+                required: true,
+            },
         },
     ],
     secondaryEducation: [

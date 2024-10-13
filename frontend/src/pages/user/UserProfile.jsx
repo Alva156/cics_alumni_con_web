@@ -5,6 +5,7 @@ import { uniqueId } from "lodash"; // Make sure you import uniqueId
 import imageCompression from "browser-image-compression";
 
 function UserProfile() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [showValidationMessage, setShowValidationMessage] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
@@ -257,12 +258,12 @@ function UserProfile() {
     try {
       // Try to fetch profile to check if it exists
       const profileResponse = await axios.get(
-        "http://localhost:6001/profile/userprofile",
+        `${backendUrl}/profile/userprofile`,
         { withCredentials: true }
       );
 
       // If profile exists, update it
-      await axios.put("http://localhost:6001/profile/updateprofile", userData, {
+      await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
         withCredentials: true,
       });
       console.log("Profile updated successfully!");
@@ -276,11 +277,9 @@ function UserProfile() {
     } catch (error) {
       if (error.response && error.response.status === 404) {
         // If profile doesn't exist, create a new one
-        await axios.post(
-          "http://localhost:6001/profile/createprofile",
-          userData,
-          { withCredentials: true }
-        );
+        await axios.post(`${backendUrl}/profile/createprofile`, userData, {
+          withCredentials: true,
+        });
         console.log("Profile created successfully!");
         setValidationMessage("Profile created successfully!");
         setShowValidationMessage(true);
@@ -306,10 +305,9 @@ function UserProfile() {
     const fetchProfile = async () => {
       try {
         console.log("Sending request to fetch profile...");
-        const response = await axios.get(
-          "http://localhost:6001/profile/userprofile",
-          { withCredentials: true }
-        );
+        const response = await axios.get(`${backendUrl}/profile/userprofile`, {
+          withCredentials: true,
+        });
 
         console.log("Profile fetched:", response.data);
 

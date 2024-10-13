@@ -1,6 +1,7 @@
 const UserProfile = require("../models/userProfileModel");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 exports.getProfile = async (req, res) => {
   try {
@@ -268,5 +269,47 @@ exports.getAllAlumni = async (req, res) => {
       error: "Failed to fetch alumni profiles",
       message: error.message,
     });
+  }
+};
+exports.changePassword = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized, please log in." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id; // Get the userId from the token
+
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ error: "New password is required." });
+    }
+
+    // Fetch the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Check password complexity (Optional: adjust this as needed)
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      return res
+        .status(400)
+        .json({ error: "Password must meet the complexity requirements." });
+    }
+
+    // Hash the new password and update it
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully!" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ error: "Server error", message: error.message });
   }
 };

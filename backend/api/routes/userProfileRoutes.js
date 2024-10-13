@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const authenticateJWT = require("../../middleware/auth");
+
 const userProfileController = require("../controllers/userProfileController");
 
 router.get("/userprofile", authenticateJWT, userProfileController.getProfile);
@@ -18,6 +19,11 @@ router.put(
   "/updateprofile",
   authenticateJWT,
   userProfileController.updateProfile
+);
+router.post(
+  "/changepassword",
+  authenticateJWT,
+  userProfileController.changePassword
 );
 
 module.exports = router;

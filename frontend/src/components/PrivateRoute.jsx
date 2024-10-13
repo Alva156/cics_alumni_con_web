@@ -8,6 +8,7 @@ const ErrorFallback = () => {
 };
 
 const PrivateRoute = ({ children, requiredRole }) => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,7 +16,7 @@ const PrivateRoute = ({ children, requiredRole }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch("http://localhost:6001/users/check-auth", {
+        const response = await fetch(`${backendUrl}/users/check-auth`, {
           method: "GET",
           credentials: "include", // Ensures cookies are sent with the request
         });

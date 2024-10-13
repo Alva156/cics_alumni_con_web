@@ -5,6 +5,7 @@ import { MdOutlineLogout } from "react-icons/md";
 import axios from "axios";
 
 const Navbar = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -21,7 +22,7 @@ const Navbar = () => {
   const logout = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/logout",
+        `${backendUrl}/users/logout`,
         {},
         { withCredentials: true }
       );

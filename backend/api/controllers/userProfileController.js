@@ -2,6 +2,22 @@ const UserProfile = require("../models/userProfileModel");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory where files will be saved
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`); // Ensure unique filenames
+  },
+});
+
+const upload = multer({ storage });
+
+// Middleware for file upload
+exports.uploadFile = upload.single('file'); // Use 'file' as the field name for uploads
 
 exports.getProfile = async (req, res) => {
   try {
@@ -79,7 +95,7 @@ exports.createProfile = async (req, res) => {
       workIndustry: req.body.workIndustry,
       yearGraduatedCollege: req.body.yearGraduatedCollege,
       yearStartedCollege: req.body.yearStartedCollege,
-      attachments: req.body.attachments,
+      attachments: req.body.attachments || [],
     };
 
     // Validate required fields (this can be customized based on your requirements)
@@ -215,7 +231,7 @@ exports.updateProfile = async (req, res) => {
         workIndustry,
         yearGraduatedCollege,
         yearStartedCollege,
-        attachments,
+        attachments: attachments || [],
       },
       { new: true, upsert: false } // Return the updated document, don't create if it doesn't exist
     );
@@ -313,3 +329,34 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ error: "Server error", message: error.message });
   }
 };
+
+// Backend function to delete a specific company section
+exports.deleteCompanySection = async (req, res) => {
+  const sectionId = req.params.sectionId;
+  
+  if (!sectionId) {
+      return res.status(400).send({ message: "Section ID is required." });
+  }
+
+  try {
+      const result = await UserProfile.updateOne(
+          { _id: req.user.id }, 
+          { $pull: { "companySections": { _id: sectionId } } } // Ensure 'companySections' is correct
+      );
+
+      if (result.modifiedCount === 0) {
+          return res.status(404).send({ message: "Company section not found." });
+      }
+
+      return res.status(200).send({ message: "Company section deleted successfully." });
+  } catch (error) {
+      console.error("Error deleting company section:", error);
+      return res.status(500).send({ message: "Error deleting company section." });
+  }
+};
+
+
+
+
+
+

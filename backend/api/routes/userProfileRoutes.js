@@ -26,4 +26,6 @@ router.post(
   userProfileController.changePassword
 );
 
+router.delete("/company-section/:sectionId", authenticateJWT, userProfileController.deleteCompanySection);
+
 module.exports = router;

@@ -59,39 +59,39 @@ function UserProfile() {
 
   // Handler for file selection
 
+  // Update attachments state after file upload
   const handleFileChange = (e, index) => {
     const file = e.target.files[0];
-    const newAttachments = [...attachments]; // Copy the current attachments array
-  
     if (file) {
       const formData = new FormData();
       formData.append("file", file);
-  
+
       axios
-        .post(`${backendUrl}/profile/uploadfile`, formData, {
-          withCredentials: true,
-        })
+        .post(`${backendUrl}/profile/uploadattachment`, formData, { withCredentials: true })
         .then((response) => {
-          // Assuming the backend responds with the correct file path and filename
-          newAttachments[index] = {
-            ...newAttachments[index],
-            id: newAttachments[index].id, // Keep the same ID
-            filename: file.name,          // Filename from the uploaded file
-            filepath: response.data.filepath, // File path from the server response
-          };
-          setAttachments(newAttachments); // Update the state with the new attachment data
+          if (response.data && response.data.filename && response.data.filepath) {
+            const newAttachments = [...attachments];
+            newAttachments[index] = {
+              id: uniqueId(),
+              filename: response.data.filename,
+              filepath: response.data.filepath,
+            };
+            setAttachments(newAttachments);
+          } else {
+            console.error("Unexpected response format:", response.data);
+          }
         })
-        .catch((error) => console.error("Error uploading file:", error));
+        .catch((error) => {
+          console.error("Error uploading file:", error);
+        });
     }
   };
+
   
 
   // Function to add a new attachment field
   const addAttachment = () => {
-    setAttachments((prev) => [
-      ...prev,
-      { id: uniqueId(), file: null, fileName: "" }, // Initialize with a unique ID and empty values
-    ]);
+    setAttachments((prev) => [...prev, { id: uniqueId(), fileName: "", filePath: "" }]);
   };
 
   const handleAttachmentChange = async (e, id) => {
@@ -266,13 +266,37 @@ function UserProfile() {
     setCompanySections(newSections);
   };
 
+  // Updated handleDeleteCompanySection with logging
+  const handleDeleteCompanySection = async (sectionId, index) => {
+    console.log(`Attempting to delete section with ID: ${sectionId}`); // Debugging line
+    try {
+      const response = await axios.delete(
+        `${backendUrl}/profile/company-section/${sectionId}`,
+        { withCredentials: true }
+      );
+  
+      console.log("Delete response:", response.data); // Check response
+      // If successful, update the local state
+      setCompanySections((prevSections) => prevSections.filter((_, i) => i !== index));
+      console.log("Company section deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting section:", error.response ? error.response.data : error.message);
+      // Optionally display an error message to the user
+    }
+  };
+  
+  
+  
+
+  
+  
+
   const handleSave = (e) => {
     console.log("saved");
     e.preventDefault(); // Prevent default form submission
     handleSubmit(e); // Call the handleSubmit function to save the form data
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -284,7 +308,7 @@ function UserProfile() {
       return; // Prevent submission
     }
 
-    // Reset error messages when inputs are valid
+    // Reset error messages
     setShowErrorMessage(false);
 
     const userData = {
@@ -305,10 +329,7 @@ function UserProfile() {
       salaryRange,
       placeOfEmployment,
       profileImage,
-      attachments: attachments.map((attachment) => ({
-        fileName: attachment.fileName,
-        file: attachment.file, // include the file object here
-      })),
+      attachments, // Directly use the state as is
       secondaryEducation: secondaryEducationSections,
       tertiaryEducation: tertiaryEducationSections,
       careerBackground: companySections,
@@ -327,17 +348,13 @@ function UserProfile() {
       await axios.get(`${backendUrl}/profile/userprofile`, { withCredentials: true });
 
       // Update the existing profile
-      await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
-        withCredentials: true,
-      });
+      await axios.put(`${backendUrl}/profile/updateprofile`, userData, { withCredentials: true });
       console.log("Profile updated successfully!");
       setValidationMessage("Profile saved successfully!");
     } catch (error) {
       if (error.response && error.response.status === 404) {
         // Create a new profile if it doesn't exist
-        await axios.post(`${backendUrl}/profile/createprofile`, userData, {
-          withCredentials: true,
-        });
+        await axios.post(`${backendUrl}/profile/createprofile`, userData, { withCredentials: true });
         console.log("Profile created successfully!");
         setValidationMessage("Profile created successfully!");
       } else {
@@ -354,20 +371,15 @@ function UserProfile() {
     setTimeout(() => setShowValidationMessage(false), 3000);
   };
 
+  // Fetch user profile on mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        console.log("Sending request to fetch profile...");
-        const response = await axios.get(`${backendUrl}/profile/userprofile`, {
-          withCredentials: true,
-        });
-
-        console.log("Profile fetched:", response.data);
-
+        const response = await axios.get(`${backendUrl}/profile/userprofile`, { withCredentials: true });
         const profileData = response.data;
 
-        // Check if profile data is populated and set the form values
         if (profileData) {
+          // Populate form fields with fetched profile data
           setFirstName(profileData.firstName || "");
           setLastName(profileData.lastName || "");
           setProfession(profileData.profession || "");
@@ -390,36 +402,28 @@ function UserProfile() {
           setMobileNumber(profileData.contactInformation?.mobileNumber || "");
           setOtherContact(profileData.contactInformation?.other || "");
           setProfileImage(profileData.profileImage || "");
-          // Set secondary education, tertiary education, company sections, and attachments
-          setSecondaryEducationSections(
-            profileData.secondaryEducationSections || []
-          );
-          setTertiaryEducationSections(
-            profileData.tertiaryEducationSections || []
-          );
-          setCompanySections(profileData.companySections || []);
+          
+          // Set education and company sections
+          setSecondaryEducationSections(profileData.secondaryEducation || []);
+          setTertiaryEducationSections(profileData.tertiaryEducation || []);
+          setCompanySections(profileData.careerBackground || []);
           setAttachments(profileData.attachments || []); // Fetch attachments
 
           // Convert birthday to "yyyy-MM-dd" format if available
           if (profileData.birthday) {
-            const birthdayDate = new Date(profileData.birthday)
-              .toISOString()
-              .substring(0, 10);
+            const birthdayDate = new Date(profileData.birthday).toISOString().substring(0, 10);
             setBirthday(birthdayDate);
           }
         } else {
           console.error("User profile not found");
         }
       } catch (error) {
-        console.error(
-          "Error fetching profile:",
-          error.response ? error.response.data : error.message
-        );
+        console.error("Error fetching user profile:", error);
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [backendUrl]);
 
   return (
     <>
@@ -841,26 +845,22 @@ function UserProfile() {
                   </div>
                 </div>
 
-                {attachments.length > 0 ? (
-                  attachments.map((attachment) => (
-                    <div key={attachment.id}>
-                      <label className="pt-4 pb-2 text-sm">
-                        Attachment {attachment.id}
-                      </label>
-                      <div className="text-sm text-gray-600">
-                        {attachment.fileName || "No file uploaded."}
-                      </div>
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
-                        onChange={(e) => handleFileChange(e, index)} // Handle file change
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <p>No attachments available.</p>
-                )}
+                {attachments.map((attachment, index) => (
+    <div key={attachment.id}>
+        <label className="pt-4 pb-2 text-sm">
+            Attachment {index + 1} {/* Change to index + 1 for better user experience */}
+        </label>
+        <div className="text-sm text-gray-600">
+            {attachment.filename || "No file uploaded."}
+        </div>
+        <input
+            type="file"
+            accept="application/pdf"
+            className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
+            onChange={(e) => handleFileChange(e, index)} // Pass the correct index
+        />
+    </div>
+))}
               </div>
             </div>
 
@@ -895,50 +895,42 @@ function UserProfile() {
                 </div>
 
                 {secondaryEducationSections.map((section, index) => (
-                  <div
-                    key={index}
-                    className="w-full border-2 rounded py-2 px-4 mt-2"
-                  >
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">School Name</label>
-                      <input
-                        type="text"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.schoolName}
-                        onChange={(e) =>
-                          handleSecondaryEducationChange(index, e)
-                        }
-                      />
-                    </div>
+  <div key={index} className="w-full border-2 rounded py-2 px-4 mt-2">
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">School Name</label>
+      <input
+        type="text"
+        placeholder="Type here"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.schoolName}
+        onChange={(e) => handleSecondaryEducationChange(index, e)}
+        name="schoolName"
+      />
+    </div>
 
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Started</label>
-                      <input
-                        type="date"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearStarted}
-                        onChange={(e) =>
-                          handleSecondaryEducationChange(index, e)
-                        }
-                      />
-                    </div>
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Year Started</label>
+      <input
+        type="date"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.yearStarted}
+        onChange={(e) => handleSecondaryEducationChange(index, e)}
+        name="yearStarted"
+      />
+    </div>
 
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Ended</label>
-                      <input
-                        type="date"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearEnded}
-                        onChange={(e) =>
-                          handleSecondaryEducationChange(index, e)
-                        }
-                      />
-                    </div>
-                  </div>
-                ))}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Year Ended</label>
+      <input
+        type="date"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.yearEnded}
+        onChange={(e) => handleSecondaryEducationChange(index, e)}
+        name="yearEnded"
+      />
+    </div>
+  </div>
+))}
 
                 {/* TERTIARY EDUCATION */}
                 <div className="flex items-center mt-8">
@@ -954,63 +946,58 @@ function UserProfile() {
                 </div>
 
                 {tertiaryEducationSections.map((section, index) => (
-                  <div
-                    key={index}
-                    className="w-full border-2 rounded py-2 px-4 mt-2"
-                  >
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">School Name</label>
-                      <input
-                        type="text"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.schoolName}
-                        onChange={(e) =>
-                          handleTertiaryEducationChange(index, e)
-                        }
-                      />
-                    </div>
+  <div key={index} className="w-full border-2 rounded py-2 px-4 mt-2">
+    {/* School Name */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">School Name</label>
+      <input
+        type="text"
+        name="schoolName"
+        placeholder="Type here"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.schoolName}
+        onChange={(e) => handleTertiaryEducationChange(index, e)}
+      />
+    </div>
 
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Program</label>
-                      <input
-                        type="text"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.program}
-                        onChange={(e) =>
-                          handleTertiaryEducationChange(index, e)
-                        }
-                      />
-                    </div>
+    {/* Program */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Program</label>
+      <input
+        type="text"
+        name="program"
+        placeholder="Type here"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.program}
+        onChange={(e) => handleTertiaryEducationChange(index, e)}
+      />
+    </div>
 
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Started</label>
-                      <input
-                        type="date"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearStarted}
-                        onChange={(e) =>
-                          handleTertiaryEducationChange(index, e)
-                        }
-                      />
-                    </div>
+    {/* Year Started */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Year Started</label>
+      <input
+        type="date"
+        name="yearStarted"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.yearStarted}
+        onChange={(e) => handleTertiaryEducationChange(index, e)}
+      />
+    </div>
 
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Ended</label>
-                      <input
-                        type="date"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearEnded}
-                        onChange={(e) =>
-                          handleTertiaryEducationChange(index, e)
-                        }
-                      />
-                    </div>
-                  </div>
-                ))}
+    {/* Year Ended */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Year Ended</label>
+      <input
+        type="date"
+        name="yearEnded"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.yearEnded}
+        onChange={(e) => handleTertiaryEducationChange(index, e)}
+      />
+    </div>
+  </div>
+))}
               </div>
             </div>
 
@@ -1042,55 +1029,71 @@ function UserProfile() {
                 </div>
 
                 {companySections.map((section, index) => (
-                  <div
-                    key={section.id}
-                    className="w-full border-2 rounded py-2 px-4 mt-2"
-                  >
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Company Name</label>
-                      <input
-                        type="text"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.companyName}
-                        onChange={(e) => handleCompanyChange(index, e)}
-                      />
-                    </div>
+  <div key={section._id} className="w-full border-2 rounded py-2 px-4 mt-2"> {/* Use section._id instead of section.id */}
+    
+    {/* Company Name */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Company Name</label>
+      <input
+        type="text"
+        name="companyName"
+        placeholder="Type here"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.companyName}
+        onChange={(e) => handleCompanyChange(index, e)}
+      />
+    </div>
 
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Position</label>
-                      <input
-                        type="text"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.position}
-                        onChange={(e) => handleCompanyChange(index, e)}
-                      />
-                    </div>
+    {/* Position */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Position</label>
+      <input
+        type="text"
+        name="position"
+        placeholder="Type here"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.position}
+        onChange={(e) => handleCompanyChange(index, e)}
+      />
+    </div>
 
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Started</label>
-                      <input
-                        type="date"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearStarted}
-                        onChange={(e) => handleCompanyChange(index, e)}
-                      />
-                    </div>
+    {/* Year Started */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Year Started</label>
+      <input
+        type="date"
+        name="yearStarted"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.yearStarted}
+        onChange={(e) => handleCompanyChange(index, e)}
+      />
+    </div>
 
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Ended</label>
-                      <input
-                        type="date"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearEnded}
-                        onChange={(e) => handleCompanyChange(index, e)}
-                      />
-                    </div>
-                  </div>
-                ))}
+    {/* Year Ended */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Year Ended</label>
+      <input
+        type="date"
+        name="yearEnded"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.yearEnded}
+        onChange={(e) => handleCompanyChange(index, e)}
+      />
+    </div>
+
+    {/* Delete Button */}
+    <div className="flex justify-end">
+      <button
+        className="btn btn-sm w-36 bg-red text-white mt-2" // Fixed class name for consistency
+        onClick={() => handleDeleteCompanySection(section._id, index)} // Use section._id
+      >
+        Delete
+      </button>
+    </div>
+  </div>
+))}
+
+
               </div>
             </div>
 

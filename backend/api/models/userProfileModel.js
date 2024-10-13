@@ -63,9 +63,6 @@ const userProfileSchema = new Schema({
     },
     attachments: [
         {
-            id: {
-                type: Number,
-            },
             fileName: {
                 type: String, // The original file name
                 required: true,

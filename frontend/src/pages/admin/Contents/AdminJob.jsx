@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function AdminJobs() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedJobs, setSelectedJobs] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -19,7 +20,7 @@ function AdminJobs() {
   // Fetch all jobs from the server
   const fetchJobs = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/jobs/view", {
+      const response = await axios.get(`${backendUrl}/jobs/view`, {
         withCredentials: true,
       });
       setJobs(response.data);
@@ -64,7 +65,7 @@ function AdminJobs() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:6001/jobs/delete-jobs/${selectedJobs._id}`,
+        `${backendUrl}/jobs/delete-jobs/${selectedJobs._id}`,
         { withCredentials: true }
       );
 
@@ -100,7 +101,7 @@ function AdminJobs() {
 
     try {
       const response = await axios.put(
-        `http://localhost:6001/jobs/update-jobs/${selectedJobs._id}`,
+        `${backendUrl}/jobs/update-jobs/${selectedJobs._id}`,
         {
           name: selectedJobs.name,
           address: selectedJobs.address,
@@ -150,7 +151,7 @@ function AdminJobs() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/jobs/create-jobs",
+        `${backendUrl}/jobs/create-jobs`,
         jobsData,
         {
           withCredentials: true,
@@ -291,9 +292,7 @@ function AdminJobs() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedJobs.name}
-            </div>
+            <div className="text-2xl font-medium mb-2">{selectedJobs.name}</div>
             <div className="text-md mb-2">{selectedJobs.address}</div>
             <img
               src={selectedJobs.image}

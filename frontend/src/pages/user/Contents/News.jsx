@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function News() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedNews, setSelectedNews] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ function News() {
   // Fetch all news from the server
   const fetchNews = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/news/view", {
+      const response = await axios.get(`${backendUrl}/news/view`, {
         withCredentials: true,
       });
       setNews(response.data);
@@ -117,9 +118,7 @@ function News() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedNews.name}
-            </div>
+            <div className="text-2xl font-medium mb-2">{selectedNews.name}</div>
             <div className="text-md mb-2">{selectedNews.address}</div>
             <img
               src={selectedNews.image}

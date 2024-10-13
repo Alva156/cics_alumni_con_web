@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function AdminCertifications() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedCertifications, setSelectedCertifications] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -19,7 +20,7 @@ function AdminCertifications() {
   // Fetch all certifications from the server
   const fetchCertifications = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/certifications/view", {
+      const response = await axios.get(`${backendUrl}/certifications/view`, {
         withCredentials: true,
       });
       setCertifications(response.data);
@@ -64,7 +65,7 @@ function AdminCertifications() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:6001/certifications/delete-certifications/${selectedCertifications._id}`,
+        `${backendUrl}/certifications/delete-certifications/${selectedCertifications._id}`,
         { withCredentials: true }
       );
 
@@ -100,7 +101,7 @@ function AdminCertifications() {
 
     try {
       const response = await axios.put(
-        `http://localhost:6001/certifications/update-certifications/${selectedCertifications._id}`,
+        `${backendUrl}/certifications/update-certifications/${selectedCertifications._id}`,
         {
           name: selectedCertifications.name,
           address: selectedCertifications.address,
@@ -113,7 +114,9 @@ function AdminCertifications() {
 
       setCertifications((prevCertifications) =>
         prevCertifications.map((certifications) =>
-          certifications._id === selectedCertifications._id ? response.data : certifications
+          certifications._id === selectedCertifications._id
+            ? response.data
+            : certifications
         )
       );
 
@@ -150,7 +153,7 @@ function AdminCertifications() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/certifications/create-certifications",
+        `${backendUrl}/certifications/create-certifications`,
         certificationsData,
         {
           withCredentials: true,
@@ -244,8 +247,12 @@ function AdminCertifications() {
           onClick={() => openViewModal(certifications)}
         >
           <div>
-            <div className="text-md font-medium mb-1">{certifications.name}</div>
-            <div className="text-sm text-black-600">{certifications.address}</div>
+            <div className="text-md font-medium mb-1">
+              {certifications.name}
+            </div>
+            <div className="text-sm text-black-600">
+              {certifications.address}
+            </div>
           </div>
           <div className="flex items-center">
             <div
@@ -300,7 +307,9 @@ function AdminCertifications() {
               alt={selectedCertifications.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
-            <div className="text-sm mb-4">{selectedCertifications.description}</div>
+            <div className="text-sm mb-4">
+              {selectedCertifications.description}
+            </div>
             <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
               href={`mailto:${selectedCertifications.contact}`}

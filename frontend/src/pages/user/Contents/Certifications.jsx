@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function Certifications() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedCertifications, setSelectedCertifications] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ function Certifications() {
   // Fetch all certifications from the server
   const fetchCertifications = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/certifications/view", {
+      const response = await axios.get(`${backendUrl}/certifications/view`, {
         withCredentials: true,
       });
       setCertifications(response.data);
@@ -95,8 +96,12 @@ function Certifications() {
           onClick={() => openViewModal(certifications)}
         >
           <div>
-            <div className="text-md font-medium mb-1">{certifications.name}</div>
-            <div className="text-sm text-black-600">{certifications.address}</div>
+            <div className="text-md font-medium mb-1">
+              {certifications.name}
+            </div>
+            <div className="text-sm text-black-600">
+              {certifications.address}
+            </div>
           </div>
         </div>
       ))}
@@ -126,7 +131,9 @@ function Certifications() {
               alt={selectedCertifications.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
-            <div className="text-sm mb-4">{selectedCertifications.description}</div>
+            <div className="text-sm mb-4">
+              {selectedCertifications.description}
+            </div>
             <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
               href={`mailto:${selectedCertifications.contact}`}

@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function AdminNews() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedNews, setSelectedNews] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -19,7 +20,7 @@ function AdminNews() {
   // Fetch all news from the server
   const fetchNews = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/news/view", {
+      const response = await axios.get(`${backendUrl}/news/view`, {
         withCredentials: true,
       });
       setNews(response.data);
@@ -64,7 +65,7 @@ function AdminNews() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:6001/news/delete-news/${selectedNews._id}`,
+        `${backendUrl}/news/delete-news/${selectedNews._id}`,
         { withCredentials: true }
       );
 
@@ -100,7 +101,7 @@ function AdminNews() {
 
     try {
       const response = await axios.put(
-        `http://localhost:6001/news/update-news/${selectedNews._id}`,
+        `${backendUrl}/news/update-news/${selectedNews._id}`,
         {
           name: selectedNews.name,
           address: selectedNews.address,
@@ -150,7 +151,7 @@ function AdminNews() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/news/create-news",
+        `${backendUrl}/news/create-news`,
         newsData,
         {
           withCredentials: true,
@@ -291,9 +292,7 @@ function AdminNews() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedNews.name}
-            </div>
+            <div className="text-2xl font-medium mb-2">{selectedNews.name}</div>
             <div className="text-md mb-2">{selectedNews.address}</div>
             <img
               src={selectedNews.image}

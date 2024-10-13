@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 
 function Companies() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +14,7 @@ function Companies() {
   // Fetch all companies from the server
   const fetchCompanies = async () => {
     try {
-      const response = await axios.get("http://localhost:6001/companies/view", {
+      const response = await axios.get(`${backendUrl}/companies/view`, {
         withCredentials: true,
       });
       setCompanies(response.data);

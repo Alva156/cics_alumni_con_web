@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 function Alumni() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [alumni, setAlumni] = useState([]); // Alumni state
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,10 +15,9 @@ function Alumni() {
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:6001/profile/alumni",
-          { withCredentials: true }
-        );
+        const response = await axios.get(`${backendUrl}/profile/alumni`, {
+          withCredentials: true,
+        });
         setAlumni(response.data.alumni);
       } catch (error) {
         console.error("Error fetching alumni:", error);

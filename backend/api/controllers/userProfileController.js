@@ -35,7 +35,6 @@ exports.getProfile = async (req, res) => {
   }
 };
 
-
 exports.createProfile = async (req, res) => {
   try {
     // Extract the token from cookies
@@ -138,7 +137,7 @@ exports.createUserProfile = async (req, res) => {
       contactInformation: {
         mobileNumber: req.body.mobileNumber,
       },
-      accountEmail:req.body.accountEmail,
+      accountEmail: req.body.accountEmail,
     };
 
     // Create a new UserProfile instance
@@ -224,6 +223,19 @@ exports.updateProfile = async (req, res) => {
       return res
         .status(404)
         .json({ error: "Profile not found. Please create a profile first." });
+    }
+    // If accountEmail is provided, update the email in User model
+    if (accountEmail) {
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { email: accountEmail }, // Update the user's email with the new accountEmail
+        { new: true, upsert: false } // Don't create a new user if not found
+      );
+      if (!updatedUser) {
+        return res
+          .status(404)
+          .json({ error: "User not found while updating email." });
+      }
     }
 
     res.status(200).json({

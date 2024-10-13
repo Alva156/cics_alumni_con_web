@@ -4,6 +4,7 @@ import imageCompression from "browser-image-compression"; // Ensure you have thi
 import "../../App.css"; // Adjust the path based on your project structure
 
 function AdminAccount() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [showValidationMessage, setShowValidationMessage] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
@@ -18,8 +19,11 @@ function AdminAccount() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:6001/profile/userprofile", { withCredentials: true });
-        const { firstName, lastName, accountEmail, profileImage } = response.data;
+        const response = await axios.get(`${backendUrl}/profile/userprofile`, {
+          withCredentials: true,
+        });
+        const { firstName, lastName, accountEmail, profileImage } =
+          response.data;
 
         // Populate form with fetched data
         setFirstName(firstName || "");
@@ -82,11 +86,10 @@ function AdminAccount() {
       setErrorMessage("First Name and Last Name are required.");
       setShowErrorMessage(true);
       setTimeout(() => {
-          setShowErrorMessage(false);
+        setShowErrorMessage(false);
       }, 3000);
       return; // Prevent submission
-  }
-
+    }
 
     // Prepare updated data for submission
     const updatedData = {
@@ -98,7 +101,7 @@ function AdminAccount() {
 
     try {
       // Update the profile with the provided data
-      await axios.put("http://localhost:6001/profile/updateprofile", updatedData, {
+      await axios.put(`${backendUrl}/profile/updateprofile`, updatedData, {
         withCredentials: true,
       });
 
@@ -130,11 +133,18 @@ function AdminAccount() {
         </div>
       )}
 
-      <form onSubmit={handleSave} className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+      <form
+        onSubmit={handleSave}
+        className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12"
+      >
         <div className="page-title text-xl py-4">Admin Account</div>
 
         <div className="py-1">
-          <img src={profileImage} alt="Profile" className="h-40 w-40 border-2 mb-4" />
+          <img
+            src={profileImage}
+            alt="Profile"
+            className="h-40 w-40 border-2 mb-4"
+          />
           <label className="pt-4 pb-2 text-sm">Profile Picture</label>
           <input
             type="file"
@@ -184,25 +194,28 @@ function AdminAccount() {
         </div>
 
         <div className="flex mt-8 space-x-3">
-        <div className="">
-          <button className="btn md:w-64 w-52 bg-[#E58008] text-white">
-            Reset Password
-          </button>
+          <div className="">
+            <button className="btn md:w-64 w-52 bg-[#E58008] text-white">
+              Reset Password
+            </button>
+          </div>
         </div>
-      </div>
 
-      <div className="flex justify-center mt-16 space-x-3">
-        <div className="">
-          <button className="btn md:w-64 w-52 bg-fgray text-white">
-            Cancel
-          </button>
+        <div className="flex justify-center mt-16 space-x-3">
+          <div className="">
+            <button className="btn md:w-64 w-52 bg-fgray text-white">
+              Cancel
+            </button>
+          </div>
+          <div className="">
+            <button
+              className="btn md:w-64 w-52 bg-green text-white"
+              onClick={handleSave}
+            >
+              Save
+            </button>
+          </div>
         </div>
-        <div className="">
-          <button className="btn md:w-64 w-52 bg-green text-white" onClick={handleSave}>
-            Save
-          </button>
-        </div>
-      </div>
       </form>
     </div>
   );

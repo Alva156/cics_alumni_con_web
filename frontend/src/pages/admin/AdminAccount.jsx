@@ -367,7 +367,23 @@ function AdminAccount() {
                 required
               />
             </div>
-            <div className="flex justify-center gap-2 mt-4">
+            <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
+              Password Requirements:
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              At least 8 characters long
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must contain at least one uppercase letter (A-Z)
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must contain at least one digit (0-9)
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must include at least one special character (e.g., !, @, #, $, %,
+              ^, &, *)
+            </p>
+            <div className="flex justify-center gap-2 mt-8">
               <button
                 onClick={handlePasswordSub}
                 className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"

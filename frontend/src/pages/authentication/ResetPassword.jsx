@@ -8,6 +8,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 
 function ResetPassword() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [formData, setFormData] = useState({
     newPassword: "",
     confirmPassword: "",
@@ -67,13 +68,12 @@ function ResetPassword() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/resetpassword",
+        `${backendUrl}/users/resetpassword`,
         { newPassword },
         { withCredentials: true }
       );
 
       if (response.status === 200) {
-        setSuccess("Password reset successfully.");
         setModalVisible(true); // Show modal on success
       } else {
         setError("Failed to reset password");
@@ -94,7 +94,7 @@ function ResetPassword() {
   const handleCancelModal = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/cancel",
+        `${backendUrl}/users/cancel`,
         {},
         { withCredentials: true }
       );
@@ -109,7 +109,7 @@ function ResetPassword() {
   const handleReturnModal = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/cancel",
+        `${backendUrl}/users/cancel`,
         {},
         { withCredentials: true }
       );

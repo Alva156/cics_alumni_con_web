@@ -1,142 +1,45 @@
 import React, { useState, useEffect, useRef } from "react";
-import sampleidpic from "../../assets/sampleidpic.jpg";
+import axios from "axios";
 
 function Alumni() {
+  const [alumni, setAlumni] = useState([]); // Alumni state
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [selectedProgram, setSelectedProgram] = useState("");
   const modalRef = useRef(null);
 
-  const alumni = [
-    {
-      name: "Andrei Cimoune Alvarico",
-      profession: "Top 1 Programmer PH",
-      image: sampleidpic,
-      collegeprogram: "Information Technology",
-      specialization: "Web and Mobile App Development",
-      yearstarted: "2021",
-      yeargraduated: "2025",
-      joblanding: "2",
-      employmentstatus: "Employed",
-      workindustry: "Telecommunications",
-      currentprofession: "Yes",
-      maritalstatus: "Single",
-      salaryrange: "500,000 - 999,000 PHP",
-      employmentplace: "Local",
-      secondaryeducation: "Far Eastern University - Diliman",
-      secondaryeducationyear: "2019-2021",
-      tertiaryeducation: "University of Santo Tomas",
-      tertiaryeducationdegree: "Bachelor of Science in Information Technology",
-      tertiaryeducationyear: "2021-2025",
-      career: "Google LLC",
-      careerposition: "Software Engineer",
-      careeryear: "2025-2030",
-      linkedin: "andrei@linkedin",
-      facebook: "andrei@facebook",
-      instagram: "andrei@insta",
-      email: "andrei@gmail",
-      mobilenumber: "09223334444",
-    },
-    {
-      name: "Alessandra Claire Cruz",
-      profession: "Software Developer",
-      image: sampleidpic,
-      collegeprogram: "Information Technology",
-      specialization: "Web and Mobile App Development",
-      yearstarted: "2021",
-      yeargraduated: "2025",
-      joblanding: "2",
-      employmentstatus: "Employed",
-      workindustry: "Telecommunications",
-      currentprofession: "Yes",
-      maritalstatus: "Single",
-      salaryrange: "500,000 - 999,000 PHP",
-      employmentplace: "Local",
-      secondaryeducation: "Far Eastern University - Diliman",
-      secondaryeducationyear: "2019-2021",
-      tertiaryeducation: "University of Santo Tomas",
-      tertiaryeducationdegree: "Bachelor of Science in Information Technology",
-      tertiaryeducationyear: "2021-2025",
-      career: "Google LLC",
-      careerposition: "Software Engineer",
-      careeryear: "2025-2030",
-      linkedin: "claire@linkedin",
-      facebook: "claire@facebook",
-      instagram: "claire@insta",
-      email: "claire@gmail",
-      mobilenumber: "09223334444",
-    },
-    {
-      name: "James Lorenz Santos",
-      profession: "Software Engineering Specialist",
-      image: sampleidpic,
-      collegeprogram: "Information Technology",
-      specialization: "Web and Mobile App Development",
-      yearstarted: "2021",
-      yeargraduated: "2025",
-      joblanding: "2",
-      employmentstatus: "Employed",
-      workindustry: "Telecommunications",
-      currentprofession: "Yes",
-      maritalstatus: "Single",
-      salaryrange: "500,000 - 999,000 PHP",
-      employmentplace: "Local",
-      secondaryeducation: "Far Eastern University - Diliman",
-      secondaryeducationyear: "2019-2021",
-      tertiaryeducation: "University of Santo Tomas",
-      tertiaryeducationdegree: "Bachelor of Science in Information Technology",
-      tertiaryeducationyear: "2021-2025",
-      career: "Google LLC",
-      careerposition: "Software Engineer",
-      careeryear: "2025-2030",
-      linkedin: "james@linkedin",
-      facebook: "james@facebook",
-      instagram: "james@insta",
-      email: "james@gmail",
-      mobilenumber: "09223334444",
-    },
-    {
-      name: "Denise Anne Valdivieso",
-      profession: "Multi-awarded Software Engineer",
-      image: sampleidpic,
-      collegeprogram: "Information Technology",
-      specialization: "Web and Mobile App Development",
-      yearstarted: "2021",
-      yeargraduated: "2025",
-      joblanding: "2",
-      employmentstatus: "Employed",
-      workindustry: "Telecommunications",
-      currentprofession: "Yes",
-      maritalstatus: "Single",
-      salaryrange: "500,000 - 999,000 PHP",
-      employmentplace: "Local",
-      secondaryeducation: "Far Eastern University - Diliman",
-      secondaryeducationyear: "2019-2021",
-      tertiaryeducation: "University of Santo Tomas",
-      tertiaryeducationdegree: "Bachelor of Science in Information Technology",
-      tertiaryeducationyear: "2021-2025",
-      career: "Google LLC",
-      careerposition: "Software Engineer",
-      careeryear: "2025-2030",
-      linkedin: "denval@linkedin",
-      facebook: "denval@facebook",
-      instagram: "denval@insta",
-      email: "denval@gmail",
-      mobilenumber: "09223334444",
-    },
-  ];
+  // Fetch alumni data from the backend
+  useEffect(() => {
+    const fetchAlumni = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:6001/profile/alumni",
+          { withCredentials: true }
+        );
+        setAlumni(response.data.alumni);
+      } catch (error) {
+        console.error("Error fetching alumni:", error);
+      }
+    };
 
+    fetchAlumni();
+  }, []);
+
+  // Function to open the modal with selected alumni details
   const openModal = (alumni) => {
     setSelectedAlumni(alumni);
     setIsModalOpen(true);
   };
 
+  // Function to close the modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedAlumni(null);
   };
 
+  // Close modal when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -151,9 +54,25 @@ function Alumni() {
     }
   }, [isModalOpen]);
 
-  const filteredAlumni = alumni.filter((alumni) =>
-    alumni.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter alumni based on the search term and selected program
+  const filteredAlumni = alumni
+    .filter((alumni) =>
+      `${alumni.firstName} ${alumni.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    )
+    .filter((alumni) =>
+      selectedProgram ? alumni.collegeProgram === selectedProgram : true
+    );
+  // Sort alumni based on selected order
+  const sortedAlumni = [...filteredAlumni].sort((a, b) => {
+    const nameA = `${a.firstName} ${a.lastName}`;
+    const nameB = `${b.firstName} ${b.lastName}`;
+
+    return sortOrder === "asc"
+      ? nameA.localeCompare(nameB)
+      : nameB.localeCompare(nameA);
+  });
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -178,17 +97,28 @@ function Alumni() {
       <div className="flex md:flex-row">
         <div className="mb-6">
           <span className="text-sm">Sort by:</span>
-          <select className="ml-2 border border-black rounded px-3 py-1 text-sm mr-10">
-            <option>Name (A-Z)</option>
-            <option>Name (Z-A)</option>
+          <select
+            className="ml-2 border border-black rounded px-3 py-1 text-sm mr-10"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+          >
+            <option value="asc">Name (A-Z)</option>
+            <option value="desc">Name (Z-A)</option>
           </select>
         </div>
         <div className="mb-6">
           <span className="text-sm">Filter:</span>
-          <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
-            <option>Computer Science</option>
-            <option>Information Systems</option>
-            <option>Information Technology</option>
+          <select
+            className="ml-2 border border-black rounded px-3 py-1 text-sm"
+            value={selectedProgram}
+            onChange={(e) => setSelectedProgram(e.target.value)}
+          >
+            <option value="">All Programs</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Information Systems">Information Systems</option>
+            <option value="Information Technology">
+              Information Technology
+            </option>
           </select>
         </div>
       </div>
@@ -197,16 +127,22 @@ function Alumni() {
 
       <hr className="mb-6 border-black" />
 
-      {filteredAlumni.map((alumni, index) => (
-        <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openModal(alumni)}
-        >
-          <div className="text-md font-medium mb-1">{alumni.name}</div>
-          <div className="text-sm text-black-600">{alumni.profession}</div>
-        </div>
-      ))}
+      {sortedAlumni.length > 0 ? (
+        sortedAlumni.map((alumni, index) => (
+          <div
+            key={index}
+            className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+            onClick={() => openModal(alumni)}
+          >
+            <div className="text-md font-medium mb-1">
+              {`${alumni.firstName} ${alumni.lastName}`}
+            </div>
+            <div className="text-sm text-black-600">{alumni.profession}</div>
+          </div>
+        ))
+      ) : (
+        <p>No alumni found.</p>
+      )}
 
       {/* Modal */}
       {isModalOpen && selectedAlumni && (
@@ -225,11 +161,11 @@ function Alumni() {
               &times;
             </button>
 
-            <div className="">
-              {selectedAlumni.image && (
+            <div>
+              {selectedAlumni.profileImage && (
                 <div className="mb-4">
                   <img
-                    src={selectedAlumni.image}
+                    src={selectedAlumni.profileImage}
                     alt="Alumni"
                     className="w-32 h-32"
                   />
@@ -239,14 +175,16 @@ function Alumni() {
                 <div className="order-1 sm:order-1">
                   <h1 className="text-xl mb-4">Primary Information</h1>
                   <p className="text-xs mb-1/2">Name</p>
-                  <p className="text-s mb-2 font-bold">{selectedAlumni.name}</p>
+                  <p className="text-s mb-2 font-bold">
+                    {`${selectedAlumni.firstName} ${selectedAlumni.lastName}`}
+                  </p>
                   <p className="text-xs mb-1/2">Profession</p>
                   <p className="text-s mb-2 font-bold">
                     {selectedAlumni.profession}
                   </p>
                   <p className="text-xs mb-1/2">College Program</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.collegeprogram}
+                    {selectedAlumni.collegeProgram}
                   </p>
                   <p className="text-xs mb-1/2">Specialization</p>
                   <p className="text-s mb-2 font-bold">
@@ -256,80 +194,77 @@ function Alumni() {
                     Year Started on College Program
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.yearstarted}
+                    {selectedAlumni.yearStartedCollege}
                   </p>
                   <p className="text-xs mb-1/2">
                     Year Graduated on College Program
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.yeargraduated}
+                    {selectedAlumni.yearGraduatedCollege}
                   </p>
-                  <p className="text-xs mb-1/2">
-                    Time it took to land a job after graduation (Months)
-                  </p>
+                  <p className="text-xs mb-1/2">Time to Land a Job (Months)</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.joblanding}
+                    {selectedAlumni.timeToJob}
                   </p>
                 </div>
                 <div className="order-3 sm:order-2">
                   <h1 className="text-xl mb-4">Contact Information</h1>
                   <p className="text-xs mb-1/2">LinkedIn</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.linkedin}
+                    {selectedAlumni.contactInformation?.linkedin || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">Facebook</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.facebook}
+                    {selectedAlumni.contactInformation?.facebook || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">Instagram</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.instagram}
+                    {selectedAlumni.contactInformation?.instagram || "N/A"}
                   </p>
-                  <p className="text-xs mb-1/2">Email Address</p>
+                  <p className="text-xs mb-1/2">Email</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.email}
+                    {selectedAlumni.contactInformation?.email || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">Mobile Number</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.mobilenumber}
+                    {selectedAlumni.contactInformation?.mobileNumber || "N/A"}
                   </p>
                 </div>
                 <div className="order-2 sm:order-3">
                   <h1 className="text-xl mb-4 mt-6">Secondary Information</h1>
                   <p className="text-xs mb-1/2">Employment Status</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.employmentstatus}
+                    {selectedAlumni.employmentStatus || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">Work Industry</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.workindustry}
+                    {selectedAlumni.workIndustry || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">
                     Is current profession in line with college degree
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.currentprofession}
+                    {selectedAlumni.professionAlignment || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">Marital Status</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.maritalstatus}
+                    {selectedAlumni.maritalStatus || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">Salary range (PHP)</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.salaryrange}
+                    {selectedAlumni.salaryRange || "N/A"}
                   </p>
                   <p className="text-xs mb-1/2">
                     Place of employment (Local or International)
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.employmentplace}
+                    {selectedAlumni.placeOfEmployment || "N/A"}
                   </p>
                 </div>
                 <div className="order-4 sm:order-4">
                   <h1 className="text-xl mb-4 mt-6">Attachments</h1>
                 </div>
               </div>
-
               <div className="block md:flex-row md:flex justify-between"></div>
 
               <h1 className="text-xl mb-4 mt-6">Educational Background</h1>

@@ -7,6 +7,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 
 function Login() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -31,13 +32,9 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:6001/users/login",
-        formData,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.post(`${backendUrl}/users/login`, formData, {
+        withCredentials: true,
+      });
 
       if (response.data.success) {
         localStorage.setItem("isLoggedIn", "true");

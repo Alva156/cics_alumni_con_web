@@ -5,6 +5,7 @@ import verifyaccountImage from "../../assets/verifyaccount_image.jpg";
 import { useNavigate } from "react-router-dom";
 
 function VerifyAccount() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [otpType, setOtpType] = useState(null);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
@@ -52,7 +53,7 @@ function VerifyAccount() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/sendotp",
+        `${backendUrl}/users/sendotp`,
         { otpType: type },
         {
           withCredentials: true, // Ensure cookies are sent
@@ -100,7 +101,7 @@ function VerifyAccount() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/verify",
+        `${backendUrl}/users/verify`,
         { otp }, // Include password if needed
         { withCredentials: true }
       );
@@ -121,7 +122,7 @@ function VerifyAccount() {
 
         // Call the profile creation API
         const profileResponse = await axios.post(
-          "http://localhost:6001/profile/createuserprofile",
+          `${backendUrl}/profile/createuserprofile`,
           formData,
           { withCredentials: true }
         );
@@ -154,7 +155,7 @@ function VerifyAccount() {
 
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/sendotp",
+        `${backendUrl}/users/sendotp`,
         {}, // No need to send any data, email is retrieved from the token
         {
           withCredentials: true, // Ensure cookies are sent
@@ -180,7 +181,7 @@ function VerifyAccount() {
   const handleCloseModal = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/cancel",
+        `${backendUrl}/users/cancel`,
         {},
         { withCredentials: true }
       );
@@ -196,7 +197,7 @@ function VerifyAccount() {
   const handleCancelModal = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/cancel",
+        `${backendUrl}/users/cancel`,
         {},
         { withCredentials: true }
       );
@@ -211,7 +212,7 @@ function VerifyAccount() {
   const handleReturnModal = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/cancel",
+        `${backendUrl}/users/cancel`,
         {},
         { withCredentials: true }
       );

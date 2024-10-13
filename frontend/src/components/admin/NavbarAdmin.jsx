@@ -5,6 +5,7 @@ import { MdOutlineLogout } from "react-icons/md";
 import axios from "axios";
 
 const NavbarAdmin = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -20,20 +21,18 @@ const NavbarAdmin = () => {
   const logout = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/logout",
+        `${backendUrl}/users/logout`,
         {},
         { withCredentials: true }
       );
 
       if (response.status === 200) {
-  
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
         sessionStorage.setItem("logoutMessageShown", "true");
 
         console.log("User has been logged out.");
 
-       
         setTimeout(() => {
           navigate("/login?logout=success");
         }, 2000); // 2000ms = 2 seconds

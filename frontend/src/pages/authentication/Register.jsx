@@ -70,6 +70,12 @@ function Register() {
       confirmPassword,
     } = formData;
 
+    if (email.endsWith("@ust.edu.ph")) {
+      setError("UST email is not allowed");
+      setTimeout(() => setError(""), 5000);
+      return;
+    }
+
     if (
       !firstName ||
       !lastName ||

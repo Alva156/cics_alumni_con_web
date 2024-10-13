@@ -73,7 +73,6 @@ function ResetPassword() {
       );
 
       if (response.status === 200) {
-        setSuccess("Password reset successfully.");
         setModalVisible(true); // Show modal on success
       } else {
         setError("Failed to reset password");

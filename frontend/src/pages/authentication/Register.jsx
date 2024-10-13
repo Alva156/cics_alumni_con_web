@@ -7,6 +7,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 
 function Register() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [formData, setFormData] = useState({
     studentNum: "",
     firstName: "",
@@ -70,6 +71,12 @@ function Register() {
       confirmPassword,
     } = formData;
 
+    if (email.endsWith("@ust.edu.ph")) {
+      setError("UST email is not allowed");
+      setTimeout(() => setError(""), 5000);
+      return;
+    }
+
     if (
       !firstName ||
       !lastName ||
@@ -97,7 +104,7 @@ function Register() {
     }
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/register",
+        `${backendUrl}/users/register`,
         formData,
         { withCredentials: true } // Ensure credentials are sent for cookie setting
       );

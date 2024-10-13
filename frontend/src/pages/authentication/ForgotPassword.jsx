@@ -5,6 +5,7 @@ import axios from "axios";
 import forgotpasswordImage from "../../assets/forgotpassword_image.jpg";
 
 function ForgotPassword() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [otpType, setOtpType] = useState(null);
@@ -51,7 +52,7 @@ function ForgotPassword() {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:6001/users/forget", {
+      const response = await axios.post(`${backendUrl}/users/forget`, {
         email,
       });
       if (response.data.msg) {
@@ -85,7 +86,7 @@ function ForgotPassword() {
     const dataToSend = { email, otp };
     try {
       const response = await axios.post(
-        "http://localhost:6001/users/verifypassword",
+        `${backendUrl}/users/verifypassword`,
         dataToSend,
         { withCredentials: true }
       );
@@ -114,7 +115,7 @@ function ForgotPassword() {
 
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:6001/users/forget", {
+      const response = await axios.post(`${backendUrl}/users/forget`, {
         email,
       });
       if (response.data.msg) {

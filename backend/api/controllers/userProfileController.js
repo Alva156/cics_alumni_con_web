@@ -12,23 +12,29 @@ exports.getProfile = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id; // Get userId from decoded token
 
-    // Fetch the profile by userId and populate user details
+    // Fetch the profile by userId and populate user details from UserModel
     const userProfile = await UserProfile.findOne({ userId }).populate(
       "userId",
-      "firstName lastName birthday email mobileNumber"
+      "firstName lastName birthday email mobileNumber" // Include email from UserModel
     );
 
     if (!userProfile) {
       return res.status(404).json({ msg: "Profile not found" });
     }
 
-    // Ensure all fields are returned
-    res.status(200).json(userProfile);
+    // If accountEmail exists in userProfile, use it. Otherwise, use the email from userModel.
+    const profileResponse = {
+      ...userProfile.toObject(),
+      accountEmail: userProfile.accountEmail || userProfile.userId.email, // Fallback to userModel email
+    };
+
+    res.status(200).json(profileResponse);
   } catch (error) {
     console.error("Error fetching profile:", error);
     res.status(500).json({ error: "Server Error", message: error.message });
   }
 };
+
 
 exports.createProfile = async (req, res) => {
   try {
@@ -65,6 +71,7 @@ exports.createProfile = async (req, res) => {
       professionAlignment: req.body.professionAlignment,
       profileImage: req.body.profileImage,
       salaryRange: req.body.salaryRange,
+      accountEmail: req.body.accountEmail,
       secondaryEducation: req.body.secondaryEducation,
       specialization: req.body.specialization,
       tertiaryEducation: req.body.tertiaryEducation,
@@ -129,9 +136,9 @@ exports.createUserProfile = async (req, res) => {
       lastName: req.body.lastName,
       birthday: req.body.birthday,
       contactInformation: {
-        emailAddress: req.body.email,
         mobileNumber: req.body.mobileNumber,
       },
+      accountEmail:req.body.accountEmail,
     };
 
     // Create a new UserProfile instance
@@ -163,6 +170,7 @@ exports.updateProfile = async (req, res) => {
       lastName,
       birthday,
       careerBackground,
+      accountEmail,
       collegeProgram,
       contactInformation,
       employmentStatus,
@@ -190,6 +198,7 @@ exports.updateProfile = async (req, res) => {
         lastName,
         birthday,
         careerBackground,
+        accountEmail,
         collegeProgram,
         contactInformation,
         employmentStatus,
@@ -225,5 +234,27 @@ exports.updateProfile = async (req, res) => {
     res
       .status(500)
       .json({ error: "Failed to update profile", details: error.message });
+  }
+};
+
+// Get all alumni profiles
+
+exports.getAllAlumni = async (req, res) => {
+  try {
+    const alumniProfiles = await UserProfile.find().populate({
+      path: "userId",
+      match: { role: "user" },
+    });
+
+    const filteredAlumni = alumniProfiles.filter((profile) => profile.userId);
+
+    // Send the retrieved and filtered alumni profiles in the response
+    res.status(200).json({ alumni: filteredAlumni });
+  } catch (error) {
+    console.error("Error fetching alumni profiles:", error);
+    res.status(500).json({
+      error: "Failed to fetch alumni profiles",
+      message: error.message,
+    });
   }
 };

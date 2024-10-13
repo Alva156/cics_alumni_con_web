@@ -11,6 +11,15 @@ function Alumni() {
   const [selectedProgram, setSelectedProgram] = useState("");
   const modalRef = useRef(null);
 
+  // Function to format dates into "Month Day, Year" format
+  const formatDate = (dateString) => {
+    if (!dateString) return " "; // Return "N/A" if no date is provided
+
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, options);
+  };
+
   // Fetch alumni data from the backend
   useEffect(() => {
     const fetchAlumni = async () => {
@@ -194,13 +203,13 @@ function Alumni() {
                     Year Started on College Program
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.yearStartedCollege}
+                    {formatDate(selectedAlumni.yearStartedCollege)}
                   </p>
                   <p className="text-xs mb-1/2">
                     Year Graduated on College Program
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.yearGraduatedCollege}
+                    {formatDate(selectedAlumni.yearGraduatedCollege)}
                   </p>
                   <p className="text-xs mb-1/2">Time to Land a Job (Months)</p>
                   <p className="text-s mb-2 font-bold">
@@ -211,54 +220,54 @@ function Alumni() {
                   <h1 className="text-xl mb-4">Contact Information</h1>
                   <p className="text-xs mb-1/2">LinkedIn</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.linkedin || "N/A"}
+                    {selectedAlumni.contactInformation?.linkedin}
                   </p>
                   <p className="text-xs mb-1/2">Facebook</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.facebook || "N/A"}
+                    {selectedAlumni.contactInformation?.facebook}
                   </p>
                   <p className="text-xs mb-1/2">Instagram</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.instagram || "N/A"}
+                    {selectedAlumni.contactInformation?.instagram}
                   </p>
                   <p className="text-xs mb-1/2">Email</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.email || "N/A"}
+                    {selectedAlumni.contactInformation?.email}
                   </p>
                   <p className="text-xs mb-1/2">Mobile Number</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.mobileNumber || "N/A"}
+                    {selectedAlumni.contactInformation?.mobileNumber}
                   </p>
                 </div>
                 <div className="order-2 sm:order-3">
                   <h1 className="text-xl mb-4 mt-6">Secondary Information</h1>
                   <p className="text-xs mb-1/2">Employment Status</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.employmentStatus || "N/A"}
+                    {selectedAlumni.employmentStatus}
                   </p>
                   <p className="text-xs mb-1/2">Work Industry</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.workIndustry || "N/A"}
+                    {selectedAlumni.workIndustry}
                   </p>
                   <p className="text-xs mb-1/2">
                     Is current profession in line with college degree
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.professionAlignment || "N/A"}
+                    {selectedAlumni.professionAlignment}
                   </p>
                   <p className="text-xs mb-1/2">Marital Status</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.maritalStatus || "N/A"}
+                    {selectedAlumni.maritalStatus}
                   </p>
                   <p className="text-xs mb-1/2">Salary range (PHP)</p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.salaryRange || "N/A"}
+                    {selectedAlumni.salaryRange}
                   </p>
                   <p className="text-xs mb-1/2">
                     Place of employment (Local or International)
                   </p>
                   <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.placeOfEmployment || "N/A"}
+                    {selectedAlumni.placeOfEmployment}
                   </p>
                 </div>
                 <div className="order-4 sm:order-4">

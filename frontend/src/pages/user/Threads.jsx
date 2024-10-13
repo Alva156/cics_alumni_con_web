@@ -4,6 +4,7 @@ import sampleidpic from "../../assets/sampleidpic.jpg";
 import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function Threads() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [myThreads, setMyThreads] = useState([]);
   const [allThreads, setAllThreads] = useState([]);
   const [newThread, setNewThread] = useState({ title: "", content: "" });
@@ -59,7 +60,7 @@ function Threads() {
   useEffect(() => {
     const fetchAllThreads = async () => {
       try {
-        const response = await axios.get("http://localhost:6001/threads/get", {
+        const response = await axios.get(`${backendUrl}/threads/get`, {
           withCredentials: true,
         });
         setAllThreads(response.data);
@@ -70,12 +71,9 @@ function Threads() {
 
     const fetchMyThreads = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:6001/threads/my-threads",
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`${backendUrl}/threads/my-threads`, {
+          withCredentials: true,
+        });
         setMyThreads(response.data);
       } catch (error) {
         console.error("Error fetching my threads:", error);
@@ -93,7 +91,7 @@ function Threads() {
     }
     try {
       const response = await axios.post(
-        "http://localhost:6001/threads/create",
+        `${backendUrl}/threads/create`,
         {
           title: newThread.title,
           content: newThread.content,
@@ -122,7 +120,7 @@ function Threads() {
 
     try {
       const response = await axios.put(
-        `http://localhost:6001/threads/update/${selectedThread._id}`,
+        `${backendUrl}/threads/update/${selectedThread._id}`,
         {
           title: selectedThread.title,
           content: selectedThread.content,
@@ -157,12 +155,9 @@ function Threads() {
   const handleDeleteThread = async () => {
     if (!threadToDelete) return;
     try {
-      await axios.delete(
-        `http://localhost:6001/threads/delete/${threadToDelete._id}`,
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.delete(`${backendUrl}/threads/delete/${threadToDelete._id}`, {
+        withCredentials: true,
+      });
 
       // Update the threads state to remove the deleted thread
       setMyThreads(
@@ -181,7 +176,7 @@ function Threads() {
   const fetchReplies = async (threadId) => {
     try {
       const response = await axios.get(
-        `http://localhost:6001/replies/thread/${threadId}`,
+        `${backendUrl}/replies/thread/${threadId}`,
         {
           withCredentials: true,
         }
@@ -208,7 +203,7 @@ function Threads() {
 
     try {
       const response = await axios.post(
-        `http://localhost:6001/replies/create`,
+        `${backendUrl}/replies/create`,
         { threadId: selectedThread._id, reply: newReply },
         { withCredentials: true }
       );
@@ -256,7 +251,7 @@ function Threads() {
 
     try {
       const response = await axios.put(
-        `http://localhost:6001/replies/update/${replyId}`,
+        `${backendUrl}/replies/update/${replyId}`,
         { reply: selectedReply.content }, // Use 'reply' as the field name
         { withCredentials: true }
       );
@@ -282,7 +277,7 @@ function Threads() {
       const threadId = selectedThread._id; // Get the current selected thread ID
 
       // Send the delete request to the server
-      await axios.delete(`http://localhost:6001/replies/delete/${replyId}`, {
+      await axios.delete(`${backendUrl}/replies/delete/${replyId}`, {
         withCredentials: true,
       });
 

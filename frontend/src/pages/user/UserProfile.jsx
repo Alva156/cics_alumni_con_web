@@ -3,14 +3,18 @@ import "../../App.css";
 import axios from "axios";
 import { uniqueId } from "lodash"; // Make sure you import uniqueId
 import imageCompression from "browser-image-compression";
+import { useNavigate } from "react-router-dom";
 
 function UserProfile() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const navigate = useNavigate();
   const [showValidationMessage, setShowValidationMessage] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [isPassModalOpen, setIsPassModalOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthday, setBirthday] = useState("");
@@ -34,6 +38,8 @@ function UserProfile() {
   const [otherContact, setOtherContact] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [accountEmail, setAccountEmail] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [initialAccountEmail, setInitialAccountEmail] = useState("");
 
   const [secondaryEducationSections, setSecondaryEducationSections] = useState([
     { schoolName: "", yearStarted: "", yearEnded: "" },
@@ -67,9 +73,15 @@ function UserProfile() {
       formData.append("file", file);
 
       axios
-        .post(`${backendUrl}/profile/uploadattachment`, formData, { withCredentials: true })
+        .post(`${backendUrl}/profile/uploadattachment`, formData, {
+          withCredentials: true,
+        })
         .then((response) => {
-          if (response.data && response.data.filename && response.data.filepath) {
+          if (
+            response.data &&
+            response.data.filename &&
+            response.data.filepath
+          ) {
             const newAttachments = [...attachments];
             newAttachments[index] = {
               id: uniqueId(),
@@ -87,11 +99,12 @@ function UserProfile() {
     }
   };
 
-  
-
   // Function to add a new attachment field
   const addAttachment = () => {
-    setAttachments((prev) => [...prev, { id: uniqueId(), fileName: "", filePath: "" }]);
+    setAttachments((prev) => [
+      ...prev,
+      { id: uniqueId(), fileName: "", filePath: "" },
+    ]);
   };
 
   const handleAttachmentChange = async (e, id) => {
@@ -274,22 +287,21 @@ function UserProfile() {
         `${backendUrl}/profile/company-section/${sectionId}`,
         { withCredentials: true }
       );
-  
+
       console.log("Delete response:", response.data); // Check response
       // If successful, update the local state
-      setCompanySections((prevSections) => prevSections.filter((_, i) => i !== index));
+      setCompanySections((prevSections) =>
+        prevSections.filter((_, i) => i !== index)
+      );
       console.log("Company section deleted successfully!");
     } catch (error) {
-      console.error("Error deleting section:", error.response ? error.response.data : error.message);
+      console.error(
+        "Error deleting section:",
+        error.response ? error.response.data : error.message
+      );
       // Optionally display an error message to the user
     }
   };
-  
-  
-  
-
-  
-  
 
   const handleSave = (e) => {
     console.log("saved");
@@ -308,7 +320,7 @@ function UserProfile() {
       return; // Prevent submission
     }
 
-    // Reset error messages
+    // Reset error messages when inputs are valid
     setShowErrorMessage(false);
 
     const userData = {
@@ -329,7 +341,10 @@ function UserProfile() {
       salaryRange,
       placeOfEmployment,
       profileImage,
-      attachments, // Directly use the state as is
+      attachments: attachments.map((attachment) => ({
+        fileName: attachment.fileName,
+        file: attachment.file, // include the file object here
+      })),
       secondaryEducation: secondaryEducationSections,
       tertiaryEducation: tertiaryEducationSections,
       careerBackground: companySections,
@@ -345,37 +360,69 @@ function UserProfile() {
 
     try {
       // Check if the profile exists
-      await axios.get(`${backendUrl}/profile/userprofile`, { withCredentials: true });
+      await axios.get(`${backendUrl}/profile/userprofile`, {
+        withCredentials: true,
+      });
 
       // Update the existing profile
-      await axios.put(`${backendUrl}/profile/updateprofile`, userData, { withCredentials: true });
+      await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
+        withCredentials: true,
+      });
+
+      // Check if the email has changed
+      if (accountEmail !== initialAccountEmail) {
+        setShowValidationMessage(false);
+
+        // Set validation message for the modal
+        setValidationMessage(
+          "Email changed successfully! Please log in using your new email."
+        );
+
+        // Show the modal only, without the background message
+        setModalVisible(true); // Show modal
+      } else {
+        // Only show the success message if the email has NOT changed
+        setValidationMessage("Profile updated successfully!");
+        setShowValidationMessage(true);
+        setTimeout(() => {
+          setShowValidationMessage(false);
+        }, 3000);
+      }
+
       console.log("Profile updated successfully!");
-      setValidationMessage("Profile saved successfully!");
     } catch (error) {
       if (error.response && error.response.status === 404) {
         // Create a new profile if it doesn't exist
-        await axios.post(`${backendUrl}/profile/createprofile`, userData, { withCredentials: true });
+        await axios.post(`${backendUrl}/profile/createprofile`, userData, {
+          withCredentials: true,
+        });
         console.log("Profile created successfully!");
         setValidationMessage("Profile created successfully!");
       } else {
         // Handle errors during save
-        console.error("Error saving profile:", error.response ? error.response.data : error.message);
+        console.error(
+          "Error saving profile:",
+          error.response ? error.response.data : error.message
+        );
         setErrorMessage("Error saving profile. Please try again.");
         setShowErrorMessage(true);
         setTimeout(() => setShowErrorMessage(false), 3000);
       }
     }
 
-    // Show validation message for successful save
-    setShowValidationMessage(true);
-    setTimeout(() => setShowValidationMessage(false), 3000);
+    //validation message for successful save (if email has not changed)
+    if (accountEmail === initialAccountEmail) {
+      setShowValidationMessage(true);
+      setTimeout(() => setShowValidationMessage(false), 3000);
+    }
   };
-
   // Fetch user profile on mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get(`${backendUrl}/profile/userprofile`, { withCredentials: true });
+        const response = await axios.get(`${backendUrl}/profile/userprofile`, {
+          withCredentials: true,
+        });
         const profileData = response.data;
 
         if (profileData) {
@@ -402,7 +449,8 @@ function UserProfile() {
           setMobileNumber(profileData.contactInformation?.mobileNumber || "");
           setOtherContact(profileData.contactInformation?.other || "");
           setProfileImage(profileData.profileImage || "");
-          
+          setInitialAccountEmail(profileData.accountEmail || "");
+
           // Set education and company sections
           setSecondaryEducationSections(profileData.secondaryEducation || []);
           setTertiaryEducationSections(profileData.tertiaryEducation || []);
@@ -411,7 +459,9 @@ function UserProfile() {
 
           // Convert birthday to "yyyy-MM-dd" format if available
           if (profileData.birthday) {
-            const birthdayDate = new Date(profileData.birthday).toISOString().substring(0, 10);
+            const birthdayDate = new Date(profileData.birthday)
+              .toISOString()
+              .substring(0, 10);
             setBirthday(birthdayDate);
           }
         } else {
@@ -424,9 +474,188 @@ function UserProfile() {
 
     fetchProfile();
   }, [backendUrl]);
+  const handlePasswordSub = async (e) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    if (!newPassword || !confirmPassword) {
+      setErrorMessage("All fields are required.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
+      return;
+    }
+
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      setErrorMessage("Password must meet the complexity requirements.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setErrorMessage("Passwords do not match.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/profile/changepassword`,
+        { newPassword }, // Only new password
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        setValidationMessage(
+          "Password changed successfully! Please log in using your new password."
+        );
+        setModalVisible(true);
+      } else {
+        setErrorMessage("Failed to reset password.");
+        setShowErrorMessage(true);
+        setTimeout(() => setShowErrorMessage(false), 3000);
+      }
+    } catch (err) {
+      console.error("Error resetting password:", err);
+      setErrorMessage("Server error occurred.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
+    }
+  };
+
+  const handleExitModal = async () => {
+    try {
+      const response = await axios.post(
+        `${backendUrl}/users/cancel`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Error cancelling:", error);
+    }
+  };
+  // Function to open the password modal
+  const openPassModal = () => {
+    setIsPassModalOpen(true);
+  };
+
+  // Function to close the password modal
+  const closePassModal = () => {
+    setIsPassModalOpen(false);
+  };
 
   return (
     <>
+      {/* Password Modal */}
+      {isPassModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ">
+          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4 ">
+            <button
+              onClick={closePassModal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">
+                New Password
+              </label>
+              <input
+                type="password"
+                name="newPassword"
+                placeholder="New Password"
+                className="input input-sm input-bordered w-full h-10"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)} // Add this line
+                required
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                className="input input-sm input-bordered w-full h-10"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)} // Add this line
+                required
+              />
+            </div>
+            <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
+              Password Requirements:
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              At least 8 characters long
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must contain at least one uppercase letter (A-Z)
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must contain at least one digit (0-9)
+            </p>
+            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+              Must include at least one special character (e.g., !, @, #, $, %,
+              ^, &, *)
+            </p>
+            <div className="flex justify-center gap-2 mt-8">
+              <button
+                onClick={handlePasswordSub}
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Save
+              </button>
+              <button
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+                onClick={closePassModal}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal */}
+      {modalVisible && (
+        <dialog id="my_modal_5" className="modal modal-middle " open>
+          <div className="modal-box">
+            <p className="py-4">{validationMessage}</p>
+            <div className="modal-action">
+              <button
+                onClick={handleExitModal}
+                className=" bg-green text-white py-2 px-4 rounded hover:bg-green"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </dialog>
+      )}
+
       {showErrorMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
           <p>{errorMessage}</p>
@@ -437,6 +666,7 @@ function UserProfile() {
           <p>{validationMessage}</p>
         </div>
       )}
+
       <form onSubmit={handleSubmit}>
         <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
           <div className="page-title">User Profile</div>
@@ -846,21 +1076,22 @@ function UserProfile() {
                 </div>
 
                 {attachments.map((attachment, index) => (
-    <div key={attachment.id}>
-        <label className="pt-4 pb-2 text-sm">
-            Attachment {index + 1} {/* Change to index + 1 for better user experience */}
-        </label>
-        <div className="text-sm text-gray-600">
-            {attachment.filename || "No file uploaded."}
-        </div>
-        <input
-            type="file"
-            accept="application/pdf"
-            className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
-            onChange={(e) => handleFileChange(e, index)} // Pass the correct index
-        />
-    </div>
-))}
+                  <div key={attachment.id}>
+                    <label className="pt-4 pb-2 text-sm">
+                      Attachment {index + 1}{" "}
+                      {/* Change to index + 1 for better user experience */}
+                    </label>
+                    <div className="text-sm text-gray-600">
+                      {attachment.filename || "No file uploaded."}
+                    </div>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
+                      onChange={(e) => handleFileChange(e, index)} // Pass the correct index
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -895,42 +1126,51 @@ function UserProfile() {
                 </div>
 
                 {secondaryEducationSections.map((section, index) => (
-  <div key={index} className="w-full border-2 rounded py-2 px-4 mt-2">
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">School Name</label>
-      <input
-        type="text"
-        placeholder="Type here"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.schoolName}
-        onChange={(e) => handleSecondaryEducationChange(index, e)}
-        name="schoolName"
-      />
-    </div>
+                  <div
+                    key={index}
+                    className="w-full border-2 rounded py-2 px-4 mt-2"
+                  >
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">School Name</label>
+                      <input
+                        type="text"
+                        placeholder="Type here"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.schoolName}
+                        onChange={(e) =>
+                          handleSecondaryEducationChange(index, e)
+                        }
+                        name="schoolName"
+                      />
+                    </div>
 
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Year Started</label>
-      <input
-        type="date"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.yearStarted}
-        onChange={(e) => handleSecondaryEducationChange(index, e)}
-        name="yearStarted"
-      />
-    </div>
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Year Started</label>
+                      <input
+                        type="date"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.yearStarted}
+                        onChange={(e) =>
+                          handleSecondaryEducationChange(index, e)
+                        }
+                        name="yearStarted"
+                      />
+                    </div>
 
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Year Ended</label>
-      <input
-        type="date"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.yearEnded}
-        onChange={(e) => handleSecondaryEducationChange(index, e)}
-        name="yearEnded"
-      />
-    </div>
-  </div>
-))}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Year Ended</label>
+                      <input
+                        type="date"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.yearEnded}
+                        onChange={(e) =>
+                          handleSecondaryEducationChange(index, e)
+                        }
+                        name="yearEnded"
+                      />
+                    </div>
+                  </div>
+                ))}
 
                 {/* TERTIARY EDUCATION */}
                 <div className="flex items-center mt-8">
@@ -946,58 +1186,69 @@ function UserProfile() {
                 </div>
 
                 {tertiaryEducationSections.map((section, index) => (
-  <div key={index} className="w-full border-2 rounded py-2 px-4 mt-2">
-    {/* School Name */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">School Name</label>
-      <input
-        type="text"
-        name="schoolName"
-        placeholder="Type here"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.schoolName}
-        onChange={(e) => handleTertiaryEducationChange(index, e)}
-      />
-    </div>
+                  <div
+                    key={index}
+                    className="w-full border-2 rounded py-2 px-4 mt-2"
+                  >
+                    {/* School Name */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">School Name</label>
+                      <input
+                        type="text"
+                        name="schoolName"
+                        placeholder="Type here"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.schoolName}
+                        onChange={(e) =>
+                          handleTertiaryEducationChange(index, e)
+                        }
+                      />
+                    </div>
 
-    {/* Program */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Program</label>
-      <input
-        type="text"
-        name="program"
-        placeholder="Type here"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.program}
-        onChange={(e) => handleTertiaryEducationChange(index, e)}
-      />
-    </div>
+                    {/* Program */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Program</label>
+                      <input
+                        type="text"
+                        name="program"
+                        placeholder="Type here"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.program}
+                        onChange={(e) =>
+                          handleTertiaryEducationChange(index, e)
+                        }
+                      />
+                    </div>
 
-    {/* Year Started */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Year Started</label>
-      <input
-        type="date"
-        name="yearStarted"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.yearStarted}
-        onChange={(e) => handleTertiaryEducationChange(index, e)}
-      />
-    </div>
+                    {/* Year Started */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Year Started</label>
+                      <input
+                        type="date"
+                        name="yearStarted"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.yearStarted}
+                        onChange={(e) =>
+                          handleTertiaryEducationChange(index, e)
+                        }
+                      />
+                    </div>
 
-    {/* Year Ended */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Year Ended</label>
-      <input
-        type="date"
-        name="yearEnded"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.yearEnded}
-        onChange={(e) => handleTertiaryEducationChange(index, e)}
-      />
-    </div>
-  </div>
-))}
+                    {/* Year Ended */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Year Ended</label>
+                      <input
+                        type="date"
+                        name="yearEnded"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.yearEnded}
+                        onChange={(e) =>
+                          handleTertiaryEducationChange(index, e)
+                        }
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -1029,71 +1280,71 @@ function UserProfile() {
                 </div>
 
                 {companySections.map((section, index) => (
-  <div key={section._id} className="w-full border-2 rounded py-2 px-4 mt-2"> {/* Use section._id instead of section.id */}
-    
-    {/* Company Name */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Company Name</label>
-      <input
-        type="text"
-        name="companyName"
-        placeholder="Type here"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.companyName}
-        onChange={(e) => handleCompanyChange(index, e)}
-      />
-    </div>
-
-    {/* Position */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Position</label>
-      <input
-        type="text"
-        name="position"
-        placeholder="Type here"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.position}
-        onChange={(e) => handleCompanyChange(index, e)}
-      />
-    </div>
-
-    {/* Year Started */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Year Started</label>
-      <input
-        type="date"
-        name="yearStarted"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.yearStarted}
-        onChange={(e) => handleCompanyChange(index, e)}
-      />
-    </div>
-
-    {/* Year Ended */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Year Ended</label>
-      <input
-        type="date"
-        name="yearEnded"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.yearEnded}
-        onChange={(e) => handleCompanyChange(index, e)}
-      />
-    </div>
-
-    {/* Delete Button */}
-    <div className="flex justify-end">
-      <button
-        className="btn btn-sm w-36 bg-red text-white mt-2" // Fixed class name for consistency
-        onClick={() => handleDeleteCompanySection(section._id, index)} // Use section._id
-      >
-        Delete
-      </button>
-    </div>
-  </div>
-))}
-
-
+                  <div
+                    key={section._id}
+                    className="w-full border-2 rounded py-2 px-4 mt-2"
+                  >
+                    {" "}
+                    {/* Use section._id instead of section.id */}
+                    {/* Company Name */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Company Name</label>
+                      <input
+                        type="text"
+                        name="companyName"
+                        placeholder="Type here"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.companyName}
+                        onChange={(e) => handleCompanyChange(index, e)}
+                      />
+                    </div>
+                    {/* Position */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Position</label>
+                      <input
+                        type="text"
+                        name="position"
+                        placeholder="Type here"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.position}
+                        onChange={(e) => handleCompanyChange(index, e)}
+                      />
+                    </div>
+                    {/* Year Started */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Year Started</label>
+                      <input
+                        type="date"
+                        name="yearStarted"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.yearStarted}
+                        onChange={(e) => handleCompanyChange(index, e)}
+                      />
+                    </div>
+                    {/* Year Ended */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Year Ended</label>
+                      <input
+                        type="date"
+                        name="yearEnded"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.yearEnded}
+                        onChange={(e) => handleCompanyChange(index, e)}
+                      />
+                    </div>
+                    {/* Delete Button */}
+                    <div className="flex justify-end">
+                      <button
+                        className="btn btn-sm w-36 bg-red text-white mt-2" // Fixed class name for consistency
+                        onClick={() =>
+                          handleDeleteCompanySection(section._id, index)
+                        } // Use section._id
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -1123,33 +1374,37 @@ function UserProfile() {
                     className="input input-sm input-bordered w-full h-10"
                   />
                 </div>
-
-                <div className="mt-4">
-                  <button className="btn md:w-64 w-full bg-fgray text-white">
-                    Reset Password
-                  </button>
-                </div>
               </div>
               {/* END OF SETTINGS */}
             </div>
           </div>
           {/* END OF TABS */}
-
-          {/* BOTTOM BUTTONS */}
-          <div className="flex justify-center mt-16 space-x-3">
-            <div>
-              <button
-                className="btn md:w-64 w-52 bg-green text-white"
-                onClick={handleSave} // Add a function to handle saving
-                aria-label="Save" // Added aria-label for accessibility
-              >
-                Save
-              </button>
-            </div>
-          </div>
-          {/* END OF BOTTOM BUTTONS */}
         </div>
       </form>
+      <div>
+        {/* BOTTOM BUTTONS */}
+        <div className="flex justify-center mt-16 space-x-3 mb-12">
+          <div>
+            <button
+              className="btn md:w-64 w-52 bg-green text-white"
+              onClick={handleSave} // Add a function to handle saving
+              aria-label="Save" // Added aria-label for accessibility
+            >
+              Save
+            </button>
+          </div>
+          <div className="">
+            <button
+              onClick={openPassModal}
+              className="btn md:w-64 w-full bg-fgray text-white"
+            >
+              Reset Password
+            </button>
+          </div>
+        </div>
+
+        {/* END OF BOTTOM BUTTONS */}
+      </div>
     </>
   );
 }

@@ -144,6 +144,68 @@ function AdminCompanies() {
       }
     }
   };
+  const handleCreateCompany = async () => {
+    const companyData = new FormData();
+    companyData.append("name", document.getElementById("company-name").value);
+    companyData.append(
+      "address",
+      document.getElementById("company-address").value
+    );
+    companyData.append(
+      "description",
+      document.getElementById("company-description").value
+    );
+    companyData.append(
+      "contact",
+      document.getElementById("company-contact").value
+    );
+    const image = document.getElementById("company-image").files[0];
+    if (image) {
+      companyData.append("image", image); // Add the image to formData
+    }
+
+    if (
+      !companyData.get("name") ||
+      !companyData.get("address") ||
+      !companyData.get("description") ||
+      !companyData.get("contact")
+    ) {
+      setshowMessage("Please fill in all required fields.");
+      setErrorMessage(true);
+      setTimeout(() => setErrorMessage(false), 3000);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/companies/create-companies`,
+        companyData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      setCompanies([...companies, response.data]);
+      closeModal();
+      setshowMessage("Company created successfully!");
+      setSuccessMessage(true);
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error creating company:", error);
+      // Display error message to the user
+      if (error.response) {
+        setshowMessage(error.response.data.msg);
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
+    }
+  };
+
   const filteredCompanies = companies.filter((company) =>
     company.name.toLowerCase().includes(searchTerm.toLowerCase())
   );

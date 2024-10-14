@@ -1,75 +1,64 @@
 import React, { useState, useEffect, useRef } from "react";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
 
-function Job() {
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+function Jobs() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [selectedJobs, setSelectedJobs] = useState(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [jobs, setJobs] = useState([]);
+  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
   const modalRef = useRef(null);
 
-  const jobs = [
-    {
-      name: "Job/Internship Title",
-      field: "Field",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-    {
-      name: "Job/Internship Title",
-      field: "Field",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-    {
-      name: "Job/Internship Title",
-      field: "Field",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-  ];
-
-  const openModal = (job) => {
-    setSelectedJob(job);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedJob(null);
+  // Fetch all jobs from the server
+  const fetchJobs = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/jobs/view`, {
+        withCredentials: true,
+      });
+      setJobs(response.data);
+    } catch (error) {
+      console.error("Error fetching jobs:", error);
+    }
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        closeModal();
-      }
-    };
+    fetchJobs();
+  }, []);
 
-    if (isModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [isModalOpen]);
+  const openViewModal = (jobs) => {
+    setSelectedJobs(jobs);
+    setIsViewModalOpen(true);
+  };
 
-  const filteredJob = jobs.filter((job) =>
-    job.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const closeModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedJobs(null);
+  };
+
+  const filteredJobs = jobs.filter((jobs) =>
+    jobs.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Sort jobs based on selected criteria
+  const sortedJobs = filteredJobs.sort((a, b) => {
+    if (sortCriteria === "Name (A-Z)") {
+      return a.name.localeCompare(b.name);
+    } else if (sortCriteria === "Name (Z-A)") {
+      return b.name.localeCompare(a.name);
+    }
+    return 0;
+  });
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-xl mb-4">Job and Internship Referrals</h1>
+      <h1 className="text-xl mb-4">Jobs</h1>
 
       <div className="mb-4 relative">
         <input
           type="text"
-          placeholder="Search Job or Internship"
+          placeholder="Search Jobs"
           className="w-full border border-black rounded-lg px-4 py-2"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -84,29 +73,37 @@ function Job() {
 
       <div className="mb-6">
         <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
-          <option>Title (A-Z)</option>
-          <option>Title (Z-A)</option>
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortCriteria}
+          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+        >
+          <option>Name (A-Z)</option>
+          <option>Name (Z-A)</option>
         </select>
       </div>
 
-      <div className="text-lg mb-4">All Jobs/Internships</div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="text-lg">Jobs Lists</div>
+      </div>
 
       <hr className="mb-6 border-black" />
 
-      {filteredJob.map((job, index) => (
+      {filteredJobs.map((jobs) => (
         <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openModal(job)}
+          key={jobs._id}
+          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
+          onClick={() => openViewModal(jobs)}
         >
-          <div className="text-md font-medium mb-1">{job.name}</div>
-          <div className="text-sm text-black-600">{job.field}</div>
+          <div>
+            <div className="text-md font-medium mb-1">{jobs.name}</div>
+            <div className="text-sm text-black-600">{jobs.address}</div>
+          </div>
         </div>
       ))}
 
-      {/* Modal */}
-      {isModalOpen && selectedJob && (
+      {/* View Modal */}
+      {isViewModalOpen && selectedJobs && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
           style={{ zIndex: 9999 }}
@@ -121,22 +118,20 @@ function Job() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">{selectedJob.name}</div>
-            <div className="text-md mb-2">{selectedJob.field}</div>
+            <div className="text-2xl font-medium mb-2">{selectedJobs.name}</div>
+            <div className="text-md mb-2">{selectedJobs.address}</div>
             <img
-              src={selectedJob.image}
-              alt={selectedJob.name}
+              src={selectedJobs.image}
+              alt={selectedJobs.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
-            <div className="text-sm mb-4">{selectedJob.description}</div>
-            <div className="text-sm font-medium mb-2">
-              {selectedJob.contact}
-            </div>
+            <div className="text-sm mb-4">{selectedJobs.description}</div>
+            <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
-              href={`mailto:job@gmail.com`}
+              href={`mailto:${selectedJobs.contact}`}
               className="block text-sm text-blue-600 underline"
             >
-              job@gmail.com
+              {selectedJobs.contact}
             </a>
           </div>
         </div>
@@ -145,4 +140,4 @@ function Job() {
   );
 }
 
-export default Job;
+export default Jobs;

@@ -1,66 +1,55 @@
 import React, { useState, useEffect, useRef } from "react";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import axios from "axios";
 
 function Companies() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedCompany, setSelectedCompany] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [companies, setCompanies] = useState([]);
+  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
   const modalRef = useRef(null);
 
-  const companies = [
-    {
-      name: "Company Name",
-      address: "Address",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-    {
-      name: "Company Name",
-      address: "Address",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-    {
-      name: "Company Name",
-      address: "Address",
-      image: "",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      contact: "Contact Details",
-    },
-  ];
-
-  const openModal = (company) => {
-    setSelectedCompany(company);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedCompany(null);
+  // Fetch all companies from the server
+  const fetchCompanies = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/companies/view`, {
+        withCredentials: true,
+      });
+      setCompanies(response.data);
+    } catch (error) {
+      console.error("Error fetching companies:", error);
+    }
   };
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        closeModal();
-      }
-    };
+    fetchCompanies();
+  }, []);
 
-    if (isModalOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [isModalOpen]);
+  const openViewModal = (company) => {
+    setSelectedCompany(company);
+    setIsViewModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedCompany(null);
+  };
 
   const filteredCompanies = companies.filter((company) =>
     company.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Sort companies based on selected criteria
+  const sortedCompanies = filteredCompanies.sort((a, b) => {
+    if (sortCriteria === "Name (A-Z)") {
+      return a.name.localeCompare(b.name);
+    } else if (sortCriteria === "Name (Z-A)") {
+      return b.name.localeCompare(a.name);
+    }
+    return 0;
+  });
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -84,29 +73,37 @@ function Companies() {
 
       <div className="mb-6">
         <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortCriteria}
+          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+        >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
         </select>
       </div>
 
-      <div className="text-lg mb-4">All Companies</div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="text-lg">Company Lists</div>
+      </div>
 
       <hr className="mb-6 border-black" />
 
-      {filteredCompanies.map((company, index) => (
+      {filteredCompanies.map((company) => (
         <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openModal(company)}
+          key={company._id}
+          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
+          onClick={() => openViewModal(company)}
         >
-          <div className="text-md font-medium mb-1">{company.name}</div>
-          <div className="text-sm text-black-600">{company.address}</div>
+          <div>
+            <div className="text-md font-medium mb-1">{company.name}</div>
+            <div className="text-sm text-black-600">{company.address}</div>
+          </div>
         </div>
       ))}
 
-      {/* Modal */}
-      {isModalOpen && selectedCompany && (
+      {/* View Modal */}
+      {isViewModalOpen && selectedCompany && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
           style={{ zIndex: 9999 }}
@@ -131,14 +128,12 @@ function Companies() {
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
             <div className="text-sm mb-4">{selectedCompany.description}</div>
-            <div className="text-sm font-medium mb-2">
-              {selectedCompany.contact}
-            </div>
+            <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
-              href={`mailto:company@gmail.com`}
+              href={`mailto:${selectedCompany.contact}`}
               className="block text-sm text-blue-600 underline"
             >
-              company@gmail.com
+              {selectedCompany.contact}
             </a>
           </div>
         </div>

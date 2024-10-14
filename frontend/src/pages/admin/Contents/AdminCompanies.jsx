@@ -87,6 +87,7 @@ function AdminCompanies() {
 
   const handleUpdateCompany = async () => {
     if (!selectedCompany) return;
+
     if (
       !selectedCompany.name ||
       !selectedCompany.address ||
@@ -99,17 +100,27 @@ function AdminCompanies() {
       return;
     }
 
+    const companyData = new FormData();
+    companyData.append("name", selectedCompany.name);
+    companyData.append("address", selectedCompany.address);
+    companyData.append("description", selectedCompany.description);
+    companyData.append("contact", selectedCompany.contact);
+
+    const image = document.getElementById("company-image").files[0];
+    if (image) {
+      companyData.append("image", image);
+    }
+
     try {
       const response = await axios.put(
         `${backendUrl}/companies/update-companies/${selectedCompany._id}`,
+        companyData,
         {
-          name: selectedCompany.name,
-          address: selectedCompany.address,
-          image: selectedCompany.image,
-          description: selectedCompany.description,
-          contact: selectedCompany.contact,
-        },
-        { withCredentials: true }
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
       );
 
       setCompanies((prevCompanies) =>
@@ -126,56 +137,13 @@ function AdminCompanies() {
       }, 3000);
     } catch (error) {
       console.error("Error updating company:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg); // Display error message from backend
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
     }
   };
-
-  const handleCreateCompany = async () => {
-    const companyData = {
-      name: document.getElementById("company-name").value,
-      address: document.getElementById("company-address").value,
-      image: "", // Handle image upload separately
-      description: document.getElementById("company-description").value,
-      contact: document.getElementById("company-contact").value,
-    };
-    if (
-      !companyData.name ||
-      !companyData.address ||
-      !companyData.description ||
-      !companyData.contact
-    ) {
-      setshowMessage("Please fill in all required fields.");
-      setErrorMessage(true); // Ensure to set this to true
-      setTimeout(() => setErrorMessage(false), 3000);
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `${backendUrl}/companies/create-companies`,
-        companyData,
-        {
-          withCredentials: true,
-        }
-      );
-
-      setCompanies([...companies, response.data]); // Update companies list
-      setSelectedCompany(null); // Clear selected company
-      setIsAddModalOpen(false); // Close the modal
-      setshowMessage("Company created successfully!");
-      setSuccessMessage(true);
-      // Optionally reset input fields if necessary
-      document.getElementById("company-name").value = "";
-      document.getElementById("company-address").value = "";
-      document.getElementById("company-description").value = "";
-      document.getElementById("company-contact").value = "";
-      setTimeout(() => {
-        setSuccessMessage(false);
-      }, 3000);
-    } catch (error) {
-      console.error("Error creating company:", error);
-    }
-  };
-
   const filteredCompanies = companies.filter((company) =>
     company.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -297,7 +265,7 @@ function AdminCompanies() {
             </div>
             <div className="text-md mb-2">{selectedCompany.address}</div>
             <img
-              src={selectedCompany.image}
+              src={`${backendUrl}${selectedCompany.image}`}
               alt={selectedCompany.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
@@ -368,6 +336,7 @@ function AdminCompanies() {
             <div className="mb-4">
               <label className="block text-sm mb-1">Company Image</label>
               <input
+                id="company-image" // Add this line
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -488,6 +457,7 @@ function AdminCompanies() {
             <div className="mb-4">
               <label className="block text-sm mb-1">Company Image</label>
               <input
+                id="company-image" // Add this line
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"

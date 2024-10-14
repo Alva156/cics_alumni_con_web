@@ -66,6 +66,7 @@ exports.updateJobs = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id; // Get userId from the decoded token
+    const userRole = decoded.role; // Get user role from the decoded token
 
     const { name, address, image, description, contact } = req.body;
     const jobs = await Jobs.findById(req.params.id);
@@ -74,8 +75,8 @@ exports.updateJobs = async (req, res) => {
       return res.status(404).json({ msg: "Jobs not found" });
     }
 
-    // Ensure user owns the jobs
-    if (jobs.userId.toString() !== userId) {
+    // Ensure user is admin or owns the job
+    if (userRole !== "admin" && jobs.userId.toString() !== userId) {
       return res.status(403).json({ msg: "Unauthorized" });
     }
 
@@ -104,6 +105,7 @@ exports.deleteJobs = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id; // Get userId from the decoded token
+    const userRole = decoded.role; // Get user role from the decoded token
 
     const jobs = await Jobs.findById(req.params.id);
     if (!jobs) {
@@ -111,12 +113,9 @@ exports.deleteJobs = async (req, res) => {
       return res.status(404).json({ message: "Jobs not found" });
     }
 
-    if (jobs.userId.toString() !== userId) {
-      console.log(
-        "Unauthorized attempt to delete jobs:",
-        userId,
-        jobs.userId
-      );
+    // Ensure user is admin or owns the job
+    if (userRole !== "admin" && jobs.userId.toString() !== userId) {
+      console.log("Unauthorized attempt to delete jobs:", userId, jobs.userId);
       return res.status(403).json({ message: "Unauthorized" });
     }
 

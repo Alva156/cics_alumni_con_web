@@ -66,6 +66,7 @@ exports.updateNews = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id; // Get userId from the decoded token
+    const userRole = decoded.role; // Get user role from the decoded token
 
     const { name, address, image, description, contact } = req.body;
     const news = await News.findById(req.params.id);
@@ -74,8 +75,8 @@ exports.updateNews = async (req, res) => {
       return res.status(404).json({ msg: "News not found" });
     }
 
-    // Ensure user owns the news
-    if (news.userId.toString() !== userId) {
+    // Ensure user is admin or owns the news
+    if (userRole !== "admin" && news.userId.toString() !== userId) {
       return res.status(403).json({ msg: "Unauthorized" });
     }
 
@@ -104,6 +105,7 @@ exports.deleteNews = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id; // Get userId from the decoded token
+    const userRole = decoded.role; // Get user role from the decoded token
 
     const news = await News.findById(req.params.id);
     if (!news) {
@@ -111,12 +113,9 @@ exports.deleteNews = async (req, res) => {
       return res.status(404).json({ message: "News not found" });
     }
 
-    if (news.userId.toString() !== userId) {
-      console.log(
-        "Unauthorized attempt to delete news:",
-        userId,
-        news.userId
-      );
+    // Ensure user is admin or owns the news
+    if (userRole !== "admin" && news.userId.toString() !== userId) {
+      console.log("Unauthorized attempt to delete news:", userId, news.userId);
       return res.status(403).json({ message: "Unauthorized" });
     }
 

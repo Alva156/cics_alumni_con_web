@@ -66,6 +66,7 @@ exports.updateCompany = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id; // Get userId from the decoded token
+    const userRole = decoded.role; // Get user role from the decoded token
 
     const { name, address, image, description, contact } = req.body;
     const company = await Company.findById(req.params.id);
@@ -74,8 +75,8 @@ exports.updateCompany = async (req, res) => {
       return res.status(404).json({ msg: "Company not found" });
     }
 
-    // Ensure user owns the company
-    if (company.userId.toString() !== userId) {
+    // Ensure user is admin or owns the company
+    if (userRole !== "admin" && company.userId.toString() !== userId) {
       return res.status(403).json({ msg: "Unauthorized" });
     }
 
@@ -104,6 +105,7 @@ exports.deleteCompany = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id; // Get userId from the decoded token
+    const userRole = decoded.role; // Get user role from the decoded token
 
     const company = await Company.findById(req.params.id);
     if (!company) {
@@ -111,12 +113,8 @@ exports.deleteCompany = async (req, res) => {
       return res.status(404).json({ message: "Company not found" });
     }
 
-    if (company.userId.toString() !== userId) {
-      console.log(
-        "Unauthorized attempt to delete company:",
-        userId,
-        company.userId
-      );
+    // Ensure user is admin or owns the company
+    if (userRole !== "admin" && company.userId.toString() !== userId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 

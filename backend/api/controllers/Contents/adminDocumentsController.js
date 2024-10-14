@@ -66,6 +66,7 @@ exports.updateDocuments = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id; // Get userId from the decoded token
+    const userRole = decoded.role; // Get user role from the decoded token
 
     const { name, address, image, description, contact } = req.body;
     const documents = await Documents.findById(req.params.id);
@@ -74,8 +75,8 @@ exports.updateDocuments = async (req, res) => {
       return res.status(404).json({ msg: "Documents not found" });
     }
 
-    // Ensure user owns the documents
-    if (documents.userId.toString() !== userId) {
+    // Ensure user is admin or owns the documents
+    if (userRole !== "admin" && documents.userId.toString() !== userId) {
       return res.status(403).json({ msg: "Unauthorized" });
     }
 
@@ -104,6 +105,7 @@ exports.deleteDocuments = async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id; // Get userId from the decoded token
+    const userRole = decoded.role; // Get user role from the decoded token
 
     const documents = await Documents.findById(req.params.id);
     if (!documents) {
@@ -111,7 +113,8 @@ exports.deleteDocuments = async (req, res) => {
       return res.status(404).json({ message: "Documents not found" });
     }
 
-    if (documents.userId.toString() !== userId) {
+    // Ensure user is admin or owns the documents
+    if (userRole !== "admin" && documents.userId.toString() !== userId) {
       console.log(
         "Unauthorized attempt to delete documents:",
         userId,

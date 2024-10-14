@@ -121,7 +121,7 @@ function Chatbot() {
       "22. Architect",
     ],
 
-    ArtsAndLetters: [
+    "Arts and Letters": [
       "1. Production Assistant",
       "2. Admissions Counselor",
       "3. Event Planner",
@@ -138,7 +138,7 @@ function Chatbot() {
       "14. Economist",
     ],
 
-    CivilLaw: [
+    "Civil Law": [
       "1. Mediator",
       "2. Paralegal",
       "3. Compliance Officer",
@@ -161,7 +161,7 @@ function Chatbot() {
       "20. Lobbyist",
     ],
 
-    CommerceAndBusinessAdministration: [
+    "Commerce and Business Administration": [
       "1. Accountant",
       "2. Actuary",
       "3. Business Consultant",
@@ -221,7 +221,7 @@ function Chatbot() {
       "14. Software Engineer",
     ],
 
-    FineArtsAndDesign: [
+    "Fine Arts and Design": [
       "1. Music Director",
       "2. Illustrator",
       "3. Photographer",
@@ -270,7 +270,7 @@ function Chatbot() {
       "46. Fine Artist",
     ],
 
-    InformationAndComputingSciences: [
+    "Information and Computing Sciences": [
       "1. Animator",
       "2. Health Information Technician",
       "3. Webmaster",
@@ -294,7 +294,7 @@ function Chatbot() {
       "21. Computer Network Architect",
     ],
 
-    MedicineAndSurgery: [
+    "Medicine and Surgery": [
       "1. Dietary Aide",
       "2. Home Health Aide",
       "3. Veterinary Assistant",
@@ -392,7 +392,7 @@ function Chatbot() {
       "16. Pharmacologist",
     ],
 
-    PhysicalEducationAndAthletics: [
+    "Physical Education and Athletics": [
       "1. Dance Instructor",
       "2. Athletic Coach",
       "3. Sport Journalist",
@@ -405,7 +405,7 @@ function Chatbot() {
       "10. Occupational Therapist",
     ],
 
-    RehabilitationSciences: [
+    "Rehabilitation Sciences": [
       "1. Case Manager",
       "2. Clinical Research Coordinator",
       "3. Design Engineer",
@@ -454,7 +454,7 @@ function Chatbot() {
       "35. Neurologist",
     ],
 
-    TourismAndHospitalityManagement: [
+    "Tourism and Hospitality Management": [
       "1. Cruise Agent",
       "2. Sports Center Manager",
       "3. Food Truck Manager",
@@ -477,7 +477,7 @@ function Chatbot() {
       "20. Travel Consultant",
     ],
 
-    CanonLaw: [
+    "Canon Law": [
       "1. Canon Lawyer (Advocate)",
       "2. Church Tribunal Official",
       "3. Canonical Consultant",
@@ -506,7 +506,7 @@ function Chatbot() {
       "10. Psychologist",
     ],
 
-    SacredTheology: [
+    "Sacred Theology": [
       "1. Music Minister",
       "2. Nonprofit Coordinator",
       "3. Manager of Volunteer Services",
@@ -584,24 +584,24 @@ function Chatbot() {
         options = [
           "Accountancy",
           "Architecture",
-          "ArtsAndLetters",
-          "CivilLaw",
-          "CommerceAndBusinessAdministration",
+          "Arts and Letters",
+          "Civil Law",
+          "Commerce and Business Administration",
           "Education",
           "Engineering",
-          "FineArtsAndDesign",
-          "InformationAndComputingSciences",
-          "MedicineAndSurgery",
+          "Fine Arts and Design",
+          "Information and Computing Sciences",
+          "Medicine and Surgery",
           "Music",
           "Nursing",
           "Pharmacy",
-          "PhysicalEducationAndAthletics",
-          "RehabilitationSciences",
+          "Physical Education and Athletics",
+          "Rehabilitation Sciences",
           "Science",
-          "TourismAndHospitalityManagement",
-          "CanonLaw",
+          "Tourism and Hospitality Management",
+          "Canon Law",
           "Philosophy",
-          "SacredTheology",
+          "Sacred Theology",
           "Go back",
         ];
       }

@@ -87,6 +87,7 @@ function AdminEvents() {
 
   const handleUpdateEvents = async () => {
     if (!selectedEvents) return;
+
     if (
       !selectedEvents.name ||
       !selectedEvents.address ||
@@ -99,22 +100,32 @@ function AdminEvents() {
       return;
     }
 
+    const eventData = new FormData();
+    eventData.append("name", selectedEvents.name);
+    eventData.append("address", selectedEvents.address);
+    eventData.append("description", selectedEvents.description);
+    eventData.append("contact", selectedEvents.contact);
+
+    const image = document.getElementById("events-image").files[0];
+    if (image) {
+      eventData.append("image", image);
+    }
+
     try {
       const response = await axios.put(
         `${backendUrl}/events/update-events/${selectedEvents._id}`,
+        eventData,
         {
-          name: selectedEvents.name,
-          address: selectedEvents.address,
-          image: selectedEvents.image,
-          description: selectedEvents.description,
-          contact: selectedEvents.contact,
-        },
-        { withCredentials: true }
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
       );
 
       setEvents((prevEvents) =>
-        prevEvents.map((events) =>
-          events._id === selectedEvents._id ? response.data : events
+        prevEvents.map((event) =>
+          event._id === selectedEvents._id ? response.data : event
         )
       );
 
@@ -126,25 +137,43 @@ function AdminEvents() {
       }, 3000);
     } catch (error) {
       console.error("Error updating events:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg); // Display error message from backend
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
     }
   };
 
   const handleCreateEvents = async () => {
-    const eventsData = {
-      name: document.getElementById("events-name").value,
-      address: document.getElementById("events-address").value,
-      image: "", // Handle image upload separately
-      description: document.getElementById("events-description").value,
-      contact: document.getElementById("events-contact").value,
-    };
+    const eventData = new FormData();
+    eventData.append("name", document.getElementById("events-name").value);
+    eventData.append(
+      "address",
+      document.getElementById("events-address").value
+    );
+    eventData.append(
+      "description",
+      document.getElementById("events-description").value
+    );
+    eventData.append(
+      "contact",
+      document.getElementById("events-contact").value
+    );
+
+    const image = document.getElementById("events-image").files[0];
+    if (image) {
+      eventData.append("image", image); // Add the image to formData
+    }
+
     if (
-      !eventsData.name ||
-      !eventsData.address ||
-      !eventsData.description ||
-      !eventsData.contact
+      !eventData.get("name") ||
+      !eventData.get("address") ||
+      !eventData.get("description") ||
+      !eventData.get("contact")
     ) {
       setshowMessage("Please fill in all required fields.");
-      setErrorMessage(true); // Ensure to set this to true
+      setErrorMessage(true);
       setTimeout(() => setErrorMessage(false), 3000);
       return;
     }
@@ -152,27 +181,35 @@ function AdminEvents() {
     try {
       const response = await axios.post(
         `${backendUrl}/events/create-events`,
-        eventsData,
+        eventData,
         {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
           withCredentials: true,
         }
       );
 
-      setEvents([...events, response.data]); // Update events list
-      setSelectedEvents(null); // Clear selected events
-      setIsAddModalOpen(false); // Close the modal
+      setEvents([...events, response.data]);
+      closeModal();
       setshowMessage("Events created successfully!");
       setSuccessMessage(true);
-      // Optionally reset input fields if necessary
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
+
+      // Reset input fields if necessary
       document.getElementById("events-name").value = "";
       document.getElementById("events-address").value = "";
       document.getElementById("events-description").value = "";
       document.getElementById("events-contact").value = "";
-      setTimeout(() => {
-        setSuccessMessage(false);
-      }, 3000);
     } catch (error) {
       console.error("Error creating events:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg);
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
     }
   };
 
@@ -297,7 +334,7 @@ function AdminEvents() {
             </div>
             <div className="text-md mb-2">{selectedEvents.address}</div>
             <img
-              src={selectedEvents.image}
+              src={`${backendUrl}${selectedEvents.image}`}
               alt={selectedEvents.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
@@ -368,6 +405,7 @@ function AdminEvents() {
             <div className="mb-4">
               <label className="block text-sm mb-1">Events Image</label>
               <input
+                id="events-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -488,6 +526,7 @@ function AdminEvents() {
             <div className="mb-4">
               <label className="block text-sm mb-1">Events Image</label>
               <input
+                id="events-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"

@@ -87,6 +87,7 @@ function AdminJobs() {
 
   const handleUpdateJobs = async () => {
     if (!selectedJobs) return;
+
     if (
       !selectedJobs.name ||
       !selectedJobs.address ||
@@ -99,22 +100,32 @@ function AdminJobs() {
       return;
     }
 
+    const jobsData = new FormData();
+    jobsData.append("name", selectedJobs.name);
+    jobsData.append("address", selectedJobs.address);
+    jobsData.append("description", selectedJobs.description);
+    jobsData.append("contact", selectedJobs.contact);
+
+    const image = document.getElementById("jobs-image").files[0];
+    if (image) {
+      jobsData.append("image", image);
+    }
+
     try {
       const response = await axios.put(
         `${backendUrl}/jobs/update-jobs/${selectedJobs._id}`,
+        jobsData,
         {
-          name: selectedJobs.name,
-          address: selectedJobs.address,
-          image: selectedJobs.image,
-          description: selectedJobs.description,
-          contact: selectedJobs.contact,
-        },
-        { withCredentials: true }
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
       );
 
       setJobs((prevJobs) =>
-        prevJobs.map((jobs) =>
-          jobs._id === selectedJobs._id ? response.data : jobs
+        prevJobs.map((job) =>
+          job._id === selectedJobs._id ? response.data : job
         )
       );
 
@@ -126,25 +137,37 @@ function AdminJobs() {
       }, 3000);
     } catch (error) {
       console.error("Error updating jobs:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg);
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
     }
   };
 
   const handleCreateJobs = async () => {
-    const jobsData = {
-      name: document.getElementById("jobs-name").value,
-      address: document.getElementById("jobs-address").value,
-      image: "", // Handle image upload separately
-      description: document.getElementById("jobs-description").value,
-      contact: document.getElementById("jobs-contact").value,
-    };
+    const jobsData = new FormData();
+    jobsData.append("name", document.getElementById("jobs-name").value);
+    jobsData.append("address", document.getElementById("jobs-address").value);
+    jobsData.append(
+      "description",
+      document.getElementById("jobs-description").value
+    );
+    jobsData.append("contact", document.getElementById("jobs-contact").value);
+
+    const image = document.getElementById("jobs-image").files[0];
+    if (image) {
+      jobsData.append("image", image); // Add the image to formData
+    }
+
     if (
-      !jobsData.name ||
-      !jobsData.address ||
-      !jobsData.description ||
-      !jobsData.contact
+      !jobsData.get("name") ||
+      !jobsData.get("address") ||
+      !jobsData.get("description") ||
+      !jobsData.get("contact")
     ) {
       setshowMessage("Please fill in all required fields.");
-      setErrorMessage(true); // Ensure to set this to true
+      setErrorMessage(true);
       setTimeout(() => setErrorMessage(false), 3000);
       return;
     }
@@ -154,25 +177,27 @@ function AdminJobs() {
         `${backendUrl}/jobs/create-jobs`,
         jobsData,
         {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
           withCredentials: true,
         }
       );
 
-      setJobs([...jobs, response.data]); // Update jobs list
-      setSelectedJobs(null); // Clear selected jobs
-      setIsAddModalOpen(false); // Close the modal
+      setJobs([...jobs, response.data]);
+      closeModal();
       setshowMessage("Jobs created successfully!");
       setSuccessMessage(true);
-      // Optionally reset input fields if necessary
-      document.getElementById("jobs-name").value = "";
-      document.getElementById("jobs-address").value = "";
-      document.getElementById("jobs-description").value = "";
-      document.getElementById("jobs-contact").value = "";
       setTimeout(() => {
         setSuccessMessage(false);
       }, 3000);
     } catch (error) {
       console.error("Error creating jobs:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg);
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
     }
   };
 
@@ -295,7 +320,7 @@ function AdminJobs() {
             <div className="text-2xl font-medium mb-2">{selectedJobs.name}</div>
             <div className="text-md mb-2">{selectedJobs.address}</div>
             <img
-              src={selectedJobs.image}
+              src={`${backendUrl}${selectedJobs.image}`}
               alt={selectedJobs.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
@@ -366,6 +391,7 @@ function AdminJobs() {
             <div className="mb-4">
               <label className="block text-sm mb-1">Jobs Image</label>
               <input
+                id="jobs-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -486,6 +512,7 @@ function AdminJobs() {
             <div className="mb-4">
               <label className="block text-sm mb-1">Jobs Image</label>
               <input
+                id="jobs-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"

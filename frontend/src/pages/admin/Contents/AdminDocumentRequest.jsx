@@ -87,6 +87,7 @@ function AdminDocuments() {
 
   const handleUpdateDocuments = async () => {
     if (!selectedDocuments) return;
+
     if (
       !selectedDocuments.name ||
       !selectedDocuments.address ||
@@ -99,22 +100,32 @@ function AdminDocuments() {
       return;
     }
 
+    const documentData = new FormData();
+    documentData.append("name", selectedDocuments.name);
+    documentData.append("address", selectedDocuments.address);
+    documentData.append("description", selectedDocuments.description);
+    documentData.append("contact", selectedDocuments.contact);
+
+    const image = document.getElementById("documents-image").files[0]; // Make sure the input ID matches
+    if (image) {
+      documentData.append("image", image); // Append image to FormData
+    }
+
     try {
       const response = await axios.put(
         `${backendUrl}/documents/update-documents/${selectedDocuments._id}`,
+        documentData,
         {
-          name: selectedDocuments.name,
-          address: selectedDocuments.address,
-          image: selectedDocuments.image,
-          description: selectedDocuments.description,
-          contact: selectedDocuments.contact,
-        },
-        { withCredentials: true }
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
       );
 
       setDocuments((prevDocuments) =>
-        prevDocuments.map((documents) =>
-          documents._id === selectedDocuments._id ? response.data : documents
+        prevDocuments.map((doc) =>
+          doc._id === selectedDocuments._id ? response.data : doc
         )
       );
 
@@ -126,25 +137,46 @@ function AdminDocuments() {
       }, 3000);
     } catch (error) {
       console.error("Error updating documents:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg); // Display error message from backend
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
     }
   };
 
   const handleCreateDocuments = async () => {
-    const documentsData = {
-      name: document.getElementById("documents-name").value,
-      address: document.getElementById("documents-address").value,
-      image: "", // Handle image upload separately
-      description: document.getElementById("documents-description").value,
-      contact: document.getElementById("documents-contact").value,
-    };
+    const documentsData = new FormData(); // Use FormData to handle image uploads
+    documentsData.append(
+      "name",
+      document.getElementById("documents-name").value
+    );
+    documentsData.append(
+      "address",
+      document.getElementById("documents-address").value
+    );
+    documentsData.append(
+      "description",
+      document.getElementById("documents-description").value
+    );
+    documentsData.append(
+      "contact",
+      document.getElementById("documents-contact").value
+    );
+
+    const image = document.getElementById("documents-image").files[0]; // Ensure the input ID matches
+    if (image) {
+      documentsData.append("image", image); // Append image to FormData
+    }
+
     if (
-      !documentsData.name ||
-      !documentsData.address ||
-      !documentsData.description ||
-      !documentsData.contact
+      !documentsData.get("name") ||
+      !documentsData.get("address") ||
+      !documentsData.get("description") ||
+      !documentsData.get("contact")
     ) {
       setshowMessage("Please fill in all required fields.");
-      setErrorMessage(true); // Ensure to set this to true
+      setErrorMessage(true);
       setTimeout(() => setErrorMessage(false), 3000);
       return;
     }
@@ -154,6 +186,9 @@ function AdminDocuments() {
         `${backendUrl}/documents/create-documents`,
         documentsData,
         {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
           withCredentials: true,
         }
       );
@@ -163,16 +198,23 @@ function AdminDocuments() {
       setIsAddModalOpen(false); // Close the modal
       setshowMessage("Documents created successfully!");
       setSuccessMessage(true);
-      // Optionally reset input fields if necessary
+      // Reset input fields
       document.getElementById("documents-name").value = "";
       document.getElementById("documents-address").value = "";
       document.getElementById("documents-description").value = "";
       document.getElementById("documents-contact").value = "";
+      document.getElementById("documents-image").value = ""; // Reset image input
+
       setTimeout(() => {
         setSuccessMessage(false);
       }, 3000);
     } catch (error) {
       console.error("Error creating documents:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg); // Display error message from backend
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
     }
   };
 
@@ -297,7 +339,7 @@ function AdminDocuments() {
             </div>
             <div className="text-md mb-2">{selectedDocuments.address}</div>
             <img
-              src={selectedDocuments.image}
+              src={`${backendUrl}${selectedDocuments.image}`}
               alt={selectedDocuments.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
@@ -368,6 +410,7 @@ function AdminDocuments() {
             <div className="mb-4">
               <label className="block text-sm mb-1">Documents Image</label>
               <input
+                id="documents-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -488,6 +531,7 @@ function AdminDocuments() {
             <div className="mb-4">
               <label className="block text-sm mb-1">Documents Image</label>
               <input
+                id="documents-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"

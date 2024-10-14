@@ -40,6 +40,7 @@ function UserProfile() {
   const [accountEmail, setAccountEmail] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [initialAccountEmail, setInitialAccountEmail] = useState("");
+  const [profileId, setProfileId] = useState(null);
 
   const [secondaryEducationSections, setSecondaryEducationSections] = useState([
     { schoolName: "", yearStarted: "", yearEnded: "" },
@@ -280,28 +281,56 @@ function UserProfile() {
   };
 
   // Updated handleDeleteCompanySection with logging
-  const handleDeleteCompanySection = async (sectionId, index) => {
-    console.log(`Attempting to delete section with ID: ${sectionId}`); // Debugging line
+  const handleDeleteCompanySection = async (sectionId) => {
+    console.log("Delete button clicked");
+    console.log("Section ID in function:", sectionId);
+    
+    if (!profileId || !sectionId) {
+      console.log("Profile ID or Section ID is missing.");
+      return;
+    }
+  
+    console.log("Deleting company section with Profile ID:", profileId);
+    console.log("Attempting to delete section with ID:", sectionId);
+  
     try {
       const response = await axios.delete(
-        `${backendUrl}/profile/company-section/${sectionId}`,
+        `${backendUrl}/profile/company-section/${profileId}/${sectionId}`,
         { withCredentials: true }
       );
-
-      console.log("Delete response:", response.data); // Check response
-      // If successful, update the local state
-      setCompanySections((prevSections) =>
-        prevSections.filter((_, i) => i !== index)
-      );
-      console.log("Company section deleted successfully!");
+  
+      console.log("Delete response:", response);
+      
+      if (response.status === 200) {
+        
+        // Update state to remove the deleted section
+        setCompanySections((prevSections) => {
+          const updatedSections = prevSections.filter((section) => section._id !== sectionId); // Ensure correct ID comparison
+          // Check if the updated sections array is empty
+          if (updatedSections.length === 0) {
+            // If empty, handle the empty state if needed, e.g., reset form or show a message
+            alert("No company sections remaining.");
+          }
+          return updatedSections;
+        });
+  
+        alert("Company section deleted successfully!");
+      } else {
+        alert("Failed to delete company section. Please try again.");
+      }
     } catch (error) {
-      console.error(
-        "Error deleting section:",
-        error.response ? error.response.data : error.message
-      );
-      // Optionally display an error message to the user
+      console.error("Error deleting company section:", error);
+      if (error.response) {
+        console.log("Response status:", error.response.status);
+        console.log("Response data:", error.response.data);
+        alert(`Failed to delete company section. Reason: ${error.response.data.message || "Please try again."}`);
+      } else {
+        alert("Failed to delete company section. Please check your network connection.");
+      }
     }
-  };
+};
+
+
 
   const handleSave = (e) => {
     console.log("saved");
@@ -451,6 +480,8 @@ function UserProfile() {
           setProfileImage(profileData.profileImage || "");
           setInitialAccountEmail(profileData.accountEmail || "");
 
+          setProfileId(profileData._id);
+
           // Set education and company sections
           setSecondaryEducationSections(profileData.secondaryEducation || []);
           setTertiaryEducationSections(profileData.tertiaryEducation || []);
@@ -474,6 +505,7 @@ function UserProfile() {
 
     fetchProfile();
   }, [backendUrl]);
+  
   const handlePasswordSub = async (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -1280,71 +1312,72 @@ function UserProfile() {
                 </div>
 
                 {companySections.map((section, index) => (
-                  <div
-                    key={section._id}
-                    className="w-full border-2 rounded py-2 px-4 mt-2"
-                  >
-                    {" "}
-                    {/* Use section._id instead of section.id */}
-                    {/* Company Name */}
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Company Name</label>
-                      <input
-                        type="text"
-                        name="companyName"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.companyName}
-                        onChange={(e) => handleCompanyChange(index, e)}
-                      />
-                    </div>
-                    {/* Position */}
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Position</label>
-                      <input
-                        type="text"
-                        name="position"
-                        placeholder="Type here"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.position}
-                        onChange={(e) => handleCompanyChange(index, e)}
-                      />
-                    </div>
-                    {/* Year Started */}
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Started</label>
-                      <input
-                        type="date"
-                        name="yearStarted"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearStarted}
-                        onChange={(e) => handleCompanyChange(index, e)}
-                      />
-                    </div>
-                    {/* Year Ended */}
-                    <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Ended</label>
-                      <input
-                        type="date"
-                        name="yearEnded"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearEnded}
-                        onChange={(e) => handleCompanyChange(index, e)}
-                      />
-                    </div>
-                    {/* Delete Button */}
-                    <div className="flex justify-end">
-                      <button
-                        className="btn btn-sm w-36 bg-red text-white mt-2" // Fixed class name for consistency
-                        onClick={() =>
-                          handleDeleteCompanySection(section._id, index)
-                        } // Use section._id
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
+  <div
+    key={section._id}
+    className="w-full border-2 rounded py-2 px-4 mt-2"
+  >
+    {/* Company Name */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Company Name</label>
+      <input
+        type="text"
+        name="companyName"
+        placeholder="Type here"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.companyName}
+        onChange={(e) => handleCompanyChange(index, e)}
+      />
+    </div>
+    {/* Position */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Position</label>
+      <input
+        type="text"
+        name="position"
+        placeholder="Type here"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.position}
+        onChange={(e) => handleCompanyChange(index, e)}
+      />
+    </div>
+    {/* Year Started */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Year Started</label>
+      <input
+        type="date"
+        name="yearStarted"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.yearStarted}
+        onChange={(e) => handleCompanyChange(index, e)}
+      />
+    </div>
+    {/* Year Ended */}
+    <div className="py-1">
+      <label className="pt-4 pb-2 text-sm">Year Ended</label>
+      <input
+        type="date"
+        name="yearEnded"
+        className="input input-sm input-bordered w-full h-10"
+        value={section.yearEnded}
+        onChange={(e) => handleCompanyChange(index, e)}
+      />
+    </div>
+    {/* Delete Button */}
+    <div className="flex justify-end">
+      <button
+        className="btn btn-sm w-36 bg-red text-white mt-2"
+        onClick={() => {
+          console.log("Profile ID:", profileId);
+          console.log("Section ID:", section._id); // Use section._id here
+          handleDeleteCompanySection(section._id); // Pass the correct section ID
+        }}
+      >
+        Delete
+      </button>
+    </div>
+  </div>
+))}
+
               </div>
             </div>
 

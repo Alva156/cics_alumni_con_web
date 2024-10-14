@@ -87,6 +87,7 @@ function AdminNews() {
 
   const handleUpdateNews = async () => {
     if (!selectedNews) return;
+
     if (
       !selectedNews.name ||
       !selectedNews.address ||
@@ -99,17 +100,27 @@ function AdminNews() {
       return;
     }
 
+    const newsData = new FormData();
+    newsData.append("name", selectedNews.name);
+    newsData.append("address", selectedNews.address);
+    newsData.append("description", selectedNews.description);
+    newsData.append("contact", selectedNews.contact);
+
+    const image = document.getElementById("news-image").files[0];
+    if (image) {
+      newsData.append("image", image);
+    }
+
     try {
       const response = await axios.put(
         `${backendUrl}/news/update-news/${selectedNews._id}`,
+        newsData,
         {
-          name: selectedNews.name,
-          address: selectedNews.address,
-          image: selectedNews.image,
-          description: selectedNews.description,
-          contact: selectedNews.contact,
-        },
-        { withCredentials: true }
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
       );
 
       setNews((prevNews) =>
@@ -126,25 +137,37 @@ function AdminNews() {
       }, 3000);
     } catch (error) {
       console.error("Error updating news:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg); // Display error message from backend
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
     }
   };
 
   const handleCreateNews = async () => {
-    const newsData = {
-      name: document.getElementById("news-name").value,
-      address: document.getElementById("news-address").value,
-      image: "", // Handle image upload separately
-      description: document.getElementById("news-description").value,
-      contact: document.getElementById("news-contact").value,
-    };
+    const newsData = new FormData();
+    newsData.append("name", document.getElementById("news-name").value);
+    newsData.append("address", document.getElementById("news-address").value);
+    newsData.append(
+      "description",
+      document.getElementById("news-description").value
+    );
+    newsData.append("contact", document.getElementById("news-contact").value);
+
+    const image = document.getElementById("news-image").files[0];
+    if (image) {
+      newsData.append("image", image); // Add the image to formData
+    }
+
     if (
-      !newsData.name ||
-      !newsData.address ||
-      !newsData.description ||
-      !newsData.contact
+      !newsData.get("name") ||
+      !newsData.get("address") ||
+      !newsData.get("description") ||
+      !newsData.get("contact")
     ) {
       setshowMessage("Please fill in all required fields.");
-      setErrorMessage(true); // Ensure to set this to true
+      setErrorMessage(true);
       setTimeout(() => setErrorMessage(false), 3000);
       return;
     }
@@ -154,25 +177,27 @@ function AdminNews() {
         `${backendUrl}/news/create-news`,
         newsData,
         {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
           withCredentials: true,
         }
       );
 
-      setNews([...news, response.data]); // Update news list
-      setSelectedNews(null); // Clear selected news
-      setIsAddModalOpen(false); // Close the modal
+      setNews([...news, response.data]);
+      closeModal();
       setshowMessage("News created successfully!");
       setSuccessMessage(true);
-      // Optionally reset input fields if necessary
-      document.getElementById("news-name").value = "";
-      document.getElementById("news-address").value = "";
-      document.getElementById("news-description").value = "";
-      document.getElementById("news-contact").value = "";
       setTimeout(() => {
         setSuccessMessage(false);
       }, 3000);
     } catch (error) {
       console.error("Error creating news:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg);
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
     }
   };
 
@@ -295,7 +320,7 @@ function AdminNews() {
             <div className="text-2xl font-medium mb-2">{selectedNews.name}</div>
             <div className="text-md mb-2">{selectedNews.address}</div>
             <img
-              src={selectedNews.image}
+              src={`${backendUrl}${selectedNews.image}`}
               alt={selectedNews.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
@@ -366,6 +391,7 @@ function AdminNews() {
             <div className="mb-4">
               <label className="block text-sm mb-1">News Image</label>
               <input
+                id="news-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -486,6 +512,7 @@ function AdminNews() {
             <div className="mb-4">
               <label className="block text-sm mb-1">News Image</label>
               <input
+                id="news-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"

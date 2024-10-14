@@ -23,6 +23,7 @@ app.use(
   "/uploads/contents/companies",
   express.static("uploads/contents/companies")
 );
+app.use("/uploads/contents/news", express.static("uploads/contents/news"));
 
 // Database Connection
 mongoose

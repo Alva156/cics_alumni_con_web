@@ -1,39 +1,83 @@
 const News = require("../../models/Contents/newsModel");
-const jwt = require("jsonwebtoken"); // Add this line
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+// Set storage engine for news images
+const storage = multer.diskStorage({
+  destination: "./uploads/contents/news", // Save images in the 'uploads' directory
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+// Initialize upload for news images
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png/;
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    const mimetype = filetypes.test(file.mimetype);
+
+    if (!mimetype || !extname) {
+      return cb(new Error("Only images (jpeg, jpg, png) are allowed"));
+    }
+
+    cb(null, true);
+  },
+}).single("image");
 
 // Create new news
 exports.createNews = async (req, res) => {
-  try {
-    const token = req.cookies.token; // Get the token from cookies
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized, token missing." });
+  upload(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({ msg: "Image must be a maximum of 5MB" });
+      }
+      return res.status(400).json({ msg: err.message });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from the decoded token
+    try {
+      const token = req.cookies.token;
+      if (!token) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized, token missing." });
+      }
 
-    const { name, address, image, description, contact } = req.body;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decoded.id;
 
-    const news = new News({
-      userId,
-      name,
-      address,
-      image,
-      description,
-      contact,
-    });
-    await news.save();
+      const { name, address, description, contact } = req.body;
+      const image = req.file
+        ? `/uploads/contents/news/${req.file.filename}`
+        : null;
 
-    res.status(201).json(news);
-  } catch (error) {
-    res.status(500).json({ msg: "Server Error", error: error.message });
-  }
+      const news = new News({
+        userId,
+        name,
+        address,
+        image,
+        description,
+        contact,
+      });
+
+      await news.save();
+
+      res.status(201).json(news);
+    } catch (error) {
+      res.status(500).json({ msg: "Server Error", error: error.message });
+    }
+  });
 };
 
 // Get all news for a specific user
 exports.getNews = async (req, res) => {
   try {
-    // Fetch all news without filtering by userId
     const news = await News.find();
     res.status(200).json(news);
   } catch (error) {
@@ -58,54 +102,75 @@ exports.getNewsById = async (req, res) => {
 
 // Update news
 exports.updateNews = async (req, res) => {
-  try {
-    const token = req.cookies.token; // Get the token from cookies
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized, token missing." });
+  upload(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({ msg: "Image must be a maximum of 5MB" });
+      }
+      return res.status(400).json({ msg: err.message });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from the decoded token
-    const userRole = decoded.role; // Get user role from the decoded token
+    try {
+      const token = req.cookies.token;
+      if (!token) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized, token missing." });
+      }
 
-    const { name, address, image, description, contact } = req.body;
-    const news = await News.findById(req.params.id);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decoded.id;
+      const userRole = decoded.role;
 
-    if (!news) {
-      return res.status(404).json({ msg: "News not found" });
+      const { name, address, description, contact } = req.body;
+      const news = await News.findById(req.params.id);
+
+      if (!news) {
+        return res.status(404).json({ msg: "News not found" });
+      }
+
+      if (userRole !== "admin" && news.userId.toString() !== userId) {
+        return res.status(403).json({ msg: "Unauthorized" });
+      }
+
+      const newImage = req.file
+        ? `/uploads/contents/news/${req.file.filename}`
+        : news.image;
+
+      if (req.file && news.image) {
+        const oldImagePath = path.join(__dirname, `../../../${news.image}`);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
+      news.name = name || news.name;
+      news.address = address || news.address;
+      news.image = newImage;
+      news.description = description || news.description;
+      news.contact = contact || news.contact;
+
+      await news.save();
+      res.status(200).json(news);
+    } catch (error) {
+      res.status(500).json({ msg: "Server Error", error: error.message });
     }
-
-    // Ensure user is admin or owns the news
-    if (userRole !== "admin" && news.userId.toString() !== userId) {
-      return res.status(403).json({ msg: "Unauthorized" });
-    }
-
-    news.name = name || news.name;
-    news.address = address || news.address;
-    news.image = image || news.image;
-    news.description = description || news.description;
-    news.contact = contact || news.contact;
-
-    await news.save();
-    res.status(200).json(news);
-  } catch (error) {
-    res.status(500).json({ msg: "Server Error", error: error.message });
-  }
+  });
 };
 
 // Delete news
 exports.deleteNews = async (req, res) => {
   console.log("Delete request received for news ID:", req.params.id);
   try {
-    const token = req.cookies.token; // Get the token from cookies
+    const token = req.cookies.token;
     if (!token) {
       console.log("Token is missing.");
       return res.status(401).json({ message: "Unauthorized, token missing." });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from the decoded token
-    const userRole = decoded.role; // Get user role from the decoded token
+    const userId = decoded.id;
+    const userRole = decoded.role;
 
     const news = await News.findById(req.params.id);
     if (!news) {
@@ -113,10 +178,19 @@ exports.deleteNews = async (req, res) => {
       return res.status(404).json({ message: "News not found" });
     }
 
-    // Ensure user is admin or owns the news
     if (userRole !== "admin" && news.userId.toString() !== userId) {
       console.log("Unauthorized attempt to delete news:", userId, news.userId);
       return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    if (news.image) {
+      const imagePath = path.join(__dirname, `../../../${news.image}`);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+        console.log("Old image deleted successfully:", imagePath);
+      } else {
+        console.log("Image not found at path:", imagePath);
+      }
     }
 
     await News.deleteOne({ _id: req.params.id });

@@ -153,8 +153,6 @@ function Chatbot() {
           "Education",
           "Engineering",
           "Fine Arts and Design",
-          "Graduate School?",
-          "Graduate School of Law?",
           "Information and Computing Sciences",
           "Medicine and Surgery",
           "Music",

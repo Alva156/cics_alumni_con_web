@@ -123,7 +123,7 @@ function Events() {
             </div>
             <div className="text-md mb-2">{selectedEvents.address}</div>
             <img
-              src={selectedEvents.image}
+              src={`${backendUrl}${selectedEvents.image}`}
               alt={selectedEvents.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />

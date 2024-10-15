@@ -121,7 +121,7 @@ function News() {
             <div className="text-2xl font-medium mb-2">{selectedNews.name}</div>
             <div className="text-md mb-2">{selectedNews.address}</div>
             <img
-              src={selectedNews.image}
+              src={`${backendUrl}${selectedNews.image}`}
               alt={selectedNews.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />

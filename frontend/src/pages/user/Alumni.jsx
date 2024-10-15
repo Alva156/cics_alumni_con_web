@@ -3,24 +3,22 @@ import axios from "axios";
 
 function Alumni() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const [alumni, setAlumni] = useState([]); // Alumni state
+  const [alumni, setAlumni] = useState([]);
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedProgram, setSelectedProgram] = useState("");
+  const [activeTab, setActiveTab] = useState("primary");
   const modalRef = useRef(null);
 
-  // Function to format dates into "Month Day, Year" format
   const formatDate = (dateString) => {
-    if (!dateString) return " "; // Return "N/A" if no date is provided
-
+    if (!dateString) return " ";
     const options = { year: "numeric", month: "long", day: "numeric" };
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, options);
   };
 
-  // Fetch alumni data from the backend
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
@@ -36,19 +34,17 @@ function Alumni() {
     fetchAlumni();
   }, []);
 
-  // Function to open the modal with selected alumni details
   const openModal = (alumni) => {
     setSelectedAlumni(alumni);
     setIsModalOpen(true);
+    setActiveTab("primary");
   };
 
-  // Function to close the modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedAlumni(null);
   };
 
-  // Close modal when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -63,7 +59,6 @@ function Alumni() {
     }
   }, [isModalOpen]);
 
-  // Filter alumni based on the search term and selected program
   const filteredAlumni = alumni
     .filter((alumni) =>
       `${alumni.firstName} ${alumni.lastName}`
@@ -73,11 +68,10 @@ function Alumni() {
     .filter((alumni) =>
       selectedProgram ? alumni.collegeProgram === selectedProgram : true
     );
-  // Sort alumni based on selected order
+
   const sortedAlumni = [...filteredAlumni].sort((a, b) => {
     const nameA = `${a.firstName} ${a.lastName}`;
     const nameB = `${b.firstName} ${b.lastName}`;
-
     return sortOrder === "asc"
       ? nameA.localeCompare(nameB)
       : nameB.localeCompare(nameA);
@@ -153,7 +147,6 @@ function Alumni() {
         <p>No alumni found.</p>
       )}
 
-      {/* Modal */}
       {isModalOpen && selectedAlumni && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
@@ -170,23 +163,73 @@ function Alumni() {
               &times;
             </button>
 
+            {/* Profile Image */}
+            {selectedAlumni.profileImage && (
+              <img
+                src={selectedAlumni.profileImage}
+                alt="Alumni"
+                className="w-32 h-32 mb-4 rounded-full mx-auto"
+              />
+            )}
+
+            {/* Tab Navigation */}
+            <div className="mb-4 flex space-x-4">
+              <button
+                className={`py-2 px-4 ${
+                  activeTab === "primary" ? "bg-gray-200" : ""
+                }`}
+                onClick={() => setActiveTab("primary")}
+              >
+                Primary Information
+              </button>
+              <button
+                className={`py-2 px-4 ${
+                  activeTab === "secondary" ? "bg-gray-200" : ""
+                }`}
+                onClick={() => setActiveTab("secondary")}
+              >
+                Secondary Information
+              </button>
+              <button
+                className={`py-2 px-4 ${
+                  activeTab === "contact" ? "bg-gray-200" : ""
+                }`}
+                onClick={() => setActiveTab("contact")}
+              >
+                Contact Information
+              </button>
+              <button
+                className={`py-2 px-4 ${
+                  activeTab === "attachments" ? "bg-gray-200" : ""
+                }`}
+                onClick={() => setActiveTab("attachments")}
+              >
+                Attachments
+              </button>
+              <button
+                className={`py-2 px-4 ${
+                  activeTab === "education" ? "bg-gray-200" : ""
+                }`}
+                onClick={() => setActiveTab("education")}
+              >
+                Educational Background
+              </button>
+              <button
+                className={`py-2 px-4 ${
+                  activeTab === "career" ? "bg-gray-200" : ""
+                }`}
+                onClick={() => setActiveTab("career")}
+              >
+                Career Background
+              </button>
+            </div>
+
+            {/* Tab Content */}
             <div>
-              {selectedAlumni.profileImage && (
-                <div className="mb-4">
-                  <img
-                    src={selectedAlumni.profileImage}
-                    alt="Alumni"
-                    className="w-32 h-32"
-                  />
-                </div>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 justify-between">
-                <div className="order-1 sm:order-1">
-                  <h1 className="text-xl mb-4">Primary Information</h1>
+              {activeTab === "primary" && (
+                <>
                   <p className="text-xs mb-1/2">Name</p>
-                  <p className="text-s mb-2 font-bold">
-                    {`${selectedAlumni.firstName} ${selectedAlumni.lastName}`}
-                  </p>
+                  <p className="text-s mb-2 font-bold">{`${selectedAlumni.firstName} ${selectedAlumni.lastName}`}</p>
                   <p className="text-xs mb-1/2">Profession</p>
                   <p className="text-s mb-2 font-bold">
                     {selectedAlumni.profession}
@@ -215,32 +258,10 @@ function Alumni() {
                   <p className="text-s mb-2 font-bold">
                     {selectedAlumni.timeToJob}
                   </p>
-                </div>
-                <div className="order-3 sm:order-2">
-                  <h1 className="text-xl mb-4">Contact Information</h1>
-                  <p className="text-xs mb-1/2">LinkedIn</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.linkedin}
-                  </p>
-                  <p className="text-xs mb-1/2">Facebook</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.facebook}
-                  </p>
-                  <p className="text-xs mb-1/2">Instagram</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.instagram}
-                  </p>
-                  <p className="text-xs mb-1/2">Email</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.email}
-                  </p>
-                  <p className="text-xs mb-1/2">Mobile Number</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.mobileNumber}
-                  </p>
-                </div>
-                <div className="order-2 sm:order-3">
-                  <h1 className="text-xl mb-4 mt-6">Secondary Information</h1>
+                </>
+              )}
+              {activeTab === "secondary" && (
+                <>
                   <p className="text-xs mb-1/2">Employment Status</p>
                   <p className="text-s mb-2 font-bold">
                     {selectedAlumni.employmentStatus}
@@ -269,38 +290,84 @@ function Alumni() {
                   <p className="text-s mb-2 font-bold">
                     {selectedAlumni.placeOfEmployment}
                   </p>
-                </div>
-                <div className="order-4 sm:order-4">
+                </>
+              )}
+              {activeTab === "contact" && (
+                <>
+                  <p className="text-xs mb-1/2">LinkedIn</p>
+                  <p className="text-s mb-2 font-bold">
+                    {selectedAlumni.contactInformation?.linkedin}
+                  </p>
+                  <p className="text-xs mb-1/2">Facebook</p>
+                  <p className="text-s mb-2 font-bold">
+                    {selectedAlumni.contactInformation?.facebook}
+                  </p>
+                  <p className="text-xs mb-1/2">Instagram</p>
+                  <p className="text-s mb-2 font-bold">
+                    {selectedAlumni.contactInformation?.instagram}
+                  </p>
+                  <p className="text-xs mb-1/2">Email</p>
+                  <p className="text-s mb-2 font-bold">
+                    {selectedAlumni.contactInformation?.email}
+                  </p>
+                  <p className="text-xs mb-1/2">Mobile Number</p>
+                  <p className="text-s mb-2 font-bold">
+                    {selectedAlumni.contactInformation?.mobileNumber}
+                  </p>
+                </>
+              )}
+              {activeTab === "attachments" && (
+                <>
                   <h1 className="text-xl mb-4 mt-6">Attachments</h1>
-                </div>
-              </div>
-              <div className="block md:flex-row md:flex justify-between"></div>
-
-              <h1 className="text-xl mb-4 mt-6">Educational Background</h1>
-              <p className="text-xs mb-1">Secondary Education</p>
-              <p className="text-s font-bold">
-                {selectedAlumni.secondaryeducation}
-              </p>
-              <p className="text-xs mb-2">
-                {selectedAlumni.secondaryeducationyear}
-              </p>
-              <p className="text-xs mb-1 mt-3">Tertiary Education</p>
-              <p className="text-s font-bold">
-                {selectedAlumni.tertiaryeducation}
-              </p>
-              <p className="text-xs mb-1 italic">
-                {selectedAlumni.tertiaryeducationdegree}
-              </p>
-              <p className="text-xs mb-2">
-                {selectedAlumni.tertiaryeducationyear}
-              </p>
-
-              <h1 className="text-xl mb-4 mt-6">Career Background</h1>
-              <p className="text-s font-bold">{selectedAlumni.career}</p>
-              <p className="text-xs mb-1 italic">
-                {selectedAlumni.careerposition}
-              </p>
-              <p className="text-xs mb-2">{selectedAlumni.careeryear}</p>
+                  {selectedAlumni.attachments &&
+                  selectedAlumni.attachments.length > 0 ? (
+                    selectedAlumni.attachments.map((attachment, index) => (
+                      <div key={index} className="mb-2">
+                        <a
+                          href={attachment.url}
+                          className="text-blue-600 underline"
+                        >
+                          {attachment.name}
+                        </a>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No attachments available.</p>
+                  )}
+                </>
+              )}
+              {activeTab === "education" && (
+                <>
+                  <h1 className="text-xl mb-4 mt-6">Educational Background</h1>
+                  <p className="text-xs mb-1">Secondary Education</p>
+                  <p className="text-s font-bold">
+                    {selectedAlumni.secondaryeducation}
+                  </p>
+                  <p className="text-xs mb-2">
+                    {selectedAlumni.secondaryeducationyear}
+                  </p>
+                  <p className="text-xs mb-1 mt-3">Tertiary Education</p>
+                  <p className="text-s font-bold">
+                    {selectedAlumni.tertiaryeducation}
+                  </p>
+                  <p className="text-xs mb-1 italic">
+                    {selectedAlumni.tertiaryeducationdegree}
+                  </p>
+                  <p className="text-xs mb-2">
+                    {selectedAlumni.tertiaryeducationyear}
+                  </p>
+                </>
+              )}
+              {activeTab === "career" && (
+                <>
+                  <h1 className="text-xl mb-4 mt-6">Career Background</h1>
+                  <p className="text-s font-bold">{selectedAlumni.career}</p>
+                  <p className="text-xs mb-1 italic">
+                    {selectedAlumni.careerposition}
+                  </p>
+                  <p className="text-xs mb-2">{selectedAlumni.careeryear}</p>
+                </>
+              )}
             </div>
           </div>
         </div>

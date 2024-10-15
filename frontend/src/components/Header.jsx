@@ -1,5 +1,4 @@
 import React from "react";
-import ustlogo from "../assets/ustlogo.png";
 import cicslogo from "../assets/cicslogo.png";
 import alumniconnectlogo from "../assets/alumniconnectlogo.png";
 

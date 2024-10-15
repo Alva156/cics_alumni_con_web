@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import homepage1 from "../../assets/homepage1.jpg";
-import homepage2 from "../../assets/homepage2.png";
+import homepage2 from "../../assets/homepage2.jpg";
 
 function AdminHomepage() {
   const images = [

@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 import ustbg from "../../assets/ustbg.mp4";
 import "../../App.css";
 import homepage1 from "../../assets/homepage1.jpg";
-import homepage2 from "../../assets/homepage2.png";
+import homepage2 from "../../assets/homepage2.jpg";
 
 const Homepage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [fade, setFade] = useState(false);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
-  const images = [homepage1, homepage2, homepage1]; // Placeholder images
+  const images = [homepage1, homepage2, homepage2]; // Placeholder images
   const videoRef = useRef(null);
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -167,23 +167,24 @@ const Homepage = () => {
         <button className="carousel-button next" onClick={nextPage}>❯</button>
       </div>
   
-      <div className="mission-vision-section">
-        <div className="mission-vision-content">
-          <h2 className="mission-title">Our Mission</h2>
-          <p className="mission-text">
-            To cultivate a community that fosters growth, innovation, and collaboration among alumni and students, inspiring them to achieve their fullest potential and contribute positively to society.
-          </p>
-          <h2 className="vision-title">Our Vision</h2>
-          <p className="vision-text">
-            To be a leading alumni network that empowers individuals to connect, share knowledge, and create impactful solutions for a better future.
-          </p>
-        </div>
-        <div className="image-carousel-container">
-          <button className="carousel-button prev" onClick={prevImage}>❮</button>
-          <img src={images[currentImage]} alt="Placeholder" className="carousel-image" />
-          <button className="carousel-button next" onClick={nextImage}>❯</button>
-        </div>
-      </div>
+      <div className="mission-vision-section fixed-height">
+  <div className="mission-vision-content">
+    <h2 className="mission-title">Our Mission</h2>
+    <p className="mission-text">
+      To cultivate a community that fosters growth, innovation, and collaboration among alumni and students, inspiring them to achieve their fullest potential and contribute positively to society.
+    </p>
+    <h2 className="vision-title">Our Vision</h2>
+    <p className="vision-text">
+      To be a leading alumni network that empowers individuals to connect, share knowledge, and create impactful solutions for a better future.
+    </p>
+  </div>
+  <div className="image-carousel-container fixed-height">
+    <button className="carousel-button prev" onClick={prevImage}>❮</button>
+    <img src={images[currentImage]} alt="Placeholder" className="carousel-image" />
+    <button className="carousel-button next" onClick={nextImage}>❯</button>
+  </div>
+</div>
+
     </div>
   );
 };

@@ -4,13 +4,14 @@ import ustbg from "../../assets/ustbg.mp4";
 import "../../App.css";
 import homepage1 from "../../assets/homepage1.jpg";
 import homepage2 from "../../assets/homepage2.jpg";
+import homepage3 from "../../assets/homepage3.jpg";
 
 const Homepage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [fade, setFade] = useState(false);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
-  const images = [homepage1, homepage2, homepage2]; // Placeholder images
+  const images = [homepage1, homepage2, homepage3]; // Placeholder images
   const videoRef = useRef(null);
   const navigate = useNavigate(); // Initialize useNavigate
 

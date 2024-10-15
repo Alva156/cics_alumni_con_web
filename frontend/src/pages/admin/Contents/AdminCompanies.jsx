@@ -16,6 +16,13 @@ function AdminCompanies() {
   const [showSuccessMessage, setSuccessMessage] = useState(false);
   const [showErrorMessage, setErrorMessage] = useState(false);
   const [showMessage, setshowMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
+    </div>
+  );
 
   // Fetch all companies from the server
   const fetchCompanies = async () => {
@@ -110,6 +117,7 @@ function AdminCompanies() {
     if (image) {
       companyData.append("image", image);
     }
+    setLoading(true); // Start loading
 
     try {
       const response = await axios.put(
@@ -142,6 +150,8 @@ function AdminCompanies() {
         setErrorMessage(true);
         setTimeout(() => setErrorMessage(false), 3000);
       }
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
   const handleCreateCompany = async () => {
@@ -175,6 +185,7 @@ function AdminCompanies() {
       setTimeout(() => setErrorMessage(false), 3000);
       return;
     }
+    setLoading(true); // Start loading
 
     try {
       const response = await axios.post(
@@ -203,6 +214,8 @@ function AdminCompanies() {
         setErrorMessage(true);
         setTimeout(() => setErrorMessage(false), 3000);
       }
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -223,11 +236,10 @@ function AdminCompanies() {
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       {showSuccessMessage && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-100">
           <p>{showMessage}</p>
         </div>
       )}
-
       <div className="mb-4 relative">
         <input
           type="text"
@@ -243,7 +255,6 @@ function AdminCompanies() {
           X
         </span>
       </div>
-
       <div className="mb-6">
         <span className="text-sm">Sort by:</span>
         <select
@@ -255,7 +266,6 @@ function AdminCompanies() {
           <option>Name (Z-A)</option>
         </select>
       </div>
-
       <div className="flex justify-between items-center mb-4">
         <div className="text-lg">My Listed Companies</div>
         <button
@@ -265,9 +275,7 @@ function AdminCompanies() {
           +
         </button>
       </div>
-
       <hr className="mb-6 border-black" />
-
       {filteredCompanies.map((company) => (
         <div
           key={company._id}
@@ -305,7 +313,6 @@ function AdminCompanies() {
           </div>
         </div>
       ))}
-
       {/* View Modal */}
       {isViewModalOpen && selectedCompany && (
         <div
@@ -342,7 +349,6 @@ function AdminCompanies() {
           </div>
         </div>
       )}
-
       {/* Edit Modal */}
       {isEditModalOpen && selectedCompany && (
         <div
@@ -358,6 +364,7 @@ function AdminCompanies() {
                 <p>{showMessage}</p>
               </div>
             )}
+            {loading && <LoadingSpinner />} {/* Show loading spinner */}
             <button
               className="absolute top-4 right-4 text-black text-2xl"
               onClick={closeModal}
@@ -394,7 +401,6 @@ function AdminCompanies() {
                 }
               />
             </div>
-
             <div className="mb-4">
               <label className="block text-sm mb-1">Company Image</label>
               <input
@@ -404,7 +410,6 @@ function AdminCompanies() {
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
               />
             </div>
-
             <div className="mb-4">
               <label className="block text-sm mb-1">Description</label>
               <textarea
@@ -449,7 +454,6 @@ function AdminCompanies() {
           </div>
         </div>
       )}
-
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
@@ -475,7 +479,6 @@ function AdminCompanies() {
           </div>
         </div>
       )}
-
       {/* Add Modal */}
       {isAddModalOpen && (
         <div
@@ -491,6 +494,7 @@ function AdminCompanies() {
                 <p>{showMessage}</p>
               </div>
             )}
+            {loading && <LoadingSpinner />} {/* Show loading spinner */}
             <button
               className="absolute top-4 right-4 text-black text-2xl"
               onClick={closeModal}

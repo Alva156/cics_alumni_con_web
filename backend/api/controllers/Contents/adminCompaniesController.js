@@ -1,8 +1,11 @@
 const Company = require("../../models/Contents/companyModel");
+const User = require("../../models/userModel");
 const jwt = require("jsonwebtoken"); // Add this line
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 // Set storage engine
 const storage = multer.diskStorage({
   destination: "./uploads/contents/companies", // Save images in the 'uploads' directory
@@ -67,6 +70,17 @@ exports.createCompany = async (req, res) => {
 
       await company.save();
 
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "🌟 New Company Alert: A New IT Company You Should Know About!",
+        `A new company, "${name}", has just been added. Stay updated with the latest in the IT world and explore what this new company has to offer. It could be a great opportunity for new insights or connections!`
+      );
+
       res.status(201).json(company);
     } catch (error) {
       res.status(500).json({ msg: "Server Error", error: error.message });
@@ -107,7 +121,7 @@ exports.updateCompany = async (req, res) => {
       if (err.code === "LIMIT_FILE_SIZE") {
         return res.status(400).json({ msg: "Image must be a maximum of 5MB" });
       }
-      return res.status(400).json({ msg: err.message }); // Catch other errors like unsupported file types
+      return res.status(400).json({ msg: err.message });
     }
 
     try {
@@ -150,6 +164,16 @@ exports.updateCompany = async (req, res) => {
       company.contact = contact || company.contact;
 
       await company.save();
+
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "🔔 Quick Heads Up: A Company Update Just Came In!",
+        `Heads up! The company "${name}" has recently updated its details. Stay informed on their latest developments and explore what's new—they might have something valuable to offer!`
+      );
 
       res.status(200).json(company);
     } catch (error) {
@@ -202,5 +226,30 @@ exports.deleteCompany = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting company", error: error.message });
+  }
+};
+
+// Function to send email notifications
+const sendEmailNotification = async (emailAddresses, subject, message) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      bcc: emailAddresses, // Use 'bcc' to hide recipients
+      subject: subject,
+      text: message,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent to:", emailAddresses);
+  } catch (error) {
+    console.error("Error sending email:", error.message);
   }
 };

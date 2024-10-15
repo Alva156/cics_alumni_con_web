@@ -16,6 +16,13 @@ function AdminCertifications() {
   const [showSuccessMessage, setSuccessMessage] = useState(false);
   const [showErrorMessage, setErrorMessage] = useState(false);
   const [showMessage, setshowMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
+    </div>
+  );
 
   // Fetch all certifications from the server
   const fetchCertifications = async () => {
@@ -113,6 +120,7 @@ function AdminCertifications() {
     if (image) {
       certificationsData.append("image", image);
     }
+    setLoading(true); // Start loading
 
     try {
       const response = await axios.put(
@@ -147,6 +155,8 @@ function AdminCertifications() {
         setErrorMessage(true);
         setTimeout(() => setErrorMessage(false), 3000);
       }
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -185,6 +195,7 @@ function AdminCertifications() {
       setTimeout(() => setErrorMessage(false), 3000);
       return;
     }
+    setLoading(true); // Start loading
 
     try {
       const response = await axios.post(
@@ -212,6 +223,8 @@ function AdminCertifications() {
         setErrorMessage(true);
         setTimeout(() => setErrorMessage(false), 3000);
       }
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -373,6 +386,7 @@ function AdminCertifications() {
                 <p>{showMessage}</p>
               </div>
             )}
+            {loading && <LoadingSpinner />} {/* Show loading spinner */}
             <button
               className="absolute top-4 right-4 text-black text-2xl"
               onClick={closeModal}
@@ -409,7 +423,6 @@ function AdminCertifications() {
                 }
               />
             </div>
-
             <div className="mb-4">
               <label className="block text-sm mb-1">Certifications Image</label>
               <input
@@ -419,7 +432,6 @@ function AdminCertifications() {
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
               />
             </div>
-
             <div className="mb-4">
               <label className="block text-sm mb-1">Description</label>
               <textarea
@@ -506,6 +518,7 @@ function AdminCertifications() {
                 <p>{showMessage}</p>
               </div>
             )}
+            {loading && <LoadingSpinner />} {/* Show loading spinner */}
             <button
               className="absolute top-4 right-4 text-black text-2xl"
               onClick={closeModal}

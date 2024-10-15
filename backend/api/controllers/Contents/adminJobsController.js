@@ -1,8 +1,11 @@
 const Jobs = require("../../models/Contents/jobsModel");
+const User = require("../../models/userModel");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 // Set storage engine for job images
 const storage = multer.diskStorage({
@@ -66,6 +69,16 @@ exports.createJobs = async (req, res) => {
         contact,
       });
       await jobs.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "🏆 New Job Opportunity Alert! ",
+        `A new job opportunity titled "${name}" is now available. Check it out and see what this position has to offer—it could be a fantastic chance for new insights and career growth!`
+      );
 
       res.status(201).json(jobs);
     } catch (error) {
@@ -153,6 +166,17 @@ exports.updateJobs = async (req, res) => {
       jobs.contact = contact || jobs.contact;
 
       await jobs.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "🔔 Quick Heads Up: Job Opportunity Details Updated! ",
+        `Heads up! The details for the job opportunity titled "${name}" have recently been updated. Be sure to check out the latest information—they might have something valuable to offer!`
+      );
+
       res.status(200).json(jobs);
     } catch (error) {
       res.status(500).json({ msg: "Server Error", error: error.message });
@@ -205,5 +229,29 @@ exports.deleteJobs = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting jobs", error: error.message });
+  }
+};
+// Function to send email notifications
+const sendEmailNotification = async (emailAddresses, subject, message) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      bcc: emailAddresses, // Use 'bcc' to hide recipients
+      subject: subject,
+      text: message,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent to:", emailAddresses);
+  } catch (error) {
+    console.error("Error sending email:", error.message);
   }
 };

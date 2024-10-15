@@ -1,8 +1,11 @@
 const Documents = require("../../models/Contents/documentsModel");
+const User = require("../../models/userModel");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 // Set storage engine for file uploads
 const storage = multer.diskStorage({
@@ -68,6 +71,16 @@ exports.createDocuments = async (req, res) => {
         contact,
       });
       await documents.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "📝 New Steps Alert: How to Attain the Document!",
+        `There are new steps for attaining the document titled "${name}". Review these steps to access this important resource more easily!`
+      );
 
       res.status(201).json(documents);
     } catch (error) {
@@ -158,6 +171,16 @@ exports.updateDocuments = async (req, res) => {
       documents.contact = contact || documents.contact;
 
       await documents.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "⚙️ Quick Heads Up: Updates on Document Retrieval Steps!",
+        `Heads up! There are updates on the steps for retrieving the document titled "${name}". Review these changes to ensure a smooth process—they might provide valuable guidance!`
+      );
 
       res.status(200).json(documents);
     } catch (error) {
@@ -215,5 +238,29 @@ exports.deleteDocuments = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting documents", error: error.message });
+  }
+};
+// Function to send email notifications
+const sendEmailNotification = async (emailAddresses, subject, message) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      bcc: emailAddresses, // Use 'bcc' to hide recipients
+      subject: subject,
+      text: message,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent to:", emailAddresses);
+  } catch (error) {
+    console.error("Error sending email:", error.message);
   }
 };

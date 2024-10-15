@@ -1,9 +1,11 @@
 const News = require("../../models/Contents/newsModel");
+const User = require("../../models/userModel");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 // Set storage engine for news images
 const storage = multer.diskStorage({
   destination: "./uploads/contents/news", // Save images in the 'uploads' directory
@@ -67,6 +69,16 @@ exports.createNews = async (req, res) => {
       });
 
       await news.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "📰 New News Alert from CICS Alumni Connect!",
+        `Hello everyone! 👋\n\nWe’re thrilled to bring you some exciting news from CICS Alumni Connect! Our admin team has just shared some fresh and important news that you won’t want to miss.\n\nStay in the loop and discover what’s happening in our community—there could be valuable insights and opportunities for you!\n\nBe sure to check out the latest news now and see what’s new! 🔗\n\nBest wishes,\nThe CICS Alumni Connect Team`
+      );
 
       res.status(201).json(news);
     } catch (error) {
@@ -151,6 +163,17 @@ exports.updateNews = async (req, res) => {
       news.contact = contact || news.contact;
 
       await news.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "🔔 Quick Heads Up: Recent News Update!",
+        `Hello everyone! 👋\n\nWe wanted to let you know that some existing news about "${name}" has just been updated! 🎉 Our team has refreshed the details, and you won’t want to miss the latest insights.\n\nStay informed about what’s new—there could be valuable information and opportunities for you! 🌟\n\nCheck out the updated news now and see what’s changed! 🔗\n\nBest regards,\nThe CICS Alumni Connect Team`
+      );
+
       res.status(200).json(news);
     } catch (error) {
       res.status(500).json({ msg: "Server Error", error: error.message });
@@ -201,5 +224,29 @@ exports.deleteNews = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting news", error: error.message });
+  }
+};
+// Function to send email notifications
+const sendEmailNotification = async (emailAddresses, subject, message) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      bcc: emailAddresses, // Use 'bcc' to hide recipients
+      subject: subject,
+      text: message,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent to:", emailAddresses);
+  } catch (error) {
+    console.error("Error sending email:", error.message);
   }
 };

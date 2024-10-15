@@ -1,8 +1,11 @@
 const Certifications = require("../../models/Contents/certificationsModel");
+const User = require("../../models/userModel");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 // Set storage engine for images
 const storage = multer.diskStorage({
@@ -66,6 +69,16 @@ exports.createCertifications = async (req, res) => {
         contact,
       });
       await certifications.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "🎓 Exciting Announcement: New Certification Opportunity for CICS Alumni!",
+        `A new certification titled "${name}" has just been introduced that CICS alumni can take advantage of. This could be a valuable addition to your resume and a great opportunity to enhance your job prospects!`
+      );
 
       res.status(201).json(certifications);
     } catch (error) {
@@ -154,6 +167,18 @@ exports.updateCertifications = async (req, res) => {
       certifications.contact = contact || certifications.contact;
 
       await certifications.save();
+
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "🔔 Quick Heads Up: Certification Details Have Been Updated!",
+        `Heads up! The certification titled "${name}" has recently updated its details. Check out the latest information and see what’s new—it might offer valuable benefits for your career!`
+      );
+
       res.status(200).json(certifications);
     } catch (error) {
       res.status(500).json({ msg: "Server Error", error: error.message });
@@ -212,5 +237,29 @@ exports.deleteCertifications = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting certifications", error: error.message });
+  }
+};
+// Function to send email notifications
+const sendEmailNotification = async (emailAddresses, subject, message) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      bcc: emailAddresses, // Use 'bcc' to hide recipients
+      subject: subject,
+      text: message,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent to:", emailAddresses);
+  } catch (error) {
+    console.error("Error sending email:", error.message);
   }
 };

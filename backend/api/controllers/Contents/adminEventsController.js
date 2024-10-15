@@ -1,8 +1,11 @@
 const Events = require("../../models/Contents/eventsModel");
+const User = require("../../models/userModel");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 // Set storage engine for images
 const storage = multer.diskStorage({
@@ -67,6 +70,18 @@ exports.createEvents = async (req, res) => {
       });
 
       await events.save();
+
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "📅 Attention: A New Event Has Been Posted!",
+        `A new event titled "${name}" has just been announced. Check out the details and discover what this event has to offer. It could be a great opportunity for fresh insights and valuable connections!`
+      );
+
       res.status(201).json(events);
     } catch (error) {
       res.status(500).json({ msg: "Server Error", error: error.message });
@@ -151,6 +166,17 @@ exports.updateEvents = async (req, res) => {
       events.contact = contact || events.contact;
 
       await events.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "🔔 Quick Heads Up: Event Details Have Been Updated!",
+        `Heads up! The details for the event titled "${name}" have recently been updated. Check out the latest information and see what’s new—they might have something valuable to offer!`
+      );
+
       res.status(200).json(events);
     } catch (error) {
       res.status(500).json({ msg: "Server Error", error: error.message });
@@ -207,5 +233,29 @@ exports.deleteEvents = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting event", error: error.message });
+  }
+};
+// Function to send email notifications
+const sendEmailNotification = async (emailAddresses, subject, message) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      bcc: emailAddresses, // Use 'bcc' to hide recipients
+      subject: subject,
+      text: message,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent to:", emailAddresses);
+  } catch (error) {
+    console.error("Error sending email:", error.message);
   }
 };

@@ -1,12 +1,17 @@
 import React from "react";
 import ustlogo from "../assets/ustlogo.png";
 import cicslogo from "../assets/cicslogo.png";
+import alumniconnectlogo from "../assets/alumniconnectlogo.png";
 
 const Header = () => {
   return (
     <header className="bg-hgray w-full mx-auto md:px-12 py-3 flex items-center justify-between px-2">
       <div className="flex items-center">
-        <img src={ustlogo} alt="UST Logo" className="h-11  mr-6 ml-4 md:h-16" />
+        <img
+          src={cicslogo}
+          alt="CICS Logo"
+          className="h-11  mr-6 ml-4 md:h-16"
+        />
         <div className="col">
           <p className="text-black font-light italic text-end text-xxs mt-1 md:text-xs  ">
             University of Santo Tomas
@@ -22,7 +27,11 @@ const Header = () => {
           Alumni Connect
         </p>
       </div>
-      <img src={cicslogo} alt="CICS Logo" className="h-11 ml-5 mr-4 md:h-16" />
+      <img
+        src={alumniconnectlogo}
+        alt="Alumni Connect Logo"
+        className="h-11 ml-5 mr-4 md:h-16"
+      />
     </header>
   );
 };

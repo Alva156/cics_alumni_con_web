@@ -157,31 +157,37 @@ function Register() {
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "28px" }}
             />
-            <label className="block mb-1 text-xs font-medium">
-              First Name *
-            </label>
-            <input
-              type="text"
-              name="firstName"
-              placeholder="Enter your First Name"
-              value={formData.firstName}
-              onChange={handleChange}
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "28px" }}
-            />
 
-            <label className="block mb-1 text-xs font-medium">
-              Last Name *
-            </label>
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Enter your Last Name"
-              value={formData.lastName}
-              onChange={handleChange}
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "28px" }}
-            />
+            <div className="flex mb-2">
+              <div className="w-1/2 pr-1">
+                <label className="block mb-1 text-xs font-medium">
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="Enter your First Name"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="p-2 border border-black bg-[#D9D9D9] w-full"
+                  style={{ height: "28px" }}
+                />
+              </div>
+              <div className="w-1/2 pl-1">
+                <label className="block mb-1 text-xs font-medium">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Enter your Last Name"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="p-2 border border-black bg-[#D9D9D9] w-full"
+                  style={{ height: "28px" }}
+                />
+              </div>
+            </div>
 
             <label className="block mb-1 text-xs font-medium">Birthday *</label>
             <input
@@ -300,7 +306,7 @@ function Register() {
         </div>
 
         {/* Right Image */}
-        <div className="relative w-full md:w-1/2 bg-gray-200 flex items-center justify-center">
+        <div className="relative w-full md:w-1/2 h-full flex-shrink-0 hidden md:block">
           <img
             src={signupImage}
             alt="Sign Up"

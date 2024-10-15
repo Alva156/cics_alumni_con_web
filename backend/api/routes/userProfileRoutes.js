@@ -28,5 +28,9 @@ router.post(
 
 router.delete("/company-section/:profileId/:sectionId", authenticateJWT, userProfileController.deleteCompanySection);
 
+router.delete("/secondary-section/:profileId/:sectionId", authenticateJWT, userProfileController.deleteSecondarySection);
+
+router.delete("/tertiary-section/:profileId/:sectionId", authenticateJWT, userProfileController.deleteTertiarySection);
+
 
 module.exports = router;

@@ -41,6 +41,7 @@ function UserProfile() {
   const [modalVisible, setModalVisible] = useState(false);
   const [initialAccountEmail, setInitialAccountEmail] = useState("");
   const [profileId, setProfileId] = useState(null);
+  
 
   const [secondaryEducationSections, setSecondaryEducationSections] = useState([
     { schoolName: "", yearStarted: "", yearEnded: "" },
@@ -164,6 +165,8 @@ function UserProfile() {
         yearEnded: "",
       },
     ]);
+
+    
   };
 
   const handleImageChange = async (e) => {
@@ -262,64 +265,131 @@ function UserProfile() {
   };
 
   // Handle changes for secondary education, tertiary education, and company sections
-  const handleSecondaryEducationChange = (index, e) => {
-    const newSections = [...secondaryEducationSections];
-    newSections[index][e.target.name] = e.target.value;
-    setSecondaryEducationSections(newSections);
+  const handleSecondaryEducationChange = (sectionId, e) => {
+    const { name, value } = e.target;
+  
+    setSecondaryEducationSections((prevSections) =>
+      prevSections.map((section) =>
+        section._id === sectionId
+          ? { ...section, [name]: value }
+          : section
+      )
+    );
   };
 
-  const handleTertiaryEducationChange = (index, e) => {
-    const newSections = [...tertiaryEducationSections];
-    newSections[index][e.target.name] = e.target.value;
-    setTertiaryEducationSections(newSections);
+  const handleTertiaryEducationChange = (sectionId, e) => {
+    const { name, value } = e.target;
+  
+    setTertiaryEducationSections((prevSections) =>
+      prevSections.map((section) =>
+        section._id === sectionId
+          ? { ...section, [name]: value }
+          : section
+      )
+    );
   };
 
-  const handleCompanyChange = (index, e) => {
-    const newSections = [...companySections];
-    newSections[index][e.target.name] = e.target.value;
-    setCompanySections(newSections);
+  const handleCompanyChange = (sectionId, e) => {
+    const { name, value } = e.target;
+  
+    setCompanySections((prevSections) =>
+      prevSections.map((section) =>
+        section._id === sectionId
+          ? { ...section, [name]: value }
+          : section
+      )
+    );
   };
+  
 
   // Updated handleDeleteCompanySection with logging
   const handleDeleteCompanySection = async (sectionId) => {
     console.log("Delete button clicked");
     console.log("Section ID in function:", sectionId);
-    
+  
     if (!profileId || !sectionId) {
       console.log("Profile ID or Section ID is missing.");
       return;
     }
   
-    console.log("Deleting company section with Profile ID:", profileId);
-    console.log("Attempting to delete section with ID:", sectionId);
-  
     try {
-      const response = await axios.delete(
+      // Step 1: Call the DELETE endpoint to remove the section from the database
+      const deleteResponse = await axios.delete(
         `${backendUrl}/profile/company-section/${profileId}/${sectionId}`,
         { withCredentials: true }
       );
   
-      console.log("Delete response:", response);
-      
-      if (response.status === 200) {
-        
-        // Update state to remove the deleted section
+      console.log("Delete response:", deleteResponse);
+  
+      if (deleteResponse.status === 200) {
+        // Step 2: If successful, remove the section from the frontend state
         setCompanySections((prevSections) => {
-          const updatedSections = prevSections.filter((section) => section._id !== sectionId); // Ensure correct ID comparison
-          // Check if the updated sections array is empty
-          if (updatedSections.length === 0) {
-            // If empty, handle the empty state if needed, e.g., reset form or show a message
-            alert("No company sections remaining.");
-          }
+          const updatedSections = prevSections.filter((section) => section._id !== sectionId);
+          console.log("Updated sections after deletion:", updatedSections);
           return updatedSections;
         });
   
-        alert("Company section deleted successfully!");
+        // Step 3: Update the profile with the remaining sections (after deletion)
+        const updatedUserData = {
+          firstName,
+          lastName,
+          birthday,
+          profession,
+          accountEmail,
+          collegeProgram,
+          specialization,
+          yearStartedCollege,
+          yearGraduatedCollege,
+          timeToJob,
+          employmentStatus,
+          workIndustry,
+          professionAlignment,
+          maritalStatus,
+          salaryRange,
+          placeOfEmployment,
+          profileImage,
+          attachments: attachments.map((attachment) => ({
+            fileName: attachment.fileName,
+            file: attachment.file,
+          })),
+          secondaryEducation: secondaryEducationSections.filter(
+            (section) => section._id !== sectionId
+          ),
+          tertiaryEducation: tertiaryEducationSections.filter(
+            (section) => section._id !== sectionId
+          ),
+          careerBackground: companySections.filter(
+            (section) => section._id !== sectionId // Ensure this section is removed from the user data
+          ),
+          contactInformation: {
+            linkedIn,
+            facebook,
+            instagram,
+            email,
+            mobileNumber,
+            other: otherContact,
+          },
+        };
+  
+        // Step 4: Call the PUT endpoint to update the profile with the new data
+        const updateResponse = await axios.put(
+          `${backendUrl}/profile/updateprofile`,
+          updatedUserData,
+          { withCredentials: true }
+        );
+  
+        console.log("Profile updated after section deletion:", updateResponse);
+  
+        if (updateResponse.status === 200) {
+          alert("Company section deleted and profile updated successfully!");
+        } else {
+          alert("Failed to update profile. Please try again.");
+        }
       } else {
         alert("Failed to delete company section. Please try again.");
       }
     } catch (error) {
-      console.error("Error deleting company section:", error);
+      console.error("Error deleting company section or updating profile:", error);
       if (error.response) {
         console.log("Response status:", error.response.status);
         console.log("Response data:", error.response.data);
@@ -328,9 +398,203 @@ function UserProfile() {
         alert("Failed to delete company section. Please check your network connection.");
       }
     }
-};
+  };
 
+  const handleDeleteSecondarySection = async (sectionId) => {
+    console.log("Delete button clicked");
+    console.log("Section ID in function:", sectionId);
+  
+    if (!profileId || !sectionId) {
+      console.log("Profile ID or Section ID is missing.");
+      return;
+    }
+  
+    try {
+      // Step 1: Call the DELETE endpoint to remove the section from the database
+      const deleteResponse = await axios.delete(
+        `${backendUrl}/profile/secondary-section/${profileId}/${sectionId}`,
+        { withCredentials: true }
+      );
+  
+      console.log("Delete response:", deleteResponse);
+  
+      if (deleteResponse.status === 200) {
+        // Step 2: If successful, remove the section from the frontend state
+        setSecondaryEducationSections((prevSections) => {
+          const updatedSections = prevSections.filter((section) => section._id !== sectionId);
+          console.log("Updated sections after deletion:", updatedSections);
+          return updatedSections;
+        });
+  
+        // Step 3: Update the profile with the remaining sections (after deletion)
+        const updatedUserData = {
+          firstName,
+          lastName,
+          birthday,
+          profession,
+          accountEmail,
+          collegeProgram,
+          specialization,
+          yearStartedCollege,
+          yearGraduatedCollege,
+          timeToJob,
+          employmentStatus,
+          workIndustry,
+          professionAlignment,
+          maritalStatus,
+          salaryRange,
+          placeOfEmployment,
+          profileImage,
+          attachments: attachments.map((attachment) => ({
+            fileName: attachment.fileName,
+            file: attachment.file,
+          })),
+          secondaryEducation: secondaryEducationSections.filter(
+            (section) => section._id !== sectionId
+          ),
+          tertiaryEducation: tertiaryEducationSections.filter(
+            (section) => section._id !== sectionId
+          ),
+          careerBackground: companySections.filter(
+            (section) => section._id !== sectionId
+          ),
+          contactInformation: {
+            linkedIn,
+            facebook,
+            instagram,
+            email,
+            mobileNumber,
+            other: otherContact,
+          },
+        };
+  
+        // Step 4: Call the PUT endpoint to update the profile with the new data
+        const updateResponse = await axios.put(
+          `${backendUrl}/profile/updateprofile`,
+          updatedUserData,
+          { withCredentials: true }
+        );
+  
+        console.log("Profile updated after section deletion:", updateResponse);
+  
+        if (updateResponse.status === 200) {
+          alert("Company section deleted and profile updated successfully!");
+        } else {
+          alert("Failed to update profile. Please try again.");
+        }
+      } else {
+        alert("Failed to delete company section. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error deleting company section or updating profile:", error);
+      if (error.response) {
+        console.log("Response status:", error.response.status);
+        console.log("Response data:", error.response.data);
+        alert(`Failed to delete company section. Reason: ${error.response.data.message || "Please try again."}`);
+      } else {
+        alert("Failed to delete company section. Please check your network connection.");
+      }
+    }
+  };
 
+  const handleDeleteTertiarySection = async (sectionId) => {
+    console.log("Delete button clicked");
+    console.log("Section ID in function:", sectionId);
+  
+    if (!profileId || !sectionId) {
+      console.log("Profile ID or Section ID is missing.");
+      return;
+    }
+  
+    try {
+      // Step 1: Call the DELETE endpoint to remove the section from the database
+      const deleteResponse = await axios.delete(
+        `${backendUrl}/profile/secondary-section/${profileId}/${sectionId}`,
+        { withCredentials: true }
+      );
+  
+      console.log("Delete response:", deleteResponse);
+  
+      if (deleteResponse.status === 200) {
+        // Step 2: If successful, remove the section from the frontend state
+        setTertiaryEducationSections((prevSections) => {
+          const updatedSections = prevSections.filter((section) => section._id !== sectionId);
+          console.log("Updated sections after deletion:", updatedSections);
+          return updatedSections;
+        });
+  
+        // Step 3: Update the profile with the remaining sections (after deletion)
+        const updatedUserData = {
+          firstName,
+          lastName,
+          birthday,
+          profession,
+          accountEmail,
+          collegeProgram,
+          specialization,
+          yearStartedCollege,
+          yearGraduatedCollege,
+          timeToJob,
+          employmentStatus,
+          workIndustry,
+          professionAlignment,
+          maritalStatus,
+          salaryRange,
+          placeOfEmployment,
+          profileImage,
+          attachments: attachments.map((attachment) => ({
+            fileName: attachment.fileName,
+            file: attachment.file,
+          })),
+          secondaryEducation: secondaryEducationSections.filter(
+            (section) => section._id !== sectionId
+          ),
+          tertiaryEducation: tertiaryEducationSections.filter(
+            (section) => section._id !== sectionId // Ensure this section is removed from the user data
+          ),
+          careerBackground: companySections.filter(
+            (section) => section._id !== sectionId
+          ),
+          contactInformation: {
+            linkedIn,
+            facebook,
+            instagram,
+            email,
+            mobileNumber,
+            other: otherContact,
+          },
+        };
+  
+        // Step 4: Call the PUT endpoint to update the profile with the new data
+        const updateResponse = await axios.put(
+          `${backendUrl}/profile/updateprofile`,
+          updatedUserData,
+          { withCredentials: true }
+        );
+  
+        console.log("Profile updated after section deletion:", updateResponse);
+  
+        if (updateResponse.status === 200) {
+          alert("Tertiary education section deleted and profile updated successfully!");
+        } else {
+          alert("Failed to update profile. Please try again.");
+        }
+      } else {
+        alert("Failed to delete Tertiary education section. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error deleting Tertiary education section or updating profile:", error);
+      if (error.response) {
+        console.log("Response status:", error.response.status);
+        console.log("Response data:", error.response.data);
+        alert(`Failed to delete Tertiary education section. Reason: ${error.response.data.message || "Please try again."}`);
+      } else {
+        alert("Failed to delete Tertiary education section. Please check your network connection.");
+      }
+    }
+  };
+  
+  
 
   const handleSave = (e) => {
     console.log("saved");
@@ -339,8 +603,8 @@ function UserProfile() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
+    if (e) e.preventDefault(); // Check if the event is present before calling preventDefault
+  
     // Validate required fields
     if (!firstName || !lastName) {
       setValidationMessage("First Name and Last Name are required.");
@@ -348,10 +612,10 @@ function UserProfile() {
       setTimeout(() => setShowValidationMessage(false), 3000);
       return; // Prevent submission
     }
-
+  
     // Reset error messages when inputs are valid
     setShowErrorMessage(false);
-
+  
     const userData = {
       firstName,
       lastName,
@@ -386,27 +650,27 @@ function UserProfile() {
         other: otherContact,
       },
     };
-
+  
     try {
       // Check if the profile exists
       await axios.get(`${backendUrl}/profile/userprofile`, {
         withCredentials: true,
       });
-
+  
       // Update the existing profile
       await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
         withCredentials: true,
       });
-
+  
       // Check if the email has changed
       if (accountEmail !== initialAccountEmail) {
         setShowValidationMessage(false);
-
+  
         // Set validation message for the modal
         setValidationMessage(
           "Email changed successfully! Please log in using your new email."
         );
-
+  
         // Show the modal only, without the background message
         setModalVisible(true); // Show modal
       } else {
@@ -417,7 +681,7 @@ function UserProfile() {
           setShowValidationMessage(false);
         }, 3000);
       }
-
+  
       console.log("Profile updated successfully!");
     } catch (error) {
       if (error.response && error.response.status === 404) {
@@ -438,13 +702,14 @@ function UserProfile() {
         setTimeout(() => setShowErrorMessage(false), 3000);
       }
     }
-
-    //validation message for successful save (if email has not changed)
+  
+    // Validation message for successful save (if email has not changed)
     if (accountEmail === initialAccountEmail) {
       setShowValidationMessage(true);
       setTimeout(() => setShowValidationMessage(false), 3000);
     }
   };
+  
   // Fetch user profile on mount
   useEffect(() => {
     const fetchProfile = async () => {
@@ -1157,9 +1422,9 @@ function UserProfile() {
                   </div>
                 </div>
 
-                {secondaryEducationSections.map((section, index) => (
+                {secondaryEducationSections.map((section) => (
                   <div
-                    key={index}
+                    key={section._id}
                     className="w-full border-2 rounded py-2 px-4 mt-2"
                   >
                     <div className="py-1">
@@ -1170,7 +1435,7 @@ function UserProfile() {
                         className="input input-sm input-bordered w-full h-10"
                         value={section.schoolName}
                         onChange={(e) =>
-                          handleSecondaryEducationChange(index, e)
+                          handleSecondaryEducationChange(section._id, e)
                         }
                         name="schoolName"
                       />
@@ -1183,7 +1448,7 @@ function UserProfile() {
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
                         onChange={(e) =>
-                          handleSecondaryEducationChange(index, e)
+                          handleSecondaryEducationChange(section._id, e)
                         }
                         name="yearStarted"
                       />
@@ -1196,12 +1461,29 @@ function UserProfile() {
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
                         onChange={(e) =>
-                          handleSecondaryEducationChange(index, e)
+                          handleSecondaryEducationChange(section._id, e)
                         }
                         name="yearEnded"
                       />
                     </div>
+
+                    {/* Delete Button */}
+    <div className="flex justify-end">
+      <button
+        className="btn btn-sm w-36 bg-red text-white mt-2"
+        onClick={() => {
+          console.log("Profile ID:", profileId);
+          console.log("Section ID:", section._id); // Use section._id here
+          handleDeleteSecondarySection(section._id); // Pass the correct section ID
+        }}
+      >
+        Delete
+      </button>
+    </div>
+                    
+
                   </div>
+                  
                 ))}
 
                 {/* TERTIARY EDUCATION */}
@@ -1217,9 +1499,9 @@ function UserProfile() {
                   </div>
                 </div>
 
-                {tertiaryEducationSections.map((section, index) => (
+                {tertiaryEducationSections.map((section) => (
                   <div
-                    key={index}
+                    key={section._id}
                     className="w-full border-2 rounded py-2 px-4 mt-2"
                   >
                     {/* School Name */}
@@ -1232,7 +1514,7 @@ function UserProfile() {
                         className="input input-sm input-bordered w-full h-10"
                         value={section.schoolName}
                         onChange={(e) =>
-                          handleTertiaryEducationChange(index, e)
+                          handleTertiaryEducationChange(section._id, e)
                         }
                       />
                     </div>
@@ -1247,7 +1529,7 @@ function UserProfile() {
                         className="input input-sm input-bordered w-full h-10"
                         value={section.program}
                         onChange={(e) =>
-                          handleTertiaryEducationChange(index, e)
+                          handleTertiaryEducationChange(section._id, e)
                         }
                       />
                     </div>
@@ -1261,7 +1543,7 @@ function UserProfile() {
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
                         onChange={(e) =>
-                          handleTertiaryEducationChange(index, e)
+                          handleTertiaryEducationChange(section._id, e)
                         }
                       />
                     </div>
@@ -1275,10 +1557,23 @@ function UserProfile() {
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
                         onChange={(e) =>
-                          handleTertiaryEducationChange(index, e)
+                          handleTertiaryEducationChange(section._id, e)
                         }
                       />
                     </div>
+                    {/* Delete Button */}
+    <div className="flex justify-end">
+      <button
+        className="btn btn-sm w-36 bg-red text-white mt-2"
+        onClick={() => {
+          console.log("Profile ID:", profileId);
+          console.log("Section ID:", section._id); // Use section._id here
+          handleDeleteTertiarySection(section._id); // Pass the correct section ID
+        }}
+      >
+        Delete
+      </button>
+    </div>
                   </div>
                 ))}
               </div>
@@ -1311,7 +1606,7 @@ function UserProfile() {
                   </div>
                 </div>
 
-                {companySections.map((section, index) => (
+                {companySections.map((section) => (
   <div
     key={section._id}
     className="w-full border-2 rounded py-2 px-4 mt-2"
@@ -1325,7 +1620,7 @@ function UserProfile() {
         placeholder="Type here"
         className="input input-sm input-bordered w-full h-10"
         value={section.companyName}
-        onChange={(e) => handleCompanyChange(index, e)}
+        onChange={(e) => handleCompanyChange(section._id, e)}
       />
     </div>
     {/* Position */}
@@ -1337,7 +1632,7 @@ function UserProfile() {
         placeholder="Type here"
         className="input input-sm input-bordered w-full h-10"
         value={section.position}
-        onChange={(e) => handleCompanyChange(index, e)}
+        onChange={(e) => handleCompanyChange(section._id, e)}
       />
     </div>
     {/* Year Started */}
@@ -1348,7 +1643,7 @@ function UserProfile() {
         name="yearStarted"
         className="input input-sm input-bordered w-full h-10"
         value={section.yearStarted}
-        onChange={(e) => handleCompanyChange(index, e)}
+        onChange={(e) => handleCompanyChange(section._id, e)}
       />
     </div>
     {/* Year Ended */}
@@ -1359,7 +1654,7 @@ function UserProfile() {
         name="yearEnded"
         className="input input-sm input-bordered w-full h-10"
         value={section.yearEnded}
-        onChange={(e) => handleCompanyChange(index, e)}
+        onChange={(e) => handleCompanyChange(section._id, e)}
       />
     </div>
     {/* Delete Button */}

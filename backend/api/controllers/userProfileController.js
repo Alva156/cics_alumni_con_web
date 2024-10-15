@@ -332,68 +332,169 @@ exports.changePassword = async (req, res) => {
 
 // Backend function to delete a specific company section
 exports.deleteCompanySection = async (req, res) => {
-    console.log("DeleteCompanySection function triggered");
-    console.log("Received parameters:", req.params);
+  console.log("DeleteCompanySection function triggered");
+  console.log("Received parameters:", req.params);
 
-    const sectionId = req.params.sectionId; 
-    const profileId = req.params.profileId;
+  const sectionId = req.params.sectionId;
+  const profileId = req.params.profileId;
 
-    // Token extraction and user identification
-    const token = req.cookies.token;
-    if (!token) {
-        console.log("Token is missing.");
-        return res.status(401).json({ message: "Unauthorized, token missing." });
+  // Token extraction and user identification
+  const token = req.cookies.token;
+  if (!token) {
+    console.log("Token is missing.");
+    return res.status(401).json({ message: "Unauthorized, token missing." });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(401).json({ message: "Unauthorized, invalid token." });
+  }
+
+  const userId = decoded.id; // Get userId from the decoded token
+
+  try {
+    // Check if the user profile exists
+    const userProfile = await UserProfile.findOne({ _id: profileId, userId });
+    if (!userProfile) {
+      console.log(`User profile not found for profile ID: ${profileId} and user ID: ${userId}`);
+      return res.status(404).json({ message: "User profile not found." });
     }
 
-    let decoded;
-    try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (error) {
-        console.error("Token verification failed:", error);
-        return res.status(401).json({ message: "Unauthorized, invalid token." });
+    // Use Mongoose's $pull operator to remove the company section directly by its _id
+    const result = await UserProfile.updateOne(
+      { _id: profileId, userId }, // Match the profile by profileId and userId
+      {
+        $pull: { careerBackground: { _id: sectionId } }, // Remove the section with the matching sectionId
+      }
+    );
+
+    // Check if a document was modified (meaning the section was removed)
+    if (result.modifiedCount === 0) {
+      console.log(`No section found with ID: ${sectionId} for user ID: ${userId}`);
+      return res.status(404).json({ message: "Company section not found." });
     }
 
-    const userId = decoded.id; // Get userId from the decoded token
+    console.log(`Company section with ID: ${sectionId} deleted successfully for user ID: ${userId}`);
+    return res.status(200).json({ message: "Company section deleted successfully." });
 
-    try {
-        // Check if the user profile exists
-        const userProfile = await UserProfile.findOne({ _id: profileId, userId });
-        if (!userProfile) {
-            console.log(`User profile not found for profile ID: ${profileId} and user ID: ${userId}`);
-            return res.status(404).json({ message: "User profile not found." });
-        }
-
-        // Log current career background
-        console.log("Career Background before deletion:", userProfile.careerBackground);
-
-        // Check if the company section exists
-        const sectionIndex = userProfile.careerBackground.findIndex(
-            (section) => section._id.toString() === sectionId
-        );
-
-        if (sectionIndex === -1) {
-            console.log(`No section found with ID: ${sectionId} for user ID: ${userId}`);
-            return res.status(404).json({ message: "Company section not found." });
-        }
-
-        // Remove the company section
-        userProfile.careerBackground.splice(sectionIndex, 1);
-
-        // Log updated career background
-        console.log("Career Background after deletion:", userProfile.careerBackground);
-
-        // Validate attachments before saving
-        userProfile.attachments = userProfile.attachments.filter(attachment => attachment.fileName); // Keep only valid attachments
-
-        // Save the updated userProfile
-        await userProfile.save(); // Ensure this line executes successfully
-
-        console.log(`Company section with ID: ${sectionId} deleted successfully for user ID: ${userId}`);
-        return res.status(200).json({ message: "Company section deleted successfully." });
-    } catch (error) {
-        console.error("Error deleting company section:", error);
-        return res.status(500).json({ message: "Error deleting company section", error: error.message });
-    }
+  } catch (error) {
+    console.error("Error deleting company section:", error);
+    return res.status(500).json({ message: "Error deleting company section", error: error.message });
+  }
 };
+
+exports.deleteSecondarySection = async (req, res) => {
+  console.log("DeleteCompanySection function triggered");
+  console.log("Received parameters:", req.params);
+
+  const sectionId = req.params.sectionId;
+  const profileId = req.params.profileId;
+
+  // Token extraction and user identification
+  const token = req.cookies.token;
+  if (!token) {
+    console.log("Token is missing.");
+    return res.status(401).json({ message: "Unauthorized, token missing." });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(401).json({ message: "Unauthorized, invalid token." });
+  }
+
+  const userId = decoded.id; // Get userId from the decoded token
+
+  try {
+    // Check if the user profile exists
+    const userProfile = await UserProfile.findOne({ _id: profileId, userId });
+    if (!userProfile) {
+      console.log(`User profile not found for profile ID: ${profileId} and user ID: ${userId}`);
+      return res.status(404).json({ message: "User profile not found." });
+    }
+
+    // Use Mongoose's $pull operator to remove the company section directly by its _id
+    const result = await UserProfile.updateOne(
+      { _id: profileId, userId }, // Match the profile by profileId and userId
+      {
+        $pull: { secondaryEducation: { _id: sectionId } }, // Remove the section with the matching sectionId
+      }
+    );
+
+    // Check if a document was modified (meaning the section was removed)
+    if (result.modifiedCount === 0) {
+      console.log(`No section found with ID: ${sectionId} for user ID: ${userId}`);
+      return res.status(404).json({ message: "Secondary education section not found." });
+    }
+
+    console.log(`Company section with ID: ${sectionId} deleted successfully for user ID: ${userId}`);
+    return res.status(200).json({ message: "Secondary education section deleted successfully." });
+
+  } catch (error) {
+    console.error("Error deleting company section:", error);
+    return res.status(500).json({ message: "Error deleting Secondary education section", error: error.message });
+  }
+};
+
+exports.deleteTertiarySection = async (req, res) => {
+  console.log("DeleteCompanySection function triggered");
+  console.log("Received parameters:", req.params);
+
+  const sectionId = req.params.sectionId;
+  const profileId = req.params.profileId;
+
+  // Token extraction and user identification
+  const token = req.cookies.token;
+  if (!token) {
+    console.log("Token is missing.");
+    return res.status(401).json({ message: "Unauthorized, token missing." });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(401).json({ message: "Unauthorized, invalid token." });
+  }
+
+  const userId = decoded.id; // Get userId from the decoded token
+
+  try {
+    // Check if the user profile exists
+    const userProfile = await UserProfile.findOne({ _id: profileId, userId });
+    if (!userProfile) {
+      console.log(`User profile not found for profile ID: ${profileId} and user ID: ${userId}`);
+      return res.status(404).json({ message: "User profile not found." });
+    }
+
+    // Use Mongoose's $pull operator to remove the company section directly by its _id
+    const result = await UserProfile.updateOne(
+      { _id: profileId, userId }, // Match the profile by profileId and userId
+      {
+        $pull: { tertiaryEducationEducation: { _id: sectionId } }, // Remove the section with the matching sectionId
+      }
+    );
+
+    // Check if a document was modified (meaning the section was removed)
+    if (result.modifiedCount === 0) {
+      console.log(`No section found with ID: ${sectionId} for user ID: ${userId}`);
+      return res.status(404).json({ message: "Tertiary education section not found." });
+    }
+
+    console.log(`Company section with ID: ${sectionId} deleted successfully for user ID: ${userId}`);
+    return res.status(200).json({ message: "Tertiary education section deleted successfully." });
+
+  } catch (error) {
+    console.error("Error deleting company section:", error);
+    return res.status(500).json({ message: "Error deleting tertiary education section", error: error.message });
+  }
+};
+
 
 

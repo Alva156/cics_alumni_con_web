@@ -171,7 +171,7 @@ exports.updateNews = async (req, res) => {
       await sendEmailNotification(
         emailAddresses,
         "🔔 Quick Heads Up: Recent News Update!",
-        `Hello everyone! 👋\n\nWe wanted to let you know that some existing news about "${name}" has just been updated! 🎉 Our team has refreshed the details, and you won’t want to miss the latest insights.\n\nStay informed about what’s new—there could be valuable information and opportunities for you! 🌟\n\nCheck out the updated news now and see what’s changed! 🔗\n\nBest regards,\nThe CICS Alumni Connect Team`
+        `Hello everyone! 👋\n\nWe wanted to let you know that some existing news about "${name}" has just been updated!  Our team has refreshed the details, and you won’t want to miss the latest insights.\n\nStay informed about what’s new—there could be valuable information and opportunities for you! \n\nCheck out the updated news now and see what’s changed! 🔗\n\nBest regards,\nThe CICS Alumni Connect Team`
       );
 
       res.status(200).json(news);
@@ -237,11 +237,36 @@ const sendEmailNotification = async (emailAddresses, subject, message) => {
       },
     });
 
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5;">
+        <div style="background-color: #f5f5f5; padding: 20px;">
+          <div style="background-color: #ffffff; padding: 20px; max-width: 600px; margin: 0 auto; border-radius: 8px;">
+            <div style="text-align: center; padding-bottom: 20px;">
+              <img src="https://your-logo-url.com/logo.png" alt="Company Logo" style="max-width: 150px;">
+            </div>
+            <div style="background-color: #ff4b4b; color: #ffffff; padding: 15px; border-radius: 8px;">
+              <h1 style="margin: 0; font-size: 24px; text-align: center;">${subject}</h1>
+            </div>
+            <div style="padding: 20px 0; text-align: center; font-size: 18px; color: #333;">
+              <p>${message}</p>
+            </div>
+            <div style="background-color: #fff; padding: 20px; border-radius: 8px; margin-top: 20px;">
+              <p style="text-align: center; font-size: 14px; color: #555;">
+                This email is sent to keep you updated with the latest updates.
+              </p>
+              <p style="text-align: center; font-size: 14px; color: #555;">
+                © 2024 CICS Alumni Connect. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       bcc: emailAddresses, // Use 'bcc' to hide recipients
       subject: subject,
-      text: message,
+      html: htmlContent,
     };
 
     await transporter.sendMail(mailOptions);

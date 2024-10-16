@@ -70,26 +70,45 @@ const Footer = () => {
             <div className="mb-6 text-right w-full md:w-1/2">
               <h4 className="font-semibold text-lg text-gray-300">Quick Links:</h4>
               <ul className="space-y-2 mt-2">
-                <li>
-                  <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
-                    Access Alumni Member Card
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
-                    Check Your Alumni Email
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
-                    My Alumni Account
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
-                    Give to UST
-                  </a>
-                </li>
+              <li>
+  <a
+    href="https://alumnirelations.ust.edu.ph/"
+    className="hover:text-gray-200 hover:underline transition-colors duration-300"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    UST Office of Alumni Relations
+  </a>
+</li>
+<li>
+  <a
+    href="https://www.ust.edu.ph/"
+    className="hover:text-gray-200 hover:underline transition-colors duration-300"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    UST Website Homepage
+  </a>
+</li>
+<li>
+  <a
+    href="/user-userprofile"
+    className="hover:text-gray-200 hover:underline transition-colors duration-300"
+  >
+    My Alumni Account
+  </a>
+</li>
+<li>
+  <a
+    href="https://www.ust.edu.ph/information-and-computing-sciences/"
+    className="hover:text-gray-200 hover:underline transition-colors duration-300"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    UST CICS Info
+  </a>
+</li>
+
               </ul>
             </div>
           )}

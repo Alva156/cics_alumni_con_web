@@ -275,10 +275,10 @@ const Homepage = () => {
             }}
           >
             {currentImage === 0
-              ? "Credit for Homepage Image 1"
+              ? "Photo Courtesy of UST ICS"
               : currentImage === 1
-              ? "Credit for Homepage Image 2"
-              : "Credit for Homepage Image 3"}
+              ? "Photo Courtesy of UST ICS"
+              : "Photo Courtesy of UST CSS"}
           </div>
           <button className="carousel-button next" onClick={nextImage}>
             ❯

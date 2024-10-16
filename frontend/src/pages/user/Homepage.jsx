@@ -236,7 +236,15 @@ const Homepage = () => {
             share knowledge, and create impactful solutions for a better future.
           </p>
         </div>
-        <div className="image-carousel-container fixed-height">
+        <div
+          className="image-carousel-container fixed-height"
+          style={{
+            position: "relative",
+            width: "100%",
+            height: "400px",
+            overflow: "hidden",
+          }}
+        >
           <button className="carousel-button prev" onClick={prevImage}>
             ❮
           </button>
@@ -244,7 +252,34 @@ const Homepage = () => {
             src={images[currentImage]}
             alt="Placeholder"
             className="carousel-image"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }} // Fixed size with cover
           />
+          <div
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              backgroundColor: "rgba(0, 0, 0, 0.4)",
+              color: "white",
+              padding: "10px",
+              borderRadius: "5px",
+              fontSize: "14px",
+              zIndex: "20",
+              textAlign: "right",
+              marginTop:
+                currentImage === 0
+                  ? "0px"
+                  : currentImage === 1
+                  ? "50px"
+                  : "100px", // Adjust as necessary
+            }}
+          >
+            {currentImage === 0
+              ? "Credit for Homepage Image 1"
+              : currentImage === 1
+              ? "Credit for Homepage Image 2"
+              : "Credit for Homepage Image 3"}
+          </div>
           <button className="carousel-button next" onClick={nextImage}>
             ❯
           </button>

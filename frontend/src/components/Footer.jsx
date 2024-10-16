@@ -4,17 +4,15 @@ import { FaRegCopyright, FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } fro
 const Footer = () => {
   return (
     <footer className="relative text-white">
-      {/* Top section with image, overlay, and smooth transition to #1a1a1a color */}
       <div
         className="relative"
         style={{
-          backgroundImage: "url('/src/assets/ustfooter.jpg')", // Replace with your UST image
+          backgroundImage: "url('/src/assets/ustfooter.jpg')", 
           backgroundSize: "cover",
           backgroundPosition: "center",
           height: "300px",
         }}
       >
-        {/* Adding a gradient overlay to the image that blends to #1a1a1a */}
         <div
           className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a1a]"
           aria-hidden="true"
@@ -77,7 +75,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Footer Section with #1a1a1a background */}
+      {/* Bottom Footer Section */}
       <div className="bg-[#1a1a1a] text-gray-400 py-6 text-center text-sm">
         <div className="flex justify-center items-center mb-2">
           <FaRegCopyright className="mr-1" />

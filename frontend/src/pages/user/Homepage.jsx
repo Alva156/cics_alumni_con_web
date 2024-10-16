@@ -128,11 +128,7 @@ const Homepage = () => {
                   <h3>Alumni</h3>
                   <button onClick={() => navigate('/user-alumni')}>Alumni Network</button>
                 </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Alumni</h3>
-                  <button onClick={() => navigate('/user-alumni')}>Alumni Network</button>
-                </div>
+
               </div>
             </div>
           ) : (
@@ -163,11 +159,6 @@ const Homepage = () => {
                   <h3>Title 8</h3>
                   <button>Button 8</button>
                 </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Title 8</h3>
-                  <button>Button 8</button>
-                </div>
               </div>
             </div>
           )}
@@ -186,7 +177,7 @@ const Homepage = () => {
       To be a leading alumni network that empowers individuals to connect, share knowledge, and create impactful solutions for a better future.
     </p>
   </div>
-  <div className="image-carousel-container fixed-height" data-aos="fade-up">
+  <div className="image-carousel-container fixed-height">
     <button className="carousel-button prev" onClick={prevImage}>❮</button>
     <img src={images[currentImage]} alt="Placeholder" className="carousel-image" />
     <button className="carousel-button next" onClick={nextImage}>❯</button>

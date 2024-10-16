@@ -1,26 +1,44 @@
 import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import { CSVLink } from "react-csv";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 function AdminReports() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [selectedPrograms, setSelectedPrograms] = useState(["All Programs"]);
+  const [selectedFields, setSelectedFields] = useState(["All Fields"]);
+  const [openDropdown, setOpenDropdown] = useState("");
+  const [alumni, setAlumni] = useState([]);
+
+  const formatDate = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString).getTime())) {
+      return "";
+    }
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
+
   const fieldToKeyMap = {
     Profession: "profession",
     "College Program": "collegeProgram",
     Specialization: "specialization",
-    "Year Started on College Program": "yearStartedCollegeProgram",
-    "Year Graduated on College Program": "yearGraduatedCollegeProgram",
-    "Time it took to land a job after graduation": "timeToLandJob",
+    "Year Started on College Program": "yearStartedCollege",
+    "Year Graduated on College Program": "yearGraduatedCollege",
+    "Time it took to land a job after graduation (months)": "timeToJob",
     "Employment Status": "employmentStatus",
     "Work Industry": "workIndustry",
-    "Is current profession in line with college degree":
-      "professionInLineWithDegree",
+    "Is current profession in line with college degree": "professionAlignment",
     "Marital Status": "maritalStatus",
     "Salary Range": "salaryRange",
     "Place of Employment": "placeOfEmployment",
-    LinkedIn: "linkedIn",
-    Facebook: "facebook",
-    Instagram: "instagram",
-    "Email Address": "emailAddress",
-    "Mobile Number": "mobileNumber",
-    Other: "other",
+    LinkedIn: "contactInformation.linkedIn",
+    Facebook: "contactInformation.facebook",
+    Instagram: "contactInformation.instagram",
+    "Email Address": "contactInformation.email",
+    "Mobile Number": "contactInformation.mobileNumber",
+    Other: "contactInformation.other",
   };
 
   const availableFields = Object.keys(fieldToKeyMap);
@@ -30,9 +48,30 @@ function AdminReports() {
     "Information Technology",
   ];
 
-  const [selectedPrograms, setSelectedPrograms] = useState([]);
-  const [selectedFields, setSelectedFields] = useState([]);
-  const [openDropdown, setOpenDropdown] = useState("");
+  // Fetch Alumni Data
+  useEffect(() => {
+    const fetchAlumni = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/profile/alumni`, {
+          withCredentials: true,
+        });
+        // Debugging purpose
+        console.log(response.data);
+        const alumniData = response.data.alumni || response.data;
+        alumniData.forEach((alum) => {
+          alum.yearStartedCollege = formatDate(alum.yearStartedCollege);
+          alum.yearGraduatedCollege = formatDate(alum.yearGraduatedCollege);
+          // Format other date fields as needed
+        });
+        // If data is an array, directly set it. Otherwise, access alumni key.
+        setAlumni(alumniData);
+      } catch (error) {
+        console.error("Error fetching alumni:", error);
+      }
+    };
+
+    fetchAlumni();
+  }, [backendUrl]);
 
   const dropdownRef = useRef(null);
 
@@ -89,83 +128,101 @@ function AdminReports() {
     });
   };
 
-  const data = [
-    {
-      firstName: "John",
-      lastName: "Doe",
-      birthday: "1990-01-01",
-      profession: "Software Engineer",
-      collegeProgram: "Computer Science",
-      specialization: "Artificial Intelligence",
-      yearStartedCollegeProgram: "2008",
-      yearGraduatedCollegeProgram: "2012",
-      timeToLandJob: "3 months",
-      employmentStatus: "Employed",
-      workIndustry: "Technology",
-      professionInLineWithDegree: "Yes",
-      maritalStatus: "Single",
-      salaryRange: "$60,000 - $80,000",
-      placeOfEmployment: "Tech Corp",
-      linkedIn: "https://linkedin.com/in/johndoe",
-      facebook: "https://facebook.com/johndoe",
-      instagram: "https://instagram.com/johndoe",
-      emailAddress: "john.doe@example.com",
-      mobileNumber: "1234567890",
-      other: "N/A",
-    },
-    {
-      firstName: "Jane",
-      lastName: "Smith",
-      birthday: "1992-05-12",
-      profession: "Data Analyst",
-      collegeProgram: "Information Systems",
-      specialization: "Data Science",
-      yearStartedCollegeProgram: "2010",
-      yearGraduatedCollegeProgram: "2014",
-      timeToLandJob: "6 months",
-      employmentStatus: "Employed",
-      workIndustry: "Finance",
-      professionInLineWithDegree: "Yes",
-      maritalStatus: "Married",
-      salaryRange: "$50,000 - $70,000",
-      placeOfEmployment: "Finance Inc",
-      linkedIn: "https://linkedin.com/in/janesmith",
-      facebook: "https://facebook.com/janesmith",
-      instagram: "https://instagram.com/janesmith",
-      emailAddress: "jane.smith@example.com",
-      mobileNumber: "9876543210",
-      other: "N/A",
-    },
-    {
-      firstName: "Michael",
-      lastName: "Johnson",
-      birthday: "1988-08-20",
-      profession: "Network Administrator",
-      collegeProgram: "Information Technology",
-      specialization: "Networking",
-      yearStartedCollegeProgram: "2006",
-      yearGraduatedCollegeProgram: "2010",
-      timeToLandJob: "2 months",
-      employmentStatus: "Employed",
-      workIndustry: "Technology",
-      professionInLineWithDegree: "Yes",
-      maritalStatus: "Single",
-      salaryRange: "$70,000 - $90,000",
-      placeOfEmployment: "Tech Solutions",
-      linkedIn: "https://linkedin.com/in/michaeljohnson",
-      facebook: "https://facebook.com/michaeljohnson",
-      instagram: "https://instagram.com/michaeljohnson",
-      emailAddress: "michael.johnson@example.com",
-      mobileNumber: "5551234567",
-      other: "N/A",
-    },
-  ];
+  // Get nested values for fields like contact information
+  const getNestedValue = (obj, path) => {
+    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+  };
 
-  const filteredData = data.filter(
+  // Filtered data based on selected programs
+  const filteredData = alumni.filter(
     (row) =>
       selectedPrograms.includes("All Programs") ||
       selectedPrograms.includes(row.collegeProgram)
   );
+  const generatePDF = () => {
+    const tableBody = [
+      // Table Headers
+      [
+        { text: "First Name", bold: true, fillColor: "#e0e0e0", fontSize: 12 },
+        { text: "Last Name", bold: true, fillColor: "#e0e0e0", fontSize: 12 },
+        { text: "Birthday", bold: true, fillColor: "#e0e0e0", fontSize: 12 },
+        ...(selectedFields.length === 0 || selectedFields.includes("All Fields")
+          ? availableFields.map((field) => ({
+              text: field,
+              bold: true,
+              fillColor: "#e0e0e0",
+              fontSize: 12,
+            }))
+          : selectedFields.map((field) => ({
+              text: field,
+              bold: true,
+              fillColor: "#e0e0e0",
+              fontSize: 12,
+            }))),
+      ],
+      // Table Data
+      ...filteredData.map((row) => [
+        { text: row.firstName || "", margin: [5, 2], alignment: "left" },
+        { text: row.lastName || "", margin: [5, 2], alignment: "left" },
+        {
+          text: formatDate(row.birthday) || "",
+          margin: [5, 2],
+          alignment: "left",
+        },
+        ...(selectedFields.length === 0 || selectedFields.includes("All Fields")
+          ? availableFields.map((field) => ({
+              text: getNestedValue(row, fieldToKeyMap[field]) || "",
+              margin: [5, 2],
+              alignment: "left",
+            }))
+          : selectedFields.map((field) => ({
+              text: getNestedValue(row, fieldToKeyMap[field]) || "",
+              margin: [5, 2],
+              alignment: "left",
+            }))),
+      ]),
+    ];
+
+    const docDefinition = {
+      content: [
+        {
+          text: "CICS Alumni Connect Report",
+          style: "header",
+          margin: [0, 20, 0, 10], // Add margin around header
+        },
+        {
+          table: {
+            headerRows: 1,
+            widths: "auto", // Set widths to auto for all columns
+            body: tableBody,
+          },
+          layout: {
+            fillColor: (rowIndex) => (rowIndex === 0 ? "#e0e0e0" : null), // Header color
+            hLineWidth: () => 0.5,
+            vLineWidth: () => 0.5,
+            hLineColor: () => "#ccc",
+            vLineColor: () => "#ccc",
+          },
+        },
+      ],
+      styles: {
+        header: {
+          fontSize: 28, // Larger font size for the header
+          bold: true,
+          margin: [0, 0, 0, 10],
+          alignment: "center", // Center align header
+        },
+      },
+      pageSize: "A1",
+      pageOrientation: "landscape", // Landscape orientation
+      defaultStyle: {
+        fontSize: 12, // Adjusted font size for body text
+        color: "#333", // Dark gray for better readability
+      },
+    };
+
+    pdfMake.createPdf(docDefinition).download("cicsalumniconnect_report.pdf");
+  };
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -282,53 +339,84 @@ function AdminReports() {
               <td className="px-4 py-2 border">Birthday</td>
               {selectedFields.length === 0 ||
               selectedFields.includes("All Fields")
-                ? Object.keys(fieldToKeyMap).map((field, idx) => (
-                    <td key={idx} className="px-4 py-2 border">
+                ? availableFields.map((field) => (
+                    <td key={field} className="px-4 py-2 border">
                       {field}
                     </td>
                   ))
-                : selectedFields.map((field, idx) => (
-                    <td key={idx} className="px-4 py-2 border">
+                : selectedFields.map((field) => (
+                    <td key={field} className="px-4 py-2 border">
                       {field}
                     </td>
                   ))}
             </tr>
           </thead>
           <tbody className="text-xs">
-            {filteredData.map((row, rowIndex) => (
-              <tr key={rowIndex} className="text-center">
-                <td className="px-4 py-2 border">{rowIndex + 1}</td>
-                <td className="px-4 py-2 border">{row.firstName}</td>
-                <td className="px-4 py-2 border">{row.lastName}</td>
-                <td className="px-4 py-2 border">{row.birthday}</td>
-                {selectedFields.length === 0 ||
-                selectedFields.includes("All Fields")
-                  ? Object.keys(fieldToKeyMap).map((field, fieldIndex) => (
-                      <td key={fieldIndex} className="px-4 py-2 border">
-                        {row[fieldToKeyMap[field]] || "N/A"}
-                      </td>
-                    ))
-                  : selectedFields.map((field, fieldIndex) => (
-                      <td key={fieldIndex} className="px-4 py-2 border">
-                        {row[fieldToKeyMap[field]] || "N/A"}
-                      </td>
-                    ))}
+            {filteredData.length > 0 ? (
+              filteredData.map((row, rowIndex) => (
+                <tr key={rowIndex} className="text-center">
+                  <td className="px-4 py-2 border">{rowIndex + 1}</td>
+                  <td className="px-4 py-2 border">{row.firstName}</td>
+                  <td className="px-4 py-2 border">{row.lastName}</td>
+                  <td className="px-4 py-2 border">
+                    {formatDate(row.birthday)}
+                  </td>
+                  {(selectedFields.length === 0 ||
+                  selectedFields.includes("All Fields")
+                    ? availableFields
+                    : selectedFields
+                  ).map((field) => (
+                    <td key={field} className="px-4 py-2 border">
+                      {getNestedValue(row, fieldToKeyMap[field])}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={4 + availableFields.length}
+                  className="px-4 py-2 text-center"
+                >
+                  No alumni data found.
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="flex justify-center mt-16 space-x-3">
         <div className="">
-          <button className="btn md:w-64 w-52 bg-blue text-white">
+          <button
+            onClick={generatePDF}
+            className="btn md:w-64 w-52 bg-blue text-white"
+          >
             Export to PDF
           </button>
         </div>
         <div className="">
-          <button className="btn md:w-64 w-52 bg-green text-white">
+          <CSVLink
+            data={alumni.map((row) => ({
+              FirstName: row.firstName,
+              LastName: row.lastName,
+              Birthday: formatDate(row.birthday),
+              ...(selectedFields.includes("All Fields") ||
+              selectedFields.length === 0
+                ? availableFields.reduce((acc, field) => {
+                    acc[field] = getNestedValue(row, fieldToKeyMap[field]);
+                    return acc;
+                  }, {})
+                : selectedFields.reduce((acc, field) => {
+                    acc[field] = getNestedValue(row, fieldToKeyMap[field]);
+                    return acc;
+                  }, {})),
+            }))}
+            filename="cicsalumniconnect_report.csv"
+            className="btn md:w-64 w-52 bg-green text-white"
+          >
             Export to Excel
-          </button>
+          </CSVLink>
         </div>
       </div>
     </div>

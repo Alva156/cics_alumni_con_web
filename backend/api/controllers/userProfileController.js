@@ -7,7 +7,7 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Directory where files will be saved
+    cb(null, "uploads/"); // Directory where files will be saved
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`); // Ensure unique filenames
@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Middleware for file upload
-exports.uploadFile = upload.single('file'); // Use 'file' as the field name for uploads
+exports.uploadFile = upload.single("file"); // Use 'file' as the field name for uploads
 
 exports.getProfile = async (req, res) => {
   try {
@@ -266,27 +266,6 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// Get all alumni profiles
-
-exports.getAllAlumni = async (req, res) => {
-  try {
-    const alumniProfiles = await UserProfile.find().populate({
-      path: "userId",
-      match: { role: "user" },
-    });
-
-    const filteredAlumni = alumniProfiles.filter((profile) => profile.userId);
-
-    // Send the retrieved and filtered alumni profiles in the response
-    res.status(200).json({ alumni: filteredAlumni });
-  } catch (error) {
-    console.error("Error fetching alumni profiles:", error);
-    res.status(500).json({
-      error: "Failed to fetch alumni profiles",
-      message: error.message,
-    });
-  }
-};
 exports.changePassword = async (req, res) => {
   try {
     const token = req.cookies.token;
@@ -330,7 +309,6 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-
 exports.deleteSection = async (req, res) => {
   console.log("DeleteSection function triggered");
   console.log("Received parameters:", req.params);
@@ -360,7 +338,9 @@ exports.deleteSection = async (req, res) => {
     // Check if the user profile exists
     const userProfile = await UserProfile.findOne({ _id: profileId, userId });
     if (!userProfile) {
-      console.log(`User profile not found for profile ID: ${profileId} and user ID: ${userId}`);
+      console.log(
+        `User profile not found for profile ID: ${profileId} and user ID: ${userId}`
+      );
       return res.status(404).json({ message: "User profile not found." });
     }
 
@@ -388,19 +368,164 @@ exports.deleteSection = async (req, res) => {
 
     // Check if a document was modified (meaning the section was removed)
     if (result.modifiedCount === 0) {
-      console.log(`No section found with ID: ${sectionId} in ${sectionField} for user ID: ${userId}`);
-      return res.status(404).json({ message: `${sectionType.replace("-", " ")} section not found.` });
+      console.log(
+        `No section found with ID: ${sectionId} in ${sectionField} for user ID: ${userId}`
+      );
+      return res.status(404).json({
+        message: `${sectionType.replace("-", " ")} section not found.`,
+      });
     }
 
-    console.log(`${sectionType.replace("-", " ")} section with ID: ${sectionId} deleted successfully for user ID: ${userId}`);
-    return res.status(200).json({ message: `${sectionType.replace("-", " ")} section deleted successfully.` });
-
+    console.log(
+      `${sectionType.replace(
+        "-",
+        " "
+      )} section with ID: ${sectionId} deleted successfully for user ID: ${userId}`
+    );
+    return res.status(200).json({
+      message: `${sectionType.replace("-", " ")} section deleted successfully.`,
+    });
   } catch (error) {
-    console.error(`Error deleting ${sectionType.replace("-", " ")} section:`, error);
-    return res.status(500).json({ message: `Error deleting ${sectionType.replace("-", " ")} section`, error: error.message });
+    console.error(
+      `Error deleting ${sectionType.replace("-", " ")} section:`,
+      error
+    );
+    return res.status(500).json({
+      message: `Error deleting ${sectionType.replace("-", " ")} section`,
+      error: error.message,
+    });
   }
 };
 
+//ALUMNI LIST PAGE
+exports.getAllAlumni = async (req, res) => {
+  try {
+    const alumniProfiles = await UserProfile.find().populate({
+      path: "userId",
+      match: { role: "user" },
+    });
 
+    const filteredAlumni = alumniProfiles.filter((profile) => profile.userId);
 
+    // Send the retrieved and filtered alumni profiles in the response
+    res.status(200).json({ alumni: filteredAlumni });
+  } catch (error) {
+    console.error("Error fetching alumni profiles:", error);
+    res.status(500).json({
+      error: "Failed to fetch alumni profiles",
+      message: error.message,
+    });
+  }
+};
+// DASHBOARD
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const alumniProfiles = await UserProfile.find().populate({
+      path: "userId",
+      match: { role: "user" },
+    });
 
+    // Filter valid alumni profiles
+    const filteredAlumni = alumniProfiles.filter((profile) => profile.userId);
+
+    // Calculate number of users
+    const numberOfUsers = filteredAlumni.length;
+
+    // Number of employed users
+    const employedUsers = filteredAlumni.filter(
+      (profile) => profile.employmentStatus === "Employed"
+    ).length;
+
+    // Users per academic program
+    const academicPrograms = [
+      "Information Technology",
+      "Computer Science",
+      "Information Systems",
+    ];
+    const usersPerProgram = academicPrograms.map(
+      (program) =>
+        filteredAlumni.filter((profile) => profile.collegeProgram === program)
+          .length
+    );
+
+    // Users per specialization (updated to use keys as specializations and values as counts)
+    const usersPerSpecialization = {};
+    filteredAlumni.forEach((profile) => {
+      const specialization = profile.specialization;
+      if (specialization) {
+        usersPerSpecialization[specialization] =
+          (usersPerSpecialization[specialization] || 0) + 1;
+      }
+    });
+
+    // Users per year started and graduated (updated to extract only the year)
+    const usersPerStartYear = {};
+    const usersPerGradYear = {};
+
+    filteredAlumni.forEach((profile) => {
+      // Extract only the year portion of the dates
+      const startYear = profile.yearStartedCollege
+        ? new Date(profile.yearStartedCollege).getFullYear()
+        : null;
+      const gradYear = profile.yearGraduatedCollege
+        ? new Date(profile.yearGraduatedCollege).getFullYear()
+        : null;
+
+      // Ensure we are only counting valid years
+      if (startYear) {
+        usersPerStartYear[startYear] = (usersPerStartYear[startYear] || 0) + 1;
+      }
+      if (gradYear) {
+        usersPerGradYear[gradYear] = (usersPerGradYear[gradYear] || 0) + 1;
+      }
+    });
+
+    // Employment status
+    const employmentStatus = [
+      "Employed",
+      "Unemployed",
+      "Underemployed",
+      "Freelance",
+    ];
+    const usersPerEmploymentStatus = employmentStatus.map(
+      (status) =>
+        filteredAlumni.filter((profile) => profile.employmentStatus === status)
+          .length
+    );
+
+    // Work industries
+    const workIndustries = ["Local", "International"];
+    const usersPerWorkIndustry = workIndustries.map(
+      (industry) =>
+        filteredAlumni.filter((profile) => profile.workIndustry === industry)
+          .length
+    );
+
+    // Time to get a job (updated to use keys as time to job and values as counts)
+    const usersPerTimeToJob = {};
+    filteredAlumni.forEach((profile) => {
+      const timeToJob = profile.timeToJob; // Ensure the key is correctly spelled
+      if (timeToJob) {
+        usersPerTimeToJob[timeToJob] = (usersPerTimeToJob[timeToJob] || 0) + 1;
+      }
+    });
+
+    res.status(200).json({
+      numberOfUsers,
+      employedUsers,
+      usersPerProgram,
+      usersPerSpecialization,
+      usersPerStartYear,
+      usersPerGradYear,
+      usersPerEmploymentStatus,
+      usersPerWorkIndustry,
+      usersPerTimeToJob,
+    });
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    res.status(500).json({
+      error: "Failed to fetch dashboard statistics",
+      message: error.message,
+    });
+  }
+};

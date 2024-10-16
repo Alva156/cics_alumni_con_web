@@ -26,7 +26,15 @@ router.post(
   userProfileController.changePassword
 );
 
-
-router.delete("/:sectionType/:profileId/:sectionId", authenticateJWT, userProfileController.deleteSection);
+router.delete(
+  "/:sectionType/:profileId/:sectionId",
+  authenticateJWT,
+  userProfileController.deleteSection
+);
+router.get(
+  "/dashboard-stats",
+  authenticateJWT,
+  userProfileController.getDashboardStats
+);
 
 module.exports = router;

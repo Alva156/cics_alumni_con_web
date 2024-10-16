@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bar } from "react-chartjs-2";
+import axios from "axios";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,7 +22,19 @@ ChartJS.register(
 
 const AdminDashboard = () => {
   const [fontSize, setFontSize] = useState(getFontSize());
+  const [dashboardData, setDashboardData] = useState({});
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const chartRefs = useRef([]);
+  const startYears = Object.keys(dashboardData.usersPerStartYear || {});
+  const gradYears = Object.keys(dashboardData.usersPerGradYear || {});
+  const specializationKeys = Object.keys(
+    dashboardData.usersPerSpecialization || {}
+  );
+  const specializationValues = Object.values(
+    dashboardData.usersPerSpecialization || {}
+  );
+  const timeToJobKeys = Object.keys(dashboardData.usersPerTimeToJob || {});
+  const timeToJobValues = Object.values(dashboardData.usersPerTimeToJob || {});
 
   function getFontSize() {
     if (window.innerWidth < 640) {
@@ -48,6 +61,23 @@ const AdminDashboard = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
+  }, []);
+  const fetchDashboardData = async () => {
+    try {
+      const response = await axios.get(
+        `${backendUrl}/profile/dashboard-stats`,
+        {
+          withCredentials: true,
+        }
+      );
+      setDashboardData(response.data);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
   }, []);
 
   const createOptions = (stepSize) => ({
@@ -89,11 +119,11 @@ const AdminDashboard = () => {
   const options2 = createOptions(2);
 
   const data1 = {
-    labels: ["CS", "IS", "IT"],
+    labels: ["IT", "CS", "IS"],
     datasets: [
       {
         label: "Number of Alumni",
-        data: [555, 300, 801],
+        data: dashboardData.usersPerProgram,
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -101,11 +131,11 @@ const AdminDashboard = () => {
   };
 
   const data2 = {
-    labels: ["Networking", "Web Development", "Automation"],
+    labels: specializationKeys, // Fetch specializations as labels
     datasets: [
       {
         label: "Number of Alumni",
-        data: [300, 700, 200],
+        data: specializationValues, // Fetch counts of alumni
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -113,11 +143,11 @@ const AdminDashboard = () => {
   };
 
   const data3 = {
-    labels: ["2016", "2017", "2018", "2019", "2020"],
+    labels: startYears, // Use the dynamic years as labels
     datasets: [
       {
         label: "Number of Alumni",
-        data: [300, 700, 200, 300, 700],
+        data: dashboardData.usersPerStartYear, // Use the dynamic number of users
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -125,11 +155,11 @@ const AdminDashboard = () => {
   };
 
   const data4 = {
-    labels: ["2020", "2021", "2022", "2023", "2024"],
+    labels: gradYears, // Use the dynamic graduation years as labels
     datasets: [
       {
-        label: "Number of Alumni",
-        data: [300, 700, 200, 300, 700, 200],
+        label: "Number of Alumni Graduated",
+        data: dashboardData.usersPerGradYear, // Use the dynamic number of graduated users
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -137,11 +167,11 @@ const AdminDashboard = () => {
   };
 
   const data5 = {
-    labels: ["Employed", "Unemployed", "Retired", "Underemployed"],
+    labels: ["Employed", "Unemployed", "Underemployed", "Retired"],
     datasets: [
       {
         label: "Number of Alumni",
-        data: [800, 100, 200, 50],
+        data: dashboardData.usersPerEmploymentStatus,
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -149,17 +179,11 @@ const AdminDashboard = () => {
   };
 
   const data6 = {
-    labels: [
-      "IT",
-      "Finance",
-      "Healthcare",
-      "Retail",
-      "Media and Entertainment",
-    ],
+    labels: ["Local", "International"],
     datasets: [
       {
         label: "Number of Alumni",
-        data: [900, 700, 200, 400, 60],
+        data: dashboardData.usersPerWorkIndustry,
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -167,11 +191,11 @@ const AdminDashboard = () => {
   };
 
   const data7 = {
-    labels: ["1 month", "2 months", "3 months", "4 months", "5 months"],
+    labels: timeToJobKeys,
     datasets: [
       {
         label: "Number of Alumni",
-        data: [3, 5, 11, 12, 15],
+        data: timeToJobValues,
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -185,7 +209,9 @@ const AdminDashboard = () => {
       <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
         <div>
           <div className="text-sm text-black-600">Number of Users</div>
-          <div className="text-lg font-medium mb-1 mt-2">9990</div>
+          <div className="text-lg font-medium mb-1 mt-2">
+            {dashboardData.numberOfUsers}
+          </div>
         </div>
       </div>
       <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
@@ -193,7 +219,9 @@ const AdminDashboard = () => {
           <div className="text-sm text-black-600">
             Number of currently employed users
           </div>
-          <div className="text-lg font-medium mb-1 mt-2">9990</div>
+          <div className="text-lg font-medium mb-1 mt-2">
+            {dashboardData.employedUsers}
+          </div>
         </div>
       </div>
 

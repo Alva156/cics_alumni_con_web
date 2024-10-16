@@ -1,6 +1,23 @@
 const UserProfile = require("../models/userProfileModel");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory where files will be saved
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`); // Ensure unique filenames
+  },
+});
+
+const upload = multer({ storage });
+
+// Middleware for file upload
+exports.uploadFile = upload.single('file'); // Use 'file' as the field name for uploads
 
 exports.getProfile = async (req, res) => {
   try {
@@ -34,7 +51,6 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ error: "Server Error", message: error.message });
   }
 };
-
 
 exports.createProfile = async (req, res) => {
   try {
@@ -79,7 +95,7 @@ exports.createProfile = async (req, res) => {
       workIndustry: req.body.workIndustry,
       yearGraduatedCollege: req.body.yearGraduatedCollege,
       yearStartedCollege: req.body.yearStartedCollege,
-      attachments: req.body.attachments,
+      attachments: req.body.attachments || [],
     };
 
     // Validate required fields (this can be customized based on your requirements)
@@ -138,7 +154,7 @@ exports.createUserProfile = async (req, res) => {
       contactInformation: {
         mobileNumber: req.body.mobileNumber,
       },
-      accountEmail:req.body.accountEmail,
+      accountEmail: req.body.accountEmail,
     };
 
     // Create a new UserProfile instance
@@ -215,7 +231,7 @@ exports.updateProfile = async (req, res) => {
         workIndustry,
         yearGraduatedCollege,
         yearStartedCollege,
-        attachments,
+        attachments: attachments || [],
       },
       { new: true, upsert: false } // Return the updated document, don't create if it doesn't exist
     );
@@ -224,6 +240,19 @@ exports.updateProfile = async (req, res) => {
       return res
         .status(404)
         .json({ error: "Profile not found. Please create a profile first." });
+    }
+    // If accountEmail is provided, update the email in User model
+    if (accountEmail) {
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { email: accountEmail }, // Update the user's email with the new accountEmail
+        { new: true, upsert: false } // Don't create a new user if not found
+      );
+      if (!updatedUser) {
+        return res
+          .status(404)
+          .json({ error: "User not found while updating email." });
+      }
     }
 
     res.status(200).json({
@@ -258,3 +287,120 @@ exports.getAllAlumni = async (req, res) => {
     });
   }
 };
+exports.changePassword = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized, please log in." });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id; // Get the userId from the token
+
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ error: "New password is required." });
+    }
+
+    // Fetch the user
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    // Check password complexity (Optional: adjust this as needed)
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      return res
+        .status(400)
+        .json({ error: "Password must meet the complexity requirements." });
+    }
+
+    // Hash the new password and update it
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully!" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ error: "Server error", message: error.message });
+  }
+};
+
+
+exports.deleteSection = async (req, res) => {
+  console.log("DeleteSection function triggered");
+  console.log("Received parameters:", req.params);
+
+  const sectionType = req.params.sectionType; // Get the type of section (e.g., company, secondary, tertiary)
+  const sectionId = req.params.sectionId;
+  const profileId = req.params.profileId;
+
+  // Token extraction and user identification
+  const token = req.cookies.token;
+  if (!token) {
+    console.log("Token is missing.");
+    return res.status(401).json({ message: "Unauthorized, token missing." });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(401).json({ message: "Unauthorized, invalid token." });
+  }
+
+  const userId = decoded.id; // Get userId from the decoded token
+
+  try {
+    // Check if the user profile exists
+    const userProfile = await UserProfile.findOne({ _id: profileId, userId });
+    if (!userProfile) {
+      console.log(`User profile not found for profile ID: ${profileId} and user ID: ${userId}`);
+      return res.status(404).json({ message: "User profile not found." });
+    }
+
+    // Define the mapping for the section type to its corresponding field in the UserProfile model
+    const sectionFieldMap = {
+      "company-section": "careerBackground",
+      "secondary-section": "secondaryEducation",
+      "tertiary-section": "tertiaryEducation",
+    };
+
+    // Validate sectionType
+    const sectionField = sectionFieldMap[sectionType];
+    if (!sectionField) {
+      console.log(`Invalid section type: ${sectionType}`);
+      return res.status(400).json({ message: "Invalid section type." });
+    }
+
+    // Use Mongoose's $pull operator to remove the section by its _id
+    const result = await UserProfile.updateOne(
+      { _id: profileId, userId }, // Match the profile by profileId and userId
+      {
+        $pull: { [sectionField]: { _id: sectionId } }, // Remove the section with the matching sectionId
+      }
+    );
+
+    // Check if a document was modified (meaning the section was removed)
+    if (result.modifiedCount === 0) {
+      console.log(`No section found with ID: ${sectionId} in ${sectionField} for user ID: ${userId}`);
+      return res.status(404).json({ message: `${sectionType.replace("-", " ")} section not found.` });
+    }
+
+    console.log(`${sectionType.replace("-", " ")} section with ID: ${sectionId} deleted successfully for user ID: ${userId}`);
+    return res.status(200).json({ message: `${sectionType.replace("-", " ")} section deleted successfully.` });
+
+  } catch (error) {
+    console.error(`Error deleting ${sectionType.replace("-", " ")} section:`, error);
+    return res.status(500).json({ message: `Error deleting ${sectionType.replace("-", " ")} section`, error: error.message });
+  }
+};
+
+
+
+

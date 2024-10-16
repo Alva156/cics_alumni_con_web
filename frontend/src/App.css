@@ -26,6 +26,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Shadow effect */
   margin: 0; /* Remove margin */
   padding: 0; /* Remove padding if any */
+  margin: var(--section-spacing) 0;
 }
 
 .background-video {
@@ -42,7 +43,7 @@ body {
 
 /* Spacing Variable */
 :root {
-  --section-spacing: 40px; /* Variable for uniform spacing */
+  --section-spacing: 30px; /* Variable for uniform spacing */
 }
 
 /* Carousel Styles */

@@ -125,8 +125,8 @@ const Homepage = () => {
                 </div>
                 <div className="square-item">
                   <div className="logo"></div>
-                  <h3>Alumni</h3>
-                  <button onClick={() => navigate('/user-alumni')}>Alumni Network</button>
+                  <h3>Chatbot</h3>
+                  <button onClick={() => navigate('/user-chatbot')}>Chat with Us</button>
                 </div>
 
               </div>
@@ -136,27 +136,27 @@ const Homepage = () => {
               <div className="square-container">
                 <div className="square-item">
                   <div className="logo"></div>
-                  <h3>Chatbot</h3>
+                  <h3>Companies</h3>
                   <button onClick={() => navigate('/user-chatbot')}>Chat with Us</button>
                 </div>
                 <div className="square-item">
                   <div className="logo"></div>
-                  <h3>Title 6</h3>
+                  <h3>News/Events</h3>
                   <button>Button 6</button>
                 </div>
                 <div className="square-item">
                   <div className="logo"></div>
-                  <h3>Title 7</h3>
+                  <h3>Certifications</h3>
                   <button>Button 7</button>
                 </div>
                 <div className="square-item">
                   <div className="logo"></div>
-                  <h3>Title 8</h3>
+                  <h3>Documents</h3>
                   <button>Button 8</button>
                 </div>
                 <div className="square-item">
                   <div className="logo"></div>
-                  <h3>Title 8</h3>
+                  <h3>Job/Internship</h3>
                   <button>Button 8</button>
                 </div>
               </div>

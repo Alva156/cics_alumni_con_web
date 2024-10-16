@@ -168,12 +168,44 @@ exports.sendOTP = async (req, res) => {
         pass: process.env.EMAIL_PASS,
       },
     });
-
+    const htmlContent = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f8f8; border-radius: 8px;">
+        <div style="background-color: #ff4b4b; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <img src="https://yourlogo.com/logo.png" alt="Logo" style="width: 120px;">
+        </div>
+        <div style="background-color: #fff; padding: 40px; border-radius: 0 0 8px 8px;">
+          <h2 style="color: #ff4b4b; text-align: center;">Your OTP Code</h2>
+          <p style="text-align: center; font-size: 16px; color: #333;">
+            Hello,
+          </p>
+          <p style="text-align: center; font-size: 16px; color: #333;">
+            To continue with your registration, please use the following One-Time Password (OTP):
+          </p>
+          <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px;">
+            <h1 style="color: #ff4b4b; font-size: 32px; letter-spacing: 2px;">${otp}</h1>
+          </div>
+          <p style="text-align: center; font-size: 14px; color: #777;">
+            This OTP will expire in 5 minutes.
+          </p>
+          <p style="text-align: center; font-size: 14px; color: #777;">
+            If you didn’t request this, please ignore this email.
+          </p>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <p style="font-size: 12px; color: #999;">
+          © 2024 CICS Alumni Connect. All rights reserved.
+        </p>
+      </div>
+    </div>
+  `;
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Your OTP Code",
       text: `Your OTP code is ${otp}`,
+      html: htmlContent,
     };
 
     await transporter.sendMail(mailOptions);
@@ -390,12 +422,45 @@ exports.forgotPassword = async (req, res) => {
         pass: process.env.EMAIL_PASS,
       },
     });
+    const htmlContent = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f8f8; border-radius: 8px;">
+        <div style="background-color: #ff4b4b; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <img src="https://yourlogo.com/logo.png" alt="Logo" style="width: 120px;">
+        </div>
+        <div style="background-color: #fff; padding: 40px; border-radius: 0 0 8px 8px;">
+          <h2 style="color: #ff4b4b; text-align: center;">Your OTP Code</h2>
+          <p style="text-align: center; font-size: 16px; color: #333;">
+            Hello,
+          </p>
+          <p style="text-align: center; font-size: 16px; color: #333;">
+            To continue with your registration, please use the following One-Time Password (OTP):
+          </p>
+          <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px;">
+            <h1 style="color: #ff4b4b; font-size: 32px; letter-spacing: 2px;">${otp}</h1>
+          </div>
+          <p style="text-align: center; font-size: 14px; color: #777;">
+            This OTP will expire in 5 minutes.
+          </p>
+          <p style="text-align: center; font-size: 14px; color: #777;">
+            If you didn’t request this, please ignore this email.
+          </p>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <p style="font-size: 12px; color: #999;">
+          © 2024 CICS Alumni Connect. All rights reserved.
+        </p>
+      </div>
+    </div>
+  `;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Your OTP Code for Password Reset",
       text: `Your OTP code is ${otp}`,
+      html: htmlContent,
     };
 
     await transporter.sendMail(mailOptions);

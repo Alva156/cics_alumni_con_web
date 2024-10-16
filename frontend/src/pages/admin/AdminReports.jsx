@@ -55,15 +55,14 @@ function AdminReports() {
         const response = await axios.get(`${backendUrl}/profile/alumni`, {
           withCredentials: true,
         });
-        // Debugging purpose
-        console.log(response.data);
+
         const alumniData = response.data.alumni || response.data;
         alumniData.forEach((alum) => {
           alum.yearStartedCollege = formatDate(alum.yearStartedCollege);
           alum.yearGraduatedCollege = formatDate(alum.yearGraduatedCollege);
           // Format other date fields as needed
         });
-        // If data is an array, directly set it. Otherwise, access alumni key.
+
         setAlumni(alumniData);
       } catch (error) {
         console.error("Error fetching alumni:", error);

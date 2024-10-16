@@ -103,62 +103,69 @@ const Homepage = () => {
           {currentPage === 0 ? (
             <div className="carousel-page">
               <div className="square-container">
+              <div className="square-item">
+            <div className="logo userprofile-logo"></div> {/* Add a specific class for the survey logo */}
+            <h3>Profile</h3>
+            <button onClick={() => navigate('/user-userprofile')}>Go to Profile</button>
+          </div>
                 <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Profile</h3>
-                  <button onClick={() => navigate('/user-userprofile')}>Go to Profile</button>
-                </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Survey</h3>
-                  <button onClick={() => navigate('/user-survey')}>Take Survey</button>
-                </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Threads</h3>
-                  <button onClick={() => navigate('/user-threads')}>View Threads</button>
-                </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Alumni</h3>
-                  <button onClick={() => navigate('/user-alumni')}>Alumni Network</button>
-                </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Chatbot</h3>
-                  <button onClick={() => navigate('/user-chatbot')}>Chat with Us</button>
-                </div>
+            <div className="logo survey-logo"></div> {/* Add a specific class for the survey logo */}
+            <h3>Survey</h3>
+            <button onClick={() => navigate('/user-survey')}>Take Survey</button>
+          </div>
+          <div className="square-item">
+            <div className="logo threads-logo"></div> {/* Add a specific class for the survey logo */}
+            <h3>Threads</h3>
+            <button onClick={() => navigate('/user-threads')}>View Threads</button>
+          </div>
+          <div className="square-item">
+            <div className="logo alumni-logo"></div> {/* Add a specific class for the survey logo */}
+            <h3>Alumni</h3>
+            <button onClick={() => navigate('/user-alumni')}>Alumni Network</button>
+          </div>
+          <div className="square-item">
+            <div className="logo chatbot-logo"></div> {/* Add a specific class for the survey logo */}
+            <h3>Chatbot</h3>
+            <button onClick={() => navigate('/user-chatbot')}>Chat with Us</button>
+          </div>
 
               </div>
             </div>
           ) : (
             <div className="carousel-page">
               <div className="square-container">
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Companies</h3>
-                  <button onClick={() => navigate('/user-chatbot')}>Chat with Us</button>
-                </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>News/Events</h3>
-                  <button>Button 6</button>
-                </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Certifications</h3>
-                  <button>Button 7</button>
-                </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Documents</h3>
-                  <button>Button 8</button>
-                </div>
-                <div className="square-item">
-                  <div className="logo"></div>
-                  <h3>Job/Internship</h3>
-                  <button>Button 8</button>
-                </div>
+              <div className="square-item">
+            <div className="logo companies-logo"></div> {/* Add a specific class for the survey logo */}
+            <h3>Companies</h3>
+            <button onClick={() => navigate('/user-companies')}>View Companies</button>
+          </div>
+          <div className="square-item">
+  <div className="logo newsevents-logo"></div> {/* Specific class for the news/events logo */}
+  <h3>News/Events</h3>
+  <div className="dropdown">
+    <button className="dropdown-button">View News/Events</button>
+    <div className="dropdown-content">
+      <button onClick={() => navigate('/user-news')}>News</button>
+      <button onClick={() => navigate('/user-events')}>Events</button>
+    </div>
+  </div>
+</div>
+
+          <div className="square-item">
+            <div className="logo certifications-logo"></div> {/* Add a specific class for the survey logo */}
+            <h3>Certifications</h3>
+            <button onClick={() => navigate('/user-certifications')}>View Certifications</button>
+          </div>
+          <div className="square-item">
+            <div className="logo documents-logo"></div> {/* Add a specific class for the survey logo */}
+            <h3>Documents</h3>
+            <button onClick={() => navigate('/user-documentrequest')}>View Documents</button>
+          </div>
+          <div className="square-item">
+            <div className="logo jobs-logo"></div> {/* Add a specific class for the survey logo */}
+            <h3>Job/Internship</h3>
+            <button onClick={() => navigate('/user-job')}>View Jobs/Internships</button>
+          </div>
               </div>
             </div>
           )}

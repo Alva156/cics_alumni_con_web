@@ -128,51 +128,52 @@ const Navbar = () => {
           </div>
         </div>
         <div className="navbar-center hidden lg:flex py-1">
-          <ul className="menu menu-horizontal px-1 ">
-            <li className="px-2.5 pr-8">
-              <a href="/">Home</a>
-            </li>
-            <li className="px-2.5 pr-8">
-              <a href="/user-userprofile">User Profile</a>
-            </li>
-            <li className="px-2.5 pr-8">
-              <a href="/user-survey">Survey</a>
-            </li>
-            <li className="px-2.5 pr-8">
-              <a href="/user-threads">Threads</a>
-            </li>
-            <li className="px-2.5 pr-8">
-              <details>
-                <summary>Contents</summary>
-                <ul className="px-2.5 bg-white pr-8 z-20">
-                  <li className="p-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-companies">Companies</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-news">News</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-events">Events</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-certifications">Certifications</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-documentrequest">Document Request Steps</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-job">Job/Internship Referrals</a>
-                  </li>
-                </ul>
-              </details>
-            </li>
-            <li className="px-2.5 pr-8">
-              <a href="/user-alumni">Alumni</a>
-            </li>
-            <li className="px-2.5 ">
-              <a href="/user-chatbot">Chatbot</a>
-            </li>
-          </ul>
+        <ul className="menu menu-horizontal px-1">
+  <li className="px-2.5 pr-8">
+    <a href="/" className="font-bold text-gray-700">Home</a>
+  </li>
+  <li className="px-2.5 pr-8">
+    <a href="/user-userprofile" className="font-bold text-gray-700">User Profile</a>
+  </li>
+  <li className="px-2.5 pr-8">
+    <a href="/user-survey" className="font-bold text-gray-700">Survey</a>
+  </li>
+  <li className="px-2.5 pr-8">
+    <a href="/user-threads" className="font-bold text-gray-700">Threads</a>
+  </li>
+  <li className="px-2.5 pr-8">
+    <details>
+      <summary className="font-bold text-gray-700">Contents</summary>
+      <ul className="px-2.5 bg-white pr-8 z-20">
+        <li className="p-1 border-b border-hgray last:border-b-0">
+          <a href="/user-companies" className="font-bold text-gray-700">Companies</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-news" className="font-bold text-gray-700">News</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-events" className="font-bold text-gray-700">Events</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-certifications" className="font-bold text-gray-700">Certifications</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-documentrequest" className="font-bold text-gray-700">Document Request Steps</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-job" className="font-bold text-gray-700">Job/Internship Referrals</a>
+        </li>
+      </ul>
+    </details>
+  </li>
+  <li className="px-2.5 pr-8">
+    <a href="/user-alumni" className="font-bold text-gray-700">Alumni</a>
+  </li>
+  <li className="px-2.5">
+    <a href="/user-chatbot" className="font-bold text-gray-700">Chatbot</a>
+  </li>
+</ul>
+
         </div>
         <div className="navbar-end relative">
           <a

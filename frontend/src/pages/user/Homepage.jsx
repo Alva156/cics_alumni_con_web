@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import AOS from "aos";
+import "aos/dist/aos.css"; // Import the AOS CSS styles
 import ustbg from "../../assets/ustbg.mp4";
 import "../../App.css";
 import homepage1 from "../../assets/homepage1.jpg";
@@ -14,6 +16,11 @@ const Homepage = () => {
   const images = [homepage1, homepage2, homepage3]; // Placeholder images
   const videoRef = useRef(null);
   const navigate = useNavigate(); // Initialize useNavigate
+
+    // Initialize AOS library
+    useEffect(() => {
+      AOS.init({ duration: 1000, once: true });
+    }, []);
 
   const nextPage = () => {
     setFade(true);
@@ -90,7 +97,7 @@ const Homepage = () => {
         </div>
       )}
   
-      <div className="carousel-container">
+      <div className="carousel-container" data-aos="fade-up">
         <button className="carousel-button prev" onClick={prevPage}>❮</button>
         <div className={`carousel-content ${fade ? 'fade' : ''}`}>
           {currentPage === 0 ? (
@@ -168,7 +175,7 @@ const Homepage = () => {
         <button className="carousel-button next" onClick={nextPage}>❯</button>
       </div>
   
-      <div className="mission-vision-section fixed-height">
+      <div className="mission-vision-section fixed-height" data-aos="fade-up">
   <div className="mission-vision-content">
     <h2 className="mission-title">Our Mission</h2>
     <p className="mission-text">
@@ -179,7 +186,7 @@ const Homepage = () => {
       To be a leading alumni network that empowers individuals to connect, share knowledge, and create impactful solutions for a better future.
     </p>
   </div>
-  <div className="image-carousel-container fixed-height">
+  <div className="image-carousel-container fixed-height" data-aos="fade-up">
     <button className="carousel-button prev" onClick={prevImage}>❮</button>
     <img src={images[currentImage]} alt="Placeholder" className="carousel-image" />
     <button className="carousel-button next" onClick={nextImage}>❯</button>

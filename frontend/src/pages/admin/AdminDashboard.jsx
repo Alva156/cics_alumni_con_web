@@ -47,7 +47,7 @@ const AdminDashboard = () => {
       // Large screens
       return 13;
     } else {
-      // Extra large screens
+      // Extra large screenss
       return 13;
     }
   }

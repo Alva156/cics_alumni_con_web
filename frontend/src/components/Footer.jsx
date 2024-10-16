@@ -2,12 +2,31 @@ import React from "react";
 import { FaRegCopyright, FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 const Footer = () => {
+  // State to manage visibility of Quick Links
+  const [showQuickLinks, setShowQuickLinks] = React.useState(true);
+
+  // Effect to update visibility based on screen size
+  React.useEffect(() => {
+    const handleResize = () => {
+      setShowQuickLinks(window.innerWidth >= 768); // Show Quick Links on wider screens
+    };
+
+    // Initial check
+    handleResize();
+    
+    // Event listener for window resize
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <footer className="relative text-white">
       <div
         className="relative"
         style={{
-          backgroundImage: "url('/src/assets/ustfooter.jpg')", 
+          backgroundImage: "url('/src/assets/ustfooter.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           height: "300px",
@@ -47,31 +66,33 @@ const Footer = () => {
           </div>
 
           {/* Column 2: Additional Links */}
-          <div className="mb-6 text-right w-full md:w-1/2">
-            <h4 className="font-semibold text-lg text-gray-300">Quick Links:</h4>
-            <ul className="space-y-2 mt-2">
-              <li>
-                <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
-                  Access Alumni Member Card
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
-                  Check Your Alumni Email
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
-                  My Alumni Account
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
-                  Give to UST
-                </a>
-              </li>
-            </ul>
-          </div>
+          {showQuickLinks && ( // Conditional rendering based on screen width
+            <div className="mb-6 text-right w-full md:w-1/2">
+              <h4 className="font-semibold text-lg text-gray-300">Quick Links:</h4>
+              <ul className="space-y-2 mt-2">
+                <li>
+                  <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
+                    Access Alumni Member Card
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
+                    Check Your Alumni Email
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
+                    My Alumni Account
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-gray-200 hover:underline transition-colors duration-300">
+                    Give to UST
+                  </a>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
 

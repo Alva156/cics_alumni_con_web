@@ -121,7 +121,7 @@ function Jobs() {
             <div className="text-2xl font-medium mb-2">{selectedJobs.name}</div>
             <div className="text-md mb-2">{selectedJobs.address}</div>
             <img
-              src={selectedJobs.image}
+              src={`${backendUrl}${selectedJobs.image}`}
               alt={selectedJobs.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />

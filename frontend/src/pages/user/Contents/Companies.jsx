@@ -123,7 +123,7 @@ function Companies() {
             </div>
             <div className="text-md mb-2">{selectedCompany.address}</div>
             <img
-              src={selectedCompany.image}
+              src={`${backendUrl}${selectedCompany.image}`}
               alt={selectedCompany.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />

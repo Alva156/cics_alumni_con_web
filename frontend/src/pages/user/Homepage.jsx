@@ -30,10 +30,10 @@ const Homepage = () => {
     }, 500);
   };
 
-  useEffect(() => {
-    const interval = setInterval(nextPage, 20000);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(nextPage, 20000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const prevPage = () => {
     setFade(true);
@@ -184,11 +184,31 @@ const Homepage = () => {
       To be a leading alumni network that empowers individuals to connect, share knowledge, and create impactful solutions for a better future.
     </p>
   </div>
-  <div className="image-carousel-container fixed-height">
-    <button className="carousel-button prev" onClick={prevImage}>❮</button>
-    <img src={images[currentImage]} alt="Placeholder" className="carousel-image" />
-    <button className="carousel-button next" onClick={nextImage}>❯</button>
-  </div>
+  <div className="image-carousel-container">
+      <button className="carousel-button prev" onClick={prevImage}>❮</button>
+      <div className="carousel-images">
+  {images.map((image, index) => (
+    <img
+      key={index}
+      src={image}
+      alt={`carousel-${index}`}
+      className={`carousel-image ${currentImage === index ? "active" : ""}`}
+    />
+  ))}
+</div>
+
+      <button className="carousel-button next" onClick={nextImage}>❯</button>
+
+      <div className="carousel-indicators">
+        {images.map((_, index) => (
+          <span
+            key={index}
+            className={`indicator ${currentImage === index ? "active" : ""}`}
+            onClick={() => setCurrentImage(index)}
+          ></span>
+        ))}
+      </div>
+    </div>
 </div>
 
     </div>

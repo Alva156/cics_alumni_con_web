@@ -448,15 +448,15 @@ exports.getDashboardStats = async (req, res) => {
           .length
     );
 
-    // Users per specialization (updated to use keys as specializations and values as counts)
-    const usersPerSpecialization = {};
-    filteredAlumni.forEach((profile) => {
-      const specialization = profile.specialization;
-      if (specialization) {
-        usersPerSpecialization[specialization] =
-          (usersPerSpecialization[specialization] || 0) + 1;
-      }
-    });
+    // Users per specialization
+    const specializations = ["Web Development", "Networking", "Automation"];
+
+    const usersPerSpecialization = specializations.map(
+      (specialization) =>
+        filteredAlumni.filter(
+          (profile) => profile.specialization === specialization
+        ).length
+    );
 
     // Users per year started and graduated (updated to extract only the year)
     const usersPerStartYear = {};

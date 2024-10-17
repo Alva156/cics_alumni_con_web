@@ -9,6 +9,13 @@ const NavbarAdmin = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
+    </div>
+  );
   const navigate = useNavigate();
 
   const toggleDropdown = () => {
@@ -27,6 +34,8 @@ const NavbarAdmin = () => {
       );
 
       if (response.status === 200) {
+        setLoading(true);
+
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
         sessionStorage.setItem("logoutMessageShown", "true");
@@ -34,6 +43,7 @@ const NavbarAdmin = () => {
         console.log("User has been logged out.");
 
         setTimeout(() => {
+          setLoading(false);
           navigate("/login?logout=success");
         }, 2000); // 2000ms = 2 seconds
       }
@@ -197,6 +207,7 @@ const NavbarAdmin = () => {
 
           {isModalVisible && (
             <dialog id="my_modal_5" className="modal modal-middle " open>
+              {loading && <LoadingSpinner />} {/* Show loading spinner */}
               <div className="modal-box">
                 <h3 className="font-bold text-lg">Logout</h3>
                 <p className="py-4">Are you sure you want to log out?</p>

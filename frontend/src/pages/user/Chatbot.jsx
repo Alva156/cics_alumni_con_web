@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
+import chatbotimage from "../../assets/chatbotimage.jpg";
 
 function Chatbot() {
   const [step, setStep] = useState(1);
@@ -276,8 +277,15 @@ function Chatbot() {
 
         {/* Start Button for Initial Setup */}
         {step === 1 && (
-          <div className="p-6 rounded-lg shadow-lg text-center bg-red h-[62vh] flex flex-col items-center justify-center">
-            <div className="mb-4 font-light sm:text-2xl text-xl text-white">
+          <div
+            className="p-6 rounded-lg shadow-lg text-center h-[62vh] flex flex-col items-center justify-center"
+            style={{
+              backgroundImage: `url(${chatbotimage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            <div className="mb-4 font-bold sm:text-2xl text-xl text-white">
               Welcome to Chatbot! Please click Get Started to continue.
             </div>
             <button

@@ -76,7 +76,7 @@ exports.createCertifications = async (req, res) => {
       // Send email notification
       await sendEmailNotification(
         emailAddresses,
-        "🎓 Exciting Announcement: New Certification Opportunity for CICS Alumni!",
+        "🎓 New Certification ALert: New Certification Opportunity for CICS Alumni!",
         `A new certification titled "${name}" has just been introduced that CICS alumni can take advantage of. This could be a valuable addition to your resume and a great opportunity to enhance your job prospects!`
       );
 

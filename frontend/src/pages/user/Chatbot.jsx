@@ -276,9 +276,10 @@ function Chatbot() {
         ))}
 
         {/* Start Button for Initial Setup */}
+        {/* Start Button for Initial Setup */}
         {step === 1 && (
           <div
-            className="p-6 rounded-lg shadow-lg text-center h-[62vh] flex flex-col items-center justify-center"
+            className="relative p-6 rounded-lg shadow-lg text-center h-[62vh] flex flex-col items-center justify-center"
             style={{
               backgroundImage: `url(${chatbotimage})`,
               backgroundSize: "cover",
@@ -294,6 +295,24 @@ function Chatbot() {
             >
               Get Started
             </button>
+
+            {/* Credit Overlay */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: "20px",
+                right: "20px",
+                backgroundColor: "rgba(0, 0, 0, 0.4)",
+                color: "white",
+                padding: "10px",
+                borderRadius: "5px",
+                fontSize: "14px",
+                zIndex: "20",
+                textAlign: "right",
+              }}
+            >
+              Photo Courtesy of UST ICS
+            </div>
           </div>
         )}
 

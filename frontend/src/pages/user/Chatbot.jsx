@@ -227,7 +227,9 @@ function Chatbot() {
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       <div className="flex items-center mb-4">
         <img src={chatbotsymbol} alt="Logo" className="w-10 h-10 mr-2" />
-        <h1 className="text-2xl font-medium text-gray-700">AlumniConnect Chatbot</h1>
+        <h1 className="text-2xl font-medium text-gray-700">
+          AlumniConnect Chatbot
+        </h1>
       </div>
       {/* Chat Container */}
       <div
@@ -328,7 +330,7 @@ function Chatbot() {
                 className="btn bg-green text-white py-2 px-6 rounded-lg"
                 onClick={handleAskAgain}
               >
-                Ask Again
+                Ask Againn
               </button>
             </div>
           </div>

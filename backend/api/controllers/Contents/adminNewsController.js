@@ -77,7 +77,7 @@ exports.createNews = async (req, res) => {
       await sendEmailNotification(
         emailAddresses,
         "📰 New News Alert from CICS Alumni Connect!",
-        `Hello everyone! 👋\n\nWe’re thrilled to bring you some exciting news from CICS Alumni Connect! Our admin team has just shared some fresh and important news that you won’t want to miss.\n\nStay in the loop and discover what’s happening in our community—there could be valuable insights and opportunities for you!\n\nBe sure to check out the latest news now and see what’s new! 🔗\n\nBest wishes,\nThe CICS Alumni Connect Team`
+        `Hello everyone! 👋\n\nWe’re thrilled to bring you some exciting news about "${name}" from CICS Alumni Connect that you don’t want to miss! `
       );
 
       res.status(201).json(news);
@@ -171,7 +171,7 @@ exports.updateNews = async (req, res) => {
       await sendEmailNotification(
         emailAddresses,
         "🔔 Quick Heads Up: Recent News Update!",
-        `Hello everyone! 👋\n\nWe wanted to let you know that some existing news about "${name}" has just been updated!  Our team has refreshed the details, and you won’t want to miss the latest insights.\n\nStay informed about what’s new—there could be valuable information and opportunities for you! \n\nCheck out the updated news now and see what’s changed! 🔗\n\nBest regards,\nThe CICS Alumni Connect Team`
+        `Hello everyone! 👋\n\nWe wanted to let you know that some existing news about "${name}" has just been updated and you won’t want to miss out on these new insights.`
       );
 
       res.status(200).json(news);

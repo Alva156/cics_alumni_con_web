@@ -78,7 +78,7 @@ exports.createEvents = async (req, res) => {
       // Send email notification
       await sendEmailNotification(
         emailAddresses,
-        "📅 Attention: A New Event Has Been Posted!",
+        "📅 New Event Alert: A New Event Has Been Posted!",
         `A new event titled "${name}" has just been announced. Check out the details and discover what this event has to offer. It could be a great opportunity for fresh insights and valuable connections!`
       );
 

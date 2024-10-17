@@ -330,7 +330,7 @@ function Chatbot() {
                 className="btn bg-green text-white py-2 px-6 rounded-lg"
                 onClick={handleAskAgain}
               >
-                Ask Againn
+                Ask Again
               </button>
             </div>
           </div>

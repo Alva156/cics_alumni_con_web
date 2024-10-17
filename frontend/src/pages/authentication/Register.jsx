@@ -157,8 +157,9 @@ function Register() {
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "28px" }}
             />
+
             <div className="flex mb-2">
-              <div className="flex-1 pr-2">
+              <div className="w-1/2 pr-1">
                 <label className="block mb-1 text-xs font-medium">
                   First Name *
                 </label>
@@ -172,7 +173,7 @@ function Register() {
                   style={{ height: "28px" }}
                 />
               </div>
-              <div className="flex-1 pl-2">
+              <div className="w-1/2 pl-1">
                 <label className="block mb-1 text-xs font-medium">
                   Last Name *
                 </label>
@@ -306,7 +307,6 @@ function Register() {
 
         {/* Right Image */}
         <div className="relative w-full md:w-1/2 h-full flex-shrink-0 hidden md:block">
-          <div className="absolute inset-0 bg-[#5D0000] opacity-30"></div>
           <img
             src={signupImage}
             alt="Sign Up"

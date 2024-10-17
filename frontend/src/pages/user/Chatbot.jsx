@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
+import chatbotsymbol from "../../assets/chatbot.png";
 import chatbotimage from "../../assets/chatbotimage.jpg";
 
 function Chatbot() {
@@ -224,7 +225,10 @@ function Chatbot() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-xl mb-4">Chatbot</h1>
+      <div className="flex items-center mb-4">
+        <img src={chatbotsymbol} alt="Logo" className="w-10 h-10 mr-2" />
+        <h1 className="text-2xl font-semibold">AlumniConnect Chatbot</h1>
+      </div>
       {/* Chat Container */}
       <div
         className="w-full h-[80vh] bg-white p-6 rounded-lg shadow-lg flex flex-col space-y-4 overflow-auto"

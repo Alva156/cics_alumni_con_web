@@ -1,34 +1,129 @@
 import React from "react";
-import { FaRegCopyright } from "react-icons/fa";
+import { FaRegCopyright, FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 const Footer = () => {
+  // State to manage visibility of Quick Links
+  const [showQuickLinks, setShowQuickLinks] = React.useState(true);
+
+  // Effect to update visibility based on screen size
+  React.useEffect(() => {
+    const handleResize = () => {
+      setShowQuickLinks(window.innerWidth >= 768); // Show Quick Links on wider screens
+    };
+
+    // Initial check
+    handleResize();
+    
+    // Event listener for window resize
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup event listener on component unmount
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <footer className="bg-fgray p-4 pb-16 pt-10 text-grayt text-xxs md:text-sm">
-      <div className="ml-6">
-        <aside className="mb-8 ml-2 md:ml-12">
-          <p className="flex flex-wrap items-center">
-            <FaRegCopyright className="flex items-center mr-1" />
-            2024. University of Santo Tomas. College of Information and
-            Computing Sciences.
-          </p>
-        </aside>
-        <p className="ml-2 text-bgray text-xxs font-light mb-2 md:text-xs md:ml-12">
-          Developers
-        </p>
-        <div className="flex flex-wrap gap-x-4 ml-2 md:ml-12 ">
-          <div className="flex flex-col mr-6">
-            <div className="mb-2">Andrei Alvarico</div>
-            <div className="mb-2">Claire Cruz</div>
-            <div className="mb-2">James Lorenz Santos</div>
-            <div>Denise Anne Valdivieso</div>
+    <footer className="relative text-white">
+      <div
+        className="relative"
+        style={{
+          backgroundImage: "url('/src/assets/ustfooter.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          height: "300px",
+        }}
+      >
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-transparent to-[#1a1a1a]"
+          aria-hidden="true"
+        ></div>
+
+        <div className="relative z-10 px-10 md:px-20 py-10 flex flex-col md:flex-row justify-between">
+          {/* Column 1: Contact Info */}
+          <div className="mb-6 w-full md:w-1/2">
+            <h3 className="font-bold text-3xl">UST CICS | <span className="italic">Alumni</span></h3>
+            <address className="mt-4 not-italic text-gray-200">
+              UST Blessed Pier Giorgio Frassati Building <br />
+              España Blvd, Sampaloc, Manila <br />
+              1000 Metro Manila
+            </address>
+            <div className="mt-4">
+              <h4 className="font-semibold text-lg text-gray-300">Connect with Us:</h4>
+              <div className="flex space-x-4 mt-2">
+                <a href="#" className="hover:text-gray-300 transform hover:scale-110 transition duration-300">
+                  <FaFacebookF />
+                </a>
+                <a href="#" className="hover:text-gray-300 transform hover:scale-110 transition duration-300">
+                  <FaTwitter />
+                </a>
+                <a href="#" className="hover:text-gray-300 transform hover:scale-110 transition duration-300">
+                  <FaInstagram />
+                </a>
+                <a href="#" className="hover:text-gray-300 transform hover:scale-110 transition duration-300">
+                  <FaLinkedinIn />
+                </a>
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <div className="mb-2">andreicimoune.alvarico.cics@ust.edu.ph</div>
-            <div className="mb-2">alessandraclaire.cruz.cics@ust.edu.ph</div>
-            <div className="mb-2">jameslorenz.santos.cics@ust.edu.ph</div>
-            <div>deniseanne.valdivieso.cics@ust.edu.ph</div>
-          </div>
+
+          {/* Column 2: Additional Links */}
+          {showQuickLinks && ( // Conditional rendering based on screen width
+            <div className="mb-6 text-right w-full md:w-1/2">
+              <h4 className="font-semibold text-lg text-gray-300">Quick Links:</h4>
+              <ul className="space-y-2 mt-2">
+              <li>
+  <a
+    href="https://alumnirelations.ust.edu.ph/"
+    className="hover:text-gray-200 hover:underline transition-colors duration-300"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    UST Office of Alumni Relations
+  </a>
+</li>
+<li>
+  <a
+    href="https://www.ust.edu.ph/"
+    className="hover:text-gray-200 hover:underline transition-colors duration-300"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    UST Website Homepage
+  </a>
+</li>
+<li>
+  <a
+    href="/user-userprofile"
+    className="hover:text-gray-200 hover:underline transition-colors duration-300"
+  >
+    My Alumni Account
+  </a>
+</li>
+<li>
+  <a
+    href="https://www.ust.edu.ph/information-and-computing-sciences/"
+    className="hover:text-gray-200 hover:underline transition-colors duration-300"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    UST CICS Info
+  </a>
+</li>
+
+              </ul>
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* Bottom Footer Section */}
+      <div className="bg-[#1a1a1a] text-gray-400 py-6 text-center text-sm">
+        <div className="flex justify-center items-center mb-2">
+          <FaRegCopyright className="mr-1" />
+          <p>2024. University of Santo Tomas. College of Information and Computing Sciences.</p>
+        </div>
+        <p className="text-xs">
+          Developers: Andrei Cimoune Alvarico, Alessandra Claire Cruz, James Lorenz Santos, Denise Anne Valdivieso
+        </p>
       </div>
     </footer>
   );

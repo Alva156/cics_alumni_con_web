@@ -57,6 +57,7 @@ function Login() {
       }, 5000);
     }
   };
+
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     if (
@@ -168,6 +169,23 @@ function Login() {
             alt="Login illustration"
             className="object-cover w-full h-full"
           />
+          <div
+            className="absolute bottom-4 right-4 bg-black text-white text-sm p-2 rounded"
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              backgroundColor: "rgba(0, 0, 0, 0.4)",
+              color: "white",
+              padding: "10px",
+              borderRadius: "5px",
+              fontSize: "14px",
+              zIndex: "20",
+              textAlign: "right",
+            }}
+          >
+            Photo Courtesy of UST SITE
+          </div>
         </div>
       </div>
     </>

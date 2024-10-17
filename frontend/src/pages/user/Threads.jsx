@@ -375,8 +375,8 @@ function Threads() {
   };
 
   return (
-    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
+    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-0 mb-12">
+      <div className="carousel relative bg-white m-3 max-w-full overflow-hidden">
         {showErrorMessage && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
             <p>{errorMessage}</p>
@@ -388,7 +388,7 @@ function Threads() {
           </div>
         )}
       </div>
-      <h1 className="text-xl mb-4">Threads</h1>
+      <h1 className="text-2xl font-medium text-gray-700 mb-6">Threads</h1>
       <div className="mb-4 relative">
         <input
           type="text"

@@ -137,7 +137,9 @@ function AdminAccount() {
         onSubmit={handleSave}
         className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12"
       >
-        <div className="page-title text-xl py-4">Admin Account</div>
+        <div className="flex items-center mb-4">
+          <h1 className="text-2xl font-medium text-gray-700">Admin Account</h1>
+        </div>
 
         <div className="py-1">
           <img

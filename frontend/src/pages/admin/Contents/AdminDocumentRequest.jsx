@@ -198,6 +198,12 @@ function AdminDocuments() {
         </div>
       )}
 
+      <div className="flex items-center mb-4">
+        <h1 className="text-2xl font-medium text-gray-700">
+          Document Request Steps
+        </h1>
+      </div>
+
       <div className="mb-4 relative">
         <input
           type="text"

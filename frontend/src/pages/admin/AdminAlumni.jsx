@@ -76,7 +76,9 @@ function AdminAlumni() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-xl mb-4">Alumni</h1>
+      <div className="flex items-center mb-4">
+        <h1 className="text-2xl font-medium text-gray-700">Alumni</h1>
+      </div>
 
       <div className="mb-4 relative">
         <input

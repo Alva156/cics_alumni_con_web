@@ -27,12 +27,6 @@ const AdminDashboard = () => {
   const chartRefs = useRef([]);
   const startYears = Object.keys(dashboardData.usersPerStartYear || {});
   const gradYears = Object.keys(dashboardData.usersPerGradYear || {});
-  const specializationKeys = Object.keys(
-    dashboardData.usersPerSpecialization || {}
-  );
-  const specializationValues = Object.values(
-    dashboardData.usersPerSpecialization || {}
-  );
   const timeToJobKeys = Object.keys(dashboardData.usersPerTimeToJob || {});
   const timeToJobValues = Object.values(dashboardData.usersPerTimeToJob || {});
 
@@ -131,11 +125,11 @@ const AdminDashboard = () => {
   };
 
   const data2 = {
-    labels: specializationKeys, // Fetch specializations as labels
+    labels: ["Web Development", "Networking", "Automation"], // Fetch specializations as labels
     datasets: [
       {
         label: "Number of Alumni",
-        data: specializationValues, // Fetch counts of alumni
+        data: dashboardData.usersPerSpecialization,
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },

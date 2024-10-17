@@ -227,7 +227,7 @@ function Chatbot() {
       <h1 className="text-xl mb-4">Chatbot</h1>
       {/* Chat Container */}
       <div
-        className="w-full h-[62vh] bg-white p-6 rounded-lg shadow-lg flex flex-col space-y-4 overflow-auto"
+        className="w-full h-[80vh] bg-white p-6 rounded-lg shadow-lg flex flex-col space-y-4 overflow-auto"
         ref={chatContainerRef}
       >
         {/* Chat Messages */}

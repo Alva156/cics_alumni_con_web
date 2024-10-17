@@ -3,7 +3,7 @@ import axios from "axios";
 
 function Alumni() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const [alumni, setAlumni] = useState([]); // Alumni state
+  const [alumni, setAlumni] = useState([]);
   const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -11,16 +11,13 @@ function Alumni() {
   const [selectedProgram, setSelectedProgram] = useState("");
   const modalRef = useRef(null);
 
-  // Function to format dates into "Month Day, Year" format
   const formatDate = (dateString) => {
-    if (!dateString) return " "; // Return "N/A" if no date is provided
-
+    if (!dateString) return " ";
     const options = { year: "numeric", month: "long", day: "numeric" };
     const date = new Date(dateString);
     return date.toLocaleDateString(undefined, options);
   };
 
-  // Fetch alumni data from the backend
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
@@ -32,23 +29,19 @@ function Alumni() {
         console.error("Error fetching alumni:", error);
       }
     };
-
     fetchAlumni();
   }, []);
 
-  // Function to open the modal with selected alumni details
   const openModal = (alumni) => {
     setSelectedAlumni(alumni);
     setIsModalOpen(true);
   };
 
-  // Function to close the modal
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedAlumni(null);
   };
 
-  // Close modal when clicking outside of it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -63,7 +56,6 @@ function Alumni() {
     }
   }, [isModalOpen]);
 
-  // Filter alumni based on the search term and selected program
   const filteredAlumni = alumni
     .filter((alumni) =>
       `${alumni.firstName} ${alumni.lastName}`
@@ -73,11 +65,10 @@ function Alumni() {
     .filter((alumni) =>
       selectedProgram ? alumni.collegeProgram === selectedProgram : true
     );
-  // Sort alumni based on selected order
+
   const sortedAlumni = [...filteredAlumni].sort((a, b) => {
     const nameA = `${a.firstName} ${a.lastName}`;
     const nameB = `${b.firstName} ${b.lastName}`;
-
     return sortOrder === "asc"
       ? nameA.localeCompare(nameB)
       : nameB.localeCompare(nameA);
@@ -103,8 +94,8 @@ function Alumni() {
         </span>
       </div>
 
-      <div className="flex md:flex-row">
-        <div className="mb-6">
+      <div className="flex md:flex-row mb-6">
+        <div>
           <span className="text-sm">Sort by:</span>
           <select
             className="ml-2 border border-black rounded px-3 py-1 text-sm mr-10"
@@ -115,7 +106,7 @@ function Alumni() {
             <option value="desc">Name (Z-A)</option>
           </select>
         </div>
-        <div className="mb-6">
+        <div>
           <span className="text-sm">Filter:</span>
           <select
             className="ml-2 border border-black rounded px-3 py-1 text-sm"
@@ -133,7 +124,6 @@ function Alumni() {
       </div>
 
       <div className="text-lg mb-4">All Alumni</div>
-
       <hr className="mb-6 border-black" />
 
       {sortedAlumni.length > 0 ? (
@@ -170,137 +160,203 @@ function Alumni() {
               &times;
             </button>
 
-            <div>
-              {selectedAlumni.profileImage && (
-                <div className="mb-4">
-                  <img
-                    src={selectedAlumni.profileImage}
-                    alt="Alumni"
-                    className="w-32 h-32"
-                  />
-                </div>
-              )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 justify-between">
-                <div className="order-1 sm:order-1">
-                  <h1 className="text-xl mb-4">Primary Information</h1>
-                  <p className="text-xs mb-1/2">Name</p>
-                  <p className="text-s mb-2 font-bold">
-                    {`${selectedAlumni.firstName} ${selectedAlumni.lastName}`}
-                  </p>
-                  <p className="text-xs mb-1/2">Profession</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.profession}
-                  </p>
-                  <p className="text-xs mb-1/2">College Program</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.collegeProgram}
-                  </p>
-                  <p className="text-xs mb-1/2">Specialization</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.specialization}
-                  </p>
-                  <p className="text-xs mb-1/2">
-                    Year Started on College Program
-                  </p>
-                  <p className="text-s mb-2 font-bold">
-                    {formatDate(selectedAlumni.yearStartedCollege)}
-                  </p>
-                  <p className="text-xs mb-1/2">
-                    Year Graduated on College Program
-                  </p>
-                  <p className="text-s mb-2 font-bold">
-                    {formatDate(selectedAlumni.yearGraduatedCollege)}
-                  </p>
-                  <p className="text-xs mb-1/2">Time to Land a Job (Months)</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.timeToJob}
-                  </p>
-                </div>
-                <div className="order-3 sm:order-2">
-                  <h1 className="text-xl mb-4">Contact Information</h1>
-                  <p className="text-xs mb-1/2">LinkedIn</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.linkedin}
-                  </p>
-                  <p className="text-xs mb-1/2">Facebook</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.facebook}
-                  </p>
-                  <p className="text-xs mb-1/2">Instagram</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.instagram}
-                  </p>
-                  <p className="text-xs mb-1/2">Email</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.email}
-                  </p>
-                  <p className="text-xs mb-1/2">Mobile Number</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.contactInformation?.mobileNumber}
-                  </p>
-                </div>
-                <div className="order-2 sm:order-3">
-                  <h1 className="text-xl mb-4 mt-6">Secondary Information</h1>
-                  <p className="text-xs mb-1/2">Employment Status</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.employmentStatus}
-                  </p>
-                  <p className="text-xs mb-1/2">Work Industry</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.workIndustry}
-                  </p>
-                  <p className="text-xs mb-1/2">
-                    Is current profession in line with college degree
-                  </p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.professionAlignment}
-                  </p>
-                  <p className="text-xs mb-1/2">Marital Status</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.maritalStatus}
-                  </p>
-                  <p className="text-xs mb-1/2">Salary range (PHP)</p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.salaryRange}
-                  </p>
-                  <p className="text-xs mb-1/2">
-                    Place of employment (Local or International)
-                  </p>
-                  <p className="text-s mb-2 font-bold">
-                    {selectedAlumni.placeOfEmployment}
-                  </p>
-                </div>
-                <div className="order-4 sm:order-4">
-                  <h1 className="text-xl mb-4 mt-6">Attachments</h1>
-                </div>
+            <div role="tablist" className="tabs tabs-lifted mb-6">
+              <input
+                type="radio"
+                name="my_tabs_2"
+                role="tab"
+                className="tab"
+                aria-label="Primary"
+                defaultChecked
+              />
+              <div
+                role="tabpanel"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              >
+                <h1 className="text-xl mb-4">Primary Information</h1>
+                {selectedAlumni.profileImage && (
+                  <div className="mb-4">
+                    <img
+                      src={selectedAlumni.profileImage}
+                      alt="Alumni"
+                      className="w-32 h-32"
+                    />
+                  </div>
+                )}
+                <p className="text-xs mb-1/2">Name</p>
+                <p className="text-s mb-2 font-bold">
+                  {`${selectedAlumni.firstName} ${selectedAlumni.lastName}`}
+                </p>
+                <p className="text-xs mb-1/2">Profession</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.profession}
+                </p>
+                <p className="text-xs mb-1/2">College Program</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.collegeProgram}
+                </p>
+                <p className="text-xs mb-1/2">Specialization</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.specialization}
+                </p>
+                <p className="text-xs mb-1/2">
+                  Year Started on College Program
+                </p>
+                <p className="text-s mb-2 font-bold">
+                  {formatDate(selectedAlumni.yearStartedCollege)}
+                </p>
+                <p className="text-xs mb-1/2">
+                  Year Graduated on College Program
+                </p>
+                <p className="text-s mb-2 font-bold">
+                  {formatDate(selectedAlumni.yearGraduatedCollege)}
+                </p>
+                <p className="text-xs mb-1/2">Time to Land a Job (Months)</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.timeToJob}
+                </p>
               </div>
-              <div className="block md:flex-row md:flex justify-between"></div>
 
-              <h1 className="text-xl mb-4 mt-6">Educational Background</h1>
-              <p className="text-xs mb-1">Secondary Education</p>
-              <p className="text-s font-bold">
-                {selectedAlumni.secondaryeducation}
-              </p>
-              <p className="text-xs mb-2">
-                {selectedAlumni.secondaryeducationyear}
-              </p>
-              <p className="text-xs mb-1 mt-3">Tertiary Education</p>
-              <p className="text-s font-bold">
-                {selectedAlumni.tertiaryeducation}
-              </p>
-              <p className="text-xs mb-1 italic">
-                {selectedAlumni.tertiaryeducationdegree}
-              </p>
-              <p className="text-xs mb-2">
-                {selectedAlumni.tertiaryeducationyear}
-              </p>
+              <input
+                type="radio"
+                name="my_tabs_2"
+                role="tab"
+                className="tab"
+                aria-label="Secondary"
+              />
+              <div
+                role="tabpanel"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              >
+                <h1 className="text-xl mb-4">Secondary Information</h1>
+                <p className="text-xs mb-1/2">Employment Status</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.employmentStatus}
+                </p>
+                <p className="text-xs mb-1/2">Work Industry</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.workIndustry}
+                </p>
+                <p className="text-xs mb-1/2">
+                  Is current profession in line with college degree
+                </p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.professionAlignment}
+                </p>
+                <p className="text-xs mb-1/2">Marital Status</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.maritalStatus}
+                </p>
+                <p className="text-xs mb-1/2">Salary range (PHP)</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.salaryRange}
+                </p>
+                <p className="text-xs mb-1/2">
+                  Place of employment (Local or International)
+                </p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.placeOfEmployment}
+                </p>
+              </div>
 
-              <h1 className="text-xl mb-4 mt-6">Career Background</h1>
-              <p className="text-s font-bold">{selectedAlumni.career}</p>
-              <p className="text-xs mb-1 italic">
-                {selectedAlumni.careerposition}
-              </p>
-              <p className="text-xs mb-2">{selectedAlumni.careeryear}</p>
+              <input
+                type="radio"
+                name="my_tabs_2"
+                role="tab"
+                className="tab"
+                aria-label="Contacts"
+              />
+              <div
+                role="tabpanel"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              >
+                <h1 className="text-xl mb-4">Contacts</h1>
+                <p className="text-xs mb-1/2">Facebook</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.contactInformation?.facebook}
+                </p>
+                <p className="text-xs mb-1/2">LinkedIn</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.contactInformation?.linkedIn}
+                </p>
+                <p className="text-xs mb-1/2">Instagram</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.contactInformation?.instagram}
+                </p>
+                <p className="text-xs mb-1/2">Email</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.contactInformation?.email}
+                </p>
+                <p className="text-xs mb-1/2">Mobile Number</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.contactInformation?.mobileNumber}
+                </p>
+              </div>
+
+              <input
+                type="radio"
+                name="my_tabs_2"
+                role="tab"
+                className="tab"
+                aria-label="Attachments"
+              />
+              <div
+                role="tabpanel"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              >
+                <h1 className="text-xl mb-4">Attachments</h1>
+                {/* Add any attachment display logic here */}
+              </div>
+
+              <input
+                type="radio"
+                name="my_tabs_2"
+                role="tab"
+                className="tab"
+                aria-label="Education"
+              />
+              <div
+                role="tabpanel"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              >
+                <h1 className="text-xl mb-4">Educational Background</h1>
+                <p className="text-xs mb-1">Secondary Education</p>
+                <p className="text-s font-bold">
+                  {selectedAlumni.secondaryeducation}
+                </p>
+                <p className="text-xs mb-2">
+                  {selectedAlumni.secondaryeducationyear}
+                </p>
+                <p className="text-xs mb-1 mt-3">Tertiary Education</p>
+                <p className="text-s font-bold">
+                  {selectedAlumni.tertiaryeducation}
+                </p>
+                <p className="text-xs mb-1 italic">
+                  {selectedAlumni.tertiaryeducationdegree}
+                </p>
+                <p className="text-xs mb-2">
+                  {selectedAlumni.tertiaryeducationyear}
+                </p>
+              </div>
+
+              <input
+                type="radio"
+                name="my_tabs_2"
+                role="tab"
+                className="tab"
+                aria-label="Career"
+              />
+              <div
+                role="tabpanel"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              >
+                <h1 className="text-xl mb-4">Career Background</h1>
+                <p className="text-s font-bold">{selectedAlumni.career}</p>
+                <p className="text-xs mb-1 italic">
+                  {selectedAlumni.careerposition}
+                </p>
+                <p className="text-xs mb-2">{selectedAlumni.careeryear}</p>
+              </div>
             </div>
           </div>
         </div>

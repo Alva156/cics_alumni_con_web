@@ -43,8 +43,6 @@ function UserProfile() {
   const [profileId, setProfileId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState(null);
-  
-  
 
   const [secondaryEducationSections, setSecondaryEducationSections] = useState([
     { schoolName: "", yearStarted: "", yearEnded: "" },
@@ -168,8 +166,6 @@ function UserProfile() {
         yearEnded: "",
       },
     ]);
-
-    
   };
 
   const handleImageChange = async (e) => {
@@ -267,10 +263,9 @@ function UserProfile() {
     }
   };
 
-
   const handleSectionChange = (sectionType, sectionId, e) => {
     const { name, value } = e.target;
-  
+
     if (sectionType === "secondary") {
       setSecondaryEducationSections((prevSections) =>
         prevSections.map((section) =>
@@ -296,53 +291,68 @@ function UserProfile() {
     setIsDeleteModalOpen(true); // Open the modal
     setSectionToDelete({ sectionType, sectionId }); // Store the section type and ID
   };
-  
+
   const handleDeleteSection = async () => {
     if (!sectionToDelete) {
       return;
     }
-    
+
     const { sectionType, sectionId } = sectionToDelete;
-  
+
     console.log("Delete button clicked");
     console.log("Section ID in function:", sectionId);
-  
+
     if (!profileId || !sectionId) {
       console.log("Profile ID or Section ID is missing.");
       return;
     }
-  
+
     try {
       // Step 1: Call the DELETE endpoint to remove the section from the database
       const deleteResponse = await axios.delete(
         `${backendUrl}/profile/${sectionType}/${profileId}/${sectionId}`,
         { withCredentials: true }
       );
-  
+
       console.log("Delete response:", deleteResponse);
-  
+
       if (deleteResponse.status === 200) {
         // Step 2: Update the frontend state after successful deletion
         if (sectionType === "company-section") {
           setCompanySections((prevSections) => {
-            const updatedSections = prevSections.filter((section) => section._id !== sectionId);
-            console.log("Updated company sections after deletion:", updatedSections);
+            const updatedSections = prevSections.filter(
+              (section) => section._id !== sectionId
+            );
+            console.log(
+              "Updated company sections after deletion:",
+              updatedSections
+            );
             return updatedSections;
           });
         } else if (sectionType === "secondary-section") {
           setSecondaryEducationSections((prevSections) => {
-            const updatedSections = prevSections.filter((section) => section._id !== sectionId);
-            console.log("Updated secondary education sections after deletion:", updatedSections);
+            const updatedSections = prevSections.filter(
+              (section) => section._id !== sectionId
+            );
+            console.log(
+              "Updated secondary education sections after deletion:",
+              updatedSections
+            );
             return updatedSections;
           });
         } else if (sectionType === "tertiary-section") {
           setTertiaryEducationSections((prevSections) => {
-            const updatedSections = prevSections.filter((section) => section._id !== sectionId);
-            console.log("Updated tertiary education sections after deletion:", updatedSections);
+            const updatedSections = prevSections.filter(
+              (section) => section._id !== sectionId
+            );
+            console.log(
+              "Updated tertiary education sections after deletion:",
+              updatedSections
+            );
             return updatedSections;
           });
         }
-  
+
         // Step 3: Update the profile with the remaining sections
         const updatedUserData = {
           firstName,
@@ -384,41 +394,58 @@ function UserProfile() {
             other: otherContact,
           },
         };
-  
+
         // Step 4: Call the PUT endpoint to update the profile
         const updateResponse = await axios.put(
           `${backendUrl}/profile/updateprofile`,
           updatedUserData,
           { withCredentials: true }
         );
-  
+
         console.log("Profile updated after section deletion:", updateResponse);
-  
+
         if (updateResponse.status === 200) {
-          alert(`${sectionType.replace("-", " ")} deleted and profile updated successfully!`);
+          alert(
+            `${sectionType.replace(
+              "-",
+              " "
+            )} deleted and profile updated successfully!`
+          );
         } else {
           alert("Failed to update profile. Please try again.");
         }
       } else {
-        alert(`Failed to delete ${sectionType.replace("-", " ")}. Please try again.`);
+        alert(
+          `Failed to delete ${sectionType.replace("-", " ")}. Please try again.`
+        );
       }
     } catch (error) {
-      console.error(`Error deleting ${sectionType.replace("-", " ")} or updating profile:`, error);
+      console.error(
+        `Error deleting ${sectionType.replace("-", " ")} or updating profile:`,
+        error
+      );
       if (error.response) {
         console.log("Response status:", error.response.status);
         console.log("Response data:", error.response.data);
-        alert(`Failed to delete ${sectionType.replace("-", " ")}. Reason: ${error.response.data.message || "Please try again."}`);
+        alert(
+          `Failed to delete ${sectionType.replace("-", " ")}. Reason: ${
+            error.response.data.message || "Please try again."
+          }`
+        );
       } else {
-        alert(`Failed to delete ${sectionType.replace("-", " ")}. Please check your network connection.`);
+        alert(
+          `Failed to delete ${sectionType.replace(
+            "-",
+            " "
+          )}. Please check your network connection.`
+        );
       }
     }
-  
+
     // Close the modal and clear the sectionToDelete
     setIsDeleteModalOpen(false);
     setSectionToDelete(null);
   };
-  
-  
 
   const handleSave = (e) => {
     console.log("saved");
@@ -428,7 +455,7 @@ function UserProfile() {
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault(); // Check if the event is present before calling preventDefault
-  
+
     // Validate required fields
     if (!firstName || !lastName) {
       setValidationMessage("First Name and Last Name are required.");
@@ -436,10 +463,10 @@ function UserProfile() {
       setTimeout(() => setShowValidationMessage(false), 3000);
       return; // Prevent submission
     }
-  
+
     // Reset error messages when inputs are valid
     setShowErrorMessage(false);
-  
+
     const userData = {
       firstName,
       lastName,
@@ -474,27 +501,27 @@ function UserProfile() {
         other: otherContact,
       },
     };
-  
+
     try {
       // Check if the profile exists
       await axios.get(`${backendUrl}/profile/userprofile`, {
         withCredentials: true,
       });
-  
+
       // Update the existing profile
       await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
         withCredentials: true,
       });
-  
+
       // Check if the email has changed
       if (accountEmail !== initialAccountEmail) {
         setShowValidationMessage(false);
-  
+
         // Set validation message for the modal
         setValidationMessage(
           "Email changed successfully! Please log in using your new email."
         );
-  
+
         // Show the modal only, without the background message
         setModalVisible(true); // Show modal
       } else {
@@ -505,7 +532,7 @@ function UserProfile() {
           setShowValidationMessage(false);
         }, 3000);
       }
-  
+
       console.log("Profile updated successfully!");
     } catch (error) {
       if (error.response && error.response.status === 404) {
@@ -526,14 +553,14 @@ function UserProfile() {
         setTimeout(() => setShowErrorMessage(false), 3000);
       }
     }
-  
+
     // Validation message for successful save (if email has not changed)
     if (accountEmail === initialAccountEmail) {
       setShowValidationMessage(true);
       setTimeout(() => setShowValidationMessage(false), 3000);
     }
   };
-  
+
   // Fetch user profile on mount
   useEffect(() => {
     const fetchProfile = async () => {
@@ -594,7 +621,7 @@ function UserProfile() {
 
     fetchProfile();
   }, [backendUrl]);
-  
+
   const handlePasswordSub = async (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -675,7 +702,6 @@ function UserProfile() {
 
   return (
     <>
-    
       {/* Password Modal */}
       {isPassModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ">
@@ -789,28 +815,28 @@ function UserProfile() {
         </div>
       )}
 
-{isDeleteModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-      <h2 className="text-2xl mb-4">Delete Section</h2>
-      <p>Are you sure you want to delete this section?</p>
-      <div className="flex justify-end mt-4">
-        <button
-          className="btn btn-sm w-24 bg-red text-white mr-2"
-          onClick={handleDeleteSection} // Call the actual delete function on confirm
-        >
-          Delete
-        </button>
-        <button
-          className="btn btn-sm w-24 bg-gray-500 text-white"
-          onClick={() => setIsDeleteModalOpen(false)} // Close the modal on cancel
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Section</h2>
+            <p>Are you sure you want to delete this section?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={handleDeleteSection} // Call the actual delete function on confirm
+              >
+                Delete
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteModalOpen(false)} // Close the modal on cancel
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -924,14 +950,19 @@ function UserProfile() {
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">Specialization</label>
-                    <input
-                      type="text"
-                      placeholder="Type here"
-                      className="input input-sm input-bordered w-full h-10"
+                    <select
+                      className="select select-bordered select-sm border-2 w-full h-10"
+                      onChange={(e) => setSpecialization(e.target.value)}
                       name="specialization"
                       value={specialization}
-                      onChange={(e) => setSpecialization(e.target.value)}
-                    />
+                    >
+                      <option value="" disabled>
+                        Choose
+                      </option>
+                      <option>Web Development</option>
+                      <option>Networking</option>
+                      <option>Automation</option>
+                    </select>
                   </div>
 
                   <div className="py-1">
@@ -1282,7 +1313,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.schoolName}
-                        onChange={(e) =>handleSectionChange("secondary", section._id, e)}
+                        onChange={(e) =>
+                          handleSectionChange("secondary", section._id, e)
+                        }
                         name="schoolName"
                       />
                     </div>
@@ -1293,7 +1326,9 @@ function UserProfile() {
                         type="date"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
-                        onChange={(e) =>handleSectionChange("secondary", section._id, e)}
+                        onChange={(e) =>
+                          handleSectionChange("secondary", section._id, e)
+                        }
                         name="yearStarted"
                       />
                     </div>
@@ -1304,28 +1339,32 @@ function UserProfile() {
                         type="date"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
-                        onChange={(e) =>handleSectionChange("secondary", section._id, e)}
+                        onChange={(e) =>
+                          handleSectionChange("secondary", section._id, e)
+                        }
                         name="yearEnded"
                       />
                     </div>
 
                     {/* Delete Button */}
-    <div className="flex justify-end">
-      <button
-        className="btn btn-sm w-36 bg-red text-white mt-2"
-        onClick={() => {
-          console.log("Profile ID:", profileId);
-          console.log("Section ID:", section._id); // Use section._id here
-          initiateDeleteSection("secondary-section", section._id)} // Pass the correct section ID
-        }
-      >
-        Delete
-      </button>
-    </div>
-                    
-
+                    <div className="flex justify-end">
+                      <button
+                        className="btn btn-sm w-36 bg-red text-white mt-2"
+                        onClick={
+                          () => {
+                            console.log("Profile ID:", profileId);
+                            console.log("Section ID:", section._id); // Use section._id here
+                            initiateDeleteSection(
+                              "secondary-section",
+                              section._id
+                            );
+                          } // Pass the correct section ID
+                        }
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                  
                 ))}
 
                 {/* TERTIARY EDUCATION */}
@@ -1355,7 +1394,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.schoolName}
-                        onChange={(e) =>handleSectionChange("tertiary", section._id, e)}
+                        onChange={(e) =>
+                          handleSectionChange("tertiary", section._id, e)
+                        }
                       />
                     </div>
 
@@ -1368,7 +1409,9 @@ function UserProfile() {
                         placeholder="Type here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.program}
-                        onChange={(e) =>handleSectionChange("tertiary", section._id, e)}
+                        onChange={(e) =>
+                          handleSectionChange("tertiary", section._id, e)
+                        }
                       />
                     </div>
 
@@ -1380,7 +1423,9 @@ function UserProfile() {
                         name="yearStarted"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
-                        onChange={(e) =>handleSectionChange("tertiary", section._id, e)}
+                        onChange={(e) =>
+                          handleSectionChange("tertiary", section._id, e)
+                        }
                       />
                     </div>
 
@@ -1392,22 +1437,29 @@ function UserProfile() {
                         name="yearEnded"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
-                        onChange={(e) =>handleSectionChange("tertiary", section._id, e)}
+                        onChange={(e) =>
+                          handleSectionChange("tertiary", section._id, e)
+                        }
                       />
                     </div>
                     {/* Delete Button */}
-    <div className="flex justify-end">
-      <button
-        className="btn btn-sm w-36 bg-red text-white mt-2"
-        onClick={() => {
-          console.log("Profile ID:", profileId);
-          console.log("Section ID:", section._id); // Use section._id here
-          initiateDeleteSection("tertiary-section", section._id)} // Pass the correct section ID
-        }
-      >
-        Delete
-      </button>
-    </div>
+                    <div className="flex justify-end">
+                      <button
+                        className="btn btn-sm w-36 bg-red text-white mt-2"
+                        onClick={
+                          () => {
+                            console.log("Profile ID:", profileId);
+                            console.log("Section ID:", section._id); // Use section._id here
+                            initiateDeleteSection(
+                              "tertiary-section",
+                              section._id
+                            );
+                          } // Pass the correct section ID
+                        }
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1441,72 +1493,79 @@ function UserProfile() {
                 </div>
 
                 {companySections.map((section) => (
-  <div
-    key={section._id}
-    className="w-full border-2 rounded py-2 px-4 mt-2"
-  >
-    {/* Company Name */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Company Name</label>
-      <input
-        type="text"
-        name="companyName"
-        placeholder="Type here"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.companyName}
-        onChange={(e) => handleSectionChange("company", section._id, e)}
-      />
-    </div>
-    {/* Position */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Position</label>
-      <input
-        type="text"
-        name="position"
-        placeholder="Type here"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.position}
-        onChange={(e) => handleSectionChange("company", section._id, e)}
-      />
-    </div>
-    {/* Year Started */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Year Started</label>
-      <input
-        type="date"
-        name="yearStarted"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.yearStarted}
-        onChange={(e) => handleSectionChange("company", section._id, e)}
-      />
-    </div>
-    {/* Year Ended */}
-    <div className="py-1">
-      <label className="pt-4 pb-2 text-sm">Year Ended</label>
-      <input
-        type="date"
-        name="yearEnded"
-        className="input input-sm input-bordered w-full h-10"
-        value={section.yearEnded}
-        onChange={(e) => handleSectionChange("company", section._id, e)}
-      />
-    </div>
-    {/* Delete Button */}
-    <div className="flex justify-end">
-      <button
-        className="btn btn-sm w-36 bg-red text-white mt-2"
-        onClick={() => {
-          console.log("Profile ID:", profileId);
-          console.log("Section ID:", section._id); // Use section._id here
-          initiateDeleteSection("company-section", section._id)}
-        }
-      >
-        Delete
-      </button>
-    </div>
-  </div>
-))}
-
+                  <div
+                    key={section._id}
+                    className="w-full border-2 rounded py-2 px-4 mt-2"
+                  >
+                    {/* Company Name */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Company Name</label>
+                      <input
+                        type="text"
+                        name="companyName"
+                        placeholder="Type here"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.companyName}
+                        onChange={(e) =>
+                          handleSectionChange("company", section._id, e)
+                        }
+                      />
+                    </div>
+                    {/* Position */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Position</label>
+                      <input
+                        type="text"
+                        name="position"
+                        placeholder="Type here"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.position}
+                        onChange={(e) =>
+                          handleSectionChange("company", section._id, e)
+                        }
+                      />
+                    </div>
+                    {/* Year Started */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Year Started</label>
+                      <input
+                        type="date"
+                        name="yearStarted"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.yearStarted}
+                        onChange={(e) =>
+                          handleSectionChange("company", section._id, e)
+                        }
+                      />
+                    </div>
+                    {/* Year Ended */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Year Ended</label>
+                      <input
+                        type="date"
+                        name="yearEnded"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.yearEnded}
+                        onChange={(e) =>
+                          handleSectionChange("company", section._id, e)
+                        }
+                      />
+                    </div>
+                    {/* Delete Button */}
+                    <div className="flex justify-end">
+                      <button
+                        className="btn btn-sm w-36 bg-red text-white mt-2"
+                        onClick={() => {
+                          console.log("Profile ID:", profileId);
+                          console.log("Section ID:", section._id); // Use section._id here
+                          initiateDeleteSection("company-section", section._id);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 

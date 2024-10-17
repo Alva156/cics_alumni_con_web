@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
 
 function Chatbot() {
   const [step, setStep] = useState(1);
@@ -238,7 +239,7 @@ function Chatbot() {
           >
             {chat.from === "chatbot" && (
               <img
-                src="https://via.placeholder.com/40" // Replace with your image URL
+                src={alumniconnectlogo2}
                 alt="Chatbot Avatar"
                 className="w-10 h-10 rounded mr-2" // Adjust size and margin as needed
               />

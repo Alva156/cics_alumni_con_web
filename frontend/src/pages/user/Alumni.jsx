@@ -4,13 +4,17 @@ import axios from "axios";
 function Alumni() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [alumni, setAlumni] = useState([]);
-  const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedProgram, setSelectedProgram] = useState("");
   const [activeTab, setActiveTab] = useState("primary");
   const modalRef = useRef(null);
+  const [selectedAlumni, setSelectedAlumni] = useState({
+    secondaryEducation: [],
+    tertiaryEducation: [],
+    careerBackground: [],
+  });
 
   const formatDate = (dateString) => {
     if (!dateString) return " ";
@@ -323,22 +327,25 @@ function Alumni() {
               >
                 <h1 className="text-xl mb-4">Educational Background</h1>
                 <p className="text-xs mb-1">Secondary Education</p>
-                <p className="text-s font-bold">
-                  {selectedAlumni.secondaryeducation}
-                </p>
-                <p className="text-xs mb-2">
-                  {selectedAlumni.secondaryeducationyear}
-                </p>
+
+                {selectedAlumni.secondaryEducation.map((edu, index) => (
+                  <div key={index}>
+                    <p className="text-s font-bold">{edu.schoolName}</p>
+                    <p className="text-xs mb-2">
+                      {edu.yearStarted} - {edu.yearEnded}
+                    </p>
+                  </div>
+                ))}
                 <p className="text-xs mb-1 mt-3">Tertiary Education</p>
-                <p className="text-s font-bold">
-                  {selectedAlumni.tertiaryeducation}
-                </p>
-                <p className="text-xs mb-1 italic">
-                  {selectedAlumni.tertiaryeducationdegree}
-                </p>
-                <p className="text-xs mb-2">
-                  {selectedAlumni.tertiaryeducationyear}
-                </p>
+                {selectedAlumni.tertiaryEducation.map((edu, index) => (
+                  <div key={index}>
+                    <p className="text-s font-bold">{edu.schoolName}</p>
+                    <p className="text-xs mb-1 italic">{edu.program}</p>
+                    <p className="text-xs mb-2">
+                      {edu.yearStarted} - {edu.yearEnded}
+                    </p>
+                  </div>
+                ))}
               </div>
 
               <input
@@ -353,11 +360,15 @@ function Alumni() {
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6"
               >
                 <h1 className="text-xl mb-4">Career Background</h1>
-                <p className="text-s font-bold">{selectedAlumni.career}</p>
-                <p className="text-xs mb-1 italic">
-                  {selectedAlumni.careerposition}
-                </p>
-                <p className="text-xs mb-2">{selectedAlumni.careeryear}</p>
+                {selectedAlumni.careerBackground.map((career, index) => (
+                  <div key={index}>
+                    <p className="text-s font-bold">{career.companyName}</p>
+                    <p className="text-xs mb-1 italic">{career.position}</p>
+                    <p className="text-xs mb-2">
+                      {career.yearStarted} - {career.yearEnded}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

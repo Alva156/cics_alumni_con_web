@@ -135,12 +135,12 @@ function Login() {
               </span>
             </div>
 
-            <a
-              href="/forgotpassword"
+            <div
               className="text-sm underline mb-8 block text-left"
             >
-              Forgot Password?
-            </a>
+            <a href="/forgotpassword">Forgot Password?</a>
+              
+            </div>
 
             <button
               className="bg-[#BE142E] text-white font-bold text-lg py-3 px-6 w-full mb-6 transition duration-300 ease-in-out hover:bg-[#a10c2b]"

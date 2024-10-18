@@ -293,31 +293,31 @@ function UserProfile() {
     setIsDeleteModalOpen(true); // Open the modal
     setSectionToDelete({ sectionType, sectionId }); // Store the section type and ID
   };
-  
+
   const handleDeleteSection = async () => {
     if (!sectionToDelete) {
       return;
     }
-  
+
     const { sectionType, sectionId } = sectionToDelete;
-  
+
     console.log("Delete button clicked");
     console.log("Section ID in function:", sectionId);
-  
+
     if (!profileId || !sectionId) {
       console.log("Profile ID or Section ID is missing.");
       return;
     }
-  
+
     try {
       // Call the DELETE endpoint to remove the section from the database
       const deleteResponse = await axios.delete(
         `${backendUrl}/profile/${sectionType}/${profileId}/${sectionId}`,
         { withCredentials: true }
       );
-  
+
       console.log("Delete response:", deleteResponse);
-  
+
       if (deleteResponse.status === 200) {
         // Update the frontend state after successful deletion
         if (sectionType === "company-section") {
@@ -333,7 +333,7 @@ function UserProfile() {
             prevSections.filter((section) => section._id !== sectionId)
           );
         }
-  
+
         console.log("Section deleted successfully!");
         alert(
           `${sectionType.replace("-", " ")} deleted and profile updated successfully!`
@@ -345,23 +345,23 @@ function UserProfile() {
         `Failed to delete ${sectionType.replace("-", " ")}. Please try again.`
       );
     }
-  
+
     // Close the modal and clear the sectionToDelete
     setIsDeleteModalOpen(false);
     setSectionToDelete(null);
   };
-  
+
 
   const handleSave = async (e) => {
     e.preventDefault(); // Prevent default form submission
     console.log("saved");
-  
+
     await handleSubmit(e); // Call the handleSubmit function to save the form data
   };
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault(); // Prevent default form submission
-  
+
     // Validate required fields
     if (!firstName || !lastName) {
       setValidationMessage("First Name and Last Name are required.");
@@ -369,10 +369,10 @@ function UserProfile() {
       setTimeout(() => setShowValidationMessage(false), 3000);
       return; // Prevent submission
     }
-  
+
     // Reset error messages when inputs are valid
     setShowErrorMessage(false);
-  
+
     const userData = {
       firstName,
       lastName,
@@ -407,28 +407,28 @@ function UserProfile() {
         other: otherContact,
       },
     };
-  
+
     try {
       // Check if the profile exists
       await axios.get(`${backendUrl}/profile/userprofile`, {
         withCredentials: true,
       });
-  
+
       // Update the existing profile
       await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
         withCredentials: true,
       });
-  
+
       // Re-fetch the profile to ensure we have the latest data
       const updatedProfileResponse = await axios.get(`${backendUrl}/profile/userprofile`, {
         withCredentials: true,
       });
-  
+
       // Update state with the newly fetched data
       setCompanySections(updatedProfileResponse.data.careerBackground || []);
       setSecondaryEducationSections(updatedProfileResponse.data.secondaryEducation || []);
       setTertiaryEducationSections(updatedProfileResponse.data.tertiaryEducation || []);
-  
+
       // Check if the email has changed
       if (accountEmail !== initialAccountEmail) {
         setShowValidationMessage(false);
@@ -444,7 +444,7 @@ function UserProfile() {
           setShowValidationMessage(false);
         }, 3000);
       }
-  
+
       console.log("Profile updated successfully!");
     } catch (error) {
       if (error.response && error.response.status === 404) {
@@ -465,14 +465,14 @@ function UserProfile() {
         setTimeout(() => setShowErrorMessage(false), 3000);
       }
     }
-  
+
     // Validation message for successful save (if email has not changed)
     if (accountEmail === initialAccountEmail) {
       setShowValidationMessage(true);
       setTimeout(() => setShowValidationMessage(false), 3000);
     }
   };
-  
+
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -886,12 +886,16 @@ function UserProfile() {
                       Year Started on College Program
                     </label>
                     <input
-                      type="date"
-                      placeholder="Type here"
+                      type="number"
+                      min="1990"    // Set the minimum acceptable year
+                      max="2024"    // Set the maximum acceptable year
+                      step="1"      // Allow only whole numbers (no decimals)
+                      placeholder="YYYY"
                       className="input input-sm input-bordered w-full h-10"
                       name="yearStartedCollege"
                       value={yearStartedCollege}
                       onChange={(e) => setYearStartedCollege(e.target.value)}
+
                     />
                   </div>
 
@@ -900,8 +904,11 @@ function UserProfile() {
                       Year Graduated on College Program
                     </label>
                     <input
-                      type="date"
-                      placeholder="Type here"
+                      type="number"
+                      min="1990"    // Set the minimum acceptable year
+                      max="2024"    // Set the maximum acceptable year
+                      step="1"      // Allow only whole numbers (no decimals)
+                      placeholder="YYYY"
                       className="input input-sm input-bordered w-full h-10"
                       name="yearGraduatedCollege"
                       value={yearGraduatedCollege}
@@ -914,7 +921,7 @@ function UserProfile() {
                       Time it took to land a job after graduation (Months)
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       placeholder="Type here"
                       className="input input-sm input-bordered w-full h-10"
                       name="timeToJob"
@@ -1239,26 +1246,32 @@ function UserProfile() {
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Started</label>
                       <input
-                        type="date"
+                        type="number"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
-                        onChange={(e) =>
-                          handleSectionChange("secondary", section._id, e)
-                        }
+                        onChange={(e) => handleSectionChange("secondary", section._id, e)}
                         name="yearStarted"
+                        min="1990"    // Set the minimum acceptable year
+                        max="2024"    // Set the maximum acceptable year
+                        step="1"      // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
 
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Ended</label>
                       <input
-                        type="date"
+                        type="number"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
                         onChange={(e) =>
                           handleSectionChange("secondary", section._id, e)
                         }
                         name="yearEnded"
+                        min="1990"    // Set the minimum acceptable year
+                        max="2024"    // Set the maximum acceptable year
+                        step="1"      // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
 
@@ -1335,13 +1348,17 @@ function UserProfile() {
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Started</label>
                       <input
-                        type="date"
+                        type="number"
                         name="yearStarted"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
                         onChange={(e) =>
                           handleSectionChange("tertiary", section._id, e)
                         }
+                        min="1990"    // Set the minimum acceptable year
+                        max="2024"    // Set the maximum acceptable year
+                        step="1"      // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
 
@@ -1349,13 +1366,17 @@ function UserProfile() {
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Ended</label>
                       <input
-                        type="date"
+                        type="number"
                         name="yearEnded"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
                         onChange={(e) =>
                           handleSectionChange("tertiary", section._id, e)
                         }
+                        min="1990"    // Set the minimum acceptable year
+                        max="2024"    // Set the maximum acceptable year
+                        step="1"      // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
                     {/* Delete Button */}
@@ -1445,26 +1466,34 @@ function UserProfile() {
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Started</label>
                       <input
-                        type="date"
+                        type="number"
                         name="yearStarted"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
                         onChange={(e) =>
                           handleSectionChange("company", section._id, e)
                         }
+                        min="1990"    // Set the minimum acceptable year
+                        max="2024"    // Set the maximum acceptable year
+                        step="1"      // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
                     {/* Year Ended */}
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Ended</label>
                       <input
-                        type="date"
+                        type="number"
                         name="yearEnded"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
                         onChange={(e) =>
                           handleSectionChange("company", section._id, e)
                         }
+                        min="1990"    // Set the minimum acceptable year
+                        max="2024"    // Set the maximum acceptable year
+                        step="1"      // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
                     {/* Delete Button */}

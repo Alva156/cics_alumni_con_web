@@ -20,6 +20,8 @@ function Register() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [modal2Visible, setModal2Visible] = useState(false);
+  const [modal3Visible, setModal3Visible] = useState(false);
   const [error, setError] = useState(""); // State for error messages
   const navigate = useNavigate();
 
@@ -114,18 +116,21 @@ function Register() {
         setTimeout(() => {
           navigate("/verifyaccount");
         }, 3000);
-      } else {
-        setError(response.data.msg || "An error occurred during registration");
-        setTimeout(() => setError(""), 5000);
       }
     } catch (error) {
-      setError(
-        error.response?.data?.msg || "An error occurred during registration"
-      );
-      setTimeout(() => setError(""), 5000);
+      if (
+        error.response?.status === 400 &&
+        error.response?.data?.msg === "User already exists"
+      ) {
+        setModal2Visible(true);
+      } else {
+        setModal3Visible(true);
+        setError(
+          error.response?.data?.msg || "An error occurred during registration"
+        );
+      }
     }
   };
-
   return (
     <>
       <Header />
@@ -141,8 +146,6 @@ function Register() {
                 Enter required user information and start connecting with us.
               </p>
             </div>
-            {/* Error Message */}
-            {error && <p className="text-red text-xs mb-2">{error}</p>}
 
             {/* Form Fields */}
             <label className="block mb-1 mt-2 text-xs font-medium">
@@ -308,6 +311,45 @@ function Register() {
           />
         </div>
       </div>
+      {modal2Visible && (
+        <dialog id="my_modal_5" className="modal modal-middle " open>
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Oops!</h3>
+            <p className="py-4">User already exists</p>
+            <div className="modal-action">
+              <button
+                onClick={() => navigate("/login")}
+                className="btn bg-blue text-white w-20"
+              >
+                Login
+              </button>
+
+              <button
+                className="btn bg-green text-white w-20"
+                onClick={() => setModal2Visible(false)}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </dialog>
+      )}
+      {modal3Visible && (
+        <dialog id="my_modal_5" className="modal modal-middle " open>
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Oops!</h3>
+            <p className="py-4">{error}</p>
+            <div className="modal-action">
+              <button
+                className="btn bg-green text-white w-20"
+                onClick={() => setModal3Visible(false)}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </dialog>
+      )}
     </>
   );
 }

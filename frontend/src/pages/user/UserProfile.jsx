@@ -288,175 +288,80 @@ function UserProfile() {
     }
   };
 
+
   const initiateDeleteSection = (sectionType, sectionId) => {
     setIsDeleteModalOpen(true); // Open the modal
     setSectionToDelete({ sectionType, sectionId }); // Store the section type and ID
   };
-
+  
   const handleDeleteSection = async () => {
     if (!sectionToDelete) {
       return;
     }
-
+  
     const { sectionType, sectionId } = sectionToDelete;
-
+  
     console.log("Delete button clicked");
     console.log("Section ID in function:", sectionId);
-
+  
     if (!profileId || !sectionId) {
       console.log("Profile ID or Section ID is missing.");
       return;
     }
-
+  
     try {
-      // Step 1: Call the DELETE endpoint to remove the section from the database
+      // Call the DELETE endpoint to remove the section from the database
       const deleteResponse = await axios.delete(
         `${backendUrl}/profile/${sectionType}/${profileId}/${sectionId}`,
         { withCredentials: true }
       );
-
+  
       console.log("Delete response:", deleteResponse);
-
+  
       if (deleteResponse.status === 200) {
-        // Step 2: Update the frontend state after successful deletion
+        // Update the frontend state after successful deletion
         if (sectionType === "company-section") {
-          setCompanySections((prevSections) => {
-            const updatedSections = prevSections.filter(
-              (section) => section._id !== sectionId
-            );
-            console.log(
-              "Updated company sections after deletion:",
-              updatedSections
-            );
-            return updatedSections;
-          });
-        } else if (sectionType === "secondary-section") {
-          setSecondaryEducationSections((prevSections) => {
-            const updatedSections = prevSections.filter(
-              (section) => section._id !== sectionId
-            );
-            console.log(
-              "Updated secondary education sections after deletion:",
-              updatedSections
-            );
-            return updatedSections;
-          });
-        } else if (sectionType === "tertiary-section") {
-          setTertiaryEducationSections((prevSections) => {
-            const updatedSections = prevSections.filter(
-              (section) => section._id !== sectionId
-            );
-            console.log(
-              "Updated tertiary education sections after deletion:",
-              updatedSections
-            );
-            return updatedSections;
-          });
-        }
-
-        // Step 3: Update the profile with the remaining sections
-        const updatedUserData = {
-          firstName,
-          lastName,
-          birthday,
-          profession,
-          accountEmail,
-          collegeProgram,
-          specialization,
-          yearStartedCollege,
-          yearGraduatedCollege,
-          timeToJob,
-          employmentStatus,
-          workIndustry,
-          professionAlignment,
-          maritalStatus,
-          salaryRange,
-          placeOfEmployment,
-          profileImage,
-          attachments: attachments.map((attachment) => ({
-            fileName: attachment.fileName,
-            file: attachment.file,
-          })),
-          secondaryEducation: secondaryEducationSections.filter(
-            (section) => section._id !== sectionId
-          ),
-          tertiaryEducation: tertiaryEducationSections.filter(
-            (section) => section._id !== sectionId
-          ),
-          careerBackground: companySections.filter(
-            (section) => section._id !== sectionId
-          ),
-          contactInformation: {
-            linkedIn,
-            facebook,
-            instagram,
-            email,
-            mobileNumber,
-            other: otherContact,
-          },
-        };
-
-        // Step 4: Call the PUT endpoint to update the profile
-        const updateResponse = await axios.put(
-          `${backendUrl}/profile/updateprofile`,
-          updatedUserData,
-          { withCredentials: true }
-        );
-
-        console.log("Profile updated after section deletion:", updateResponse);
-
-        if (updateResponse.status === 200) {
-          alert(
-            `${sectionType.replace(
-              "-",
-              " "
-            )} deleted and profile updated successfully!`
+          setCompanySections((prevSections) =>
+            prevSections.filter((section) => section._id !== sectionId)
           );
-        } else {
-          alert("Failed to update profile. Please try again.");
+        } else if (sectionType === "secondary-section") {
+          setSecondaryEducationSections((prevSections) =>
+            prevSections.filter((section) => section._id !== sectionId)
+          );
+        } else if (sectionType === "tertiary-section") {
+          setTertiaryEducationSections((prevSections) =>
+            prevSections.filter((section) => section._id !== sectionId)
+          );
         }
-      } else {
+  
+        console.log("Section deleted successfully!");
         alert(
-          `Failed to delete ${sectionType.replace("-", " ")}. Please try again.`
+          `${sectionType.replace("-", " ")} deleted and profile updated successfully!`
         );
       }
     } catch (error) {
-      console.error(
-        `Error deleting ${sectionType.replace("-", " ")} or updating profile:`,
-        error
+      console.error("Error deleting section:", error);
+      alert(
+        `Failed to delete ${sectionType.replace("-", " ")}. Please try again.`
       );
-      if (error.response) {
-        console.log("Response status:", error.response.status);
-        console.log("Response data:", error.response.data);
-        alert(
-          `Failed to delete ${sectionType.replace("-", " ")}. Reason: ${
-            error.response.data.message || "Please try again."
-          }`
-        );
-      } else {
-        alert(
-          `Failed to delete ${sectionType.replace(
-            "-",
-            " "
-          )}. Please check your network connection.`
-        );
-      }
     }
-
+  
     // Close the modal and clear the sectionToDelete
     setIsDeleteModalOpen(false);
     setSectionToDelete(null);
   };
+  
 
-  const handleSave = (e) => {
-    console.log("saved");
+  const handleSave = async (e) => {
     e.preventDefault(); // Prevent default form submission
-    handleSubmit(e); // Call the handleSubmit function to save the form data
+    console.log("saved");
+  
+    await handleSubmit(e); // Call the handleSubmit function to save the form data
   };
 
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault(); // Check if the event is present before calling preventDefault
-
+    if (e) e.preventDefault(); // Prevent default form submission
+  
     // Validate required fields
     if (!firstName || !lastName) {
       setValidationMessage("First Name and Last Name are required.");
@@ -464,10 +369,10 @@ function UserProfile() {
       setTimeout(() => setShowValidationMessage(false), 3000);
       return; // Prevent submission
     }
-
+  
     // Reset error messages when inputs are valid
     setShowErrorMessage(false);
-
+  
     const userData = {
       firstName,
       lastName,
@@ -502,28 +407,34 @@ function UserProfile() {
         other: otherContact,
       },
     };
-
+  
     try {
       // Check if the profile exists
       await axios.get(`${backendUrl}/profile/userprofile`, {
         withCredentials: true,
       });
-
+  
       // Update the existing profile
       await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
         withCredentials: true,
       });
-
+  
+      // Re-fetch the profile to ensure we have the latest data
+      const updatedProfileResponse = await axios.get(`${backendUrl}/profile/userprofile`, {
+        withCredentials: true,
+      });
+  
+      // Update state with the newly fetched data
+      setCompanySections(updatedProfileResponse.data.careerBackground || []);
+      setSecondaryEducationSections(updatedProfileResponse.data.secondaryEducation || []);
+      setTertiaryEducationSections(updatedProfileResponse.data.tertiaryEducation || []);
+  
       // Check if the email has changed
       if (accountEmail !== initialAccountEmail) {
         setShowValidationMessage(false);
-
-        // Set validation message for the modal
         setValidationMessage(
           "Email changed successfully! Please log in using your new email."
         );
-
-        // Show the modal only, without the background message
         setModalVisible(true); // Show modal
       } else {
         // Only show the success message if the email has NOT changed
@@ -533,7 +444,7 @@ function UserProfile() {
           setShowValidationMessage(false);
         }, 3000);
       }
-
+  
       console.log("Profile updated successfully!");
     } catch (error) {
       if (error.response && error.response.status === 404) {
@@ -554,13 +465,14 @@ function UserProfile() {
         setTimeout(() => setShowErrorMessage(false), 3000);
       }
     }
-
+  
     // Validation message for successful save (if email has not changed)
     if (accountEmail === initialAccountEmail) {
       setShowValidationMessage(true);
       setTimeout(() => setShowValidationMessage(false), 3000);
     }
   };
+  
 
   // Fetch user profile on mount
   useEffect(() => {

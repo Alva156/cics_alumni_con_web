@@ -288,7 +288,6 @@ function UserProfile() {
     }
   };
 
-
   const initiateDeleteSection = (sectionType, sectionId) => {
     setIsDeleteModalOpen(true); // Open the modal
     setSectionToDelete({ sectionType, sectionId }); // Store the section type and ID
@@ -334,10 +333,13 @@ function UserProfile() {
           );
         }
 
-        console.log("Section deleted successfully!");
-        alert(
-          `${sectionType.replace("-", " ")} deleted and profile updated successfully!`
-        );
+        // Set validation message for successful deletion
+        setValidationMessage("Profile updated successfully!");
+        setShowValidationMessage(true); // Show the validation message
+
+        setTimeout(() => {
+          setShowValidationMessage(false);
+        }, 3000);
       }
     } catch (error) {
       console.error("Error deleting section:", error);
@@ -350,7 +352,6 @@ function UserProfile() {
     setIsDeleteModalOpen(false);
     setSectionToDelete(null);
   };
-
 
   const handleSave = async (e) => {
     e.preventDefault(); // Prevent default form submission
@@ -420,14 +421,21 @@ function UserProfile() {
       });
 
       // Re-fetch the profile to ensure we have the latest data
-      const updatedProfileResponse = await axios.get(`${backendUrl}/profile/userprofile`, {
-        withCredentials: true,
-      });
+      const updatedProfileResponse = await axios.get(
+        `${backendUrl}/profile/userprofile`,
+        {
+          withCredentials: true,
+        }
+      );
 
       // Update state with the newly fetched data
       setCompanySections(updatedProfileResponse.data.careerBackground || []);
-      setSecondaryEducationSections(updatedProfileResponse.data.secondaryEducation || []);
-      setTertiaryEducationSections(updatedProfileResponse.data.tertiaryEducation || []);
+      setSecondaryEducationSections(
+        updatedProfileResponse.data.secondaryEducation || []
+      );
+      setTertiaryEducationSections(
+        updatedProfileResponse.data.tertiaryEducation || []
+      );
 
       // Check if the email has changed
       if (accountEmail !== initialAccountEmail) {
@@ -472,7 +480,6 @@ function UserProfile() {
       setTimeout(() => setShowValidationMessage(false), 3000);
     }
   };
-
 
   // Fetch user profile on mount
   useEffect(() => {
@@ -887,15 +894,14 @@ function UserProfile() {
                     </label>
                     <input
                       type="number"
-                      min="1990"    // Set the minimum acceptable year
-                      max="2024"    // Set the maximum acceptable year
-                      step="1"      // Allow only whole numbers (no decimals)
+                      min="1990" // Set the minimum acceptable year
+                      max="2024" // Set the maximum acceptable year
+                      step="1" // Allow only whole numbers (no decimals)
                       placeholder="YYYY"
                       className="input input-sm input-bordered w-full h-10"
                       name="yearStartedCollege"
                       value={yearStartedCollege}
                       onChange={(e) => setYearStartedCollege(e.target.value)}
-
                     />
                   </div>
 
@@ -905,9 +911,9 @@ function UserProfile() {
                     </label>
                     <input
                       type="number"
-                      min="1990"    // Set the minimum acceptable year
-                      max="2024"    // Set the maximum acceptable year
-                      step="1"      // Allow only whole numbers (no decimals)
+                      min="1990" // Set the minimum acceptable year
+                      max="2024" // Set the maximum acceptable year
+                      step="1" // Allow only whole numbers (no decimals)
                       placeholder="YYYY"
                       className="input input-sm input-bordered w-full h-10"
                       name="yearGraduatedCollege"
@@ -1249,11 +1255,13 @@ function UserProfile() {
                         type="number"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
-                        onChange={(e) => handleSectionChange("secondary", section._id, e)}
+                        onChange={(e) =>
+                          handleSectionChange("secondary", section._id, e)
+                        }
                         name="yearStarted"
-                        min="1990"    // Set the minimum acceptable year
-                        max="2024"    // Set the maximum acceptable year
-                        step="1"      // Allow only whole numbers (no decimals)
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
                     </div>
@@ -1268,9 +1276,9 @@ function UserProfile() {
                           handleSectionChange("secondary", section._id, e)
                         }
                         name="yearEnded"
-                        min="1990"    // Set the minimum acceptable year
-                        max="2024"    // Set the maximum acceptable year
-                        step="1"      // Allow only whole numbers (no decimals)
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
                     </div>
@@ -1355,9 +1363,9 @@ function UserProfile() {
                         onChange={(e) =>
                           handleSectionChange("tertiary", section._id, e)
                         }
-                        min="1990"    // Set the minimum acceptable year
-                        max="2024"    // Set the maximum acceptable year
-                        step="1"      // Allow only whole numbers (no decimals)
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
                     </div>
@@ -1373,9 +1381,9 @@ function UserProfile() {
                         onChange={(e) =>
                           handleSectionChange("tertiary", section._id, e)
                         }
-                        min="1990"    // Set the minimum acceptable year
-                        max="2024"    // Set the maximum acceptable year
-                        step="1"      // Allow only whole numbers (no decimals)
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
                     </div>
@@ -1473,9 +1481,9 @@ function UserProfile() {
                         onChange={(e) =>
                           handleSectionChange("company", section._id, e)
                         }
-                        min="1990"    // Set the minimum acceptable year
-                        max="2024"    // Set the maximum acceptable year
-                        step="1"      // Allow only whole numbers (no decimals)
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
                     </div>
@@ -1490,9 +1498,9 @@ function UserProfile() {
                         onChange={(e) =>
                           handleSectionChange("company", section._id, e)
                         }
-                        min="1990"    // Set the minimum acceptable year
-                        max="2024"    // Set the maximum acceptable year
-                        step="1"      // Allow only whole numbers (no decimals)
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
                     </div>

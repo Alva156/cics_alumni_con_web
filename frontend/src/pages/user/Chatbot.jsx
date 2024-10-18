@@ -42,7 +42,7 @@ function Chatbot() {
     Chatbot: [
       "1. Sign In: Enter your registered credentials (username and password) to log in to the system.",
       "2. Navigate to Chatbot Page: Click on the 'Chatbot' tab in the navigation bar or scroll through the home page to find the “Chatbot” link.",
-      "3. View the Chatbot Page: Click the 'Get Started' button, and the inquiry options will be displayed. You can inquire about platform navigation, documents, certifications, and jobs; however, there will be no option to chat live with an administrator.",
+      "3. View the Chatbot Page: Click the 'Get Started' button, and the inquiry options will be displayed. You can inquire about platform navigation, certifications, jobs, and information about CICS office; however, there will be no option to chat live with an administrator.",
     ],
 
     //Certifications
@@ -526,6 +526,17 @@ function Chatbot() {
       "14. Development Director",
       "15. Religion Professor",
     ],
+
+    Schedule: ["Monday - Saturday", "8am to 5pm"],
+    Location: [
+      "CICS Office: 2nd Floor Blessed Pier Giorgio Frassati O.P., Building",
+      "UST: España Blvd, Sampaloc, Manila, 1008 Metro Manila",
+    ],
+    "Contact Details": [
+      "CICS Alumni Connect: cicsalumniconnect@gmail.com",
+      "CICS Office: cics@ust.edu.ph",
+      "Office of Alumni Relations: alumnirelations@ust.edu.ph",
+    ],
   };
 
   const addChatMessage = (from, message) => {
@@ -550,7 +561,12 @@ function Chatbot() {
       // Display options based on previous step
       if (previousStep === 2) {
         addChatMessage("chatbot", "Hi! Please choose an option:");
-        addChatMessage("chatbot", ["Navigation", "Certifications", "Jobs"]);
+        addChatMessage("chatbot", [
+          "Navigation",
+          "Certifications",
+          "Jobs",
+          "CICS Office",
+        ]);
       } else if (previousStep === 3) {
         addChatMessage("chatbot", "You chose:");
         addChatMessage("chatbot", currentOptions); // Restore options from Step 3
@@ -561,7 +577,12 @@ function Chatbot() {
   const handleGetStarted = () => {
     addChatMessage("user", "Get Started");
     addChatMessage("chatbot", "Hello CICS Alumni! Please choose an option:");
-    addChatMessage("chatbot", ["Navigation", "Certifications", "Jobs"]);
+    addChatMessage("chatbot", [
+      "Navigation",
+      "Certifications",
+      "Jobs",
+      "CICS Office",
+    ]);
     setStepHistory([1]);
     setStep(2);
   };
@@ -609,6 +630,8 @@ function Chatbot() {
           "Sacred Theology",
           "Go back",
         ];
+      } else if (option === "CICS Office") {
+        options = ["Schedule", "Location", "Contact Details", "Go back"];
       }
       setCurrentOptions(options); // Save options for the current step
       addChatMessage("chatbot", options); // Display options for the current step

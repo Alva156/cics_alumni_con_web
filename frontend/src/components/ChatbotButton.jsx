@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import chatbot from "../assets/chatbot.png";
+import chatbot from "../assets/chatbotbutton.png";
 
 const ChatbotButton = () => {
   const navigate = useNavigate();

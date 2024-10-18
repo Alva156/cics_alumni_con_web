@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import AOS from "aos";
-import "aos/dist/aos.css"; // Import the AOS CSS styles
+import "aos/dist/aos.css";
 import ustbg from "../../assets/ustbg.mp4";
-import "../../App.css";
 import homepage1 from "../../assets/homepage1.jpg";
 import homepage2 from "../../assets/homepage2.jpg";
 import homepage3 from "../../assets/homepage3.jpg";
@@ -13,13 +12,23 @@ const Homepage = () => {
   const [fade, setFade] = useState(false);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
-  const images = [homepage1, homepage2, homepage3]; // Placeholder images
+  const images = [homepage1, homepage2, homepage3];
   const videoRef = useRef(null);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
-  // Initialize AOS library
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
+  }, []);
+
+  useEffect(() => {
+    const storedLoginStatus = localStorage.getItem("isLoggedIn");
+    const messageShown = sessionStorage.getItem("loginMessageShown");
+
+    if (storedLoginStatus === "true" && messageShown !== "true") {
+      setShowLoginMessage(true);
+      sessionStorage.setItem("loginMessageShown", "true");
+      setTimeout(() => setShowLoginMessage(false), 5000);
+    }
   }, []);
 
   const nextPage = () => {
@@ -30,11 +39,6 @@ const Homepage = () => {
     }, 500);
   };
 
-  // useEffect(() => {
-  //   const interval = setInterval(nextPage, 20000);
-  //   return () => clearInterval(interval);
-  // }, []);
-
   const prevPage = () => {
     setFade(true);
     setTimeout(() => {
@@ -43,32 +47,6 @@ const Homepage = () => {
     }, 500);
   };
 
-  useEffect(() => {
-    if (videoRef.current) {
-      const timeout = setTimeout(() => {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play();
-      }, 60000);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [currentPage]);
-
-  useEffect(() => {
-    const storedLoginStatus = localStorage.getItem("isLoggedIn");
-    const messageShown = sessionStorage.getItem("loginMessageShown");
-
-    if (storedLoginStatus === "true" && messageShown !== "true") {
-      setShowLoginMessage(true);
-      sessionStorage.setItem("loginMessageShown", "true");
-
-      setTimeout(() => {
-        setShowLoginMessage(false);
-      }, 5000);
-    }
-  }, []);
-
-  // Image carousel functionality
   const nextImage = () => {
     setCurrentImage((prevImage) =>
       prevImage === images.length - 1 ? 0 : prevImage + 1
@@ -82,7 +60,7 @@ const Homepage = () => {
   };
 
   useEffect(() => {
-    const imageInterval = setInterval(nextImage, 5000); // Change image every 5 seconds
+    const imageInterval = setInterval(nextImage, 5000);
     return () => clearInterval(imageInterval);
   }, []);
 
@@ -107,7 +85,6 @@ const Homepage = () => {
             borderRadius: "5px",
             fontSize: "14px",
             zIndex: "20",
-            textAlign: "right",
           }}
         >
           Photo Courtesy of UST SITE
@@ -128,91 +105,49 @@ const Homepage = () => {
           {currentPage === 0 ? (
             <div className="carousel-page">
               <div className="square-container">
-                <div className="square-item">
-                  <div className="logo userprofile-logo"></div>
-                  <h3>Profile</h3>
-                  <button onClick={() => navigate("/user-userprofile")}>
-                    Go to Profile
-                  </button>
-                </div>
-                <div className="square-item">
-                  <div className="logo survey-logo"></div>
-                  <h3>Survey</h3>
-                  <button onClick={() => navigate("/user-survey")}>
-                    Take Survey
-                  </button>
-                </div>
-                <div className="square-item">
-                  <div className="logo threads-logo"></div>
-                  <h3>Threads</h3>
-                  <button onClick={() => navigate("/user-threads")}>
-                    View Threads
-                  </button>
-                </div>
-                <div className="square-item">
-                  <div className="logo alumni-logo"></div>
-                  <h3>Alumni</h3>
-                  <button onClick={() => navigate("/user-alumni")}>
-                    Alumni Network
-                  </button>
-                </div>
-                <div className="square-item">
-                  <div className="logo chatbot-logo"></div>
-                  <h3>Chatbot</h3>
-                  <button onClick={() => navigate("/user-chatbot")}>
-                    Chat with Us
-                  </button>
-                </div>
+                {["Profile", "Survey", "Threads", "Alumni", "Chatbot"].map(
+                  (item, index) => (
+                    <div className="square-item" key={index}>
+                      <div className={`logo ${item.toLowerCase()}-logo`}></div>
+                      <h3>{item}</h3>
+                      <button
+                        onClick={() => navigate(`/user-${item.toLowerCase()}`)}
+                      >
+                        Go to {item}
+                      </button>
+                    </div>
+                  )
+                )}
               </div>
             </div>
           ) : (
             <div className="carousel-page">
               <div className="square-container">
-                <div className="square-item">
-                  <div className="logo companies-logo"></div>
-                  <h3>Companies</h3>
-                  <button onClick={() => navigate("/user-companies")}>
-                    View Companies
-                  </button>
-                </div>
-                <div className="square-item">
-                  <div className="logo newsevents-logo"></div>
-                  <h3>News/Events</h3>
-                  <div className="dropdown">
-                    <button className="dropdown-button">
-                      View News/Events
+                {[
+                  "Companies",
+                  "News/Events",
+                  "Certifications",
+                  "Documents",
+                  "Jobs/Internship",
+                ].map((item, index) => (
+                  <div className="square-item" key={index}>
+                    <div
+                      className={`logo ${item
+                        .toLowerCase()
+                        .replace(/\/.+/, "")}-logo`}
+                    ></div>
+                    <h3>{item}</h3>
+                    <button
+                      onClick={() =>
+                        navigate(
+                          `/user-${item.toLowerCase().replace(/\/.+/, "")}`
+                        )
+                      }
+                    >
+                      View {item}
                     </button>
-                    <div className="dropdown-content">
-                      <button onClick={() => navigate("/user-news")}>
-                        News
-                      </button>
-                      <button onClick={() => navigate("/user-events")}>
-                        Events
-                      </button>
-                    </div>
                   </div>
-                </div>
-                <div className="square-item">
-                  <div className="logo certifications-logo"></div>
-                  <h3>Certifications</h3>
-                  <button onClick={() => navigate("/user-certifications")}>
-                    View Certifications
-                  </button>
-                </div>
-                <div className="square-item">
-                  <div className="logo documents-logo"></div>
-                  <h3>Documents</h3>
-                  <button onClick={() => navigate("/user-documentrequest")}>
-                    View Documents
-                  </button>
-                </div>
-                <div className="square-item">
-                  <div className="logo jobs-logo"></div>
-                  <h3>Job/Internship</h3>
-                  <button onClick={() => navigate("/user-job")}>
-                    View Jobs/Internships
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
           )}
@@ -222,7 +157,7 @@ const Homepage = () => {
         </button>
       </div>
 
-      <div className="mission-vision-section fixed-height" data-aos="fade-up">
+      <div className="mission-vision-section" data-aos="fade-up">
         <div className="mission-vision-content">
           <h2 className="mission-title">Our Mission</h2>
           <p className="mission-text">
@@ -236,54 +171,69 @@ const Homepage = () => {
             share knowledge, and create impactful solutions for a better future.
           </p>
         </div>
-        <div
-          className="image-carousel-container fixed-height"
+      </div>
+
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          maxHeight: "400px",
+          overflow: "hidden",
+          marginBottom: "20px",
+        }}
+      >
+        <button
+          onClick={prevImage}
           style={{
-            position: "relative",
-            width: "100%",
-            height: "400px",
-            overflow: "hidden",
+            position: "absolute",
+            top: "50%",
+            left: "10px",
+            fontSize: "2em",
+            backgroundColor: "transparent",
+            border: "none",
+            cursor: "pointer",
           }}
         >
-          <button className="carousel-button prev" onClick={prevImage}>
-            ❮
-          </button>
-          <img
-            src={images[currentImage]}
-            alt="Placeholder"
-            className="carousel-image"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }} // Fixed size with cover
-          />
-          <div
-            style={{
-              position: "absolute",
-              bottom: "20px",
-              right: "20px",
-              backgroundColor: "rgba(0, 0, 0, 0.4)",
-              color: "white",
-              padding: "10px",
-              borderRadius: "5px",
-              fontSize: "14px",
-              zIndex: "20",
-              textAlign: "right",
-              marginTop:
-                currentImage === 0
-                  ? "0px"
-                  : currentImage === 1
-                  ? "50px"
-                  : "100px", // Adjust as necessary
-            }}
-          >
-            {currentImage === 0
-              ? "Photo Courtesy of UST ICS"
-              : currentImage === 1
-              ? "Photo Courtesy of UST ICS"
-              : "Photo Courtesy of UST CSS"}
-          </div>
-          <button className="carousel-button next" onClick={nextImage}>
-            ❯
-          </button>
+          ❮
+        </button>
+        <img
+          src={images[currentImage]}
+          alt="Placeholder"
+          style={{ width: "100%", height: "auto", objectFit: "cover" }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            bottom: "20px",
+            right: "20px",
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            color: "white",
+            padding: "10px",
+            borderRadius: "5px",
+            fontSize: "14px",
+            zIndex: "20",
+          }}
+        >
+          {currentImage === 0
+            ? "Photo Courtesy of UST ICS"
+            : currentImage === 1
+            ? "Photo Courtesy of UST ICS"
+            : "Photo Courtesy of UST CSS"}
         </div>
+        <button
+          onClick={nextImage}
+          style={{
+            position: "absolute",
+            top: "50%",
+            right: "10px",
+            fontSize: "2em",
+            backgroundColor: "transparent",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
+          ❯
+        </button>
       </div>
     </div>
   );

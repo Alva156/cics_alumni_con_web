@@ -28,7 +28,7 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="relative text-white">
+    <footer className="relative text-white print:hidden">
       <div
         className="relative"
         style={{

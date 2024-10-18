@@ -268,7 +268,7 @@ function AdminAlumni() {
                 <h1 className="text-xl mb-4">Contact Information</h1>
                 <p className="text-xs mb-1/2">LinkedIn</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.linkedin || "N/A"}
+                  {selectedAlumni.contactInformation?.linkedIn || "N/A"}
                 </p>
                 <p className="text-xs mb-1/2">Facebook</p>
                 <p className="text-s mb-2 font-bold">

@@ -47,7 +47,7 @@ const NavbarAdmin = () => {
 
   return (
     <div>
-      <div className="navbar bg-white text-black font-light">
+      <div className="navbar bg-white text-black font-light print:hidden">
         <div className="navbar-start">
           <div className="dropdown">
             <div

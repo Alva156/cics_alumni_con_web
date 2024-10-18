@@ -29,6 +29,7 @@ const AdminDashboard = () => {
   const gradYears = Object.keys(dashboardData.usersPerGradYear || {});
   const timeToJobKeys = Object.keys(dashboardData.usersPerTimeToJob || {});
   const timeToJobValues = Object.values(dashboardData.usersPerTimeToJob || {});
+  const dashboardRef = useRef(null);
 
   function getFontSize() {
     if (window.innerWidth < 640) {
@@ -195,11 +196,26 @@ const AdminDashboard = () => {
       },
     ],
   };
+  // Function to trigger the browser's print dialog
+  const exportToPDF = () => {
+    if (dashboardRef.current) {
+      window.print(); // Triggers the print dialog
+    }
+  };
 
   return (
-    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <div className="flex items-center mb-4">
-        <h1 className="text-2xl font-medium text-gray-700">Dashboard</h1>
+    <div
+      className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12 "
+      ref={dashboardRef}
+    >
+      <div className=" flex justify-between items-center">
+        <h1 className="text-xl mb-4">Dashboard</h1>
+        <button
+          onClick={exportToPDF}
+          className="header btn mb-4 text-sm  md:w-64 w-44 bg-blue text-white"
+        >
+          Export to PDF
+        </button>
       </div>
 
       <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
@@ -221,7 +237,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
+      <div className="chart mb-4 p-6 border border-black rounded-lg cursor-pointer">
         <div>
           <div className="text-sm text-black-600">Academic Program</div>
           <div className="h-48 mt-8">
@@ -237,7 +253,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Entry Year</div>
           <div className="h-48 mt-8">
@@ -261,7 +277,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Work Industry</div>
           <div className="h-48 mt-8">

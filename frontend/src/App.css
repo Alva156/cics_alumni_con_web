@@ -423,3 +423,32 @@ body {
     margin-bottom: var(--section-spacing); /* Add bottom margin */
   }
 }
+@media print {
+  @page {
+    size: A3; /* You can change this to 'letter' or other sizes */
+    margin: 5mm; /* Adjust the margins as needed */
+  }
+  /* Hide the export button when printing */
+  .no-print {
+    display: none;
+  }
+
+  /* Hide the header when printing */
+  .header {
+    display: none;
+  }
+
+  /* Hide the footer if you have one */
+  .footer {
+    display: none;
+  }
+
+  /* Adjust chart height for printing */
+  .chart {
+    width: 100%; /* Make charts take full width */
+    height: auto; /* Adjust height to fit printed page */
+  }
+  .chart-container {
+    page-break-inside: avoid; /* Avoid page breaks within charts */
+  }
+}

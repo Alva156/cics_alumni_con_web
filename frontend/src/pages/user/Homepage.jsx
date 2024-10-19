@@ -12,7 +12,6 @@ import axios from "axios";
 const Homepage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [fade, setFade] = useState(false);
-  const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
   const [news, setNews] = useState([]);
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
@@ -84,67 +83,79 @@ const Homepage = () => {
   };
 
   return (
-    <div className="homepage-container">
-    <div className="background-news-container">
-      <div className="background-section">
-        <video autoPlay muted ref={videoRef} className="background-video">
-          <source src={ustbg} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
-        <div
-          className="absolute bottom-4 right-4 bg-black text-white text-sm p-2 rounded"
-          style={{
-            position: "absolute",
-            bottom: "20px",
-            right: "20px",
-            backgroundColor: "rgba(0, 0, 0, 0.4)",
-            color: "white",
-            padding: "10px",
-            borderRadius: "5px",
-            fontSize: "14px",
-            zIndex: "20",
-            textAlign: "right",
-          }}
-        >
-          Photo Courtesy of UST SITE
+    <div className="homepage-container" style={{ display: "flex" }}>
+      <div
+        className="background-news-container"
+        style={{ width: "75%", position: "relative" }}
+      >
+        <div className="background-section">
+          <video
+            autoPlay
+            muted
+            ref={videoRef}
+            className="background-video"
+            style={{ width: "100%" }}
+          >
+            <source src={ustbg} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div
+            className="absolute"
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              backgroundColor: "rgba(0, 0, 0, 0.4)",
+              color: "white",
+              padding: "10px",
+              borderRadius: "5px",
+              zIndex: "20",
+              textAlign: "right",
+            }}
+          >
+            Photo Courtesy of UST SITE
+          </div>
         </div>
-      </div>
 
-      <div className="news-carousel-container" data-aos="fade-up">
-        <h2 className="text-2xl font-medium mb-4">Latest News</h2>
-        <button className="carousel-button prev" onClick={prevNews}>
-          ❮
-        </button>
-        <div className="flex justify-center items-center">
-          {news.length > 0 && (
-            <div
-              className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-              style={{ height: "350px", width: "300px" }}
-              onClick={() => openViewModal(news[currentNewsIndex])}
-            >
-              <img
-                src={`${import.meta.env.VITE_BACKEND_URL}${news[currentNewsIndex].image}`}
-                alt={news[currentNewsIndex].name}
-                className="w-full h-48 object-cover rounded-t-lg mb-4"
-              />
-              <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
-                {news[currentNewsIndex].name}
+        <div className="news-carousel-container" data-aos="fade-up">
+          <h2 className="text-2xl font-medium mb-4">Latest News</h2>
+          <button className="carousel-button prev" onClick={prevNews}>
+            ❮
+          </button>
+          <div className="flex justify-center items-center">
+            {news.length > 0 && (
+              <div
+                className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                style={{ height: "350px", width: "300px" }}
+                onClick={() => openViewModal(news[currentNewsIndex])}
+              >
+                <img
+                  src={`${import.meta.env.VITE_BACKEND_URL}${
+                    news[currentNewsIndex].image
+                  }`}
+                  alt={news[currentNewsIndex].name}
+                  className="w-full h-48 object-cover rounded-t-lg mb-4"
+                />
+                <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                  {news[currentNewsIndex].name}
+                </div>
+                <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+                  {news[currentNewsIndex].description.slice(0, 100)}...
+                </p>
+                <a
+                  href="#"
+                  className="text-blue-500 text-sm font-medium hover:underline"
+                >
+                  Read More
+                </a>
               </div>
-              <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
-                {news[currentNewsIndex].description.slice(0, 100)}...
-              </p>
-              <a href="#" className="text-blue-500 text-sm font-medium hover:underline">
-                Read More
-              </a>
-            </div>
-          )}
+            )}
+          </div>
+          <button className="carousel-button next" onClick={nextNews}>
+            ❯
+          </button>
         </div>
-        <button className="carousel-button next" onClick={nextNews}>
-          ❯
-        </button>
       </div>
-    </div>
-
 
       <div className="carousel-container" data-aos="fade-up">
         <button className="carousel-button prev" onClick={prevPage}>

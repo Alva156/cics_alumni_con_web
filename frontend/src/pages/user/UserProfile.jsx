@@ -74,7 +74,7 @@ function UserProfile() {
 
   // Initialize attachments state
   const [attachments, setAttachments] = useState([
-    { id: uniqueId(), filename: "", filepath: "" },
+    { id: uniqueId(), file: null, filename: "", filepath: "" },
   ]);
 
   // Handler for file selection
@@ -83,33 +83,13 @@ function UserProfile() {
   const handleFileChange = (e, index) => {
     const file = e.target.files[0];
     if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      axios
-        .post(`${backendUrl}/profile/uploadattachment`, formData, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (
-            response.data &&
-            response.data.filename &&
-            response.data.filepath
-          ) {
-            const newAttachments = [...attachments];
-            newAttachments[index] = {
-              id: uniqueId(),
-              filename: response.data.filename,
-              filepath: response.data.filepath,
-            };
-            setAttachments(newAttachments);
-          } else {
-            console.error("Unexpected response format:", response.data);
-          }
-        })
-        .catch((error) => {
-          console.error("Error uploading file:", error);
-        });
+      const newAttachments = [...attachments];
+      newAttachments[index] = {
+        ...newAttachments[index],
+        file, // Set the file directly in the attachment object
+        filename: file.name, // Set the filename from the selected file
+      };
+      setAttachments(newAttachments);
     }
   };
 
@@ -117,39 +97,8 @@ function UserProfile() {
   const addAttachment = () => {
     setAttachments((prev) => [
       ...prev,
-      { id: uniqueId(), fileName: "", filePath: "" },
+      { id: uniqueId(), file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
     ]);
-  };
-
-  const handleAttachmentChange = async (e, id) => {
-    const file = e.target.files[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      try {
-        const response = await axios.post(
-          `${backendUrl}/uploadAttachment`,
-          formData,
-          {
-            withCredentials: true,
-          }
-        );
-
-        // Add the response data (which includes fileName and filePath) to the attachments state
-        setAttachments((prev) => [
-          ...prev,
-          {
-            id: response.data.id,
-            fileName: response.data.fileName,
-            filePath: response.data.filePath,
-            file: null,
-          },
-        ]);
-      } catch (error) {
-        console.error("Error uploading file:", error);
-      }
-    }
   };
 
 
@@ -393,15 +342,20 @@ const addCompanySection = async () => {
     };
 
     const formData = new FormData();
+
     attachments.forEach((attachment) => {
-      if (attachment.file) { // Ensure attachment.file exists
-        formData.append("attachments", attachment.file); // Assuming each attachment has a `file` property
+      if (attachment.file) {
+        console.log(`Appending attachment: ${attachment.filename}`); // Log the filename
+        formData.append('attachments', attachment.file); // Just append the file without index
+      } else {
+        console.warn(`Attachment is undefined or not selected for ${attachment.filename}`); // Log a warning if no file
       }
     });
 
-    if(profileImage){
-      formData.append("profileImage", profileImage);
-    }
+  if (profileImage) {
+    formData.append("profileImage", profileImage);
+    console.log("Appending profile image:", profileImage.name); // Log profile image name
+}
 
     try {
       // Check if the profile exists
@@ -436,6 +390,7 @@ const addCompanySection = async () => {
         }
       );
       
+      setAttachments(updatedProfile.data.attachments || []);
       setProfileImage(updatedProfile.data.profileImage); // Update the image state with new image
       setImagePreview(null); // Clear the preview after upload
       // Update state with the newly fetched data

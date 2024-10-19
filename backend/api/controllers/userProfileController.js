@@ -8,7 +8,13 @@ const fs = require("fs");
 
 // Set storage engine for profile images
 const storage = multer.diskStorage({
-  destination: "./uploads/profileimg", // Save images in 'uploads/profileimg' directory
+  destination: (req, file, cb) => {
+    if (file.fieldname === "profileImage") {
+      cb(null, "./uploads/profileimg"); // Save profile images in 'uploads/profileimg'
+    } else if (file.fieldname === "attachments") {
+      cb(null, "./uploads/attachments"); // Save attachments in 'uploads/attachments'
+    }
+  },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
   },
@@ -18,21 +24,32 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
   fileFilter: (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png/;
-    const extname = filetypes.test(
-      path.extname(file.originalname).toLowerCase()
-    );
+    let filetypes;
+    
+    // Determine allowed file types based on field name
+    if (file.fieldname === "profileImage") {
+      filetypes = /jpeg|jpg|png/; // Only allow image formats for profile image
+    } else if (file.fieldname === "attachments") {
+      filetypes = /jpeg|jpg|png|pdf|doc|docx/; // Allow image and document formats for attachments
+    } else {
+      return cb(new Error("Invalid field name."));
+    }
+
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = filetypes.test(file.mimetype);
 
     if (!mimetype || !extname) {
-      return cb(
-        new Error("Invalid file format. Only jpeg, jpg, and png are allowed.")
-      );
+      return cb(new Error("Invalid file format."));
     }
 
     cb(null, true);
   },
-}).single("profileImage");
+}).fields([
+  { name: "profileImage", maxCount: 1 }, // Single profile image
+  { name: "attachments", maxCount: 10 }, // Up to 10 attachments
+]);
+
+
 
 // Function to delete previous image
 const deletePreviousImage = (filePath) => {
@@ -104,6 +121,19 @@ exports.createProfile = async (req, res) => {
         });
       }
 
+      // Handle profileImage
+      const profileImage = req.files && req.files.profileImage
+        ? `/uploads/profileimg/${req.files.profileImage[0].filename}`
+        : null; // Set profile image path
+
+      // Handle attachments array
+      const attachments = req.files && req.files.attachments
+  ? req.files.attachments.map(file => ({
+      filename: file.originalname, // Store original filename
+      filepath: `/uploads/attachments/${file.filename}`, // Store file path
+    }))
+  : [];
+
       // Extract profile details from request body
       const profileData = {
         userId,
@@ -118,9 +148,7 @@ exports.createProfile = async (req, res) => {
         placeOfEmployment: req.body.placeOfEmployment,
         profession: req.body.profession,
         professionAlignment: req.body.professionAlignment,
-        profileImage: req.file
-          ? `/uploads/profileimg/${req.file.filename}`
-          : null, // Set profile image path
+        profileImage, // Use new profile image handling logic
         salaryRange: req.body.salaryRange,
         accountEmail: req.body.accountEmail,
         secondaryEducation: req.body.secondaryEducation,
@@ -130,7 +158,7 @@ exports.createProfile = async (req, res) => {
         workIndustry: req.body.workIndustry,
         yearGraduatedCollege: req.body.yearGraduatedCollege,
         yearStartedCollege: req.body.yearStartedCollege,
-        attachments: req.body.attachments || [],
+        attachments, // Use new attachments handling logic
       };
 
       // Validate required fields (this can be customized based on your requirements)
@@ -162,6 +190,9 @@ exports.createProfile = async (req, res) => {
     }
   });
 };
+
+
+
 //after regis, this is executed
 exports.createUserProfile = async (req, res) => {
   try {
@@ -249,7 +280,6 @@ exports.updateProfile = async (req, res) => {
         workIndustry,
         yearGraduatedCollege,
         yearStartedCollege,
-        attachments,
       } = req.body;
 
       // Find the existing profile
@@ -261,7 +291,7 @@ exports.updateProfile = async (req, res) => {
       }
 
       // If a new image is uploaded, delete the old one
-      if (req.file && userProfile.profileImage) {
+      if (req.files && req.files.profileImage && userProfile.profileImage) {
         const previousImagePath = path.join(
           __dirname,
           "../../",
@@ -270,7 +300,42 @@ exports.updateProfile = async (req, res) => {
         deletePreviousImage(previousImagePath);
       }
 
-      // Update profile data, including new profile image if provided
+      // Handle profileImage
+      const profileImage = req.files && req.files.profileImage
+        ? `/uploads/profileimg/${req.files.profileImage[0].filename}`
+        : userProfile.profileImage; // Keep old image if none uploaded
+
+      // Handle attachments array
+      const existingAttachments = userProfile.attachments || [];
+
+      // Process new attachments
+      const newAttachments = req.files && req.files.attachments
+        ? req.files.attachments.map(file => ({
+            filename: file.originalname,
+            filepath: `/uploads/attachments/${file.filename}`,
+            // Assuming each attachment has an `id` field from the frontend
+            // id: uniqueId() // Generate a unique ID for the new attachment
+          }))
+        : []; // No new attachments
+
+      // Update attachments: replace old ones if the IDs match
+      const updatedAttachments = existingAttachments.map(existingAttachment => {
+        const matchingNewAttachment = newAttachments.find(newAtt => newAtt.id === existingAttachment.id);
+        if (matchingNewAttachment) {
+          // Delete the old file before replacing it
+          deletePreviousImage(existingAttachment.filepath); // Remove the old file
+          return matchingNewAttachment; // Replace with the new attachment
+        }
+        return existingAttachment; // Keep the old attachment if no new match
+      });
+
+      // Add new attachments that don't have a match in existingAttachments
+      const finalAttachments = [
+        ...updatedAttachments,
+        ...newAttachments.filter(newAtt => !existingAttachments.some(existing => existing.id === newAtt.id))
+      ];
+
+      // Update profile data
       const updatedProfileData = {
         firstName,
         lastName,
@@ -284,9 +349,7 @@ exports.updateProfile = async (req, res) => {
         placeOfEmployment,
         profession,
         professionAlignment,
-        profileImage: req.file
-          ? `/uploads/profileimg/${req.file.filename}`
-          : userProfile.profileImage, // Keep the old image if no new image is uploaded
+        profileImage, // Use new profile image handling logic
         salaryRange,
         secondaryEducation,
         specialization,
@@ -295,7 +358,7 @@ exports.updateProfile = async (req, res) => {
         workIndustry,
         yearGraduatedCollege,
         yearStartedCollege,
-        attachments: attachments || [], // Ensure attachments is an array
+        attachments: finalAttachments, // Use new attachments handling logic
       };
 
       // Update the profile in the database
@@ -305,18 +368,12 @@ exports.updateProfile = async (req, res) => {
         { new: true }
       );
 
-      if (!updatedProfile) {
-        return res
-          .status(404)
-          .json({ error: "Profile not found. Please create a profile first." });
-      }
-
       // If accountEmail is provided, update the email in the User model
       if (accountEmail) {
         const updatedUser = await User.findByIdAndUpdate(
           userId,
           { email: accountEmail },
-          { new: true, upsert: false } // Don't create a new user if not found
+          { new: true, upsert: false }
         );
         if (!updatedUser) {
           return res
@@ -338,6 +395,7 @@ exports.updateProfile = async (req, res) => {
     }
   });
 };
+
 
 exports.changePassword = async (req, res) => {
   try {

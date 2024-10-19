@@ -162,32 +162,54 @@ function AdminReports() {
     const alumniconnectlogo2Base64 = await getBase64(alumniconnectlogo2);
     const cicsLogoBase64 = await getBase64(cicslogo);
 
-    // Add CICS logo and AlumniConnect logo to the PDF
-    doc.addImage(cicsLogoBase64, "PNG", 40, 30, 48, 48);
-    doc.addImage(alumniconnectlogo2Base64, "PNG", 500, 30, 50, 50);
+    // Add CICS logo (left side)
+    doc.addImage(cicsLogoBase64, "PNG", 40, 30, 48, 48); // Left-side logo
 
-    // Title and headers
-    doc.setFontSize(18);
+    // Title and headers beside the CICS logo
+
+    doc.setFontSize(10);
     doc.setTextColor("#000000");
-    doc.text("University of Santo Tomas", 100, 50);
-    doc.setFontSize(14);
-    doc.text("College of Information and Computing Sciences", 100, 70);
-    doc.setFontSize(22);
-    doc.text("CICS Alumni Report", 100, 100);
+    doc.text("University of Santo Tomas", 100, 52); // Align beside the logo
+    doc.setFontSize(8);
+    doc.text("College of Information and Computing Sciences", 100, 62); // Align beside the logo
 
-    let startY = 120; // Starting position for the table
+    // Add AlumniConnect logo (right side)
+    doc.addImage(
+      alumniconnectlogo2Base64,
+      "PNG",
+      doc.internal.pageSize.width - 90,
+      30,
+      50,
+      50
+    ); // Right-side logo
+
+    // Add "Alumni Connect" text beside AlumniConnect logo
+    // "Alumni" (black)
+    const textY = 60;
+    doc.setFontSize(20); // Adjust font size as needed
+    doc.setFont("helvetica", "bold"); // Bold font for "Alumni"
+    doc.setTextColor("#2d2b2b"); // Set color to black
+    const alumniTextWidth = doc.getTextWidth("Alumni");
+    const alumniTextX = doc.internal.pageSize.width - 250; // Position text beside logo
+    doc.text("Alumni", alumniTextX, textY); // Positioning Alumni
+
+    // "Connect" (red)
+    doc.setTextColor("#be142e"); // Set color to red
+    const connectTextX = alumniTextX + alumniTextWidth + 5; // Slight gap after "Alumni"
+    doc.text("Connect", connectTextX, textY); // Place "Connect" after "Alumni"
+
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "normal"); // Reset to normal font
+    doc.setTextColor("#000000"); // Set text color to black
+    doc.text("CICS Alumni Report", doc.internal.pageSize.width / 2, 100, {
+      align: "center",
+    });
+
+    // Adjusting the Y-coordinate for the next element
+    let startY = 120; // This creates a margin of 20 points below the title
 
     // Filtered data to be displayed in the table
     filteredData.forEach((row, index) => {
-      // Add "Alumni X" text at the top of each alumni's section
-      const alumniText = `Alumni ${index + 1}`;
-      doc.setFontSize(14);
-      doc.setTextColor(217, 83, 79); // Set text color to red
-      doc.text(alumniText, 40, startY); // Place at top of each alumni section
-
-      // Update the Y position to start after the alumni text
-      startY += 20;
-
       const defaultFields = [
         ["First Name", row.firstName || "---------"],
         ["Last Name", row.lastName || "---------"],
@@ -209,8 +231,11 @@ function AdminReports() {
 
       // Add table for current alumni
       autoTable(doc, {
-        head: [["Field", "Value"]],
-        body: [...defaultFields, ...dynamicFields],
+        head: [[`Alumni ${index + 1}`, "Field", "Value"]], // Adjusted header order
+        body: [
+          ...defaultFields.map((field) => ["", field[0], field[1]]), // Adjusted body to match new header order
+          ...dynamicFields.map((field) => ["", field[0], field[1]]), // Adjusted dynamic fields too
+        ],
         startY,
         styles: { fontSize: 10, textColor: "#333" },
         headStyles: { fillColor: "#d9534f", textColor: "#fff" }, // Red header
@@ -218,14 +243,6 @@ function AdminReports() {
 
       // Update the Y position for the next alumni
       startY = doc.autoTable.previous.finalY + 20; // Adds space after the table
-
-      // Draw a red line separator after each alumni entry
-      doc.setDrawColor(217, 83, 79); // Red color
-      doc.setLineWidth(1.5); // Thickness of the line
-      doc.line(40, startY, doc.internal.pageSize.width - 40, startY);
-
-      // Update the Y position to start after the red separator
-      startY += 10; // Adjust as needed for space after the separator
     });
 
     // Save the generated PDF

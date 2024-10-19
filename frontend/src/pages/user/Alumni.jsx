@@ -278,22 +278,56 @@ function Alumni() {
               >
                 <h1 className="text-xl mb-4">Contacts</h1>
                 <p className="text-xs mb-1/2">Facebook</p>
-                <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.facebook}
-                </p>
-                <p className="text-xs mb-1/2">LinkedIn</p>
-                <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.linkedIn}
-                </p>
-                <p className="text-xs mb-1/2">Instagram</p>
-                <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.instagram}
-                </p>
-                <p className="text-xs mb-1/2">Email</p>
-                <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.email}
-                </p>
-                <p className="text-xs mb-1/2">Mobile Number</p>
+                {selectedAlumni.contactInformation?.facebook ? (
+                  <a
+                    href={selectedAlumni.contactInformation.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                  >
+                    {selectedAlumni.contactInformation.facebook}
+                  </a>
+                ) : (
+                  <p className="text-s mb-2 font-bold"></p>
+                )}
+                <p className="text-xs mt-2 mb-1/2">LinkedIn</p>
+                {selectedAlumni.contactInformation?.linkedIn ? (
+                  <a
+                    href={selectedAlumni.contactInformation.linkedIn}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                  >
+                    {selectedAlumni.contactInformation.linkedIn}
+                  </a>
+                ) : (
+                  <p className="text-s mb-2 font-bold"></p>
+                )}
+                <p className="text-xs mt-2 mb-1/2">Instagram</p>
+                {selectedAlumni.contactInformation?.instagram ? (
+                  <a
+                    href={selectedAlumni.contactInformation.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                  >
+                    {selectedAlumni.contactInformation.instagram}
+                  </a>
+                ) : (
+                  <p className="text-s mb-2 font-bold"></p>
+                )}
+                <p className="text-xs mt-2 mb-1/2">Email</p>
+                {selectedAlumni.contactInformation?.email ? (
+                  <a
+                    href={`mailto:${selectedAlumni.contactInformation.email}`}
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                  >
+                    {selectedAlumni.contactInformation.email}
+                  </a>
+                ) : (
+                  <p className="text-s mb-2 font-bold"></p>
+                )}
+                <p className="text-xs mt-2 mb-1/2">Mobile Number</p>
                 <p className="text-s mb-2 font-bold">
                   {selectedAlumni.contactInformation?.mobileNumber}
                 </p>

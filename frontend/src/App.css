@@ -19,21 +19,17 @@ body {
 .background-section {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 100vh; /* You can adjust this if you want a different height */
+  display: flex; /* Use flexbox for alignment */
+  justify-content: flex-start; /* Align video to the left */
   overflow: hidden;
-  z-index: 0;
-  border-radius: 10px; /* Rounded corners for the background section */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Shadow effect */
-  margin: 0; /* Remove margin */
-  padding: 0; /* Remove padding if any */
-  margin: var(--section-spacing) 0;
 }
 
 .background-video {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 70%; /* Adjust the width to 70% to leave space for the news carousel */
   height: 100%;
   object-fit: cover;
   border-radius: 10px; /* Rounded corners for the video */
@@ -424,4 +420,25 @@ screens */
   .mission-vision-content {
     margin-bottom: var(--section-spacing); /* Add bottom margin */
   }
+}
+.background-news-container {
+  display: flex; /* Aligns children (video and news carousel) in a row */
+  width: 100%;
+}
+
+.background-section {
+  position: relative;
+  width: 70%; /* Adjust width as needed */
+  height: 100vh; /* You can adjust this if you want a different height */
+  display: flex; /* Use flexbox for alignment */
+  justify-content: flex-start; /* Align video to the left */
+  overflow: hidden;
+}
+
+.news-carousel-container {
+  width: 30%; /* Adjust width as needed to fit beside the video */
+  display: flex;
+  flex-direction: column; /* Stack news items vertically */
+  justify-content: center; /* Center news items vertically */
+  padding: 20px; /* Add some padding for better spacing */
 }

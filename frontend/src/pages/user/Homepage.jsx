@@ -7,24 +7,41 @@ import "../../App.css";
 import homepage1 from "../../assets/homepage1.jpg";
 import homepage2 from "../../assets/homepage2.jpg";
 import homepage3 from "../../assets/homepage3.jpg";
+import axios from "axios";
 
 const Homepage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [fade, setFade] = useState(false);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
+  const [news, setNews] = useState([]);
+  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
+  const videoRef = useRef(null);
+  const navigate = useNavigate();
+
   const images = [homepage1, homepage2, homepage3];
   const credits = [
     "Photo Courtesy of ICS",
     "Photo Courtesy of ICS",
     "Photo Courtesy of CSS",
-  ]; // Array of credits for each image
-  const videoRef = useRef(null);
-  const navigate = useNavigate();
+  ];
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
+    fetchNews();
   }, []);
+
+  const fetchNews = async () => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    try {
+      const response = await axios.get(`${backendUrl}/news/view`, {
+        withCredentials: true,
+      });
+      setNews(response.data);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+    }
+  };
 
   const nextPage = () => {
     setFade(true);
@@ -42,31 +59,6 @@ const Homepage = () => {
     }, 500);
   };
 
-  useEffect(() => {
-    if (videoRef.current) {
-      const timeout = setTimeout(() => {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play();
-      }, 60000);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [currentPage]);
-
-  useEffect(() => {
-    const storedLoginStatus = localStorage.getItem("isLoggedIn");
-    const messageShown = sessionStorage.getItem("loginMessageShown");
-
-    if (storedLoginStatus === "true" && messageShown !== "true") {
-      setShowLoginMessage(true);
-      sessionStorage.setItem("loginMessageShown", "true");
-
-      setTimeout(() => {
-        setShowLoginMessage(false);
-      }, 5000);
-    }
-  }, []);
-
   const nextImage = () => {
     setCurrentImage((prevImage) =>
       prevImage === images.length - 1 ? 0 : prevImage + 1
@@ -79,13 +71,21 @@ const Homepage = () => {
     );
   };
 
-  useEffect(() => {
-    const imageInterval = setInterval(nextImage, 5000);
-    return () => clearInterval(imageInterval);
-  }, []);
+  const nextNews = () => {
+    setCurrentNewsIndex((prevIndex) =>
+      prevIndex === news.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const prevNews = () => {
+    setCurrentNewsIndex((prevIndex) =>
+      prevIndex === 0 ? news.length - 1 : prevIndex - 1
+    );
+  };
 
   return (
     <div className="homepage-container">
+    <div className="background-news-container">
       <div className="background-section">
         <video autoPlay muted ref={videoRef} className="background-video">
           <source src={ustbg} type="video/mp4" />
@@ -110,11 +110,41 @@ const Homepage = () => {
         </div>
       </div>
 
-      {showLoginMessage && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
-          <p>Login success!</p>
+      <div className="news-carousel-container" data-aos="fade-up">
+        <h2 className="text-2xl font-medium mb-4">Latest News</h2>
+        <button className="carousel-button prev" onClick={prevNews}>
+          ❮
+        </button>
+        <div className="flex justify-center items-center">
+          {news.length > 0 && (
+            <div
+              className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+              style={{ height: "350px", width: "300px" }}
+              onClick={() => openViewModal(news[currentNewsIndex])}
+            >
+              <img
+                src={`${import.meta.env.VITE_BACKEND_URL}${news[currentNewsIndex].image}`}
+                alt={news[currentNewsIndex].name}
+                className="w-full h-48 object-cover rounded-t-lg mb-4"
+              />
+              <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                {news[currentNewsIndex].name}
+              </div>
+              <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+                {news[currentNewsIndex].description.slice(0, 100)}...
+              </p>
+              <a href="#" className="text-blue-500 text-sm font-medium hover:underline">
+                Read More
+              </a>
+            </div>
+          )}
         </div>
-      )}
+        <button className="carousel-button next" onClick={nextNews}>
+          ❯
+        </button>
+      </div>
+    </div>
+
 
       <div className="carousel-container" data-aos="fade-up">
         <button className="carousel-button prev" onClick={prevPage}>

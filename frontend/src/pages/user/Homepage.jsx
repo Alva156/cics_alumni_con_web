@@ -14,9 +14,9 @@ const Homepage = () => {
   const [fade, setFade] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
   const [news, setNews] = useState([]);
-  const [events, setEvents] = useState([]); // New state for events
+  const [events, setEvents] = useState([]);
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
-  const [currentEventsIndex, setCurrentEventsIndex] = useState(0); // New state for current events index
+  const [currentEventsIndex, setCurrentEventsIndex] = useState(0);
   const videoRef = useRef(null);
   const navigate = useNavigate();
 
@@ -30,7 +30,7 @@ const Homepage = () => {
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
     fetchNews();
-    fetchEvents(); // Fetch events when the component mounts
+    fetchEvents();
   }, []);
 
   const fetchNews = async () => {
@@ -48,7 +48,7 @@ const Homepage = () => {
   const fetchEvents = async () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     try {
-      const response = await axios.get(`${backendUrl}/events/view`, { // Assuming the endpoint is `/events/view`
+      const response = await axios.get(`${backendUrl}/events/view`, {
         withCredentials: true,
       });
       setEvents(response.data);
@@ -111,118 +111,154 @@ const Homepage = () => {
 
   return (
     <div className="homepage-container" style={{ display: "flex" }}>
-  <div
-    className="background-news-container"
-    style={{ display: "flex", width: "100%" }} // Keep this as a row
-  >
-    {/* Background Video Section */}
-    <div className="background-section" style={{ position: "relative", width: "70%" }}>
-      <video
-        autoPlay
-        muted
-        ref={videoRef}
-        className="background-video"
-        style={{ width: "100%" }}
-      >
-        <source src={ustbg} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
       <div
-        className="absolute"
-        style={{
-          position: "absolute",
-          bottom: "20px",
-          right: "20px",
-          backgroundColor: "rgba(0, 0, 0, 0.4)",
-          color: "white",
-          padding: "10px",
-          borderRadius: "5px",
-          zIndex: "20",
-          textAlign: "right",
-        }}
+        className="background-news-container"
+        style={{ display: "flex", width: "100%" }}
       >
-        Photo Courtesy of UST SITE
-      </div>
-    </div>
-
-    {/* News and Events Carousel Section */}
-    <div style={{ width: "30%", display: "flex", flexDirection: "column", padding: "20px" }}>
-      {/* News Carousel */}
-      <div className="news-carousel-container" data-aos="fade-up">
-        <h2 className="text-2xl font-medium mb-4">Latest News</h2>
-        <button className="carousel-button prev" onClick={prevNews}>
-          ❮
-        </button>
-        <div className="flex justify-center items-center">
-          {news.length > 0 && (
-            <div
-              className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-              style={{ height: "350px", width: "300px" }}
-            >
-              <img
-                src={`${import.meta.env.VITE_BACKEND_URL}${news[currentNewsIndex].image}`}
-                alt={news[currentNewsIndex].name}
-                className="w-full h-48 object-cover rounded-t-lg mb-4"
-              />
-              <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
-                {news[currentNewsIndex].name}
-              </div>
-              <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
-                {news[currentNewsIndex].description.slice(0, 100)}...
-              </p>
-              <a
-                href="#"
-                className="text-blue-500 text-sm font-medium hover:underline"
-              >
-                Read More
-              </a>
-            </div>
-          )}
+        {/* Background Video Section */}
+        <div
+          className="background-section"
+          style={{ position: "relative", width: "70%" }}
+        >
+          <video
+            autoPlay
+            muted
+            ref={videoRef}
+            className="background-video"
+            style={{ width: "100%" }}
+          >
+            <source src={ustbg} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div
+            className="absolute"
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              backgroundColor: "rgba(0, 0, 0, 0.4)",
+              color: "white",
+              padding: "10px",
+              borderRadius: "5px",
+              zIndex: "20",
+              textAlign: "right",
+            }}
+          >
+            Photo Courtesy of UST SITE
+          </div>
         </div>
-        <button className="carousel-button next" onClick={nextNews}>
-          ❯
-        </button>
-      </div>
 
-      {/* Events Carousel Section */}
-      <div className="events-carousel-container" data-aos="fade-up" style={{ marginTop: "20px" }}>
-        <h2 className="text-2xl font-medium mb-4">Upcoming Events</h2>
-        <button className="carousel-button prev" onClick={prevEvent}>
-          ❮
-        </button>
-        <div className="flex justify-center items-center">
-          {events.length > 0 && (
-            <div
-              className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-              style={{ height: "350px", width: "300px" }}
-            >
-              <img
-                src={`${import.meta.env.VITE_BACKEND_URL}${events[currentEventsIndex].image}`}
-                alt={events[currentEventsIndex].name}
-                className="w-full h-48 object-cover rounded-t-lg mb-4"
-              />
-              <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
-                {events[currentEventsIndex].name}
-              </div>
-              <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
-                {events[currentEventsIndex].description.slice(0, 100)}...
-              </p>
-              <a
-                href="#"
-                className="text-blue-500 text-sm font-medium hover:underline"
-              >
-                Read More
-              </a>
+        {/* News and Events Carousel Section */}
+        <div
+          style={{
+            width: "30%",
+            display: "flex",
+            flexDirection: "column",
+            padding: "20px",
+          }}
+        >
+          {/* News Carousel */}
+          <div
+            className="news-carousel-container"
+            data-aos="fade-up"
+            style={{ position: "relative", width: "100%", maxWidth: "400px" }}
+          >
+            <h2 className="text-2xl font-medium mb-4">Latest News</h2>
+            <div className="flex justify-center items-center">
+              {news.length > 0 && (
+                <div
+                  className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                  style={{ height: "350px", width: "100%" }}
+                >
+                  <img
+                    src={`${import.meta.env.VITE_BACKEND_URL}${
+                      news[currentNewsIndex].image
+                    }`}
+                    alt={news[currentNewsIndex].name}
+                    className="w-full h-48 object-cover rounded-t-lg mb-4"
+                  />
+                  <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                    {news[currentNewsIndex].name}
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+                    {news[currentNewsIndex].description.slice(0, 100)}...
+                  </p>
+                  <a
+                    href="#"
+                    className="text-blue-500 text-sm font-medium hover:underline"
+                  >
+                    Read More
+                  </a>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <button className="carousel-button next" onClick={nextEvent}>
-          ❯
-        </button>
-      </div>
-    </div>
-  </div>
+            {/* Next and Previous buttons inside the carousel */}
+            <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
+              <button className="carousel-button prev" onClick={prevNews}>
+                ❮
+              </button>
+            </div>
+            <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
+              <button className="carousel-button next" onClick={nextNews}>
+                ❯
+              </button>
+            </div>
+          </div>
 
+          {/* Events Carousel Section */}
+          <div
+            className="events-carousel-container"
+            data-aos="fade-up"
+            style={{
+              position: "relative",
+              width: "100%",
+              maxWidth: "400px",
+              marginTop: "20px",
+            }}
+          >
+            <h2 className="text-2xl font-medium mb-4">Upcoming Events</h2>
+            <div className="flex justify-center items-center">
+              {events.length > 0 && (
+                <div
+                  className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+                  style={{ height: "350px", width: "100%" }}
+                >
+                  <img
+                    src={`${import.meta.env.VITE_BACKEND_URL}${
+                      events[currentEventsIndex].image
+                    }`}
+                    alt={events[currentEventsIndex].name}
+                    className="w-full h-48 object-cover rounded-t-lg mb-4"
+                  />
+                  <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                    {events[currentEventsIndex].name}
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+                    {events[currentEventsIndex].description.slice(0, 100)}...
+                  </p>
+                  <a
+                    href="#"
+                    className="text-blue-500 text-sm font-medium hover:underline"
+                  >
+                    Read More
+                  </a>
+                </div>
+              )}
+            </div>
+            {/* Next and Previous buttons inside the carousel */}
+            <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
+              <button className="carousel-button prev" onClick={prevEvent}>
+                ❮
+              </button>
+            </div>
+            <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
+              <button className="carousel-button next" onClick={nextEvent}>
+                ❯
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="carousel-container" data-aos="fade-up">
         <button className="carousel-button prev" onClick={prevPage}>
@@ -340,54 +376,28 @@ const Homepage = () => {
             share knowledge, and create impactful solutions for a better future.
           </p>
         </div>
-        <div className="image-carousel-container">
-          <button className="carousel-button prev" onClick={prevImage}>
-            ❮
-          </button>
-          <div className="carousel-images">
-            {images.map((image, index) => (
-              <div
-                key={index}
-                className={`carousel-image ${
-                  currentImage === index ? "active" : ""
-                }`}
-              >
-                <img src={image} alt={`carousel-${index}`} />
-                <div
-                  className="absolute bottom-4 right-4 bg-black text-white text-sm p-2 rounded"
-                  style={{
-                    position: "absolute",
-                    bottom: "20px",
-                    right: "20px",
-                    backgroundColor: "rgba(0, 0, 0, 0.4)",
-                    color: "white",
-                    padding: "10px",
-                    borderRadius: "5px",
-                    fontSize: "14px",
-                    zIndex: "20",
-                    textAlign: "right",
-                  }}
-                >
-                  {credits[index]}{" "}
-                  {/* Display the credit based on the current index */}
-                </div>
-              </div>
-            ))}
+        {/* Image Carousel */}
+        <div
+          className={`image-carousel-container transition-opacity duration-500 ${
+            fade ? "opacity-0" : "opacity-100"
+          }`}
+          style={{ width: "100%", maxWidth: "700px", margin: "0 auto" }}
+        >
+          <img
+            src={images[currentImage]}
+            alt={`Slide ${currentImage}`}
+            className="w-full h-auto rounded-lg shadow-lg"
+          />
+          <div className="carousel-credits text-center mt-2 text-sm text-gray-600">
+            {credits[currentImage]}
           </div>
-          <button className="carousel-button next" onClick={nextImage}>
-            ❯
-          </button>
-
-          <div className="carousel-indicators">
-            {images.map((_, index) => (
-              <span
-                key={index}
-                className={`indicator ${
-                  currentImage === index ? "active" : ""
-                }`}
-                onClick={() => setCurrentImage(index)}
-              ></span>
-            ))}
+          <div className="carousel-controls">
+            <button className="carousel-button" onClick={prevImage}>
+              ❮
+            </button>
+            <button className="carousel-button" onClick={nextImage}>
+              ❯
+            </button>
           </div>
         </div>
       </div>

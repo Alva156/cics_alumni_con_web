@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { CSVLink } from "react-csv";
-import pdfMake from "pdfmake/build/pdfmake";
-import * as pdfFonts from "pdfmake/build/vfs_fonts";
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
 import cicslogo from "../../assets/cicslogo.png";
 
@@ -153,186 +152,84 @@ function AdminReports() {
   );
 
   const generatePDF = async () => {
-    try {
-      // Convert images to Base64 format
-      const alumniconnectlogo2Base64 = await getBase64(alumniconnectlogo2);
-      const cicsLogoBase64 = await getBase64(cicslogo);
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "pt",
+      format: "a3",
+    });
 
-      const content = [
-        // Header section with images and title
-        {
-          columns: [
-            {
-              image: cicsLogoBase64, // CICS logo in base64
-              width: 48,
-              margin: [10, 0, 0, 0],
-            },
-            {
-              stack: [
-                {
-                  text: "University of Santo Tomas",
-                  style: "headerUniversity",
-                },
-                {
-                  text: "College of Information and Computing Sciences",
-                  style: "headerCollege",
-                },
-              ],
-              margin: [10, 24, 0, 0],
-            },
+    // Convert images to base64
+    const alumniconnectlogo2Base64 = await getBase64(alumniconnectlogo2);
+    const cicsLogoBase64 = await getBase64(cicslogo);
 
-            {
-              text: "CICS Alumni Report",
-              bold: true,
-              style: "header",
-              alignment: "left",
-              margin: [0, 24, 0, 0],
-            },
+    // Add CICS logo and AlumniConnect logo to the PDF
+    doc.addImage(cicsLogoBase64, "PNG", 40, 30, 48, 48);
+    doc.addImage(alumniconnectlogo2Base64, "PNG", 500, 30, 50, 50);
 
-            {
-              columns: [
-                {
-                  text: [
-                    { text: "Alumni", color: "#2d2b2b", bold: true },
-                    { text: " Connect", color: "#be142e", bold: true },
-                  ],
-                  style: "headerTitle",
-                  margin: [0, 23, 10, 0],
-                },
-                {
-                  image: alumniconnectlogo2Base64,
-                  width: 50,
-                  margin: [0, 5, 0, 0],
-                },
-              ],
-              columnGap: 5,
-            },
-          ],
-          columnGap: 10,
-        },
-        { text: "\n", margin: [0, 10] },
+    // Title and headers
+    doc.setFontSize(18);
+    doc.setTextColor("#000000");
+    doc.text("University of Santo Tomas", 100, 50);
+    doc.setFontSize(14);
+    doc.text("College of Information and Computing Sciences", 100, 70);
+    doc.setFontSize(22);
+    doc.text("CICS Alumni Report", 100, 100);
 
-        ...filteredData.map((row, index) => {
-          // Default fields to display
-          const defaultFields = [
-            { label: "First Name", value: row.firstName || "---------" },
-            { label: "Last Name", value: row.lastName || "---------" },
-            {
-              label: "Birthday",
-              value: formatDate(row.birthday) || "---------",
-            },
-            { label: "Program", value: row.collegeProgram || "---------" },
-          ];
+    let startY = 120; // Starting position for the table
 
-          const dynamicFields =
-            selectedFields.length === 0 || selectedFields.includes("All Fields")
-              ? availableFields.map((field) => ({
-                  label: ` ${field}`,
-                  value:
-                    getNestedValue(row, fieldToKeyMap[field]) || "---------",
-                }))
-              : selectedFields.map((field) => ({
-                  label: ` ${field}`,
-                  value:
-                    getNestedValue(row, fieldToKeyMap[field]) || "---------",
-                }));
+    // Filtered data to be displayed in the table
+    filteredData.forEach((row, index) => {
+      // Add "Alumni X" text at the top of each alumni's section
+      const alumniText = `Alumni ${index + 1}`;
+      doc.setFontSize(14);
+      doc.setTextColor(217, 83, 79); // Set text color to red
+      doc.text(alumniText, 40, startY); // Place at top of each alumni section
 
-          const allFields = [...defaultFields, ...dynamicFields];
+      // Update the Y position to start after the alumni text
+      startY += 20;
 
-          const tableBody = [
-            [
-              {
-                text: `Alumni Record ${index + 1}`,
-                colSpan: 2,
-                style: "recordTitle",
-                margin: [0, 0, 0, 10],
-                alignment: "center",
-              },
-              {},
-            ],
-            ...allFields.map((field) => [
-              { text: field.label, style: "fieldLabel" },
-              { text: field.value, style: "fieldValue" },
-            ]),
-          ];
-
-          return {
-            margin: [0, 15, 0, 15],
-            table: {
-              widths: ["auto", "*"],
-              body: tableBody,
-            },
-            layout: {
-              hLineWidth: function (i, node) {
-                return i === 1 ? 1 : 0;
-              },
-              vLineWidth: function (i, node) {
-                return 0;
-              },
-              hLineColor: function (i, node) {
-                return "#ddd";
-              },
-            },
-          };
-        }),
+      const defaultFields = [
+        ["First Name", row.firstName || "---------"],
+        ["Last Name", row.lastName || "---------"],
+        ["Birthday", formatDate(row.birthday) || "---------"],
+        ["Program", row.collegeProgram || "---------"],
       ];
 
-      const docDefinition = {
-        content,
-        styles: {
-          headerUniversity: {
-            fontSize: 8,
-            bold: true,
-            italics: true,
-            color: "#000000",
-          },
-          headerCollege: {
-            fontSize: 7,
-            bold: true,
-            italics: true,
-            color: "#000000",
-          },
-          headerTitle: {
-            fontSize: 18,
-            bold: true,
-            color: "#333333",
-            alignment: "right",
-            margin: [0, 20, 0, 0],
-          },
-          header: {
-            fontSize: 18,
-          },
-          recordTitle: {
-            fontSize: 14,
-            bold: true,
-            color: "#fff",
-            fillColor: "#d9534f", // Red background for separation
-            alignment: "center",
-          },
-          fieldLabel: {
-            fontSize: 10,
-            bold: true,
-            color: "#d9534f", // Red color for labels
-          },
-          fieldValue: {
-            fontSize: 10,
-            color: "#333", // Dark color for values
-          },
-        },
-        pageSize: "A3",
-        pageOrientation: "portrait", // Horizontal layout
-        defaultStyle: {
-          fontSize: 12,
-          color: "#333",
-        },
-        pageMargins: [40, 40, 40, 40], // Page margins
-      };
+      // Add selected fields dynamically
+      const dynamicFields =
+        selectedFields.length === 0 || selectedFields.includes("All Fields")
+          ? availableFields.map((field) => [
+              field,
+              getNestedValue(row, fieldToKeyMap[field]) || "---------",
+            ])
+          : selectedFields.map((field) => [
+              field,
+              getNestedValue(row, fieldToKeyMap[field]) || "---------",
+            ]);
 
-      // Generate and download the PDF
-      pdfMake.createPdf(docDefinition).download("cicsalumniconnect_report.pdf");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    }
+      // Add table for current alumni
+      autoTable(doc, {
+        head: [["Field", "Value"]],
+        body: [...defaultFields, ...dynamicFields],
+        startY,
+        styles: { fontSize: 10, textColor: "#333" },
+        headStyles: { fillColor: "#d9534f", textColor: "#fff" }, // Red header
+      });
+
+      // Update the Y position for the next alumni
+      startY = doc.autoTable.previous.finalY + 20; // Adds space after the table
+
+      // Draw a red line separator after each alumni entry
+      doc.setDrawColor(217, 83, 79); // Red color
+      doc.setLineWidth(1.5); // Thickness of the line
+      doc.line(40, startY, doc.internal.pageSize.width - 40, startY);
+
+      // Update the Y position to start after the red separator
+      startY += 10; // Adjust as needed for space after the separator
+    });
+
+    // Save the generated PDF
+    doc.save("cicsalumniconnect_report.pdf");
   };
 
   return (

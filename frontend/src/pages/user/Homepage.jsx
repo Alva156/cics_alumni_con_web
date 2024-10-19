@@ -86,7 +86,7 @@ const Homepage = () => {
     <div className="homepage-container" style={{ display: "flex" }}>
       <div
         className="background-news-container"
-        style={{ width: "75%", position: "relative" }}
+        style={{ width: "100%", position: "relative" }}
       >
         <div className="background-section">
           <video

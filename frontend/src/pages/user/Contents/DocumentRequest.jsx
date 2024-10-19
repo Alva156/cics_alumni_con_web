@@ -4,7 +4,7 @@ import axios from "axios";
 
 function Documents() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const [selectedDocuments, setSelectedDocuments] = useState(null);
+  const [selectedDocument, setSelectedDocument] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [documents, setDocuments] = useState([]);
@@ -27,18 +27,18 @@ function Documents() {
     fetchDocuments();
   }, []);
 
-  const openViewModal = (documents) => {
-    setSelectedDocuments(documents);
+  const openViewModal = (document) => {
+    setSelectedDocument(document);
     setIsViewModalOpen(true);
   };
 
   const closeModal = () => {
     setIsViewModalOpen(false);
-    setSelectedDocuments(null);
+    setSelectedDocument(null);
   };
 
-  const filteredDocuments = documents.filter((documents) =>
-    documents.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredDocuments = documents.filter((document) =>
+    document.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Sort documents based on selected criteria
@@ -76,34 +76,52 @@ function Documents() {
         <select
           className="ml-2 border border-black rounded px-3 py-1 text-sm"
           value={sortCriteria}
-          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+          onChange={(e) => setSortCriteria(e.target.value)}
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
         </select>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="text-lg">Documents Lists</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedDocuments.map((document) => (
+          <div
+            key={document._id}
+            className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => openViewModal(document)}
+          >
+            {document.image.endsWith(".pdf") ? (
+              <iframe
+                src={`${backendUrl}${document.image}`}
+                title={document.name}
+                className="w-full h-48 object-cover rounded-t-lg mb-4"
+                frameBorder="0"
+              />
+            ) : (
+              <img
+                src={`${backendUrl}${document.image}`}
+                alt={document.name}
+                className="w-full h-48 object-cover rounded-t-lg mb-4"
+              />
+            )}
+            <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+              {document.name}
+            </div>
+            <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+              {document.description.slice(0, 100)}...
+            </p>
+            <a
+              href="#"
+              className="text-blue-500 text-sm font-medium hover:underline"
+            >
+              Read More
+            </a>
+          </div>
+        ))}
       </div>
 
-      <hr className="mb-6 border-black" />
-
-      {filteredDocuments.map((documents) => (
-        <div
-          key={documents._id}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
-          onClick={() => openViewModal(documents)}
-        >
-          <div>
-            <div className="text-md font-medium mb-1">{documents.name}</div>
-            <div className="text-sm text-black-600">{documents.address}</div>
-          </div>
-        </div>
-      ))}
-
       {/* View Modal */}
-      {isViewModalOpen && selectedDocuments && (
+      {isViewModalOpen && selectedDocument && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
           style={{ zIndex: 9999 }}
@@ -118,32 +136,30 @@ function Documents() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedDocuments.name}
-            </div>
-            <div className="text-md mb-2">{selectedDocuments.address}</div>
+            <div className="text-2xl font-medium mb-2">{selectedDocument.name}</div>
+            <div className="text-md mb-2">{selectedDocument.address}</div>
             {/* Conditional rendering for images and PDFs */}
-            {selectedDocuments.image.endsWith(".pdf") ? (
+            {selectedDocument.image.endsWith(".pdf") ? (
               <iframe
-                src={`${backendUrl}${selectedDocuments.image}`}
-                title={selectedDocuments.name}
-                className="mb-4 w-full h-48 md:h-64 lg:h-80"
+                src={`${backendUrl}${selectedDocument.image}`}
+                title={selectedDocument.name}
+                className="mb-4 w-full h-64"
                 frameBorder="0"
-              ></iframe>
+              />
             ) : (
               <img
-                src={`${backendUrl}${selectedDocuments.image}`}
-                alt={selectedDocuments.name}
-                className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
+                src={`${backendUrl}${selectedDocument.image}`}
+                alt={selectedDocument.name}
+                className="mb-4 w-full h-64 object-cover rounded"
               />
             )}
-            <div className="text-sm mb-4">{selectedDocuments.description}</div>
+            <div className="text-sm mb-4">{selectedDocument.description}</div>
             <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
-              href={`mailto:${selectedDocuments.contact}`}
+              href={`mailto:${selectedDocument.contact}`}
               className="block text-sm text-blue-600 underline"
             >
-              {selectedDocuments.contact}
+              {selectedDocument.contact}
             </a>
           </div>
         </div>

@@ -259,7 +259,6 @@ const Homepage = () => {
           </div>
         </div>
       </div>
-
       <div className="carousel-container" data-aos="fade-up">
         <button className="carousel-button prev" onClick={prevPage}>
           ❮
@@ -376,28 +375,54 @@ const Homepage = () => {
             share knowledge, and create impactful solutions for a better future.
           </p>
         </div>
-        {/* Image Carousel */}
-        <div
-          className={`image-carousel-container transition-opacity duration-500 ${
-            fade ? "opacity-0" : "opacity-100"
-          }`}
-          style={{ width: "100%", maxWidth: "700px", margin: "0 auto" }}
-        >
-          <img
-            src={images[currentImage]}
-            alt={`Slide ${currentImage}`}
-            className="w-full h-auto rounded-lg shadow-lg"
-          />
-          <div className="carousel-credits text-center mt-2 text-sm text-gray-600">
-            {credits[currentImage]}
+        <div className="image-carousel-container">
+          <button className="carousel-button prev" onClick={prevImage}>
+            ❮
+          </button>
+          <div className="carousel-images">
+            {images.map((image, index) => (
+              <div
+                key={index}
+                className={`carousel-image ${
+                  currentImage === index ? "active" : ""
+                }`}
+              >
+                <img src={image} alt={`carousel-${index}`} />
+                <div
+                  className="absolute bottom-4 right-4 bg-black text-white text-sm p-2 rounded"
+                  style={{
+                    position: "absolute",
+                    bottom: "20px",
+                    right: "20px",
+                    backgroundColor: "rgba(0, 0, 0, 0.4)",
+                    color: "white",
+                    padding: "10px",
+                    borderRadius: "5px",
+                    fontSize: "14px",
+                    zIndex: "20",
+                    textAlign: "right",
+                  }}
+                >
+                  {credits[index]}{" "}
+                  {/* Display the credit based on the current index */}
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="carousel-controls">
-            <button className="carousel-button" onClick={prevImage}>
-              ❮
-            </button>
-            <button className="carousel-button" onClick={nextImage}>
-              ❯
-            </button>
+          <button className="carousel-button next" onClick={nextImage}>
+            ❯
+          </button>
+
+          <div className="carousel-indicators">
+            {images.map((_, index) => (
+              <span
+                key={index}
+                className={`indicator ${
+                  currentImage === index ? "active" : ""
+                }`}
+                onClick={() => setCurrentImage(index)}
+              ></span>
+            ))}
           </div>
         </div>
       </div>

@@ -164,7 +164,7 @@ function AdminReports() {
           columns: [
             {
               image: cicsLogoBase64, // CICS logo in base64
-              width: 80,
+              width: 48,
               margin: [10, 0, 0, 0],
             },
             {
@@ -178,15 +178,15 @@ function AdminReports() {
                   style: "headerCollege",
                 },
               ],
-              margin: [10, 28, 0, 0],
+              margin: [10, 24, 0, 0],
             },
-            { text: "", width: "8%" },
+
             {
               text: "CICS Alumni Report",
               bold: true,
               style: "header",
               alignment: "left",
-              margin: [0, 28, 0, 0],
+              margin: [0, 24, 0, 0],
             },
 
             {
@@ -201,7 +201,7 @@ function AdminReports() {
                 },
                 {
                   image: alumniconnectlogo2Base64,
-                  width: 80,
+                  width: 50,
                   margin: [0, 5, 0, 0],
                 },
               ],
@@ -281,46 +281,46 @@ function AdminReports() {
         content,
         styles: {
           headerUniversity: {
-            fontSize: 12,
+            fontSize: 8,
             bold: true,
             italics: true,
             color: "#000000",
           },
           headerCollege: {
-            fontSize: 10,
+            fontSize: 7,
             bold: true,
             italics: true,
             color: "#000000",
           },
           headerTitle: {
-            fontSize: 28,
+            fontSize: 18,
             bold: true,
             color: "#333333",
             alignment: "right",
             margin: [0, 20, 0, 0],
           },
           header: {
-            fontSize: 28,
+            fontSize: 18,
           },
           recordTitle: {
-            fontSize: 17,
+            fontSize: 14,
             bold: true,
             color: "#fff",
             fillColor: "#d9534f", // Red background for separation
             alignment: "center",
           },
           fieldLabel: {
-            fontSize: 13,
+            fontSize: 10,
             bold: true,
             color: "#d9534f", // Red color for labels
           },
           fieldValue: {
-            fontSize: 13,
+            fontSize: 10,
             color: "#333", // Dark color for values
           },
         },
-        pageSize: "A2",
-        pageOrientation: "landscape", // Horizontal layout
+        pageSize: "A3",
+        pageOrientation: "portrait", // Horizontal layout
         defaultStyle: {
           fontSize: 12,
           color: "#333",

@@ -4,6 +4,8 @@ import { CSVLink } from "react-csv";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
+import ustlogo from "../../assets/ustlogo.png";
+import cicslogo from "../../assets/cicslogo.png";
 
 function AdminReports() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -11,6 +13,17 @@ function AdminReports() {
   const [selectedFields, setSelectedFields] = useState(["All Fields"]);
   const [openDropdown, setOpenDropdown] = useState("");
   const [alumni, setAlumni] = useState([]);
+
+  const getBase64 = async (url) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
   const formatDate = (dateString) => {
     if (!dateString || isNaN(new Date(dateString).getTime())) {
@@ -138,89 +151,181 @@ function AdminReports() {
       selectedPrograms.includes("All Programs") ||
       selectedPrograms.includes(row.collegeProgram)
   );
-  const generatePDF = () => {
-    const tableBody = [
-      // Table Headers
-      [
-        { text: "First Name", bold: true, fillColor: "#e0e0e0", fontSize: 12 },
-        { text: "Last Name", bold: true, fillColor: "#e0e0e0", fontSize: 12 },
-        { text: "Birthday", bold: true, fillColor: "#e0e0e0", fontSize: 12 },
-        ...(selectedFields.length === 0 || selectedFields.includes("All Fields")
-          ? availableFields.map((field) => ({
-              text: field,
-              bold: true,
-              fillColor: "#e0e0e0",
-              fontSize: 12,
-            }))
-          : selectedFields.map((field) => ({
-              text: field,
-              bold: true,
-              fillColor: "#e0e0e0",
-              fontSize: 12,
-            }))),
-      ],
-      // Table Data
-      ...filteredData.map((row) => [
-        { text: row.firstName || "", margin: [5, 2], alignment: "left" },
-        { text: row.lastName || "", margin: [5, 2], alignment: "left" },
-        {
-          text: formatDate(row.birthday) || "",
-          margin: [5, 2],
-          alignment: "left",
-        },
-        ...(selectedFields.length === 0 || selectedFields.includes("All Fields")
-          ? availableFields.map((field) => ({
-              text: getNestedValue(row, fieldToKeyMap[field]) || "",
-              margin: [5, 2],
-              alignment: "left",
-            }))
-          : selectedFields.map((field) => ({
-              text: getNestedValue(row, fieldToKeyMap[field]) || "",
-              margin: [5, 2],
-              alignment: "left",
-            }))),
-      ]),
-    ];
 
-    const docDefinition = {
-      content: [
+  const generatePDF = async () => {
+    try {
+      // Convert images to Base64 format
+      const ustLogoBase64 = await getBase64(ustlogo);
+      const cicsLogoBase64 = await getBase64(cicslogo);
+
+      const content = [
+        // Header section with images and title
+        {
+          columns: [
+            {
+              image: ustLogoBase64, // UST logo in base64
+              width: 50,
+              margin: [0, 0, 10, 0],
+            },
+            {
+              stack: [
+                {
+                  text: "University of Santo Tomas",
+                  style: "headerUniversity",
+                },
+                {
+                  text: "College of Information and Computing Sciences",
+                  style: "headerCollege",
+                },
+              ],
+              margin: [10, 0, 0, 0],
+            },
+            {
+              text: "| Alumni Connect",
+              style: "headerTitle",
+              margin: [10, 0, 10, 0],
+            },
+            {
+              image: cicsLogoBase64, // CICS logo in base64
+              width: 50,
+              margin: [10, 0, 0, 0],
+            },
+          ],
+          columnGap: 10,
+        },
+        { text: "\n", margin: [0, 10] },
         {
           text: "CICS Alumni Connect Report",
           style: "header",
-          margin: [0, 20, 0, 10], // Add margin around header
+          margin: [0, 20, 0, 20],
         },
-        {
-          table: {
-            headerRows: 1,
-            widths: "auto", // Set widths to auto for all columns
-            body: tableBody,
-          },
-          layout: {
-            fillColor: (rowIndex) => (rowIndex === 0 ? "#e0e0e0" : null), // Header color
-            hLineWidth: () => 0.5,
-            vLineWidth: () => 0.5,
-            hLineColor: () => "#ccc",
-            vLineColor: () => "#ccc",
-          },
-        },
-      ],
-      styles: {
-        header: {
-          fontSize: 28, // Larger font size for the header
-          bold: true,
-          margin: [0, 0, 0, 10],
-          alignment: "center", // Center align header
-        },
-      },
-      pageSize: "A1",
-      pageOrientation: "landscape", // Landscape orientation
-      defaultStyle: {
-        fontSize: 12, // Adjusted font size for body text
-        color: "#333", // Dark gray for better readability
-      },
-    };
+        // Map through filtered data and dynamically generate content
+        ...filteredData.map((row, index) => {
+          // Default fields to display
+          const defaultFields = [
+            { label: "First Name", value: row.firstName || "---------" },
+            { label: "Last Name", value: row.lastName || "---------" },
+            {
+              label: "Birthday",
+              value: formatDate(row.birthday) || "---------",
+            },
+            { label: "Program", value: row.collegeProgram || "---------" },
+          ];
 
-    pdfMake.createPdf(docDefinition).download("cicsalumniconnect_report.pdf");
+          // Dynamically determine fields based on selectedFields
+          const dynamicFields =
+            selectedFields.length === 0 || selectedFields.includes("All Fields")
+              ? availableFields.map((field) => ({
+                  label: ` ${field}`,
+                  value:
+                    getNestedValue(row, fieldToKeyMap[field]) || "---------",
+                }))
+              : selectedFields.map((field) => ({
+                  label: ` ${field}`,
+                  value:
+                    getNestedValue(row, fieldToKeyMap[field]) || "---------",
+                }));
+
+          // Combine default and dynamic fields
+          const allFields = [...defaultFields, ...dynamicFields];
+
+          // Create rows for the table body
+          const tableBody = [
+            [
+              {
+                text: `Alumni Record ${index + 1}`,
+                colSpan: 2,
+                style: "recordTitle",
+                margin: [0, 0, 0, 10],
+                alignment: "center",
+              },
+              {},
+            ],
+            ...allFields.map((field) => [
+              { text: field.label, style: "fieldLabel" },
+              { text: field.value, style: "fieldValue" },
+            ]),
+          ];
+
+          return {
+            margin: [0, 15, 0, 15], // Space between records
+            table: {
+              widths: ["auto", "*"], // Two columns: label and value
+              body: tableBody,
+            },
+            layout: {
+              hLineWidth: function (i, node) {
+                return i === 1 ? 1 : 0; // Add horizontal line after title row
+              },
+              vLineWidth: function (i, node) {
+                return 0; // No vertical lines
+              },
+              hLineColor: function (i, node) {
+                return "#ddd"; // Light gray lines for separation
+              },
+            },
+          };
+        }),
+      ];
+
+      const docDefinition = {
+        content,
+        styles: {
+          headerUniversity: {
+            fontSize: 12,
+            bold: true,
+            italics: true,
+            color: "#000000",
+          },
+          headerCollege: {
+            fontSize: 10,
+            bold: true,
+            italics: true,
+            color: "#000000",
+          },
+          headerTitle: {
+            fontSize: 16,
+            bold: true,
+            color: "#333333",
+          },
+          header: {
+            fontSize: 28,
+            bold: true,
+            color: "#d9534f",
+            alignment: "center",
+          },
+          recordTitle: {
+            fontSize: 20,
+            bold: true,
+            color: "#fff",
+            fillColor: "#d9534f", // Red background for separation
+            alignment: "center",
+            margin: [0, 10, 0, 10],
+          },
+          fieldLabel: {
+            fontSize: 12,
+            bold: true,
+            color: "#d9534f", // Red color for labels
+          },
+          fieldValue: {
+            fontSize: 12,
+            color: "#333", // Dark color for values
+          },
+        },
+        pageSize: "A2",
+        pageOrientation: "landscape", // Horizontal layout
+        defaultStyle: {
+          fontSize: 12,
+          color: "#333",
+        },
+        pageMargins: [40, 40, 40, 40], // Page margins
+      };
+
+      // Generate and download the PDF
+      pdfMake.createPdf(docDefinition).download("cicsalumniconnect_report.pdf");
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
   };
 
   return (

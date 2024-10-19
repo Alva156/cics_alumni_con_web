@@ -80,3 +80,5 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+// Log the FRONTEND URL with a clear message
+console.log(`Frontend URL: ${process.env.FRONTEND}`);

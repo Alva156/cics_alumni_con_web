@@ -4,7 +4,7 @@ import { CSVLink } from "react-csv";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
-import ustlogo from "../../assets/ustlogo.png";
+import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
 import cicslogo from "../../assets/cicslogo.png";
 
 function AdminReports() {
@@ -155,7 +155,7 @@ function AdminReports() {
   const generatePDF = async () => {
     try {
       // Convert images to Base64 format
-      const ustLogoBase64 = await getBase64(ustlogo);
+      const alumniconnectlogo2Base64 = await getBase64(alumniconnectlogo2);
       const cicsLogoBase64 = await getBase64(cicslogo);
 
       const content = [
@@ -163,9 +163,9 @@ function AdminReports() {
         {
           columns: [
             {
-              image: ustLogoBase64, // UST logo in base64
-              width: 50,
-              margin: [0, 0, 10, 0],
+              image: cicsLogoBase64, // CICS logo in base64
+              width: 80,
+              margin: [10, 0, 0, 0],
             },
             {
               stack: [
@@ -178,28 +178,40 @@ function AdminReports() {
                   style: "headerCollege",
                 },
               ],
-              margin: [10, 0, 0, 0],
+              margin: [10, 28, 0, 0],
             },
+            { text: "", width: "8%" },
             {
-              text: "| Alumni Connect",
-              style: "headerTitle",
-              margin: [10, 0, 10, 0],
+              text: "CICS Alumni Report",
+              bold: true,
+              style: "header",
+              alignment: "left",
+              margin: [0, 28, 0, 0],
             },
+
             {
-              image: cicsLogoBase64, // CICS logo in base64
-              width: 50,
-              margin: [10, 0, 0, 0],
+              columns: [
+                {
+                  text: [
+                    { text: "Alumni", color: "#2d2b2b", bold: true },
+                    { text: " Connect", color: "#be142e", bold: true },
+                  ],
+                  style: "headerTitle",
+                  margin: [0, 23, 10, 0],
+                },
+                {
+                  image: alumniconnectlogo2Base64,
+                  width: 80,
+                  margin: [0, 5, 0, 0],
+                },
+              ],
+              columnGap: 5,
             },
           ],
           columnGap: 10,
         },
         { text: "\n", margin: [0, 10] },
-        {
-          text: "CICS Alumni Connect Report",
-          style: "header",
-          margin: [0, 20, 0, 20],
-        },
-        // Map through filtered data and dynamically generate content
+
         ...filteredData.map((row, index) => {
           // Default fields to display
           const defaultFields = [
@@ -212,7 +224,6 @@ function AdminReports() {
             { label: "Program", value: row.collegeProgram || "---------" },
           ];
 
-          // Dynamically determine fields based on selectedFields
           const dynamicFields =
             selectedFields.length === 0 || selectedFields.includes("All Fields")
               ? availableFields.map((field) => ({
@@ -226,10 +237,8 @@ function AdminReports() {
                     getNestedValue(row, fieldToKeyMap[field]) || "---------",
                 }));
 
-          // Combine default and dynamic fields
           const allFields = [...defaultFields, ...dynamicFields];
 
-          // Create rows for the table body
           const tableBody = [
             [
               {
@@ -248,20 +257,20 @@ function AdminReports() {
           ];
 
           return {
-            margin: [0, 15, 0, 15], // Space between records
+            margin: [0, 15, 0, 15],
             table: {
-              widths: ["auto", "*"], // Two columns: label and value
+              widths: ["auto", "*"],
               body: tableBody,
             },
             layout: {
               hLineWidth: function (i, node) {
-                return i === 1 ? 1 : 0; // Add horizontal line after title row
+                return i === 1 ? 1 : 0;
               },
               vLineWidth: function (i, node) {
-                return 0; // No vertical lines
+                return 0;
               },
               hLineColor: function (i, node) {
-                return "#ddd"; // Light gray lines for separation
+                return "#ddd";
               },
             },
           };
@@ -284,31 +293,29 @@ function AdminReports() {
             color: "#000000",
           },
           headerTitle: {
-            fontSize: 16,
+            fontSize: 28,
             bold: true,
             color: "#333333",
+            alignment: "right",
+            margin: [0, 20, 0, 0],
           },
           header: {
             fontSize: 28,
-            bold: true,
-            color: "#d9534f",
-            alignment: "center",
           },
           recordTitle: {
-            fontSize: 20,
+            fontSize: 17,
             bold: true,
             color: "#fff",
             fillColor: "#d9534f", // Red background for separation
             alignment: "center",
-            margin: [0, 10, 0, 10],
           },
           fieldLabel: {
-            fontSize: 12,
+            fontSize: 13,
             bold: true,
             color: "#d9534f", // Red color for labels
           },
           fieldValue: {
-            fontSize: 12,
+            fontSize: 13,
             color: "#333", // Dark color for values
           },
         },

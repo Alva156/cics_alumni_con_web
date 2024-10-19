@@ -329,7 +329,16 @@ function Alumni() {
                 )}
                 <p className="text-xs mt-2 mb-1/2">Mobile Number</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.mobileNumber}
+                  {selectedAlumni.contactInformation?.mobileNumber ? (
+                    <a
+                      href={`tel:${selectedAlumni.contactInformation.mobileNumber}`}
+                      className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                    >
+                      {selectedAlumni.contactInformation.mobileNumber}
+                    </a>
+                  ) : (
+                    <p className="text-s mb-2 font-bold"></p>
+                  )}
                 </p>
               </div>
 

@@ -54,7 +54,7 @@ function Login() {
       );
       setTimeout(() => {
         setErrorMessage("");
-      }, 5000);
+      }, 8000);
     }
   };
 
@@ -95,10 +95,12 @@ function Login() {
                 Enter user credentials and continue connecting with us.
               </p>
             </div>
-            {/* Display error message */}
-            {errorMessage && (
-              <div className="text-red text-sm">{errorMessage}</div>
-            )}
+
+            <div className="h-4">
+              {errorMessage && (
+                <p className="text-red text-xs">{errorMessage}</p>
+              )}
+            </div>
 
             <label className="block mb-2 mt-6 text-sm font-medium">
               Email *

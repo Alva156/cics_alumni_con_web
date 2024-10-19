@@ -47,6 +47,14 @@ function UserProfile() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState(null);
 
+  const [hasUnsavedSecondaryChanges, setHasUnsavedSecondaryChanges] = useState(false);
+  const [hasUnsavedTertiaryChanges, setHasUnsavedTertiaryChanges] = useState(false);
+  const [hasUnsavedCompanyChanges, setHasUnsavedCompanyChanges] = useState(false);
+
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [confirmCallback, setConfirmCallback] = useState(null);
+
   const [secondaryEducationSections, setSecondaryEducationSections] = useState([
     { schoolName: "", yearStarted: "", yearEnded: "" },
   ]);
@@ -144,32 +152,95 @@ function UserProfile() {
     }
   };
 
-  const addSecondaryEducationSection = () => {
-    setSecondaryEducationSections([
-      ...secondaryEducationSections,
-      { schoolName: "", yearStarted: "", yearEnded: "" },
-    ]);
+
+  const openConfirmationModal = (message, onConfirm) => {
+    setConfirmationMessage(message);
+    setConfirmCallback(() => onConfirm); // Store the confirm action to execute later
+    setIsConfirmationModalOpen(true); // Open modal
   };
 
-  const addTertiaryEducationSection = () => {
-    setTertiaryEducationSections([
-      ...tertiaryEducationSections,
-      { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
-    ]);
-  };
+  const addSecondaryEducationSection = async () => {
+  if (hasUnsavedSecondaryChanges) {
+    openConfirmationModal(
+      "You have unsaved changes in the secondary education section. Do you want to proceed?",
+      async () => {
+        await handleSubmit(); // Handle any async submission
+        setSecondaryEducationSections((prev) => [
+          ...prev,
+          { schoolName: "", yearStarted: "", yearEnded: "" },
+        ]);
+        setHasUnsavedSecondaryChanges(true); // Mark unsaved changes
+      }
+    );
+    return; // Stop execution until user confirms
+  }
 
-  const addCompanySection = () => {
-    setCompanySections([
-      ...companySections,
-      {
-        id: uniqueId(),
-        companyName: "",
-        position: "",
-        yearStarted: "",
-        yearEnded: "",
-      },
-    ]);
-  };
+  setSecondaryEducationSections((prev) => [
+    ...prev,
+    { schoolName: "", yearStarted: "", yearEnded: "" },
+  ]);
+  setHasUnsavedSecondaryChanges(true); // Set unsaved changes
+};
+
+// Function to add a new tertiary education section
+const addTertiaryEducationSection = async () => {
+  if (hasUnsavedTertiaryChanges) {
+    openConfirmationModal(
+      "You have unsaved changes in the tertiary education section. Do you want to proceed?",
+      async () => {
+        await handleSubmit(); // Handle any async submission
+        setTertiaryEducationSections((prev) => [
+          ...prev,
+          { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
+        ]);
+        setHasUnsavedTertiaryChanges(true);
+      }
+    );
+    return;
+  }
+
+  setTertiaryEducationSections((prev) => [
+    ...prev,
+    { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
+  ]);
+  setHasUnsavedTertiaryChanges(true);
+};
+
+// Function to add a new company section
+const addCompanySection = async () => {
+  if (hasUnsavedCompanyChanges) {
+    openConfirmationModal(
+      "You have unsaved changes in the company section. Do you want to proceed?",
+      async () => {
+        await handleSubmit();
+        setCompanySections((prev) => [
+          ...prev,
+          {
+            id: uniqueId(),
+            companyName: "",
+            position: "",
+            yearStarted: "",
+            yearEnded: "",
+          },
+        ]);
+        setHasUnsavedCompanyChanges(true);
+      }
+    );
+    return;
+  }
+
+  setCompanySections((prev) => [
+    ...prev,
+    {
+      id: uniqueId(),
+      companyName: "",
+      position: "",
+      yearStarted: "",
+      yearEnded: "",
+    },
+  ]);
+  setHasUnsavedCompanyChanges(true);
+};
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -271,6 +342,10 @@ function UserProfile() {
     console.log("saved");
 
     await handleSubmit(e); // Call the handleSubmit function to save the form data
+
+    setHasUnsavedSecondaryChanges(false);
+    setHasUnsavedTertiaryChanges(false);
+    setHasUnsavedCompanyChanges(false);
   };
 
   const handleSubmit = async (e) => {
@@ -371,7 +446,7 @@ function UserProfile() {
       setTertiaryEducationSections(
         updatedProfileResponse.data.tertiaryEducation || []
       );
-     
+    
 
       // Check if the email has changed
       if (accountEmail !== initialAccountEmail) {
@@ -670,6 +745,32 @@ function UserProfile() {
           <p>{validationMessage}</p>
         </div>
       )}
+
+{isConfirmationModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+      <h2 className="text-2xl mb-4">Confirm Action</h2>
+      <p>{confirmationMessage}</p>
+      <div className="flex justify-end mt-4">
+        <button
+          className="btn btn-sm w-24 bg-red text-white mr-2"
+          onClick={() => {
+            if (confirmCallback) confirmCallback(); // Execute the stored callback
+            setIsConfirmationModalOpen(false); // Close the modal
+          }}
+        >
+          Yes
+        </button>
+        <button
+          className="btn btn-sm w-24 bg-gray-500 text-white"
+          onClick={() => setIsConfirmationModalOpen(false)} // Close modal on cancel
+        >
+          No
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

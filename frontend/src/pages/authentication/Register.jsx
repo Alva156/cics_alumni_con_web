@@ -23,6 +23,7 @@ function Register() {
   const [modal2Visible, setModal2Visible] = useState(false);
   const [modal3Visible, setModal3Visible] = useState(false);
   const [error, setError] = useState(""); // State for error messages
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -112,22 +113,32 @@ function Register() {
       );
 
       if (response.status === 200) {
-        setError(response.data.msg);
+        setSuccess(response.data.msg);
         setTimeout(() => {
+          setSuccess("");
           navigate("/verifyaccount");
         }, 3000);
       }
     } catch (error) {
+      const errorMsg = error.response?.data?.msg;
+
+      // Check if it's a duplicate account error
       if (
         error.response?.status === 400 &&
-        error.response?.data?.msg === "User already exists"
+        errorMsg === "Duplicate accounts are not allowed."
+      ) {
+        setModal3Visible(true);
+      } else if (
+        error.response?.status === 400 &&
+        errorMsg === "User already exists"
       ) {
         setModal2Visible(true);
       } else {
-        setModal3Visible(true);
-        setError(
-          error.response?.data?.msg || "An error occurred during registration"
-        );
+        // For other errors, display them for 8 seconds
+        setError(errorMsg || "An error occurred during registration");
+        setTimeout(() => {
+          setError("");
+        }, 8000); // 8 seconds timeout
       }
     }
   };
@@ -146,7 +157,10 @@ function Register() {
                 Enter required user information and start connecting with us.
               </p>
             </div>
-
+            <div className="h-4">
+              {error && <p className="text-red text-xs">{error}</p>}
+              {success && <p className="text-green text-xs">{success}</p>}
+            </div>
             {/* Form Fields */}
             <label className="block mb-1 mt-2 text-xs font-medium">
               Student ID Number
@@ -338,7 +352,7 @@ function Register() {
         <dialog id="my_modal_5" className="modal modal-middle " open>
           <div className="modal-box">
             <h3 className="font-bold text-lg">Oops!</h3>
-            <p className="py-4">{error}</p>
+            <p className="py-4">Duplicate accounts are not allowed.</p>
             <div className="modal-action">
               <button
                 className="btn bg-green text-white w-20"

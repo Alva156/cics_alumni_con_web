@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 // Set storage engine for profile images
 const storage = multer.diskStorage({

@@ -5,6 +5,7 @@ import { uniqueId } from "lodash"; // Make sure you import uniqueId
 import imageCompression from "browser-image-compression";
 import { useNavigate } from "react-router-dom";
 import profilesymbol from "../../assets/userprofile.png";
+import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function UserProfile() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -38,6 +39,7 @@ function UserProfile() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [otherContact, setOtherContact] = useState("");
   const [profileImage, setProfileImage] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
   const [accountEmail, setAccountEmail] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [initialAccountEmail, setInitialAccountEmail] = useState("");
@@ -169,99 +171,10 @@ function UserProfile() {
     ]);
   };
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      try {
-        const options = {
-          maxSizeMB: 1, // Limit to 1MB
-          maxWidthOrHeight: 500, // Adjust dimensions to limit size
-          useWebWorker: true,
-        };
-        const compressedFile = await imageCompression(file, options);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setProfileImage(reader.result); // This will set the base64 string of the compressed image
-        };
-        reader.readAsDataURL(compressedFile);
-      } catch (error) {
-        console.error("Error compressing image:", error);
-      }
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    switch (name) {
-      case "accountEmail":
-        setAccountEmail(value);
-        break;
-      case "firstName":
-        setFirstName(value);
-        break;
-      case "lastName":
-        setLastName(value);
-        break;
-      case "birthday":
-        setBirthday(value);
-        break;
-      case "profession":
-        setProfession(value);
-        break;
-      case "collegeProgram":
-        setCollegeProgram(value);
-        break;
-      case "specialization":
-        setSpecialization(value);
-        break;
-      case "yearStartedCollege":
-        setYearStartedCollege(value);
-        break;
-      case "yearGraduatedCollege":
-        setYearGraduatedCollege(value);
-        break;
-      case "timeToJob":
-        setTimeToJob(value);
-        break;
-      case "employmentStatus":
-        setEmploymentStatus(value);
-        break;
-      case "professionAlignment":
-        setProfessionAlignment(value);
-        break;
-      case "workIndustry":
-        setWorkIndustry(value);
-        break;
-      case "maritalStatus":
-        setMaritalStatus(value);
-        break;
-      case "salaryRange":
-        setSalaryRange(value);
-        break;
-      case "placeOfEmployment":
-        setPlaceOfEmployment(value);
-        break;
-      case "linkedIn":
-        setLinkedIn(value);
-        break; // Fixed state name here
-      case "facebook":
-        setFacebook(value);
-        break;
-      case "instagram":
-        setInstagram(value);
-        break;
-      case "email":
-        setEmail(value);
-        break;
-      case "mobileNumber":
-        setMobileNumber(value);
-        break;
-      case "otherContact":
-        setOtherContact(value);
-        break;
-      default:
-        break;
-    }
+    setProfileImage(file); // Set the File object directly
+    setImagePreview(URL.createObjectURL(file)); // Set preview URL for the selected image
   };
 
   const handleSectionChange = (sectionType, sectionId, e) => {
@@ -391,11 +304,6 @@ function UserProfile() {
       maritalStatus,
       salaryRange,
       placeOfEmployment,
-      profileImage,
-      attachments: attachments.map((attachment) => ({
-        fileName: attachment.fileName,
-        file: attachment.file, // include the file object here
-      })),
       secondaryEducation: secondaryEducationSections,
       tertiaryEducation: tertiaryEducationSections,
       careerBackground: companySections,
@@ -409,6 +317,17 @@ function UserProfile() {
       },
     };
 
+    const formData = new FormData();
+    attachments.forEach((attachment) => {
+      if (attachment.file) { // Ensure attachment.file exists
+        formData.append("attachments", attachment.file); // Assuming each attachment has a `file` property
+      }
+    });
+
+    if(profileImage){
+      formData.append("profileImage", profileImage);
+    }
+
     try {
       // Check if the profile exists
       await axios.get(`${backendUrl}/profile/userprofile`, {
@@ -420,6 +339,13 @@ function UserProfile() {
         withCredentials: true,
       });
 
+      await axios.put(`${backendUrl}/profile/updateprofile`, formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
       // Re-fetch the profile to ensure we have the latest data
       const updatedProfileResponse = await axios.get(
         `${backendUrl}/profile/userprofile`,
@@ -428,6 +354,15 @@ function UserProfile() {
         }
       );
 
+      const updatedProfile = await axios.get(
+        `${backendUrl}/profile/userprofile`,
+        {
+          withCredentials: true,
+        }
+      );
+      
+      setProfileImage(updatedProfile.data.profileImage); // Update the image state with new image
+      setImagePreview(null); // Clear the preview after upload
       // Update state with the newly fetched data
       setCompanySections(updatedProfileResponse.data.careerBackground || []);
       setSecondaryEducationSections(
@@ -436,6 +371,7 @@ function UserProfile() {
       setTertiaryEducationSections(
         updatedProfileResponse.data.tertiaryEducation || []
       );
+     
 
       // Check if the email has changed
       if (accountEmail !== initialAccountEmail) {
@@ -513,7 +449,7 @@ function UserProfile() {
           setAccountEmail(profileData.accountEmail || "");
           setMobileNumber(profileData.contactInformation?.mobileNumber || "");
           setOtherContact(profileData.contactInformation?.other || "");
-          setProfileImage(profileData.profileImage || "");
+          setProfileImage(profileData.profileImage || blankprofilepic);
           setInitialAccountEmail(profileData.accountEmail || "");
 
           setProfileId(profileData._id);
@@ -787,11 +723,23 @@ function UserProfile() {
                   {/* PRIMARY INFORMATION */}
                   <div className="text-xl py-4">Primary Information</div>
 
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="h-40 w-40 border-2"
-                  />
+                  {imagePreview ? (
+            <img
+              src={imagePreview}
+              alt="Image Preview"
+              className="h-40 w-40 border-2 mb-4"
+            />
+          ) : (
+            <img
+              src={
+                profileImage === blankprofilepic
+                  ? blankprofilepic
+                  : `${backendUrl}${profileImage}`
+              }
+              alt="Profile"
+              className="h-40 w-40 border-2 mb-4"
+            />
+          )}
 
                   <div className="mt-4">
                     <label className="pt-4 pb-2 text-sm">Profile Picture</label>

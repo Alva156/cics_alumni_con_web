@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import imageCompression from "browser-image-compression"; // Ensure you have this package installed
 import "../../App.css"; // Adjust the path based on your project structure
 import { useNavigate } from "react-router-dom";
+import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function AdminAccount() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -20,6 +20,7 @@ function AdminAccount() {
   const [isPassModalOpen, setIsPassModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
 
   // Fetch profile data when the component mounts
   useEffect(() => {
@@ -36,7 +37,7 @@ function AdminAccount() {
         setLastName(lastName || "");
         setAccountEmail(accountEmail || "");
         setInitialAccountEmail(accountEmail || "");
-        setProfileImage(profileImage || ""); // Store original profile image for display
+        setProfileImage(profileImage || blankprofilepic); // Store original profile image for display
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -45,25 +46,10 @@ function AdminAccount() {
     fetchProfile();
   }, []);
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      try {
-        const options = {
-          maxSizeMB: 1, // Limit to 1MB
-          maxWidthOrHeight: 500, // Adjust dimensions to limit size
-          useWebWorker: true,
-        };
-        const compressedFile = await imageCompression(file, options);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setProfileImage(reader.result); // Set the base64 string of the compressed image
-        };
-        reader.readAsDataURL(compressedFile);
-      } catch (error) {
-        console.error("Error compressing image:", error);
-      }
-    }
+    setProfileImage(file); // Set the File object directly
+    setImagePreview(URL.createObjectURL(file)); // Set preview URL for the selected image
   };
 
   const handleChange = (e) => {
@@ -99,18 +85,32 @@ function AdminAccount() {
     }
 
     // Prepare updated data for submission
-    const updatedData = {
-      firstName,
-      lastName,
-      accountEmail,
-      profileImage, // Base64 string if the image has been updated
-    };
+    const formData = new FormData();
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    formData.append("accountEmail", accountEmail);
+    if (profileImage) {
+      formData.append("profileImage", profileImage); // Append the file directly
+    }
 
     try {
       // Update the profile with the provided data
-      await axios.put(`${backendUrl}/profile/updateprofile`, updatedData, {
+      await axios.put(`${backendUrl}/profile/updateprofile`, formData, {
         withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+      // Fetch the updated profile image after successful upload
+      const updatedProfile = await axios.get(
+        `${backendUrl}/profile/userprofile`,
+        {
+          withCredentials: true,
+        }
+      );
+      setProfileImage(updatedProfile.data.profileImage); // Update the image state with new image
+      setImagePreview(null); // Clear the preview after upload
+
       if (accountEmail !== initialAccountEmail) {
         setValidationMessage(
           "Email changed successfully! Please log in using your new email."
@@ -126,7 +126,13 @@ function AdminAccount() {
       }
     } catch (error) {
       console.error("Error saving profile:", error);
-      setErrorMessage("Error saving profile. Please try again.");
+
+      // Check for specific error messages related to image uploads
+      if (error.response && error.response.data.msg) {
+        setErrorMessage(error.response.data.msg); // Display backend error message (like file size or format errors)
+      } else {
+        setErrorMessage("Error saving profile. Please try again.");
+      }
       setShowErrorMessage(true);
       setTimeout(() => {
         setShowErrorMessage(false);
@@ -234,11 +240,23 @@ function AdminAccount() {
         </div>
 
         <div className="py-1">
-          <img
-            src={profileImage}
-            alt="Profile"
-            className="h-40 w-40 border-2 mb-4"
-          />
+          {imagePreview ? (
+            <img
+              src={imagePreview}
+              alt="Image Preview"
+              className="h-40 w-40 border-2 mb-4"
+            />
+          ) : (
+            <img
+              src={
+                profileImage === blankprofilepic
+                  ? blankprofilepic
+                  : `${backendUrl}${profileImage}`
+              }
+              alt="Profile"
+              className="h-40 w-40 border-2 mb-4"
+            />
+          )}
           <label className="pt-4 pb-2 text-sm">Profile Picture</label>
           <input
             type="file"

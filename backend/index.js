@@ -12,6 +12,7 @@ const port = process.env.PORT || 6001;
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
+app.use("/uploads/profileimg", express.static("uploads/profileimg"));
 
 const corsOptions = {
   origin: "http://localhost:5173", // Frontend origin

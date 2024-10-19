@@ -1222,6 +1222,7 @@ function UserProfile() {
                   <div className="text-lg w-1/2">Secondary Education</div>
                   <div className="text-lg w-1/2 text-end">
                     <button
+                      type="button"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addSecondaryEducationSection}
                     >
@@ -1286,6 +1287,7 @@ function UserProfile() {
                     {/* Delete Button */}
                     <div className="flex justify-end">
                       <button
+                        type="button"
                         className="btn btn-sm w-36 bg-red text-white mt-2"
                         onClick={
                           () => {
@@ -1309,6 +1311,7 @@ function UserProfile() {
                   <div className="text-lg w-1/2">Tertiary Education</div>
                   <div className="text-lg w-1/2 text-end">
                     <button
+                      type="button"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addTertiaryEducationSection}
                     >
@@ -1390,6 +1393,7 @@ function UserProfile() {
                     {/* Delete Button */}
                     <div className="flex justify-end">
                       <button
+                        type="button"
                         className="btn btn-sm w-36 bg-red text-white mt-2"
                         onClick={
                           () => {
@@ -1429,6 +1433,7 @@ function UserProfile() {
                   </div>
                   <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
+                      type="button"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addCompanySection}
                     >
@@ -1507,6 +1512,7 @@ function UserProfile() {
                     {/* Delete Button */}
                     <div className="flex justify-end">
                       <button
+                        type="button"
                         className="btn btn-sm w-36 bg-red text-white mt-2"
                         onClick={() => {
                           console.log("Profile ID:", profileId);

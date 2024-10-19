@@ -5,19 +5,42 @@ const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const path = require("path");
 
+// Set storage engine for profile images
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Directory where files will be saved
-  },
+  destination: "./uploads/profileimg", // Save images in 'uploads/profileimg' directory
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`); // Ensure unique filenames
+    cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png/;
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    const mimetype = filetypes.test(file.mimetype);
 
-// Middleware for file upload
-exports.uploadFile = upload.single("file"); // Use 'file' as the field name for uploads
+    if (!mimetype || !extname) {
+      return cb(
+        new Error("Invalid file format. Only jpeg, jpg, and png are allowed.")
+      );
+    }
+
+    cb(null, true);
+  },
+}).single("profileImage");
+
+// Function to delete previous image
+const deletePreviousImage = (filePath) => {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error("Error deleting image:", err);
+    }
+  });
+};
 
 exports.getProfile = async (req, res) => {
   try {
@@ -53,80 +76,92 @@ exports.getProfile = async (req, res) => {
 };
 
 exports.createProfile = async (req, res) => {
-  try {
-    // Extract the token from cookies
-    const token = req.cookies.token;
-    if (!token) {
-      return res.status(401).json({ error: "Token missing, please log in." });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from token
-
-    // Check if a profile already exists for the user
-    const existingProfile = await UserProfile.findOne({ userId });
-    if (existingProfile) {
-      return res.status(400).json({
-        error: "Profile already exists. Please update your profile instead.",
-      });
-    }
-
-    // Extract profile details from request body
-    const profileData = {
-      userId,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      birthday: req.body.birthday,
-      careerBackground: req.body.careerBackground,
-      collegeProgram: req.body.collegeProgram,
-      contactInformation: req.body.contactInformation,
-      employmentStatus: req.body.employmentStatus,
-      maritalStatus: req.body.maritalStatus,
-      placeOfEmployment: req.body.placeOfEmployment,
-      profession: req.body.profession,
-      professionAlignment: req.body.professionAlignment,
-      profileImage: req.body.profileImage,
-      salaryRange: req.body.salaryRange,
-      accountEmail: req.body.accountEmail,
-      secondaryEducation: req.body.secondaryEducation,
-      specialization: req.body.specialization,
-      tertiaryEducation: req.body.tertiaryEducation,
-      timeToJob: req.body.timeToJob,
-      workIndustry: req.body.workIndustry,
-      yearGraduatedCollege: req.body.yearGraduatedCollege,
-      yearStartedCollege: req.body.yearStartedCollege,
-      attachments: req.body.attachments || [],
-    };
-
-    // Validate required fields (this can be customized based on your requirements)
-    const requiredFields = ["firstName", "lastName", "birthday"];
-    for (const field of requiredFields) {
-      if (!profileData[field]) {
-        return res.status(400).json({ error: `${field} is required.` });
+  upload(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res
+          .status(400)
+          .json({ msg: "Image size exceeds the limit of 5MB." });
       }
+      return res.status(400).json({ msg: err.message });
     }
+    try {
+      // Extract the token from cookies
+      const token = req.cookies.token;
+      if (!token) {
+        return res.status(401).json({ error: "Token missing, please log in." });
+      }
 
-    // Create a new UserProfile instance
-    const newProfile = new UserProfile(profileData);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decoded.id; // Get userId from token
 
-    // Save the profile
-    await newProfile.save();
-    console.log(
-      `User profile for ${profileData.firstName} ${profileData.lastName} created successfully.`
-    );
+      // Check if a profile already exists for the user
+      const existingProfile = await UserProfile.findOne({ userId });
+      if (existingProfile) {
+        return res.status(400).json({
+          error: "Profile already exists. Please update your profile instead.",
+        });
+      }
 
-    res.status(201).json({
-      message: "Profile created successfully!",
-      profile: newProfile,
-    });
-  } catch (error) {
-    console.error("Error creating profile:", error); // Log the error for debugging
-    res
-      .status(500)
-      .json({ error: "Failed to create profile", details: error.message });
-  }
+      // Extract profile details from request body
+      const profileData = {
+        userId,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        birthday: req.body.birthday,
+        careerBackground: req.body.careerBackground,
+        collegeProgram: req.body.collegeProgram,
+        contactInformation: req.body.contactInformation,
+        employmentStatus: req.body.employmentStatus,
+        maritalStatus: req.body.maritalStatus,
+        placeOfEmployment: req.body.placeOfEmployment,
+        profession: req.body.profession,
+        professionAlignment: req.body.professionAlignment,
+        profileImage: req.file
+          ? `/uploads/profileimg/${req.file.filename}`
+          : null, // Set profile image path
+        salaryRange: req.body.salaryRange,
+        accountEmail: req.body.accountEmail,
+        secondaryEducation: req.body.secondaryEducation,
+        specialization: req.body.specialization,
+        tertiaryEducation: req.body.tertiaryEducation,
+        timeToJob: req.body.timeToJob,
+        workIndustry: req.body.workIndustry,
+        yearGraduatedCollege: req.body.yearGraduatedCollege,
+        yearStartedCollege: req.body.yearStartedCollege,
+        attachments: req.body.attachments || [],
+      };
+
+      // Validate required fields (this can be customized based on your requirements)
+      const requiredFields = ["firstName", "lastName", "birthday"];
+      for (const field of requiredFields) {
+        if (!profileData[field]) {
+          return res.status(400).json({ error: `${field} is required.` });
+        }
+      }
+
+      // Create a new UserProfile instance
+      const newProfile = new UserProfile(profileData);
+
+      // Save the profile
+      await newProfile.save();
+      console.log(
+        `User profile for ${profileData.firstName} ${profileData.lastName} created successfully.`
+      );
+
+      res.status(201).json({
+        message: "Profile created successfully!",
+        profile: newProfile,
+      });
+    } catch (error) {
+      console.error("Error creating profile:", error); // Log the error for debugging
+      res
+        .status(500)
+        .json({ error: "Failed to create profile", details: error.message });
+    }
+  });
 };
-
+//after regis, this is executed
 exports.createUserProfile = async (req, res) => {
   try {
     const { firstName, lastName, birthday } = req.body;
@@ -173,43 +208,26 @@ exports.createUserProfile = async (req, res) => {
   }
 };
 
+// Update an existing profile
 exports.updateProfile = async (req, res) => {
-  try {
-    // Extract the token from cookies
-    const token = req.cookies.token;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from token
+  upload(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res
+          .status(400)
+          .json({ msg: "Image size exceeds the limit of 5MB." });
+      }
+      return res.status(400).json({ msg: err.message });
+    }
 
-    // Extract profile details from request body
-    const {
-      firstName,
-      lastName,
-      birthday,
-      careerBackground,
-      accountEmail,
-      collegeProgram,
-      contactInformation,
-      employmentStatus,
-      maritalStatus,
-      placeOfEmployment,
-      profession,
-      professionAlignment,
-      profileImage,
-      salaryRange,
-      secondaryEducation,
-      specialization,
-      tertiaryEducation,
-      timeToJob,
-      workIndustry,
-      yearGraduatedCollege,
-      yearStartedCollege,
-      attachments,
-    } = req.body;
+    try {
+      // Extract the token from cookies
+      const token = req.cookies.token;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decoded.id; // Get userId from token
 
-    // Find the existing profile and update it
-    const updatedProfile = await UserProfile.findOneAndUpdate(
-      { userId }, // Find profile by userId
-      {
+      // Extract profile details from request body
+      const {
         firstName,
         lastName,
         birthday,
@@ -222,7 +240,6 @@ exports.updateProfile = async (req, res) => {
         placeOfEmployment,
         profession,
         professionAlignment,
-        profileImage,
         salaryRange,
         secondaryEducation,
         specialization,
@@ -231,39 +248,94 @@ exports.updateProfile = async (req, res) => {
         workIndustry,
         yearGraduatedCollege,
         yearStartedCollege,
-        attachments: attachments || [],
-      },
-      { new: true, upsert: false } // Return the updated document, don't create if it doesn't exist
-    );
+        attachments,
+      } = req.body;
 
-    if (!updatedProfile) {
-      return res
-        .status(404)
-        .json({ error: "Profile not found. Please create a profile first." });
-    }
-    // If accountEmail is provided, update the email in User model
-    if (accountEmail) {
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { email: accountEmail }, // Update the user's email with the new accountEmail
-        { new: true, upsert: false } // Don't create a new user if not found
-      );
-      if (!updatedUser) {
+      // Find the existing profile
+      const userProfile = await UserProfile.findOne({ userId });
+      if (!userProfile) {
         return res
           .status(404)
-          .json({ error: "User not found while updating email." });
+          .json({ error: "Profile not found. Please create a profile first." });
       }
-    }
 
-    res.status(200).json({
-      message: "Profile updated successfully!",
-      profile: updatedProfile,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Failed to update profile", details: error.message });
-  }
+      // If a new image is uploaded, delete the old one
+      if (req.file && userProfile.profileImage) {
+        const previousImagePath = path.join(
+          __dirname,
+          "../../",
+          userProfile.profileImage
+        );
+        deletePreviousImage(previousImagePath);
+      }
+
+      // Update profile data, including new profile image if provided
+      const updatedProfileData = {
+        firstName,
+        lastName,
+        birthday,
+        careerBackground,
+        accountEmail,
+        collegeProgram,
+        contactInformation,
+        employmentStatus,
+        maritalStatus,
+        placeOfEmployment,
+        profession,
+        professionAlignment,
+        profileImage: req.file
+          ? `/uploads/profileimg/${req.file.filename}`
+          : userProfile.profileImage, // Keep the old image if no new image is uploaded
+        salaryRange,
+        secondaryEducation,
+        specialization,
+        tertiaryEducation,
+        timeToJob,
+        workIndustry,
+        yearGraduatedCollege,
+        yearStartedCollege,
+        attachments: attachments || [], // Ensure attachments is an array
+      };
+
+      // Update the profile in the database
+      const updatedProfile = await UserProfile.findOneAndUpdate(
+        { userId },
+        updatedProfileData,
+        { new: true }
+      );
+
+      if (!updatedProfile) {
+        return res
+          .status(404)
+          .json({ error: "Profile not found. Please create a profile first." });
+      }
+
+      // If accountEmail is provided, update the email in the User model
+      if (accountEmail) {
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { email: accountEmail },
+          { new: true, upsert: false } // Don't create a new user if not found
+        );
+        if (!updatedUser) {
+          return res
+            .status(404)
+            .json({ error: "User not found while updating email." });
+        }
+      }
+
+      // Respond with success
+      res.status(200).json({
+        message: "Profile updated successfully!",
+        profile: updatedProfile,
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res
+        .status(500)
+        .json({ error: "Failed to update profile", details: error.message });
+    }
+  });
 };
 
 exports.changePassword = async (req, res) => {

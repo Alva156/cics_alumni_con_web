@@ -76,31 +76,41 @@ function News() {
         <select
           className="ml-2 border border-black rounded px-3 py-1 text-sm"
           value={sortCriteria}
-          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+          onChange={(e) => setSortCriteria(e.target.value)}
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
         </select>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="text-lg">News Lists</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {filteredNews.map((news) => (
+    <div
+      key={news._id}
+      className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+      onClick={() => openViewModal(news)}
+    >
+      <img
+        src={`${backendUrl}${news.image}`}
+        alt={news.name}
+        className="w-full h-48 object-cover rounded-t-lg mb-4"
+      />
+      <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+        {news.name}
       </div>
+      <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+        {news.description.slice(0, 100)}...
+      </p>
+      <a
+        href="#"
+        className="text-blue-500 text-sm font-medium hover:underline"
+      >
+        Read More
+      </a>
+    </div>
+  ))}
+</div>
 
-      <hr className="mb-6 border-black" />
-
-      {filteredNews.map((news) => (
-        <div
-          key={news._id}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
-          onClick={() => openViewModal(news)}
-        >
-          <div>
-            <div className="text-md font-medium mb-1">{news.name}</div>
-            <div className="text-sm text-black-600">{news.address}</div>
-          </div>
-        </div>
-      ))}
 
       {/* View Modal */}
       {isViewModalOpen && selectedNews && (
@@ -121,7 +131,7 @@ function News() {
             <div className="text-2xl font-medium mb-2">{selectedNews.name}</div>
             <div className="text-md mb-2">{selectedNews.address}</div>
             <img
-              src={selectedNews.image}
+              src={`${backendUrl}${selectedNews.image}`}
               alt={selectedNews.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />

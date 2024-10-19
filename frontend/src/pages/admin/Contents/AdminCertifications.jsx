@@ -16,6 +16,13 @@ function AdminCertifications() {
   const [showSuccessMessage, setSuccessMessage] = useState(false);
   const [showErrorMessage, setErrorMessage] = useState(false);
   const [showMessage, setshowMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
+    </div>
+  );
 
   // Fetch all certifications from the server
   const fetchCertifications = async () => {
@@ -87,6 +94,7 @@ function AdminCertifications() {
 
   const handleUpdateCertifications = async () => {
     if (!selectedCertifications) return;
+
     if (
       !selectedCertifications.name ||
       !selectedCertifications.address ||
@@ -99,24 +107,38 @@ function AdminCertifications() {
       return;
     }
 
+    const certificationsData = new FormData();
+    certificationsData.append("name", selectedCertifications.name);
+    certificationsData.append("address", selectedCertifications.address);
+    certificationsData.append(
+      "description",
+      selectedCertifications.description
+    );
+    certificationsData.append("contact", selectedCertifications.contact);
+
+    const image = document.getElementById("certifications-image").files[0];
+    if (image) {
+      certificationsData.append("image", image);
+    }
+    setLoading(true); // Start loading
+
     try {
       const response = await axios.put(
         `${backendUrl}/certifications/update-certifications/${selectedCertifications._id}`,
+        certificationsData,
         {
-          name: selectedCertifications.name,
-          address: selectedCertifications.address,
-          image: selectedCertifications.image,
-          description: selectedCertifications.description,
-          contact: selectedCertifications.contact,
-        },
-        { withCredentials: true }
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
       );
 
       setCertifications((prevCertifications) =>
-        prevCertifications.map((certifications) =>
-          certifications._id === selectedCertifications._id
+        prevCertifications.map((certification) =>
+          certification._id === selectedCertifications._id
             ? response.data
-            : certifications
+            : certification
         )
       );
 
@@ -128,53 +150,81 @@ function AdminCertifications() {
       }, 3000);
     } catch (error) {
       console.error("Error updating certifications:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg);
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
   const handleCreateCertifications = async () => {
-    const certificationsData = {
-      name: document.getElementById("certifications-name").value,
-      address: document.getElementById("certifications-address").value,
-      image: "", // Handle image upload separately
-      description: document.getElementById("certifications-description").value,
-      contact: document.getElementById("certifications-contact").value,
-    };
+    const certificationsData = new FormData();
+    certificationsData.append(
+      "name",
+      document.getElementById("certifications-name").value
+    );
+    certificationsData.append(
+      "address",
+      document.getElementById("certifications-address").value
+    );
+    certificationsData.append(
+      "description",
+      document.getElementById("certifications-description").value
+    );
+    certificationsData.append(
+      "contact",
+      document.getElementById("certifications-contact").value
+    );
+
+    const image = document.getElementById("certifications-image").files[0];
+    if (image) {
+      certificationsData.append("image", image);
+    }
+
     if (
-      !certificationsData.name ||
-      !certificationsData.address ||
-      !certificationsData.description ||
-      !certificationsData.contact
+      !certificationsData.get("name") ||
+      !certificationsData.get("address") ||
+      !certificationsData.get("description") ||
+      !certificationsData.get("contact")
     ) {
       setshowMessage("Please fill in all required fields.");
-      setErrorMessage(true); // Ensure to set this to true
+      setErrorMessage(true);
       setTimeout(() => setErrorMessage(false), 3000);
       return;
     }
+    setLoading(true); // Start loading
 
     try {
       const response = await axios.post(
         `${backendUrl}/certifications/create-certifications`,
         certificationsData,
         {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
           withCredentials: true,
         }
       );
 
-      setCertifications([...certifications, response.data]); // Update certifications list
-      setSelectedCertifications(null); // Clear selected certifications
-      setIsAddModalOpen(false); // Close the modal
+      setCertifications([...certifications, response.data]);
+      closeModal();
       setshowMessage("Certifications created successfully!");
       setSuccessMessage(true);
-      // Optionally reset input fields if necessary
-      document.getElementById("certifications-name").value = "";
-      document.getElementById("certifications-address").value = "";
-      document.getElementById("certifications-description").value = "";
-      document.getElementById("certifications-contact").value = "";
       setTimeout(() => {
         setSuccessMessage(false);
       }, 3000);
     } catch (error) {
       console.error("Error creating certifications:", error);
+      if (error.response) {
+        setshowMessage(error.response.data.msg);
+        setErrorMessage(true);
+        setTimeout(() => setErrorMessage(false), 3000);
+      }
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -303,7 +353,7 @@ function AdminCertifications() {
             </div>
             <div className="text-md mb-2">{selectedCertifications.address}</div>
             <img
-              src={selectedCertifications.image}
+              src={`${backendUrl}${selectedCertifications.image}`}
               alt={selectedCertifications.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
@@ -336,6 +386,7 @@ function AdminCertifications() {
                 <p>{showMessage}</p>
               </div>
             )}
+            {loading && <LoadingSpinner />} {/* Show loading spinner */}
             <button
               className="absolute top-4 right-4 text-black text-2xl"
               onClick={closeModal}
@@ -372,16 +423,15 @@ function AdminCertifications() {
                 }
               />
             </div>
-
             <div className="mb-4">
               <label className="block text-sm mb-1">Certifications Image</label>
               <input
+                id="certifications-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
               />
             </div>
-
             <div className="mb-4">
               <label className="block text-sm mb-1">Description</label>
               <textarea
@@ -468,6 +518,7 @@ function AdminCertifications() {
                 <p>{showMessage}</p>
               </div>
             )}
+            {loading && <LoadingSpinner />} {/* Show loading spinner */}
             <button
               className="absolute top-4 right-4 text-black text-2xl"
               onClick={closeModal}
@@ -496,6 +547,7 @@ function AdminCertifications() {
             <div className="mb-4">
               <label className="block text-sm mb-1">Certifications Image</label>
               <input
+                id="certifications-image"
                 type="file"
                 accept="image/*"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"

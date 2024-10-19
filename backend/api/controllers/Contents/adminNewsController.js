@@ -1,39 +1,95 @@
 const News = require("../../models/Contents/newsModel");
-const jwt = require("jsonwebtoken"); // Add this line
+const User = require("../../models/userModel");
+const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const nodemailer = require("nodemailer");
+require("dotenv").config();
+// Set storage engine for news images
+const storage = multer.diskStorage({
+  destination: "./uploads/contents/news", // Save images in the 'uploads' directory
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+// Initialize upload for news images
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png/;
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    const mimetype = filetypes.test(file.mimetype);
+
+    if (!mimetype || !extname) {
+      return cb(new Error("Only images (jpeg, jpg, png) are allowed"));
+    }
+
+    cb(null, true);
+  },
+}).single("image");
 
 // Create new news
 exports.createNews = async (req, res) => {
-  try {
-    const token = req.cookies.token; // Get the token from cookies
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized, token missing." });
+  upload(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({ msg: "Image must be a maximum of 5MB" });
+      }
+      return res.status(400).json({ msg: err.message });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from the decoded token
+    try {
+      const token = req.cookies.token;
+      if (!token) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized, token missing." });
+      }
 
-    const { name, address, image, description, contact } = req.body;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decoded.id;
 
-    const news = new News({
-      userId,
-      name,
-      address,
-      image,
-      description,
-      contact,
-    });
-    await news.save();
+      const { name, address, description, contact } = req.body;
+      const image = req.file
+        ? `/uploads/contents/news/${req.file.filename}`
+        : null;
 
-    res.status(201).json(news);
-  } catch (error) {
-    res.status(500).json({ msg: "Server Error", error: error.message });
-  }
+      const news = new News({
+        userId,
+        name,
+        address,
+        image,
+        description,
+        contact,
+      });
+
+      await news.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "📰 New News Alert from CICS Alumni Connect!",
+        `Hello everyone! 👋\n\nWe’re thrilled to bring you some exciting news about "${name}" from CICS Alumni Connect that you don’t want to miss! `
+      );
+
+      res.status(201).json(news);
+    } catch (error) {
+      res.status(500).json({ msg: "Server Error", error: error.message });
+    }
+  });
 };
 
 // Get all news for a specific user
 exports.getNews = async (req, res) => {
   try {
-    // Fetch all news without filtering by userId
     const news = await News.find();
     res.status(200).json(news);
   } catch (error) {
@@ -58,52 +114,86 @@ exports.getNewsById = async (req, res) => {
 
 // Update news
 exports.updateNews = async (req, res) => {
-  try {
-    const token = req.cookies.token; // Get the token from cookies
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized, token missing." });
+  upload(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res.status(400).json({ msg: "Image must be a maximum of 5MB" });
+      }
+      return res.status(400).json({ msg: err.message });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from the decoded token
+    try {
+      const token = req.cookies.token;
+      if (!token) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized, token missing." });
+      }
 
-    const { name, address, image, description, contact } = req.body;
-    const news = await News.findById(req.params.id);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decoded.id;
+      const userRole = decoded.role;
 
-    if (!news) {
-      return res.status(404).json({ msg: "News not found" });
+      const { name, address, description, contact } = req.body;
+      const news = await News.findById(req.params.id);
+
+      if (!news) {
+        return res.status(404).json({ msg: "News not found" });
+      }
+
+      if (userRole !== "admin" && news.userId.toString() !== userId) {
+        return res.status(403).json({ msg: "Unauthorized" });
+      }
+
+      const newImage = req.file
+        ? `/uploads/contents/news/${req.file.filename}`
+        : news.image;
+
+      if (req.file && news.image) {
+        const oldImagePath = path.join(__dirname, `../../../${news.image}`);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
+      news.name = name || news.name;
+      news.address = address || news.address;
+      news.image = newImage;
+      news.description = description || news.description;
+      news.contact = contact || news.contact;
+
+      await news.save();
+      // Fetch all user emails
+      const users = await User.find();
+      const emailAddresses = users.map((user) => user.email);
+
+      // Send email notification
+      await sendEmailNotification(
+        emailAddresses,
+        "🔔 Quick Heads Up: Recent News Update!",
+        `Hello everyone! 👋\n\nWe wanted to let you know that some existing news about "${name}" has just been updated and you won’t want to miss out on these new insights.`
+      );
+
+      res.status(200).json(news);
+    } catch (error) {
+      res.status(500).json({ msg: "Server Error", error: error.message });
     }
-
-    // Ensure user owns the news
-    if (news.userId.toString() !== userId) {
-      return res.status(403).json({ msg: "Unauthorized" });
-    }
-
-    news.name = name || news.name;
-    news.address = address || news.address;
-    news.image = image || news.image;
-    news.description = description || news.description;
-    news.contact = contact || news.contact;
-
-    await news.save();
-    res.status(200).json(news);
-  } catch (error) {
-    res.status(500).json({ msg: "Server Error", error: error.message });
-  }
+  });
 };
 
 // Delete news
 exports.deleteNews = async (req, res) => {
   console.log("Delete request received for news ID:", req.params.id);
   try {
-    const token = req.cookies.token; // Get the token from cookies
+    const token = req.cookies.token;
     if (!token) {
       console.log("Token is missing.");
       return res.status(401).json({ message: "Unauthorized, token missing." });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from the decoded token
+    const userId = decoded.id;
+    const userRole = decoded.role;
 
     const news = await News.findById(req.params.id);
     if (!news) {
@@ -111,13 +201,19 @@ exports.deleteNews = async (req, res) => {
       return res.status(404).json({ message: "News not found" });
     }
 
-    if (news.userId.toString() !== userId) {
-      console.log(
-        "Unauthorized attempt to delete news:",
-        userId,
-        news.userId
-      );
+    if (userRole !== "admin" && news.userId.toString() !== userId) {
+      console.log("Unauthorized attempt to delete news:", userId, news.userId);
       return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    if (news.image) {
+      const imagePath = path.join(__dirname, `../../../${news.image}`);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+        console.log("Old image deleted successfully:", imagePath);
+      } else {
+        console.log("Image not found at path:", imagePath);
+      }
     }
 
     await News.deleteOne({ _id: req.params.id });
@@ -128,5 +224,54 @@ exports.deleteNews = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting news", error: error.message });
+  }
+};
+// Function to send email notifications
+const sendEmailNotification = async (emailAddresses, subject, message) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.5;">
+        <div style="background-color: #f5f5f5; padding: 20px;">
+          <div style="background-color: #ffffff; padding: 20px; max-width: 600px; margin: 0 auto; border-radius: 8px;">
+            <div style="text-align: center; padding-bottom: 20px;">
+              <img src="https://your-logo-url.com/logo.png" alt="Company Logo" style="max-width: 150px;">
+            </div>
+            <div style="background-color: #ff4b4b; color: #ffffff; padding: 15px; border-radius: 8px;">
+              <h1 style="margin: 0; font-size: 24px; text-align: center;">${subject}</h1>
+            </div>
+            <div style="padding: 20px 0; text-align: center; font-size: 18px; color: #333;">
+              <p>${message}</p>
+            </div>
+            <div style="background-color: #fff; padding: 20px; border-radius: 8px; margin-top: 20px;">
+              <p style="text-align: center; font-size: 14px; color: #555;">
+                This email is sent to keep you updated with the latest updates.
+              </p>
+              <p style="text-align: center; font-size: 14px; color: #555;">
+                © 2024 CICS Alumni Connect. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      bcc: emailAddresses, // Use 'bcc' to hide recipients
+      subject: subject,
+      html: htmlContent,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Email sent to:", emailAddresses);
+  } catch (error) {
+    console.error("Error sending email:", error.message);
   }
 };

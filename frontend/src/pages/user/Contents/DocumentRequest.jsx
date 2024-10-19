@@ -122,11 +122,21 @@ function Documents() {
               {selectedDocuments.name}
             </div>
             <div className="text-md mb-2">{selectedDocuments.address}</div>
-            <img
-              src={selectedDocuments.image}
-              alt={selectedDocuments.name}
-              className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
-            />
+            {/* Conditional rendering for images and PDFs */}
+            {selectedDocuments.image.endsWith(".pdf") ? (
+              <iframe
+                src={`${backendUrl}${selectedDocuments.image}`}
+                title={selectedDocuments.name}
+                className="mb-4 w-full h-48 md:h-64 lg:h-80"
+                frameBorder="0"
+              ></iframe>
+            ) : (
+              <img
+                src={`${backendUrl}${selectedDocuments.image}`}
+                alt={selectedDocuments.name}
+                className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
+              />
+            )}
             <div className="text-sm mb-4">{selectedDocuments.description}</div>
             <div className="text-sm font-medium mb-2">Contact Details</div>
             <a

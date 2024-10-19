@@ -127,7 +127,7 @@ function Certifications() {
             </div>
             <div className="text-md mb-2">{selectedCertifications.address}</div>
             <img
-              src={selectedCertifications.image}
+              src={`${backendUrl}${selectedCertifications.image}`}
               alt={selectedCertifications.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />

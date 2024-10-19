@@ -4,6 +4,7 @@ import axios from "axios";
 import { uniqueId } from "lodash"; // Make sure you import uniqueId
 import imageCompression from "browser-image-compression";
 import { useNavigate } from "react-router-dom";
+import profilesymbol from "../../assets/userprofile.png";
 
 function UserProfile() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -704,7 +705,7 @@ function UserProfile() {
     <>
       {/* Password Modal */}
       {isPassModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
           <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4 ">
             <button
               onClick={closePassModal}
@@ -840,7 +841,10 @@ function UserProfile() {
 
       <form onSubmit={handleSubmit}>
         <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-          <div className="page-title">User Profile</div>
+          <div className="flex items-center mb-4">
+            {/* <img src={profilesymbol} alt="Logo" className="w-10 h-10 mr-2" /> */}
+            <h1 className="text-2xl font-medium text-gray-700">User Profile</h1>
+          </div>
 
           {/* TABS */}
           <div

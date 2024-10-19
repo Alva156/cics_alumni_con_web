@@ -9,6 +9,13 @@ const NavbarAdmin = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
+    </div>
+  );
   const navigate = useNavigate();
 
   const toggleDropdown = () => {
@@ -27,6 +34,8 @@ const NavbarAdmin = () => {
       );
 
       if (response.status === 200) {
+        setLoading(true);
+
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
         sessionStorage.setItem("logoutMessageShown", "true");
@@ -34,6 +43,7 @@ const NavbarAdmin = () => {
         console.log("User has been logged out.");
 
         setTimeout(() => {
+          setLoading(false);
           navigate("/login?logout=success");
         }, 2000); // 2000ms = 2 seconds
       }
@@ -131,50 +141,85 @@ const NavbarAdmin = () => {
         <div className="navbar-center hidden lg:flex py-1 ">
           <ul className="menu menu-horizontal px-1 ">
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/homepage">Home</a>
+              <a href="/admin/homepage" className="font-bold text-gray-700">
+                Home
+              </a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/dashboard">Dashboard</a>
+              <a href="/admin/dashboard" className="font-bold text-gray-700">
+                Dashboard
+              </a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/surveytool">Survey Tool</a>
+              <a href="/admin/surveytool" className="font-bold text-gray-700">
+                Survey Tool
+              </a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/threads">Threads</a>
+              <a href="/admin/threads" className="font-bold text-gray-700">
+                Threads
+              </a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
               <details>
-                <summary>Contents</summary>
+                <summary className="font-bold text-gray-700">Contents</summary>
                 <ul className="px-2.5 bg-white pr-1 z-20">
                   <li className="p-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/companies">Companies</a>
+                    <a
+                      href="/admin/companies"
+                      className="font-bold text-gray-700"
+                    >
+                      Companies
+                    </a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/news">News</a>
+                    <a href="/admin/news" className="font-bold text-gray-700">
+                      News
+                    </a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/events">Events</a>
+                    <a href="/admin/events" className="font-bold text-gray-700">
+                      Events
+                    </a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/certifications">Certifications</a>
+                    <a
+                      href="/admin/certifications"
+                      className="font-bold text-gray-700"
+                    >
+                      Certifications
+                    </a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/documentrequest">Document Request Steps</a>
+                    <a
+                      href="/admin/documentrequest"
+                      className="font-bold text-gray-700"
+                    >
+                      Document Request Steps
+                    </a>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/job">Job/Internship Referrals</a>
+                    <a href="/admin/job" className="font-bold text-gray-700">
+                      Job/Internship Referrals
+                    </a>
                   </li>
                 </ul>
               </details>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/alumni">Alumni</a>
+              <a href="/admin/alumni" className="font-bold text-gray-700">
+                Alumni
+              </a>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8 ">
-              <a href="/admin/reports">Reports</a>
+              <a href="/admin/reports" className="font-bold text-gray-700">
+                Reports
+              </a>
             </li>
             <li className="px-2.5 pr-16 xl:pr-20 ">
-              <a href="/admin/account">Account</a>
+              <a href="/admin/account" className="font-bold text-gray-700">
+                Account
+              </a>
             </li>
           </ul>
         </div>
@@ -197,6 +242,7 @@ const NavbarAdmin = () => {
 
           {isModalVisible && (
             <dialog id="my_modal_5" className="modal modal-middle " open>
+              {loading && <LoadingSpinner />} {/* Show loading spinner */}
               <div className="modal-box">
                 <h3 className="font-bold text-lg">Logout</h3>
                 <p className="py-4">Are you sure you want to log out?</p>

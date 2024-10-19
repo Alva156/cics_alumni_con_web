@@ -1,4 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
+import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
+import chatbotsymbol from "../../assets/chatbot.png";
+import chatbotimage from "../../assets/chatbotimage.jpg";
 
 function Chatbot() {
   const [step, setStep] = useState(1);
@@ -657,10 +660,15 @@ function Chatbot() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-xl mb-4">Chatbot</h1>
+      <div className="flex items-center mb-4">
+        <img src={chatbotsymbol} alt="Logo" className="w-10 h-10 mr-2" />
+        <h1 className="text-2xl font-medium text-gray-700">
+          AlumniConnect Chatbot
+        </h1>
+      </div>
       {/* Chat Container */}
       <div
-        className="w-full h-[62vh] bg-white p-6 rounded-lg shadow-lg flex flex-col space-y-4 overflow-auto"
+        className="w-full h-[80vh] bg-white p-6 rounded-lg shadow-lg flex flex-col space-y-4 overflow-auto"
         ref={chatContainerRef}
       >
         {/* Chat Messages */}
@@ -673,7 +681,7 @@ function Chatbot() {
           >
             {chat.from === "chatbot" && (
               <img
-                src="https://via.placeholder.com/40" // Replace with your image URL
+                src={alumniconnectlogo2}
                 alt="Chatbot Avatar"
                 className="w-10 h-10 rounded mr-2" // Adjust size and margin as needed
               />
@@ -709,9 +717,17 @@ function Chatbot() {
         ))}
 
         {/* Start Button for Initial Setup */}
+        {/* Start Button for Initial Setup */}
         {step === 1 && (
-          <div className="p-6 rounded-lg shadow-lg text-center bg-red h-[62vh] flex flex-col items-center justify-center">
-            <div className="mb-4 font-light sm:text-2xl text-xl text-white">
+          <div
+            className="relative p-6 rounded-lg shadow-lg text-center h-[62vh] flex flex-col items-center justify-center"
+            style={{
+              backgroundImage: `url(${chatbotimage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            <div className="mb-4 font-bold sm:text-2xl text-xl text-white">
               Welcome to Chatbot! Please click Get Started to continue.
             </div>
             <button
@@ -720,6 +736,24 @@ function Chatbot() {
             >
               Get Started
             </button>
+
+            {/* Credit Overlay */}
+            <div
+              style={{
+                position: "absolute",
+                bottom: "20px",
+                right: "20px",
+                backgroundColor: "rgba(0, 0, 0, 0.4)",
+                color: "white",
+                padding: "10px",
+                borderRadius: "5px",
+                fontSize: "14px",
+                zIndex: "20",
+                textAlign: "right",
+              }}
+            >
+              Photo Courtesy of UST ICS
+            </div>
           </div>
         )}
 

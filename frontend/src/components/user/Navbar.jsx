@@ -9,6 +9,13 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
+    </div>
+  );
 
   const navigate = useNavigate();
 
@@ -28,6 +35,8 @@ const Navbar = () => {
       );
 
       if (response.status === 200) {
+        setLoading(true);
+
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("userRole");
         sessionStorage.setItem("logoutMessageShown", "true");
@@ -36,6 +45,7 @@ const Navbar = () => {
 
         // Add a 3-second delay before redirecting
         setTimeout(() => {
+          setLoading(false);
           navigate("/login?logout=success");
         }, 2000); // 2000ms = 2 seconds
       }
@@ -128,51 +138,52 @@ const Navbar = () => {
           </div>
         </div>
         <div className="navbar-center hidden lg:flex py-1">
-          <ul className="menu menu-horizontal px-1 ">
-            <li className="px-2.5 pr-8">
-              <a href="/">Home</a>
-            </li>
-            <li className="px-2.5 pr-8">
-              <a href="/user-userprofile">User Profile</a>
-            </li>
-            <li className="px-2.5 pr-8">
-              <a href="/user-survey">Survey</a>
-            </li>
-            <li className="px-2.5 pr-8">
-              <a href="/user-threads">Threads</a>
-            </li>
-            <li className="px-2.5 pr-8">
-              <details>
-                <summary>Contents</summary>
-                <ul className="px-2.5 bg-white pr-8 z-20">
-                  <li className="p-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-companies">Companies</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-news">News</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-events">Events</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-certifications">Certifications</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-documentrequest">Document Request Steps</a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-job">Job/Internship Referrals</a>
-                  </li>
-                </ul>
-              </details>
-            </li>
-            <li className="px-2.5 pr-8">
-              <a href="/user-alumni">Alumni</a>
-            </li>
-            <li className="px-2.5 ">
-              <a href="/user-chatbot">Chatbot</a>
-            </li>
-          </ul>
+        <ul className="menu menu-horizontal px-1">
+  <li className="px-2.5 pr-8">
+    <a href="/" className="font-bold text-gray-700">Home</a>
+  </li>
+  <li className="px-2.5 pr-8">
+    <a href="/user-userprofile" className="font-bold text-gray-700">User Profile</a>
+  </li>
+  <li className="px-2.5 pr-8">
+    <a href="/user-survey" className="font-bold text-gray-700">Survey</a>
+  </li>
+  <li className="px-2.5 pr-8">
+    <a href="/user-threads" className="font-bold text-gray-700">Threads</a>
+  </li>
+  <li className="px-2.5 pr-8">
+    <details>
+      <summary className="font-bold text-gray-700">Contents</summary>
+      <ul className="px-2.5 bg-white pr-8 z-20">
+        <li className="p-1 border-b border-hgray last:border-b-0">
+          <a href="/user-companies" className="font-bold text-gray-700">Companies</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-news" className="font-bold text-gray-700">News</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-events" className="font-bold text-gray-700">Events</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-certifications" className="font-bold text-gray-700">Certifications</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-documentrequest" className="font-bold text-gray-700">Document Request Steps</a>
+        </li>
+        <li className="px-1 border-b border-hgray last:border-b-0">
+          <a href="/user-job" className="font-bold text-gray-700">Job/Internship Referrals</a>
+        </li>
+      </ul>
+    </details>
+  </li>
+  <li className="px-2.5 pr-8">
+    <a href="/user-alumni" className="font-bold text-gray-700">Alumni</a>
+  </li>
+  <li className="px-2.5">
+    <a href="/user-chatbot" className="font-bold text-gray-700">Chatbot</a>
+  </li>
+</ul>
+
         </div>
         <div className="navbar-end relative">
           <a
@@ -192,6 +203,7 @@ const Navbar = () => {
 
           {isModalVisible && (
             <dialog id="my_modal_5" className="modal modal-middle " open>
+              {loading && <LoadingSpinner />} {/* Show loading spinner */}
               <div className="modal-box">
                 <h3 className="font-bold text-lg">Logout</h3>
                 <p className="py-4">Are you sure you want to log out?</p>

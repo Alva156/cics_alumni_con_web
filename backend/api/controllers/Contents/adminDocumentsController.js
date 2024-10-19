@@ -178,7 +178,7 @@ exports.updateDocuments = async (req, res) => {
       // Send email notification
       await sendEmailNotification(
         emailAddresses,
-        "⚙️ Quick Heads Up: Updates on Document Retrieval Steps!",
+        "🔔 Quick Heads Up: Updates on Document Retrieval Steps!",
         `Heads up! There are updates on the steps for retrieving the document titled "${name}". Review these changes to ensure a smooth process—they might provide valuable guidance!`
       );
 

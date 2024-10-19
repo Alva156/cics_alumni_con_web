@@ -54,9 +54,10 @@ function Login() {
       );
       setTimeout(() => {
         setErrorMessage("");
-      }, 5000);
+      }, 8000);
     }
   };
+
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     if (
@@ -94,10 +95,12 @@ function Login() {
                 Enter user credentials and continue connecting with us.
               </p>
             </div>
-            {/* Display error message */}
-            {errorMessage && (
-              <div className="text-red text-sm">{errorMessage}</div>
-            )}
+
+            <div className="h-4">
+              {errorMessage && (
+                <p className="text-red text-xs">{errorMessage}</p>
+              )}
+            </div>
 
             <label className="block mb-2 mt-6 text-sm font-medium">
               Email *
@@ -134,12 +137,12 @@ function Login() {
               </span>
             </div>
 
-            <a
-              href="/forgotpassword"
+            <div
               className="text-sm underline mb-8 block text-left"
             >
-              Forgot Password?
-            </a>
+            <a href="/forgotpassword">Forgot Password?</a>
+              
+            </div>
 
             <button
               className="bg-[#BE142E] text-white font-bold text-lg py-3 px-6 w-full mb-6 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
@@ -168,6 +171,23 @@ function Login() {
             alt="Login illustration"
             className="object-cover w-full h-full"
           />
+          <div
+            className="absolute bottom-4 right-4 bg-black text-white text-sm p-2 rounded"
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              backgroundColor: "rgba(0, 0, 0, 0.4)",
+              color: "white",
+              padding: "10px",
+              borderRadius: "5px",
+              fontSize: "14px",
+              zIndex: "20",
+              textAlign: "right",
+            }}
+          >
+            Photo Courtesy of UST SITE
+          </div>
         </div>
       </div>
     </>

@@ -128,7 +128,7 @@ function Survey() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-xl mb-4">Survey</h1>
+      <h1 className="text-2xl font-medium text-gray-700 mb-6">Survey</h1>
 
       <div className="mb-4 relative">
         <input
@@ -181,7 +181,7 @@ function Survey() {
 
       {/* Modal */}
       {isModalOpen && selectedSurvey && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div
             ref={modalRef}
             className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"

@@ -20,7 +20,10 @@ function Register() {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [modal2Visible, setModal2Visible] = useState(false);
+  const [modal3Visible, setModal3Visible] = useState(false);
   const [error, setError] = useState(""); // State for error messages
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -110,22 +113,35 @@ function Register() {
       );
 
       if (response.status === 200) {
-        setError(response.data.msg);
+        setSuccess(response.data.msg);
         setTimeout(() => {
+          setSuccess("");
           navigate("/verifyaccount");
         }, 3000);
-      } else {
-        setError(response.data.msg || "An error occurred during registration");
-        setTimeout(() => setError(""), 5000);
       }
     } catch (error) {
-      setError(
-        error.response?.data?.msg || "An error occurred during registration"
-      );
-      setTimeout(() => setError(""), 5000);
+      const errorMsg = error.response?.data?.msg;
+
+      // Check if it's a duplicate account error
+      if (
+        error.response?.status === 400 &&
+        errorMsg === "Duplicate accounts are not allowed."
+      ) {
+        setModal3Visible(true);
+      } else if (
+        error.response?.status === 400 &&
+        errorMsg === "User already exists"
+      ) {
+        setModal2Visible(true);
+      } else {
+        // For other errors, display them for 8 seconds
+        setError(errorMsg || "An error occurred during registration");
+        setTimeout(() => {
+          setError("");
+        }, 8000); // 8 seconds timeout
+      }
     }
   };
-
   return (
     <>
       <Header />
@@ -141,9 +157,10 @@ function Register() {
                 Enter required user information and start connecting with us.
               </p>
             </div>
-            {/* Error Message */}
-            {error && <p className="text-red text-xs mb-2">{error}</p>}
-
+            <div className="h-4">
+              {error && <p className="text-red text-xs">{error}</p>}
+              {success && <p className="text-green text-xs">{success}</p>}
+            </div>
             {/* Form Fields */}
             <label className="block mb-1 mt-2 text-xs font-medium">
               Student ID Number
@@ -157,31 +174,37 @@ function Register() {
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "28px" }}
             />
-            <label className="block mb-1 text-xs font-medium">
-              First Name *
-            </label>
-            <input
-              type="text"
-              name="firstName"
-              placeholder="Enter your First Name"
-              value={formData.firstName}
-              onChange={handleChange}
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "28px" }}
-            />
 
-            <label className="block mb-1 text-xs font-medium">
-              Last Name *
-            </label>
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Enter your Last Name"
-              value={formData.lastName}
-              onChange={handleChange}
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "28px" }}
-            />
+            <div className="flex mb-2">
+              <div className="w-1/2 pr-1">
+                <label className="block mb-1 text-xs font-medium">
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  name="firstName"
+                  placeholder="Enter your First Name"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="p-2 border border-black bg-[#D9D9D9] w-full"
+                  style={{ height: "28px" }}
+                />
+              </div>
+              <div className="w-1/2 pl-1">
+                <label className="block mb-1 text-xs font-medium">
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Enter your Last Name"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="p-2 border border-black bg-[#D9D9D9] w-full"
+                  style={{ height: "28px" }}
+                />
+              </div>
+            </div>
 
             <label className="block mb-1 text-xs font-medium">Birthday *</label>
             <input
@@ -300,14 +323,70 @@ function Register() {
         </div>
 
         {/* Right Image */}
-        <div className="relative w-full md:w-1/2 bg-gray-200 flex items-center justify-center">
+        <div className="relative w-full md:w-1/2 h-full flex-shrink-0 hidden md:block">
           <img
             src={signupImage}
             alt="Sign Up"
             className="object-cover w-full h-full"
           />
+          <div
+            className="absolute bottom-4 right-4 bg-black text-white text-sm p-2 rounded"
+            style={{
+              position: "absolute",
+              bottom: "20px",
+              right: "20px",
+              backgroundColor: "rgba(0, 0, 0, 0.4)",
+              color: "white",
+              padding: "10px",
+              borderRadius: "5px",
+              fontSize: "14px",
+              zIndex: "20",
+              textAlign: "right",
+            }}
+          >
+            Photo Courtesy of UST SITE
+          </div>
         </div>
       </div>
+      {modal2Visible && (
+        <dialog id="my_modal_5" className="modal modal-middle " open>
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Oops!</h3>
+            <p className="py-4">User already exists</p>
+            <div className="modal-action">
+              <button
+                onClick={() => navigate("/login")}
+                className="btn bg-blue text-white w-20"
+              >
+                Login
+              </button>
+
+              <button
+                className="btn bg-green text-white w-20"
+                onClick={() => setModal2Visible(false)}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </dialog>
+      )}
+      {modal3Visible && (
+        <dialog id="my_modal_5" className="modal modal-middle " open>
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Oops!</h3>
+            <p className="py-4">Duplicate accounts are not allowed.</p>
+            <div className="modal-action">
+              <button
+                className="btn bg-green text-white w-20"
+                onClick={() => setModal3Visible(false)}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </dialog>
+      )}
     </>
   );
 }

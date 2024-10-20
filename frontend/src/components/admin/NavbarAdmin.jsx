@@ -87,52 +87,115 @@ const NavbarAdmin = () => {
                 className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow"
               >
                 <li className="p-2.5  border-b border-hgray last:border-b-0">
-                  <a href="/admin/homepage">Home</a>
+                  <button
+                    className="font-bold text-gray-700"
+                    onClick={() => navigate("/admin/homepage")}
+                  >
+                    Home
+                  </button>
                 </li>
                 <li className="p-2.5  border-b border-hgray last:border-b-0">
-                  <a href="/admin/dashboard">Dashboard</a>
+                  <button
+                    className="font-bold text-gray-700"
+                    onClick={() => navigate("/admin/dashboard")}
+                  >
+                    Dashboard
+                  </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/admin/surveytool">Survey Tool</a>
+                  <button
+                    className="font-bold text-gray-700"
+                    onClick={() => navigate("/admin/surveytool")}
+                  >
+                    Survey Tool
+                  </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/admin/threads">Threads</a>
+                  <button
+                    className="font-bold text-gray-700"
+                    onClick={() => navigate("/admin/threads")}
+                  >
+                    Threads
+                  </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <details>
                     <summary>Contents</summary>
                     <ul className="p-2.5 z-50">
                       <li className="p-1">
-                        <a href="/admin/companies">Companies</a>
+                        <button
+                          className="font-bold text-gray-700"
+                          onClick={() => navigate("/admin/companies")}
+                        >
+                          Companies
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/news">News</a>
+                        <button
+                          className="font-bold text-gray-700"
+                          onClick={() => navigate("/admin/news")}
+                        >
+                          News
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/events">Events</a>
+                        <button
+                          className="font-bold text-gray-700"
+                          onClick={() => navigate("/admin/events")}
+                        >
+                          Events
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/certifications">Certifications</a>
+                        <button
+                          className="font-bold text-gray-700"
+                          onClick={() => navigate("/admin/certifications")}
+                        >
+                          Certifications
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/documentrequest">
+                        <button
+                          className="font-bold text-gray-700"
+                          onClick={() => navigate("/admin/documentrequest")}
+                        >
                           Document Request Steps
-                        </a>
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/job">Job/Internship Referrals</a>
+                        <button
+                          className="font-bold text-gray-700"
+                          onClick={() => navigate("/admin/job")}
+                        >
+                          Job/Internship Referrals
+                        </button>
                       </li>
                     </ul>
                   </details>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/admin/alumni">Alumni</a>
+                  <button
+                    className="font-bold text-gray-700"
+                    onClick={() => navigate("/admin/alumni")}
+                  >
+                    Alumni
+                  </button>
                 </li>
                 <li className="p-2.5 ">
-                  <a href="/admin/reports">Reports</a>
+                  <button
+                    className="font-bold text-gray-700"
+                    onClick={() => navigate("/admin/reports")}
+                  >
+                    Reports
+                  </button>
                 </li>
                 <li className="p-2.5 ">
-                  <a href="/admin/account">Account</a>
+                  <button
+                    className="font-bold text-gray-700"
+                    onClick={() => navigate("/admin/account")}
+                  >
+                    Account
+                  </button>
                 </li>
               </ul>
             )}
@@ -141,85 +204,115 @@ const NavbarAdmin = () => {
         <div className="navbar-center hidden lg:flex py-1 ">
           <ul className="menu menu-horizontal px-1 ">
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/homepage" className="font-bold text-gray-700">
+              <button
+                className="font-bold text-gray-700"
+                onClick={() => navigate("/admin/homepage")}
+              >
                 Home
-              </a>
+              </button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/dashboard" className="font-bold text-gray-700">
+              <button
+                className="font-bold text-gray-700"
+                onClick={() => navigate("/admin/dashboard")}
+              >
                 Dashboard
-              </a>
+              </button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/surveytool" className="font-bold text-gray-700">
+              <button
+                className="font-bold text-gray-700"
+                onClick={() => navigate("/admin/surveytool")}
+              >
                 Survey Tool
-              </a>
+              </button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/threads" className="font-bold text-gray-700">
+              <button
+                className="font-bold text-gray-700"
+                onClick={() => navigate("/admin/threads")}
+              >
                 Threads
-              </a>
+              </button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
               <details>
                 <summary className="font-bold text-gray-700">Contents</summary>
                 <ul className="px-2.5 bg-white pr-1 z-20">
                   <li className="p-1 border-b border-hgray last:border-b-0">
-                    <a
-                      href="/admin/companies"
+                    <button
                       className="font-bold text-gray-700"
+                      onClick={() => navigate("/admin/companies")}
                     >
                       Companies
-                    </a>
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/news" className="font-bold text-gray-700">
-                      News
-                    </a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/events" className="font-bold text-gray-700">
-                      Events
-                    </a>
-                  </li>
-                  <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a
-                      href="/admin/certifications"
+                    <button
                       className="font-bold text-gray-700"
+                      onClick={() => navigate("/admin/news")}
+                    >
+                      News
+                    </button>
+                  </li>
+                  <li className="px-1 border-b border-hgray last:border-b-0">
+                    <button
+                      className="font-bold text-gray-700"
+                      onClick={() => navigate("/admin/events")}
+                    >
+                      Events
+                    </button>
+                  </li>
+                  <li className="px-1 border-b border-hgray last:border-b-0">
+                    <button
+                      className="font-bold text-gray-700"
+                      onClick={() => navigate("/admin/certifications")}
                     >
                       Certifications
-                    </a>
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a
-                      href="/admin/documentrequest"
+                    <button
                       className="font-bold text-gray-700"
+                      onClick={() => navigate("/admin/documentrequest")}
                     >
                       Document Request Steps
-                    </a>
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/job" className="font-bold text-gray-700">
+                    <button
+                      className="font-bold text-gray-700"
+                      onClick={() => navigate("/admin/job")}
+                    >
                       Job/Internship Referrals
-                    </a>
+                    </button>
                   </li>
                 </ul>
               </details>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/alumni" className="font-bold text-gray-700">
+              <button
+                className="font-bold text-gray-700"
+                onClick={() => navigate("/admin/alumni")}
+              >
                 Alumni
-              </a>
+              </button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8 ">
-              <a href="/admin/reports" className="font-bold text-gray-700">
+              <button
+                className="font-bold text-gray-700"
+                onClick={() => navigate("/admin/reports")}
+              >
                 Reports
-              </a>
+              </button>
             </li>
             <li className="px-2.5 pr-16 xl:pr-20 ">
-              <a href="/admin/account" className="font-bold text-gray-700">
+              <button
+                className="font-bold text-gray-700"
+                onClick={() => navigate("/admin/account")}
+              >
                 Account
-              </a>
+              </button>
             </li>
           </ul>
         </div>

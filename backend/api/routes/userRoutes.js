@@ -12,7 +12,7 @@ router.post("/forget", userController.forgotPassword);
 router.post("/verifypassword", userController.verifyOTPPassword);
 router.post("/resetpassword", userController.resetPassword);
 router.post("/logout", authenticateJWT, userController.logoutUser);
-router.get("/check-auth", userController.checkAuth);
+router.get("/check-auth", authenticateJWT, userController.checkAuth);
 router.get("/protected", authenticateJWT, (req, res) => {
   res.status(200).json({ msg: "Token is valid" });
 });

@@ -42,7 +42,7 @@ function Chatbot() {
     Chatbot: [
       "1. Sign In: Enter your registered credentials (username and password) to log in to the system.",
       "2. Navigate to Chatbot Page: Click on the 'Chatbot' tab in the navigation bar or scroll through the home page to find the “Chatbot” link.",
-      "3. View the Chatbot Page: Click the 'Get Started' button, and the inquiry options will be displayed. You can inquire about platform navigation, jobs, and information about CICS office; however, there will be no option to chat live with an administrator.",
+      "3. View the Chatbot Page: Click the 'Get Started' button, and the inquiry options will be displayed. You can inquire about platform navigation, jobs, and information about different colleges; however, there will be no option to chat live with an administrator.",
     ],
 
     // Jobs
@@ -487,15 +487,105 @@ function Chatbot() {
       "15. Religion Professor",
     ],
 
-    Schedule: ["Monday - Saturday", "8am to 5pm"],
-    Location: [
-      "CICS Office: 2nd Floor Blessed Pier Giorgio Frassati O.P., Building",
-      "UST: España Blvd, Sampaloc, Manila, 1008 Metro Manila",
+    "UST-Alfredo M. Velayo College of Accountancy": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Albertus Magnus Building, Ruaño Drive",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1612, +63-2-3406-1611 local 8372",
     ],
-    "Contact Details": [
-      "CICS Alumni Connect: cicsalumniconnect@gmail.com",
-      "CICS Office: cics@ust.edu.ph",
-      "Office of Alumni Relations: alumnirelations@ust.edu.ph",
+    "College of Architecture": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Beato Angelico Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8740-9721, +63-2-3406-1611 local 8229 / 4491, +63-2-8731-4343",
+    ],
+    "Faculty of Arts and Letters": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F St. Raymund de Peñafort Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8220",
+    ],
+    "Faculty of Civil Law": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 1/F Main Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8731-4027, +63-2-3406-1611 local 8225",
+    ],
+    "College of Commerce and Business Administration": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 4/F St. Raymund of Peñafort Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8258 / 8272, +63-2-8731-3124",
+    ],
+    "College of Education": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 3/F Albertus Magnus Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8731-4323, +63-2-3406-1611 local 8260, +63-2-8786-1611 local 8392",
+    ],
+    "Faculty of Engineering": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Roque Ruaño Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8275, +63-2-8731-4041",
+    ],
+    "College of Fine Arts and Design": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Beato Angelico Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8740-9703, +63-2-3406-1600, +63-2-3406-1611 local 8390 / 8800",
+    ],
+    "College of Information and Computing Sciences": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Blessed Pier Giorgio Frassati Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8518",
+    ],
+    "Faculty of Medicine and Surgery": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F St. Martin de Porres Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8741-5314, +63-2-3406-1611 local 8239 / 8244",
+    ],
+    "Conservatory of Music": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 5/F Albertus Magnus Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8246, +63-2-8731-3124",
+    ],
+    "College of Nursing": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 3/F St. Martin de Porres Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8241, +63-2-8731-5738",
+    ],
+    "Faculty of Pharmacy": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Main Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8223, +63-2-8731-4040",
+    ],
+    "Institute of Physical Education and Athletics": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Quadricentennial Pavilion",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8227",
+    ],
+    "College of Rehabilitation Sciences": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F San Martin de Porres Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8280, +63-2-8740-9713",
+    ],
+    "College of Science": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 3/F Main Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8731-5728, +63-2-3406-1611 local 8224 / 8532, +63-2-8740-9730",
+    ],
+    "College of Tourism and Hospitality Management": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 8/F Buenaventura G. Paredes, O.P. Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8531 / 4488, +63-2-8732-0188",
+    ],
+    "Faculty of Canon Law": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> Ground Floor, Central Seminary Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8261",
+    ],
+    "Faculty of Philosophy": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> Ground Floor, Central Seminary Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8261",
+    ],
+    "Faculty of Sacred Theology": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> Ground Floor, Central Seminary Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8261",
     ],
   };
 
@@ -521,7 +611,11 @@ function Chatbot() {
       // Display options based on previous step
       if (previousStep === 2) {
         addChatMessage("chatbot", "Hi! Please choose an option:");
-        addChatMessage("chatbot", ["Navigation", "Jobs", "CICS Office"]);
+        addChatMessage("chatbot", [
+          "Navigation",
+          "Jobs",
+          "College Office Information",
+        ]);
       } else if (previousStep === 3) {
         addChatMessage("chatbot", "You chose:");
         addChatMessage("chatbot", currentOptions); // Restore options from Step 3
@@ -532,7 +626,11 @@ function Chatbot() {
   const handleGetStarted = () => {
     addChatMessage("user", "Get Started");
     addChatMessage("chatbot", "Hello CICS Alumni! Please choose an option:");
-    addChatMessage("chatbot", ["Navigation", "Jobs", "CICS Office"]);
+    addChatMessage("chatbot", [
+      "Navigation",
+      "Jobs",
+      "College Office Information",
+    ]);
     setStepHistory([1]);
     setStep(2);
   };
@@ -571,8 +669,30 @@ function Chatbot() {
           "Sacred Theology",
           "Go back",
         ];
-      } else if (option === "CICS Office") {
-        options = ["Schedule", "Location", "Contact Details", "Go back"];
+      } else if (option === "College Office Information") {
+        options = [
+          "UST-Alfredo M. Velayo College of Accountancy",
+          "College of Architecture",
+          "Faculty of Arts and Letters",
+          "Faculty of Civil Law",
+          "College of Commerce and Business Administration",
+          "College of Education",
+          "Faculty of Engineering",
+          "College of Fine Arts and Design",
+          "College of Information and Computing Sciences",
+          "Faculty of Medicine and Surgery",
+          "Conservatory of Music",
+          "College of Nursing",
+          "Faculty of Pharmacy",
+          "Institute of Physical Education and Athletics",
+          "College of Rehabilitation Sciences",
+          "College of Science",
+          "College of Tourism and Hospitality Management",
+          "Faculty of Canon Law",
+          "Faculty of Philosophy",
+          "Faculty of Sacred Theology",
+          "Go back",
+        ];
       }
       setCurrentOptions(options); // Save options for the current step
       addChatMessage("chatbot", options); // Display options for the current step

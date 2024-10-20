@@ -37,6 +37,20 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Initialize loading state to false at the beginning
+    setLoading(false);
+
+    // Validate email and password inputs
+    if (!formData.email || !formData.password) {
+      setErrorMessage("Please enter your email and password.");
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 8000);
+      return; // Exit the function if validation fails
+    }
+
+    // Start loading immediately when the form is submitted
     setLoading(true);
 
     try {
@@ -44,8 +58,10 @@ function Login() {
         withCredentials: true,
       });
 
-      if (response.data.success) {
-        setTimeout(() => {
+      // Set a 2-second loading time before handling the response
+      setTimeout(() => {
+        if (response.data.success) {
+          // Successful login
           localStorage.setItem("isLoggedIn", "true");
           sessionStorage.setItem("logoutMessageShown", "false");
           sessionStorage.setItem("loginMessageShown", "false");
@@ -55,17 +71,31 @@ function Login() {
           } else {
             navigate("/");
           }
-          setLoading(false);
-        }, 3000);
-      }
+        } else {
+          // Handle failed response if needed
+          const message =
+            response.data.msg || "An error occurred. Please try again.";
+          setErrorMessage(message);
+        }
+        // Hide loading after processing
+        setLoading(false);
+      }, 2000); // Wait for 2 seconds
     } catch (error) {
       console.error("Error during login:", error);
-      setErrorMessage(
-        error.response?.data?.msg || "An error occurred. Please try again."
-      );
+
+      // Ensure loading is set to false after 2 seconds
       setTimeout(() => {
-        setErrorMessage("");
-      }, 8000);
+        setLoading(false);
+
+        // Determine the error message
+        const message =
+          error.response?.data?.msg || "An error occurred. Please try again.";
+        setErrorMessage(message);
+
+        setTimeout(() => {
+          setErrorMessage("");
+        }, 8000);
+      }, 2000); // Wait for 2 seconds before handling the error
     }
   };
 
@@ -149,11 +179,8 @@ function Login() {
               </span>
             </div>
 
-            <div
-              className="text-sm underline mb-8 block text-left"
-            >
-            <a href="/forgotpassword">Forgot Password?</a>
-              
+            <div className="text-sm underline mb-8 block text-left">
+              <a href="/forgotpassword">Forgot Password?</a>
             </div>
 
             <button

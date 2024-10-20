@@ -27,8 +27,8 @@ function Events() {
     fetchEvents();
   }, []);
 
-  const openViewModal = (events) => {
-    setSelectedEvents(events);
+  const openViewModal = (event) => {
+    setSelectedEvents(event);
     setIsViewModalOpen(true);
   };
 
@@ -37,8 +37,8 @@ function Events() {
     setSelectedEvents(null);
   };
 
-  const filteredEvents = events.filter((events) =>
-    events.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredEvents = events.filter((event) =>
+    event.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Sort events based on selected criteria
@@ -76,31 +76,40 @@ function Events() {
         <select
           className="ml-2 border border-black rounded px-3 py-1 text-sm"
           value={sortCriteria}
-          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+          onChange={(e) => setSortCriteria(e.target.value)}
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
         </select>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="text-lg">Events Lists</div>
-      </div>
-
-      <hr className="mb-6 border-black" />
-
-      {filteredEvents.map((events) => (
-        <div
-          key={events._id}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
-          onClick={() => openViewModal(events)}
-        >
-          <div>
-            <div className="text-md font-medium mb-1">{events.name}</div>
-            <div className="text-sm text-black-600">{events.address}</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedEvents.map((event) => (
+          <div
+            key={event._id}
+            className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => openViewModal(event)}
+          >
+            <img
+              src={`${backendUrl}${event.image}`}
+              alt={event.name}
+              className="w-full h-48 object-cover rounded-t-lg mb-4"
+            />
+            <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+              {event.name}
+            </div>
+            <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+              {event.description.slice(0, 100)}...
+            </p>
+            <a
+              href="#"
+              className="text-blue-500 text-sm font-medium hover:underline"
+            >
+              Read More
+            </a>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
       {/* View Modal */}
       {isViewModalOpen && selectedEvents && (
@@ -118,9 +127,7 @@ function Events() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedEvents.name}
-            </div>
+            <div className="text-2xl font-medium mb-2">{selectedEvents.name}</div>
             <div className="text-md mb-2">{selectedEvents.address}</div>
             <img
               src={`${backendUrl}${selectedEvents.image}`}

@@ -42,47 +42,7 @@ function Chatbot() {
     Chatbot: [
       "1. Sign In: Enter your registered credentials (username and password) to log in to the system.",
       "2. Navigate to Chatbot Page: Click on the 'Chatbot' tab in the navigation bar or scroll through the home page to find the “Chatbot” link.",
-      "3. View the Chatbot Page: Click the 'Get Started' button, and the inquiry options will be displayed. You can inquire about platform navigation, documents, certifications, and jobs; however, there will be no option to chat live with an administrator.",
-    ],
-
-    //Certifications
-
-    "Computer Science Certification": [
-      "1. Certified Information Systems Auditor (CISA) - ISACA: A global benchmark for IT professionals in auditing and security, requiring a 150-question exam and five years of experience.",
-      "2. Certified Information Security Manager (CISM) - ISACA: Validates expertise in IT security management and risk, requiring a four-hour exam with 150 questions and in-depth knowledge of security policies.",
-      "3. Certified Information Systems Security Professional (CISSP) - (ISC)²: Demonstrates proficiency in managing information security programs, requiring a pass on the CISSP exam and five years of relevant experience.",
-      "4. CompTIA Security+: Confirms foundational security skills and practical problem-solving abilities, paving the way for careers in software development, security consulting, or systems administration.",
-      "5. CompTIA Cloud Essentials+: Covers essential cloud computing concepts, ensuring candidates understand key components of cloud solutions, including business principles and compliance.",
-      "6. CompTIA Cloud+: Certifies candidates’ ability to maintain and optimize cloud infrastructure services, addressing configurations, management, and troubleshooting.",
-      "7. VMware Certified Professional 6 - Data Center Virtualization (VCP6-DCV): Validates the ability to administer and troubleshoot vSphere V6 infrastructures, requiring six months of experience and specific training.",
-      "8. HDI Desktop Advanced Support Technician (HDI-DAST): Confirms the ability to enhance on-site customer interactions and understand service-level agreements, including performing root cause analyses.",
-      "9. HDI Technical Support Professional (HDI-TSP): Emphasizes customer service and incident management practices, focusing on effective incident escalation and metric management.",
-      "10. ITIL 4: Offers various certification levels to help individuals deliver services consistently through well-defined processes, with training available online or in-person.",
-      "11. SAP Certified Technology Associate: Verifies knowledge for SAP project management, building on consulting skills and validating advanced business skills and methodologies.",
-      "12. Microsoft SQL Server Certifications: Provides various certifications covering data management, analytics, and database administration, starting with the entry-level Microsoft Technology Associate.",
-      "13. Cisco Certified Internetwork Expert (CCIE) Data Center: Verifies expertise in planning, operating, monitoring, and troubleshooting complex data networks, positioning candidates for leadership roles in IT infrastructure.",
-    ],
-
-    "Information Systems Certification": [
-      "1. Information Systems Analyst: Supports recent graduates with a four-year degree in Computer Information Systems, covering topics like organizational skills, professional skills, and strategic systems development.",
-      "2. Associate Computing Professional (ACP): Designed for newcomers to the field,  requiring the ISP exam and one specialty exam, providing skills for a competitive edge in the career market.",
-      "3. Certified Computing Professional (CCP): For highly skilled professionals at master and expert levels, requiring completion of the ISP core exam and two specialty exams.",
-      "4. Certified Information Systems Auditor (CISA): Requires five years of professional experience in IS auditing, with a college degree as a substitute for some experience; involves passing the CISA exam and adhering to a Code of Professional Ethics.",
-      "5. Certified Information Systems Security Professional (CISSP): Requires a minimum of five years of professional experience, with a bachelor’s degree reducing the requirement by one year; involves passing an exam and maintaining ethical standards.",
-      "6. Certified in Risk and Information Systems Control (CRISC): Teaches risk identification and management using IS controls, requiring at least three years of work experience, with ongoing education credits available to maintain certification.",
-    ],
-
-    "Information Technology Certification": [
-      "1. CompTIA A+: Entry-level certification for IT technicians covering hardware and software troubleshooting.",
-      "2. CompTIA Network+: Focuses on networking concepts and skills.",
-      "3. CompTIA Security+: Covers foundational cybersecurity knowledge.",
-      "4. Cisco Certified Network Associate (CCNA): Validates skills in networking and IT infrastructure.",
-      "5. Microsoft Certified: Azure Fundamentals: Introduces cloud concepts and Microsoft Azure services.",
-      "6. AWS Certified Cloud Practitioner: Basic certification for Amazon Web Services.",
-      "7. Certified Ethical Hacker (CEH): Focuses on penetration testing and ethical hacking techniques.",
-      "8. Google IT Support Professional Certificate: Covers IT support fundamentals.",
-      "9. Certified Information Systems Security Professional (CISSP): Advanced certification in information security (more suited for experienced professionals).",
-      "10. ITIL Foundation: Provides an understanding of IT service management.",
+      "3. View the Chatbot Page: Click the 'Get Started' button, and the inquiry options will be displayed. You can inquire about platform navigation, jobs, and information about CICS office; however, there will be no option to chat live with an administrator.",
     ],
 
     // Jobs
@@ -526,6 +486,17 @@ function Chatbot() {
       "14. Development Director",
       "15. Religion Professor",
     ],
+
+    Schedule: ["Monday - Saturday", "8am to 5pm"],
+    Location: [
+      "CICS Office: 2nd Floor Blessed Pier Giorgio Frassati O.P., Building",
+      "UST: España Blvd, Sampaloc, Manila, 1008 Metro Manila",
+    ],
+    "Contact Details": [
+      "CICS Alumni Connect: cicsalumniconnect@gmail.com",
+      "CICS Office: cics@ust.edu.ph",
+      "Office of Alumni Relations: alumnirelations@ust.edu.ph",
+    ],
   };
 
   const addChatMessage = (from, message) => {
@@ -550,7 +521,7 @@ function Chatbot() {
       // Display options based on previous step
       if (previousStep === 2) {
         addChatMessage("chatbot", "Hi! Please choose an option:");
-        addChatMessage("chatbot", ["Navigation", "Certifications", "Jobs"]);
+        addChatMessage("chatbot", ["Navigation", "Jobs", "CICS Office"]);
       } else if (previousStep === 3) {
         addChatMessage("chatbot", "You chose:");
         addChatMessage("chatbot", currentOptions); // Restore options from Step 3
@@ -561,7 +532,7 @@ function Chatbot() {
   const handleGetStarted = () => {
     addChatMessage("user", "Get Started");
     addChatMessage("chatbot", "Hello CICS Alumni! Please choose an option:");
-    addChatMessage("chatbot", ["Navigation", "Certifications", "Jobs"]);
+    addChatMessage("chatbot", ["Navigation", "Jobs", "CICS Office"]);
     setStepHistory([1]);
     setStep(2);
   };
@@ -576,13 +547,6 @@ function Chatbot() {
       let options = [];
       if (option === "Navigation") {
         options = ["Home", "Alumni", "Survey", "Content", "Chatbot", "Go back"];
-      } else if (option === "Certifications") {
-        options = [
-          "Computer Science Certification",
-          "Information Systems Certification",
-          "Information Technology Certification",
-          "Go back",
-        ];
       } else if (option === "Jobs") {
         options = [
           "Accountancy",
@@ -607,6 +571,8 @@ function Chatbot() {
           "Sacred Theology",
           "Go back",
         ];
+      } else if (option === "CICS Office") {
+        options = ["Schedule", "Location", "Contact Details", "Go back"];
       }
       setCurrentOptions(options); // Save options for the current step
       addChatMessage("chatbot", options); // Display options for the current step

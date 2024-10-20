@@ -4,7 +4,7 @@ import axios from "axios";
 
 function Jobs() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const [selectedJobs, setSelectedJobs] = useState(null);
+  const [selectedJob, setSelectedJob] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [jobs, setJobs] = useState([]);
@@ -27,18 +27,18 @@ function Jobs() {
     fetchJobs();
   }, []);
 
-  const openViewModal = (jobs) => {
-    setSelectedJobs(jobs);
+  const openViewModal = (job) => {
+    setSelectedJob(job);
     setIsViewModalOpen(true);
   };
 
   const closeModal = () => {
     setIsViewModalOpen(false);
-    setSelectedJobs(null);
+    setSelectedJob(null);
   };
 
-  const filteredJobs = jobs.filter((jobs) =>
-    jobs.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredJobs = jobs.filter((job) =>
+    job.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Sort jobs based on selected criteria
@@ -76,34 +76,43 @@ function Jobs() {
         <select
           className="ml-2 border border-black rounded px-3 py-1 text-sm"
           value={sortCriteria}
-          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+          onChange={(e) => setSortCriteria(e.target.value)}
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
         </select>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="text-lg">Jobs Lists</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedJobs.map((job) => (
+          <div
+            key={job._id}
+            className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => openViewModal(job)}
+          >
+            <img
+              src={`${backendUrl}${job.image}`}
+              alt={job.name}
+              className="w-full h-48 object-cover rounded-t-lg mb-4"
+            />
+            <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+              {job.name}
+            </div>
+            <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+              {job.description.slice(0, 100)}...
+            </p>
+            <a
+              href="#"
+              className="text-blue-500 text-sm font-medium hover:underline"
+            >
+              Read More
+            </a>
+          </div>
+        ))}
       </div>
 
-      <hr className="mb-6 border-black" />
-
-      {filteredJobs.map((jobs) => (
-        <div
-          key={jobs._id}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
-          onClick={() => openViewModal(jobs)}
-        >
-          <div>
-            <div className="text-md font-medium mb-1">{jobs.name}</div>
-            <div className="text-sm text-black-600">{jobs.address}</div>
-          </div>
-        </div>
-      ))}
-
       {/* View Modal */}
-      {isViewModalOpen && selectedJobs && (
+      {isViewModalOpen && selectedJob && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
           style={{ zIndex: 9999 }}
@@ -118,20 +127,20 @@ function Jobs() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">{selectedJobs.name}</div>
-            <div className="text-md mb-2">{selectedJobs.address}</div>
+            <div className="text-2xl font-medium mb-2">{selectedJob.name}</div>
+            <div className="text-md mb-2">{selectedJob.address}</div>
             <img
-              src={`${backendUrl}${selectedJobs.image}`}
-              alt={selectedJobs.name}
+              src={`${backendUrl}${selectedJob.image}`}
+              alt={selectedJob.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
-            <div className="text-sm mb-4">{selectedJobs.description}</div>
+            <div className="text-sm mb-4">{selectedJob.description}</div>
             <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
-              href={`mailto:${selectedJobs.contact}`}
+              href={`mailto:${selectedJob.contact}`}
               className="block text-sm text-blue-600 underline"
             >
-              {selectedJobs.contact}
+              {selectedJob.contact}
             </a>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import Navbar from "../components/user/Navbar";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ChatbotButton from "../components/ChatbotButton";
 import "../App.css";
 import { Outlet, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -33,7 +34,7 @@ const User = () => {
     };
 
     checkTokenExpiration();
-    const intervalId = setInterval(checkTokenExpiration, 10000); // Check every 10 seconds
+    const intervalId = setInterval(checkTokenExpiration, 10000);
 
     return () => clearInterval(intervalId);
   }, [navigate]);
@@ -61,15 +62,14 @@ const User = () => {
       console.error("Error during logout:", error);
     }
   };
-  const closeModal = () => {
-    setModalVisible(false);
-  };
+
   return (
     <div>
       <Header />
       <Navbar />
       <Outlet />
       <Footer />
+      <ChatbotButton />
     </div>
   );
 };

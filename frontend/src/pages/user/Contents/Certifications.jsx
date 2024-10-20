@@ -4,7 +4,7 @@ import axios from "axios";
 
 function Certifications() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const [selectedCertifications, setSelectedCertifications] = useState(null);
+  const [selectedCertification, setSelectedCertification] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [certifications, setCertifications] = useState([]);
@@ -27,18 +27,18 @@ function Certifications() {
     fetchCertifications();
   }, []);
 
-  const openViewModal = (certifications) => {
-    setSelectedCertifications(certifications);
+  const openViewModal = (certification) => {
+    setSelectedCertification(certification);
     setIsViewModalOpen(true);
   };
 
   const closeModal = () => {
     setIsViewModalOpen(false);
-    setSelectedCertifications(null);
+    setSelectedCertification(null);
   };
 
-  const filteredCertifications = certifications.filter((certifications) =>
-    certifications.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCertifications = certifications.filter((certification) =>
+    certification.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Sort certifications based on selected criteria
@@ -76,38 +76,43 @@ function Certifications() {
         <select
           className="ml-2 border border-black rounded px-3 py-1 text-sm"
           value={sortCriteria}
-          onChange={(e) => setSortCriteria(e.target.value)} // Update sort criteria state
+          onChange={(e) => setSortCriteria(e.target.value)}
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
         </select>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="text-lg">Certifications Lists</div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedCertifications.map((certification) => (
+          <div
+            key={certification._id}
+            className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => openViewModal(certification)}
+          >
+            <img
+              src={`${backendUrl}${certification.image}`}
+              alt={certification.name}
+              className="w-full h-48 object-cover rounded-t-lg mb-4"
+            />
+            <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+              {certification.name}
+            </div>
+            <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+              {certification.description.slice(0, 100)}...
+            </p>
+            <a
+              href="#"
+              className="text-blue-500 text-sm font-medium hover:underline"
+            >
+              Read More
+            </a>
+          </div>
+        ))}
       </div>
 
-      <hr className="mb-6 border-black" />
-
-      {filteredCertifications.map((certifications) => (
-        <div
-          key={certifications._id}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
-          onClick={() => openViewModal(certifications)}
-        >
-          <div>
-            <div className="text-md font-medium mb-1">
-              {certifications.name}
-            </div>
-            <div className="text-sm text-black-600">
-              {certifications.address}
-            </div>
-          </div>
-        </div>
-      ))}
-
       {/* View Modal */}
-      {isViewModalOpen && selectedCertifications && (
+      {isViewModalOpen && selectedCertification && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
           style={{ zIndex: 9999 }}
@@ -122,24 +127,20 @@ function Certifications() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedCertifications.name}
-            </div>
-            <div className="text-md mb-2">{selectedCertifications.address}</div>
+            <div className="text-2xl font-medium mb-2">{selectedCertification.name}</div>
+            <div className="text-md mb-2">{selectedCertification.address}</div>
             <img
-              src={`${backendUrl}${selectedCertifications.image}`}
-              alt={selectedCertifications.name}
+              src={`${backendUrl}${selectedCertification.image}`}
+              alt={selectedCertification.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
-            <div className="text-sm mb-4">
-              {selectedCertifications.description}
-            </div>
+            <div className="text-sm mb-4">{selectedCertification.description}</div>
             <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
-              href={`mailto:${selectedCertifications.contact}`}
+              href={`mailto:${selectedCertification.contact}`}
               className="block text-sm text-blue-600 underline"
             >
-              {selectedCertifications.contact}
+              {selectedCertification.contact}
             </a>
           </div>
         </div>

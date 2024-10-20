@@ -20,15 +20,19 @@ const Header = () => {
 
       {/* Right Side */}
       <div className="flex items-center">
-        <p className="font-bold text-lg md:text-3xl">
-          <span className="text-[#2d2b2b]">Alumni</span>
-          <span className="text-[#be142e]"> Connect</span>
-        </p>
-        <img
-          src={alumniconnectlogo2}
-          alt="CICS Logo"
-          className="h-11 ml-2 mr-2 md:h-16"
-        />
+        <div className="flex flex-col items-end">
+          <p className="font-bold text-lg md:text-3xl text-right">
+            <span className="text-[#2d2b2b]">Alumni</span>
+            <span className="text-[#be142e]"> Connect</span>
+          </p>
+        </div>
+        <div className="ml-2 mr-2">
+          <img
+            src={alumniconnectlogo2}
+            alt="Alumni Connect Logo"
+            className="h-11 md:h-16"
+          />
+        </div>
       </div>
     </header>
   );

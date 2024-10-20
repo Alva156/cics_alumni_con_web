@@ -16,34 +16,21 @@ body {
   padding: 0 20px; /* Added left and right margin */
 }
 
-.background-section {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  z-index: 0;
-  border-radius: 10px; /* Rounded corners for the background section */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Shadow effect */
-  margin: 0; /* Remove margin */
-  padding: 0; /* Remove padding if any */
-  margin: var(--section-spacing) 0;
-}
-
 .background-video {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 70%; /* Adjust the width to 70% to leave space for the news carousel */
   height: 100%;
   object-fit: cover;
   border-radius: 10px; /* Rounded corners for the video */
   z-index: 1;
 }
 
-
 /* Spacing Variable */
 :root {
-  --section-spacing: 30px; /* Variable for uniform spacing */
+  --section-spacing: 30px; /* Variable for uniform spa
+cing */
 }
 
 /* Carousel Styles */
@@ -122,34 +109,34 @@ body {
   background-position: center;
 }
 .userprofile-logo {
-  background-image: url('/src/assets/userprofile.png');
+  background-image: url("/src/assets/userprofile.png");
 }
 .survey-logo {
-  background-image: url('/src/assets/survey.png');
+  background-image: url("/src/assets/survey.png");
 }
 .threads-logo {
-  background-image: url('/src/assets/threads.png');
+  background-image: url("/src/assets/threads.png");
 }
 .alumni-logo {
-  background-image: url('/src/assets/alumni.png');
+  background-image: url("/src/assets/alumni.png");
 }
 .chatbot-logo {
-  background-image: url('/src/assets/chatbot.png');
+  background-image: url("/src/assets/chatbot.png");
 }
 .companies-logo {
-  background-image: url('/src/assets/companies.png');
+  background-image: url("/src/assets/companies.png");
 }
 .newsevents-logo {
-  background-image: url('/src/assets/newsevents.png');
+  background-image: url("/src/assets/newsevents.png");
 }
 .certifications-logo {
-  background-image: url('/src/assets/certifications.png');
+  background-image: url("/src/assets/certifications.png");
 }
 .documents-logo {
-  background-image: url('/src/assets/documents.png');
+  background-image: url("/src/assets/documents.png");
 }
 .jobs-logo {
-  background-image: url('/src/assets/jobs.png');
+  background-image: url("/src/assets/jobs.png");
 }
 
 .square-item h3 {
@@ -188,7 +175,7 @@ body {
 }
 
 .dropdown-button:hover {
-  background-color: #4CAF50; /* Green background on hover */
+  background-color: #4caf50; /* Green background on hover */
   color: white; /* Change text color to white on hover */
 }
 
@@ -222,7 +209,6 @@ body {
 .dropdown-content button:hover {
   background-color: #f0f0f0; /* Light gray on hover */
 }
-
 
 /* Mission & Vision Section */
 .mission-vision-section {
@@ -275,7 +261,6 @@ body {
 .carousel-image.active {
   opacity: 1;
 }
-
 
 .carousel-images {
   position: relative;
@@ -350,7 +335,6 @@ body {
   background-color: rgba(255, 255, 255, 0.8);
 }
 
-
 /* Text Styles */
 .mission-title,
 .vision-title {
@@ -402,7 +386,8 @@ body {
   }
 
   .square-item {
-    width: 100%; /* Full width for squares on smaller screens */
+    width: 100%; /* Full width for squares on smaller 
+screens */
     margin: 10px 0; /* Adjust margin for smaller screens */
   }
 
@@ -451,4 +436,34 @@ body {
   .chart-container {
     page-break-inside: avoid; /* Avoid page breaks within charts */
   }
+}
+.background-news-container {
+  display: flex; /* Aligns children (video and news carousel) in a row */
+  width: 100%;
+}
+
+.background-section {
+  position: relative;
+  width: 100%; /* Full width for the section */
+  height: auto; /* Allow height to adjust based on content */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.news-carousel-container {
+  width: 100%; /* Full width for the news carousel */
+  display: flex;
+  flex-direction: column; /* Stack news items vertically */
+  justify-content: center;
+  padding: 20px;
+}
+
+.events-carousel-container {
+  width: 100%; /* Full width for the events carousel */
+  display: flex;
+  flex-direction: column; /* Stack events items vertically */
+  justify-content: center;
+  padding: 20px;
 }

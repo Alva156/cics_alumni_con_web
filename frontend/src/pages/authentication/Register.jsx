@@ -172,7 +172,7 @@ function Register() {
               value={formData.studentNum}
               onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "28px" }}
+              style={{ height: "30px" }}
             />
 
             <div className="flex mb-2">
@@ -187,7 +187,7 @@ function Register() {
                   value={formData.firstName}
                   onChange={handleChange}
                   className="p-2 border border-black bg-[#D9D9D9] w-full"
-                  style={{ height: "28px" }}
+                  style={{ height: "30px" }}
                 />
               </div>
               <div className="w-1/2 pl-1">
@@ -201,7 +201,7 @@ function Register() {
                   value={formData.lastName}
                   onChange={handleChange}
                   className="p-2 border border-black bg-[#D9D9D9] w-full"
-                  style={{ height: "28px" }}
+                  style={{ height: "30px" }}
                 />
               </div>
             </div>
@@ -214,7 +214,7 @@ function Register() {
               value={formData.birthday}
               onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "28px" }}
+              style={{ height: "30px" }}
             />
 
             <label className="block mb-1 text-xs font-medium">Email *</label>
@@ -225,7 +225,7 @@ function Register() {
               value={formData.email}
               onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "28px" }}
+              style={{ height: "30px" }}
             />
             <label className="block mb-1 text-xs font-medium">
               Mobile Number *
@@ -237,31 +237,63 @@ function Register() {
               value={formData.mobileNumber}
               onChange={handleChange}
               className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "28px" }}
+              style={{ height: "30px" }}
             />
 
-            <label className="block mb-1 text-xs font-medium">Password *</label>
-            <div className="relative mb-2">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-                className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
-                style={{ height: "28px" }}
-              />
-              <span
-                className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
-                onClick={togglePasswordVisibility}
-              >
-                <FontAwesomeIcon
-                  icon={showPassword ? faEye : faEyeSlash}
-                  className="text-black"
-                />
-              </span>
+            <div className="flex mb-2">
+              <div className="flex-1 pr-2">
+                <label className="block mb-1 text-xs font-medium">
+                  Password *
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                    style={{ height: "30px" }}
+                  />
+                  <span
+                    className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
+                    onClick={togglePasswordVisibility}
+                  >
+                    <FontAwesomeIcon
+                      icon={showPassword ? faEye : faEyeSlash}
+                      className="text-black"
+                    />
+                  </span>
+                </div>
+              </div>
+              <div className="flex-1 pl-2">
+                <label className="block mb-1 text-xs font-medium">
+                  Confirm Password *
+                </label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                    style={{ height: "30px" }}
+                  />
+                  <span
+                    className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
+                    onClick={toggleConfirmPasswordVisibility}
+                  >
+                    <FontAwesomeIcon
+                      icon={showConfirmPassword ? faEye : faEyeSlash}
+                      className="text-black"
+                    />
+                  </span>
+                </div>
+              </div>
             </div>
-            <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
+
+            <p className="text-[0.6rem] mt-2 mb-1 ml-2 sm:text-xs">
               Password Requirements:
             </p>
             <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
@@ -278,34 +310,10 @@ function Register() {
               ^, &, *)
             </p>
 
-            <label className="block mb-1 mt-4 text-xs font-medium">
-              Confirm Password *
-            </label>
-            <div className="relative mb-5">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
-                style={{ height: "28px" }}
-              />
-              <span
-                className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
-                onClick={toggleConfirmPasswordVisibility}
-              >
-                <FontAwesomeIcon
-                  icon={showConfirmPassword ? faEye : faEyeSlash}
-                  className="text-black"
-                />
-              </span>
-            </div>
-
             <button
               type="submit"
               onClick={handleSubmit}
-              className="bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
+              className="bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 transition duration-300 ease-in-out hover:bg-[#a10c2b] mt-4"
             >
               SIGN UP
             </button>

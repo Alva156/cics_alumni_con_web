@@ -180,7 +180,9 @@ function Login() {
             </div>
 
             <div className="text-sm underline mb-8 block text-left">
-              <a href="/forgotpassword">Forgot Password?</a>
+              <button onClick={() => navigate("/forgotpassword")}>
+                Forget Password
+              </button>
             </div>
 
             <button

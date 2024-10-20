@@ -4,6 +4,7 @@ import homepage2 from "../../assets/homepage2.jpg";
 import { useNavigate } from "react-router-dom";
 
 function AdminHomepage() {
+  const navigate = useNavigate();
   const images = [
     { src: homepage1, title: "", text: "Welcome to CICS Alumni Connect!" },
     {
@@ -21,7 +22,6 @@ function AdminHomepage() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate();
 
   const totalSlides = images.length;
 
@@ -292,7 +292,7 @@ function AdminHomepage() {
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
           <button
-            onClick={() => (window.location.href = "/admin-account")}
+            onClick={() => navigate("/admin-account")}
             className="homepage-text tracking-extra-wide font-light  hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
           >
             ACCOUNT

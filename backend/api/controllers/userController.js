@@ -391,7 +391,13 @@ exports.checkAuth = async (req, res) => {
 // Logout user
 exports.logoutUser = async (req, res) => {
   try {
-    res.clearCookie("token");
+    // Clear the token cookie with the same options as when it was set
+    res.clearCookie("token", {
+      httpOnly: true, // Ensures the cookie is only accessible by the web server
+      secure: true, // Only send the cookie over HTTPS
+      sameSite: "none", // Allow cross-origin requests
+    });
+
     console.log(`User logged out: ${req.user.id}, Email: ${req.user.email}`);
 
     res.status(200).json({
@@ -401,6 +407,7 @@ exports.logoutUser = async (req, res) => {
     res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
+
 //FORGET PASS
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;

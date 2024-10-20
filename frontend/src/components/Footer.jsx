@@ -1,4 +1,5 @@
 import React from "react";
+import footerimage from "../assets/ustfooter.jpg";
 import {
   FaRegCopyright,
   FaFacebookF,
@@ -32,7 +33,7 @@ const Footer = () => {
       <div
         className="relative"
         style={{
-          backgroundImage: "url('/src/assets/ustfooter.jpg')",
+          backgroundImage: `url(${footerimage})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           height: "300px",

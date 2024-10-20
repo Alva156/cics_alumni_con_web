@@ -9,6 +9,7 @@ import axios from "axios";
 function Login() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -16,6 +17,12 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
+    </div>
+  );
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -30,6 +37,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const response = await axios.post(`${backendUrl}/users/login`, formData, {
@@ -37,15 +45,18 @@ function Login() {
       });
 
       if (response.data.success) {
-        localStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("logoutMessageShown", "false");
-        sessionStorage.setItem("loginMessageShown", "false");
+        setTimeout(() => {
+          localStorage.setItem("isLoggedIn", "true");
+          sessionStorage.setItem("logoutMessageShown", "false");
+          sessionStorage.setItem("loginMessageShown", "false");
 
-        if (response.data.role === "admin") {
-          navigate("/admin/homepage");
-        } else {
-          navigate("/");
-        }
+          if (response.data.role === "admin") {
+            navigate("/admin/homepage");
+          } else {
+            navigate("/");
+          }
+          setLoading(false);
+        }, 3000);
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -78,6 +89,7 @@ function Login() {
     <>
       <Header />
       <div className="flex flex-col md:flex-row h-screen overflow-hidden">
+        {loading && <LoadingSpinner />} {/* Show loading spinner */}
         {showLogoutMessage && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
             <p> Logout success!</p>
@@ -161,7 +173,6 @@ function Login() {
             </button>
           </div>
         </div>
-
         {/* Right Image */}
         <div className="relative w-full md:w-1/2 h-full flex-shrink-0 hidden md:block">
           <div className="absolute inset-0 bg-[#5D0000] opacity-30"></div>

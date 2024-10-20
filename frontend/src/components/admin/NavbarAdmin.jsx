@@ -87,52 +87,80 @@ const NavbarAdmin = () => {
                 className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow"
               >
                 <li className="p-2.5  border-b border-hgray last:border-b-0">
-                  <a href="/admin/homepage">Home</a>
+                  <button onClick={() => navigate("/admin/homepage")}>
+                    Home
+                  </button>
                 </li>
                 <li className="p-2.5  border-b border-hgray last:border-b-0">
-                  <a href="/admin/dashboard">Dashboard</a>
+                  <button onClick={() => navigate("/admin/dashboard")}>
+                    Dashboard
+                  </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/admin/surveytool">Survey Tool</a>
+                  <button onClick={() => navigate("/admin/surveytool")}>
+                    Survey Tool
+                  </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/admin/threads">Threads</a>
+                  <button onClick={() => navigate("/admin/threads")}>
+                    Threads
+                  </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <details>
                     <summary>Contents</summary>
                     <ul className="p-2.5 z-50">
                       <li className="p-1">
-                        <a href="/admin/companies">Companies</a>
+                        <button onClick={() => navigate("/admin/companies")}>
+                          Companies
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/news">News</a>
+                        <button onClick={() => navigate("/admin/news")}>
+                          News
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/events">Events</a>
+                        <button onClick={() => navigate("/admin/events")}>
+                          Events
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/certifications">Certifications</a>
+                        <button
+                          onClick={() => navigate("/admin/certifications")}
+                        >
+                          Certifications
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/documentrequest">
+                        <button
+                          onClick={() => navigate("/admin/documentrequest")}
+                        >
                           Document Request Steps
-                        </a>
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/admin/job">Job/Internship Referrals</a>
+                        <button onClick={() => navigate("/admin/job")}>
+                          Job/Internship Referrals
+                        </button>
                       </li>
                     </ul>
                   </details>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/admin/alumni">Alumni</a>
+                  <button onClick={() => navigate("/admin/alumni")}>
+                    Alumni
+                  </button>
                 </li>
                 <li className="p-2.5 ">
-                  <a href="/admin/reports">Reports</a>
+                  <button onClick={() => navigate("/admin/reports")}>
+                    Reports
+                  </button>
                 </li>
                 <li className="p-2.5 ">
-                  <a href="/admin/account">Account</a>
+                  <button onClick={() => navigate("/admin/account")}>
+                    Account
+                  </button>
                 </li>
               </ul>
             )}
@@ -141,50 +169,72 @@ const NavbarAdmin = () => {
         <div className="navbar-center hidden lg:flex py-1 ">
           <ul className="menu menu-horizontal px-1 ">
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/homepage">Home</a>
+              <button onClick={() => navigate("/admin/homepage")}>Home</button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/dashboard">Dashboard</a>
+              <button onClick={() => navigate("/admin/dashboard")}>
+                Dashboard
+              </button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/surveytool">Survey Tool</a>
+              <button onClick={() => navigate("/admin/surveytool")}>
+                Survey Tool
+              </button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/threads">Threads</a>
+              <button onClick={() => navigate("/admin/threads")}>
+                Threads
+              </button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
               <details>
                 <summary>Contents</summary>
                 <ul className="px-2.5 bg-white pr-1 z-20">
                   <li className="p-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/companies">Companies</a>
+                    <button onClick={() => navigate("/admin/companies")}>
+                      Companies
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/news">News</a>
+                    <button onClick={() => navigate("/admin/news")}>
+                      News
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/events">Events</a>
+                    <button onClick={() => navigate("/admin/events")}>
+                      Events
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/certifications">Certifications</a>
+                    <button onClick={() => navigate("/admin/certifications")}>
+                      Certifications
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/documentrequest">Document Request Steps</a>
+                    <button onClick={() => navigate("/admin/documentrequest")}>
+                      Document Request Steps
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/admin/job">Job/Internship Referrals</a>
+                    <button onClick={() => navigate("/admin/job")}>
+                      Job/Internship Referrals
+                    </button>
                   </li>
                 </ul>
               </details>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <a href="/admin/alumni">Alumni</a>
+              <button onClick={() => navigate("/admin/alumni")}>Alumni</button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8 ">
-              <a href="/admin/reports">Reports</a>
+              <button onClick={() => navigate("/admin/reports")}>
+                Reports
+              </button>
             </li>
             <li className="px-2.5 pr-16 xl:pr-20 ">
-              <a href="/admin/account">Account</a>
+              <button onClick={() => navigate("/admin/account")}>
+                Account
+              </button>
             </li>
           </ul>
         </div>

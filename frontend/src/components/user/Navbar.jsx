@@ -89,49 +89,73 @@ const Navbar = () => {
                 className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow"
               >
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/">Home</a>
+                  <button onClick={() => navigate("/")}>Home</button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/user-userprofile">User Profile</a>
+                  <button onClick={() => navigate("/user-userprofile")}>
+                    User Profile
+                  </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/user-survey">Survey</a>
+                  <button onClick={() => navigate("/user-survey")}>
+                    Survey
+                  </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/user-threads">Threads</a>
+                  <button onClick={() => navigate("/user-threads")}>
+                    Threads
+                  </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <details>
                     <summary>Contents</summary>
                     <ul className="p-2.5 z-50">
                       <li className="p-1">
-                        <a href="/user-companies">Companies</a>
+                        <button onClick={() => navigate("/user-companies")}>
+                          Companies
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/user-news">News</a>
+                        <button onClick={() => navigate("/user-news")}>
+                          News
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/user-events">Events</a>
+                        <button onClick={() => navigate("/user-events")}>
+                          Events
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/user-certifications">Certifications</a>
+                        <button
+                          onClick={() => navigate("/user-certifications")}
+                        >
+                          Certifications
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/user-documentrequest">
+                        <button
+                          onClick={() => navigate("/user-documentrequest")}
+                        >
                           Document Request Steps
-                        </a>
+                        </button>
                       </li>
                       <li className="p-1">
-                        <a href="/user-job">Job/Internship Referrals</a>
+                        <button onClick={() => navigate("/user-job")}>
+                          Job/Internship Referrals
+                        </button>
                       </li>
                     </ul>
                   </details>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <a href="/user-alumni">Alumni</a>
+                  <button onClick={() => navigate("/user-alumni")}>
+                    Alumni
+                  </button>
                 </li>
                 <li className="p-2.5 ">
-                  <a href="/user-chatbot">Chatbot</a>
+                  <button onClick={() => navigate("/user-chatbot")}>
+                    Chatbot
+                  </button>
                 </li>
               </ul>
             )}
@@ -140,47 +164,59 @@ const Navbar = () => {
         <div className="navbar-center hidden lg:flex py-1">
           <ul className="menu menu-horizontal px-1 ">
             <li className="px-2.5 pr-8">
-              <a href="/">Home</a>
+              <button onClick={() => navigate("/")}>Home</button>
             </li>
             <li className="px-2.5 pr-8">
-              <a href="/user-userprofile">User Profile</a>
+              <button onClick={() => navigate("/user-userprofile")}>
+                User Profile
+              </button>
             </li>
             <li className="px-2.5 pr-8">
-              <a href="/user-survey">Survey</a>
+              <button onClick={() => navigate("/user-survey")}>Survey</button>
             </li>
             <li className="px-2.5 pr-8">
-              <a href="/user-threads">Threads</a>
+              <button onClick={() => navigate("/user-threads")}>Threads</button>
             </li>
             <li className="px-2.5 pr-8">
               <details>
                 <summary>Contents</summary>
                 <ul className="px-2.5 bg-white pr-8 z-20">
                   <li className="p-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-companies">Companies</a>
+                    <button onClick={() => navigate("/user-companies")}>
+                      Companies
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-news">News</a>
+                    <button onClick={() => navigate("/user-news")}>News</button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-events">Events</a>
+                    <button onClick={() => navigate("/user-events")}>
+                      Events
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-certifications">Certifications</a>
+                    <button onClick={() => navigate("/user-certifications")}>
+                      Certifications
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-documentrequest">Document Request Steps</a>
+                    <button onClick={() => navigate("/user-documentrequest")}>
+                      Document Request Steps
+                    </button>
                   </li>
                   <li className="px-1 border-b border-hgray last:border-b-0">
-                    <a href="/user-job">Job/Internship Referrals</a>
+                    <button onClick={() => navigate("/user-job")}>
+                      Job/Internship Referrals
+                    </button>
                   </li>
                 </ul>
               </details>
             </li>
             <li className="px-2.5 pr-8">
-              <a href="/user-alumni">Alumni</a>
+              <button onClick={() => navigate("/user-alumni")}>Alumni</button>
             </li>
             <li className="px-2.5 ">
-              <a href="/user-chatbot">Chatbot</a>
+              <button onClick={() => navigate("/user-chatbot")}>Chatbot</button>
             </li>
           </ul>
         </div>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import homepage1 from "../../assets/homepage1.jpg";
 import homepage2 from "../../assets/homepage2.png";
+import { useNavigate } from "react-router-dom";
 
 function AdminHomepage() {
+  const navigate = useNavigate();
   const images = [
     { src: homepage1, title: "", text: "Welcome to CICS Alumni Connect!" },
     {
@@ -120,7 +122,7 @@ function AdminHomepage() {
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
           <button
-            onClick={() => (window.location.href = "/admin-dashboard")}
+            onClick={() => navigate("/admin-dashboard")}
             className="homepage-text tracking-extra-wide font-light  hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
           >
             DASHBOARD
@@ -142,7 +144,7 @@ function AdminHomepage() {
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
           <button
-            onClick={() => (window.location.href = "/admin-surveytool")}
+            onClick={() => navigate("/admin-surveytool")}
             className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
           >
             SURVEY TOOL
@@ -165,7 +167,7 @@ function AdminHomepage() {
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
           <button
-            onClick={() => (window.location.href = "/admin-threads")}
+            onClick={() => navigate("/admin-threads")}
             className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
           >
             THREADS
@@ -188,13 +190,13 @@ function AdminHomepage() {
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex flex-col space-y-4 pt-8">
           <div className="flex justify-between space-x-2">
             <button
-              onClick={() => (window.location.href = "/admin-companies")}
+              onClick={() => navigate("/admin-companies")}
               className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.7rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
             >
               Companies
             </button>
             <button
-              onClick={() => (window.location.href = "/admin-news")}
+              onClick={() => navigate("/admin-news")}
               className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.7rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
             >
               News
@@ -202,13 +204,13 @@ function AdminHomepage() {
           </div>
           <div className="flex justify-between space-x-4">
             <button
-              onClick={() => (window.location.href = "/admin-events")}
+              onClick={() => navigate("/admin-events")}
               className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.7rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
             >
               Events
             </button>
             <button
-              onClick={() => (window.location.href = "/admin-certifications")}
+              onClick={() => navigate("/admin-certifications")}
               className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B]  text-[0.6rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
             >
               Certifications
@@ -216,13 +218,13 @@ function AdminHomepage() {
           </div>
           <div className="flex justify-between space-x-4">
             <button
-              onClick={() => (window.location.href = "/admin-documentrequest")}
+              onClick={() => navigate("/admin-documentrequest")}
               className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.7rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
             >
               Documents
             </button>
             <button
-              onClick={() => (window.location.href = "/admin-job")}
+              onClick={() => navigate("/admin-job")}
               className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.57rem] w-36 h-7 bg-[#2D2B2B] text-white rounded  btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
             >
               Job/Internship
@@ -247,7 +249,7 @@ function AdminHomepage() {
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
           <button
-            onClick={() => (window.location.href = "/admin-alumni")}
+            onClick={() => navigate("/admin-alumni")}
             className="homepage-text tracking-extra-wide font-light  hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
           >
             ALUMNI
@@ -270,7 +272,7 @@ function AdminHomepage() {
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
           <button
-            onClick={() => (window.location.href = "/admin-reports")}
+            onClick={() => navigate("/admin-reports")}
             className="homepage-text tracking-extra-wide font-light  hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
           >
             REPORTS
@@ -290,7 +292,7 @@ function AdminHomepage() {
         </div>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
           <button
-            onClick={() => (window.location.href = "/admin-account")}
+            onClick={() => navigate("/admin-account")}
             className="homepage-text tracking-extra-wide font-light  hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
           >
             ACCOUNT

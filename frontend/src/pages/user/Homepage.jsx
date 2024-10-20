@@ -118,7 +118,11 @@ const Homepage = () => {
         {/* Background Video Section */}
         <div
           className="background-section"
-          style={{ position: "relative", width: "70%" }}
+          style={{
+            position: "relative",
+            width: "70%",
+            marginTop: "30px",
+          }}
         >
           <video
             autoPlay
@@ -161,7 +165,7 @@ const Homepage = () => {
           <div
             className="news-carousel-container"
             data-aos="fade-up"
-            style={{ position: "relative", width: "100%", maxWidth: "400px" }}
+            style={{ position: "relative", width: "110%", maxWidth: "430px" }}
           >
             <h2 className="text-2xl font-medium mb-4">Latest News</h2>
             <div className="flex justify-center items-center">
@@ -185,7 +189,8 @@ const Homepage = () => {
                   </p>
                   <a
                     href="#"
-                    className="text-blue-500 text-sm font-medium hover:underline"
+                    style={{ color: "#be142e" }}
+                    className="text-sm font-medium hover:underline"
                   >
                     Read More
                   </a>
@@ -211,8 +216,8 @@ const Homepage = () => {
             data-aos="fade-up"
             style={{
               position: "relative",
-              width: "100%",
-              maxWidth: "400px",
+              width: "110%",
+              maxWidth: "430px",
               marginTop: "20px",
             }}
           >
@@ -238,7 +243,8 @@ const Homepage = () => {
                   </p>
                   <a
                     href="#"
-                    className="text-blue-500 text-sm font-medium hover:underline"
+                    style={{ color: "#be142e" }}
+                    className="text-sm font-medium hover:underline"
                   >
                     Read More
                   </a>

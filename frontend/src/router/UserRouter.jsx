@@ -1,8 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Homepage from "../pages/user/Homepage";
 import Survey from "../pages/user/Survey";
-import user from "../layout/user";
-import userProfile from "../pages/user/UserProfile";
+import User from "../layout/User";
+import UserProfile from "../pages/user/UserProfile";
 import Threads from "../pages/user/Threads";
 import Chatbot from "../pages/user/Chatbot";
 import Alumni from "../pages/user/Alumni";

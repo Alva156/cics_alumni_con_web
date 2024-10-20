@@ -121,8 +121,8 @@ exports.registerUser = async (req, res) => {
     // Set JWT token in cookies
     res.cookie("userToken", jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only secure in production
-      sameSite: "strict",
+      secure: true, // Only secure in production
+      sameSite: "none",
       maxAge: 10 * 60 * 1000, // 10 minutes expiration
     });
 
@@ -279,18 +279,18 @@ exports.cancel = async (req, res) => {
     // Clear the cookies
     res.clearCookie("userToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "none",
     });
     res.clearCookie("resetToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "none",
     });
     res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true,
+      sameSite: "none",
     });
 
     // Send response to indicate success
@@ -351,8 +351,8 @@ exports.loginUser = async (req, res) => {
     // Set token in HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true, // Secure cookie, not accessible via JavaScript
-      secure: process.env.NODE_ENV === "production", // Only send via HTTPS in production
-      sameSite: "strict", // Strict SameSite policy to prevent CSRF attacks
+      secure: true, // Only send via HTTPS in production
+      sameSite: "none", // Strict SameSite policy to prevent CSRF attacks
       maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
 
@@ -497,8 +497,8 @@ exports.verifyOTPPassword = async (req, res) => {
     // Set a secure cookie for the JWT token
     res.cookie("resetToken", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 10 * 60 * 1000, // 10mins
     });
 

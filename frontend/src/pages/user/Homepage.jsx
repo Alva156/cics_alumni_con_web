@@ -8,6 +8,8 @@ import homepage1 from "../../assets/homepage1.jpg";
 import homepage2 from "../../assets/homepage2.jpg";
 import homepage3 from "../../assets/homepage3.jpg";
 import axios from "axios";
+import { Link } from "react-router-dom";
+
 
 const Homepage = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -63,7 +65,7 @@ const Homepage = () => {
       console.error("Error fetching events:", error);
     }
   };
-
+  
   const nextPage = () => {
     setFade(true);
     setTimeout(() => {
@@ -162,7 +164,12 @@ const Homepage = () => {
           <div style={{ width: "40%", display: "flex", flexDirection: "column", padding: "20px", flexShrink: 0 }}>
             {/* News Carousel */}
             <div className="news-carousel-container" data-aos="fade-up" style={{ position: "relative", maxWidth: "600px" }}>
-              <h2 className="text-2xl font-medium mb-4">Latest News</h2>
+            <h2 className="text-2xl font-medium mb-4">
+  <Link to="/user-news" className="text-gray-700 hover:text-red-500 hover:underline">
+    Latest News
+  </Link>
+</h2>
+
               <div className="flex justify-center items-center">
                 {news.length > 0 && (
                   <div className={`bg-white border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow ${fade ? "slide-out" : ""}`} style={{ height: "380px", width: "100%", position: "relative" }}>
@@ -200,7 +207,11 @@ const Homepage = () => {
 
             {/* Events Carousel Section */}
             <div className="events-carousel-container" data-aos="fade-up" style={{ position: "relative", maxWidth: "600px", marginTop: "20px" }}>
-              <h2 className="text-2xl font-medium mb-4">Upcoming Events</h2>
+            <h2 className="text-2xl font-medium mb-4">
+  <Link to="/user-events" className="text-gray-700 hover:text-red-500 hover:underline">
+    Upcoming Events
+  </Link>
+</h2>
               <div className="flex justify-center items-center">
                 {events.length > 0 && (
                   <div className={`bg-white border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow ${fade ? "slide-out" : ""}`} style={{ height: "380px", width: "100%", position: "relative" }}>

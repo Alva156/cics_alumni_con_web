@@ -21,7 +21,9 @@ function UserProfile() {
   const [lastName, setLastName] = useState("");
   const [birthday, setBirthday] = useState("");
   const [profession, setProfession] = useState("");
+  const [college, setCollege] = useState("");
   const [collegeProgram, setCollegeProgram] = useState("");
+  const [availablePrograms, setAvailablePrograms] = useState([]);
   const [specialization, setSpecialization] = useState("");
   const [yearStartedCollege, setYearStartedCollege] = useState("");
   const [yearGraduatedCollege, setYearGraduatedCollege] = useState("");
@@ -76,6 +78,37 @@ function UserProfile() {
   const [attachments, setAttachments] = useState([
     { id: uniqueId(), file: null, filename: "", filepath: "" },
   ]);
+
+  const collegePrograms = {
+    "UST-AMV College of Accountancy": ["Accountancy", "Accounting Information System", "Management Accounting"],
+    "College of Architecture": ["Architecture",],
+    "Faculty of Arts and Letters": ["Asian Studies", "Behavioral Science", "Communication", "Creative Writing", "Economics", "English Language Studies", "History", "Journalism", "Legal Management", "Literature", "Philosophy", "Political Science", "Sociology"],
+    "Faculty of Civil Law": ["Juris Doctor"],
+    "College of Commerce and Business Administration": ["Business Administration, major in Business Economics", "Business Administration, major in Financial Management", "Business Administration, major in Human Resource Management", "Business Administration, major in Marketing Management", "Entrepreneurship"],
+    "College of Education": ["Secondary Education Major in English", "Secondary Education Major in Filipino", "Secondary Education Major in Mathematics", "Secondary Education Major in Religious and Values Education", "Secondary Education Major in Science", "Secondary Education Major in Social Studies", "Early Childhood Education", "Elementary Education", "Special Needs Education, major in Early Childhood Education", "Food Technology", "Nutrition and Dietetics", "Bachelor of Library and Information Science"],
+    "Faculty of Engineering": ["Chemical Engineering", "Civil Engineering", "Electrical Engineering", "Electronics Engineering", "Industrial Engineering", "Mechanical Engineering"],
+    "College of Fine Arts and Design": ["Fine Arts, major in Advertising Arts", "Fine Arts, major in Industrial Design", "Interior Design", "Fine Arts, major in Painting"],
+    "College of Information and Computing Sciences": ["Computer Science", "Information Systems", "Information Technology"],
+    "Faculty of Medicine and Surgery": ["Basic Human Studies", "Doctor of Medicine", "Master in Clinical Audiology", "Master in Pain Management"],
+    "Conservatory of Music": ["Performance, major in Bassoon", "Performance, major in Choral Conducting", "Performance, major in Clarinet", "Composition", "Performance, major in Double Bass", "Performance, major in Flute", "Performance, major in French Horn", "Performance, major in Guitar", "Jazz", "Musicology", "Music Education", "Music Theatre", "Music Technology", "Performance, major in Oboe", "Performance, major in Orchestral Conducting", "Performance, major in Percussion", "Performance, major in Piano", "Performance, major in Saxophone", "Performance, major in Trombone", "Performance, major in Trumpet", "Performance, major in Tuba", "Performance, major in Viola", "Performance, major in Violin", "Performance, major in Violoncello", "Performance, major in Voice"],
+    "College of Nursing": ["Nursing"],
+    "Faculty of Pharmacy": ["Biochemistry", "Medical Technology", "Pharmacy", "Pharmacy, major in Clinical Pharmacy", "Doctor of Pharmacy"],
+    "Institute of Physical Education and Athletics": ["Fitness and Sports Management"],
+    "College of Rehabilitation Sciences": ["Occupational Therapy", "Physical Therapy", "Speech-Language Pathology", "Sports Science"],
+    "College of Science": ["Applied Mathematics, major in Actuarial Science", "Applied Physics, major in Instrumentation", "Biology, major in Environmental Biology", "Biology, major in Medical Biology", "Bachelor of Science major in Molecular Biology and Biotechnology", "Chemistry", "Data Science and Analytics", "Microbiology", "Psychology"],
+    "College of Tourism and Hospitality Management": ["Hospitality Management, major in Culinary Entrepreneurship", "Hospitality Management, major in Hospitality Leadership", "Tourism Management, major in Recreation and Leisure Management", "Tourism Management, major in Travel Operation and Service Management"],
+    "Faculty of Canon Law": ["Doctor of Canon Law", "Licentiate in Canon Law", "Bachelor of Canon Law"],
+    "Faculty of Philosophy": ["Doctor of Philosophy", "Licentiate in Philosophy", "Bachelor of Philosophy (Classical)"],
+    "Faculty of Sacred Theology": ["Doctor of Sacred Theology", "Licentiate in Sacred Theology", "Bachelor of Sacred Theology"]
+  };
+
+  const handleCollegeChange = (e) => {
+    const selectedCollege = e.target.value;
+    setCollege(selectedCollege);
+
+    // Reset the college program selection when the college changes
+    setCollegeProgram(""); // Ensure college program resets
+  };
 
   // Handler for file selection
 
@@ -317,6 +350,7 @@ const addCompanySection = async () => {
       birthday,
       profession,
       accountEmail,
+      college,
       collegeProgram,
       specialization,
       yearStartedCollege,
@@ -461,6 +495,7 @@ const addCompanySection = async () => {
           setFirstName(profileData.firstName || "");
           setLastName(profileData.lastName || "");
           setProfession(profileData.profession || "");
+          setCollege(profileData.college || "");
           setCollegeProgram(profileData.collegeProgram || "");
           setSpecialization(profileData.specialization || "");
           setYearStartedCollege(profileData.yearStartedCollege || "");
@@ -859,37 +894,58 @@ const addCompanySection = async () => {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">College Program</label>
+                    <label className="pt-4 pb-2 text-sm">College</label>
                     <select
-                      className="select select-bordered select-sm border-2 w-full h-10"
-                      onChange={(e) => setCollegeProgram(e.target.value)}
-                      name="collegeProgram"
-                      value={collegeProgram}
+                      className="select select-bordered select-sm w-full h-10"
+                      onChange={handleCollegeChange}
+                      name="college"
+                      value={college}
                     >
                       <option value="" disabled>
                         Choose
                       </option>
-                      <option>Computer Science</option>
-                      <option>Information Systems</option>
-                      <option>Information Technology</option>
+                      {/* Dynamically render colleges */}
+          {Object.keys(collegePrograms).map((collegeName) => (
+            <option key={collegeName} value={collegeName}>
+              {collegeName}
+            </option>
+          ))}
+                    </select>
+                  </div>
+
+                  <div className="py-1">
+                    <label className="pt-4 pb-2 text-sm">College Program</label>
+                    <select
+                      className="select select-bordered select-sm w-full h-10"
+                      onChange={(e) => setCollegeProgram(e.target.value)}
+                      name="collegeProgram"
+                      value={collegeProgram}
+                      disabled={!college}
+                    >
+                      <option value="" disabled>
+                        Choose
+                      </option>
+                      {/* Dynamically render college programs based on selected college */}
+          {college &&
+            collegePrograms[college].map((program) => (
+              <option key={program} value={program}>
+                {program}
+              </option>
+            ))}
                     </select>
                   </div>
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">Specialization</label>
-                    <select
-                      className="select select-bordered select-sm border-2 w-full h-10"
+                    <input
+                      type="text"
+                      placeholder="Type here"
+                      className="input input-sm input-bordered w-full h-10"
                       onChange={(e) => setSpecialization(e.target.value)}
                       name="specialization"
                       value={specialization}
-                    >
-                      <option value="" disabled>
-                        Choose
-                      </option>
-                      <option>Web Development</option>
-                      <option>Networking</option>
-                      <option>Automation</option>
-                    </select>
+                    />
+                      
                   </div>
 
                   <div className="py-1">
@@ -962,7 +1018,7 @@ const addCompanySection = async () => {
                   <label className="pt-4 pb-2 text-sm">Employment Status</label>
                   <select
                     name="employmentStatus"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setEmploymentStatus(e.target.value)}
                     value={employmentStatus}
                   >
@@ -980,7 +1036,7 @@ const addCompanySection = async () => {
                   <label className="pt-4 pb-2 text-sm">Work Industry</label>
                   <select
                     name="workIndustry"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setWorkIndustry(e.target.value)}
                     value={workIndustry}
                   >
@@ -998,7 +1054,7 @@ const addCompanySection = async () => {
                   </label>
                   <select
                     name="professionAlignment"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setProfessionAlignment(e.target.value)}
                     value={professionAlignment}
                   >
@@ -1014,7 +1070,7 @@ const addCompanySection = async () => {
                   <label className="pt-4 pb-2 text-sm">Marital Status</label>
                   <select
                     name="maritalStatus"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setMaritalStatus(e.target.value)}
                     value={maritalStatus}
                   >
@@ -1034,7 +1090,7 @@ const addCompanySection = async () => {
                   </label>
                   <select
                     name="salaryRange"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setSalaryRange(e.target.value)}
                     value={salaryRange}
                   >
@@ -1055,7 +1111,7 @@ const addCompanySection = async () => {
                   </label>
                   <select
                     name="placeOfEmployment"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setPlaceOfEmployment(e.target.value)}
                     value={placeOfEmployment}
                   >

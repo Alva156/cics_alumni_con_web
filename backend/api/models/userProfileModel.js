@@ -25,6 +25,9 @@ const userProfileSchema = new Schema({
     profession: {
         type: String,
     },
+    college: {
+        type: String,
+    },
     collegeProgram: {
         type: String,
     },

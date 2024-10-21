@@ -123,7 +123,7 @@ const Homepage = () => {
             className="background-section"
             style={{
               position: "relative",
-              width: "70%",
+              width: "60%",
               marginTop: "30px",
             }}
           >

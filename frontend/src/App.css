@@ -16,8 +16,6 @@ body {
   padding: 0 20px; /* Added left and right margin */  
 }
 
-
-
 .background-video {
   position: absolute;
   top: 0;
@@ -28,6 +26,30 @@ body {
   border-radius: 10px; /* Rounded corners for the video */
   z-index: 1;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* Spacing Variable */
@@ -423,18 +445,3 @@ screens */
     margin-bottom: var(--section-spacing); /* Add bottom margin */
   }
 }
-.background-news-container {
-  display: flex; /* Aligns children (video and news carousel) in a row */
-  width: 100%;
-}
-
-.background-section {
-  position: relative;
-  width: 100%; /* Full width for the section */
-  height: auto; /* Allow height to adjust based on content */
-  display: flex;
-  flex-direction: column; /* Stack children vertically */
-  justify-content: flex-start;
-  overflow: hidden;
-}
-

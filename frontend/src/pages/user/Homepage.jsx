@@ -279,47 +279,8 @@ const Homepage = () => {
           </button>
           <div className={`carousel-content ${fade ? "fade" : ""}`}>
             {currentPage === 0 ? (
-              <div className="carousel-page">
-                <div className="square-container">
-                  <div className="square-item">
-                    <div className="logo userprofile-logo"></div>
-                    <h3>Profile</h3>
-                    <button onClick={() => navigate("/user-userprofile")}>
-                      Go to Profile
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo survey-logo"></div>
-                    <h3>Survey</h3>
-                    <button onClick={() => navigate("/user-survey")}>
-                      Take Survey
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo threads-logo"></div>
-                    <h3>Threads</h3>
-                    <button onClick={() => navigate("/user-threads")}>
-                      View Threads
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo alumni-logo"></div>
-                    <h3>Alumni</h3>
-                    <button onClick={() => navigate("/user-alumni")}>
-                      Alumni Network
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo chatbot-logo"></div>
-                    <h3>Chatbot</h3>
-                    <button onClick={() => navigate("/user-chatbot")}>
-                      Chat with Us
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="carousel-page">
+
+<div className="carousel-page">
                 <div className="square-container">
                   <div className="square-item">
                     <div className="logo companies-logo"></div>
@@ -368,6 +329,53 @@ const Homepage = () => {
                   </div>
                 </div>
               </div>
+
+
+) : (
+              <div className="carousel-page">
+                <div className="square-container">
+                  <div className="square-item">
+                    <div className="logo userprofile-logo"></div>
+                    <h3>Profile</h3>
+                    <button onClick={() => navigate("/user-userprofile")}>
+                      Go to Profile
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo survey-logo"></div>
+                    <h3>Survey</h3>
+                    <button onClick={() => navigate("/user-survey")}>
+                      Take Survey
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo threads-logo"></div>
+                    <h3>Threads</h3>
+                    <button onClick={() => navigate("/user-threads")}>
+                      View Threads
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo alumni-logo"></div>
+                    <h3>Alumni</h3>
+                    <button onClick={() => navigate("/user-alumni")}>
+                      Alumni Network
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo chatbot-logo"></div>
+                    <h3>Chatbot</h3>
+                    <button onClick={() => navigate("/user-chatbot")}>
+                      Chat with Us
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+
+
+         
+              
             )}
           </div>
           <button className="carousel-button next" onClick={nextPage}>

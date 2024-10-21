@@ -109,6 +109,11 @@ const Homepage = () => {
     );
   };
 
+  const handleNavigation = (path) => {
+    navigate(path);
+    window.scrollTo(0, 0); // Scroll to the top of the page
+  };
+
   return (
     <div style={{ paddingTop: "12px", paddingRight: "45px", paddingLeft: "45px" }}>
     <div className="homepage-container" style={{ display: "flex" }}>
@@ -332,9 +337,9 @@ const Homepage = () => {
                   <div className="square-item">
                     <div className="logo companies-logo"></div>
                     <h3>Companies</h3>
-                    <button onClick={() => navigate("/user-companies")}>
-                      View Companies
-                    </button>
+                    <button onClick={() => handleNavigation("/user-companies")}>
+  View Companies
+</button>
                   </div>
                   <div className="square-item">
                     <div className="logo newsevents-logo"></div>
@@ -344,10 +349,10 @@ const Homepage = () => {
                         View News/Events
                       </button>
                       <div className="dropdown-content">
-                        <button onClick={() => navigate("/user-news")}>
+                        <button onClick={() => handleNavigation("/user-news")}>
                           News
                         </button>
-                        <button onClick={() => navigate("/user-events")}>
+                        <button onClick={() => handleNavigation("/user-events")}>
                           Events
                         </button>
                       </div>
@@ -356,21 +361,21 @@ const Homepage = () => {
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>
                     <h3>Certifications</h3>
-                    <button onClick={() => navigate("/user-certifications")}>
+                    <button onClick={() => handleNavigation("/user-certifications")}>
                       View Certifications
                     </button>
                   </div>
                   <div className="square-item">
                     <div className="logo documents-logo"></div>
                     <h3>Documents</h3>
-                    <button onClick={() => navigate("/user-documentrequest")}>
+                    <button onClick={() => handleNavigation("/user-documentrequest")}>
                       View Documents
                     </button>
                   </div>
                   <div className="square-item">
                     <div className="logo jobs-logo"></div>
                     <h3>Job/Internship</h3>
-                    <button onClick={() => navigate("/user-job")}>
+                    <button onClick={() => handleNavigation("/user-job")}>
                       View Jobs/Internships
                     </button>
                   </div>
@@ -384,35 +389,35 @@ const Homepage = () => {
                   <div className="square-item">
                     <div className="logo userprofile-logo"></div>
                     <h3>Profile</h3>
-                    <button onClick={() => navigate("/user-userprofile")}>
+                    <button onClick={() => handleNavigation("/user-userprofile")}>
                       Go to Profile
                     </button>
                   </div>
                   <div className="square-item">
                     <div className="logo survey-logo"></div>
                     <h3>Survey</h3>
-                    <button onClick={() => navigate("/user-survey")}>
+                    <button onClick={() => handleNavigation("/user-survey")}>
                       Take Survey
                     </button>
                   </div>
                   <div className="square-item">
                     <div className="logo threads-logo"></div>
                     <h3>Threads</h3>
-                    <button onClick={() => navigate("/user-threads")}>
+                    <button onClick={() => handleNavigation("/user-threads")}>
                       View Threads
                     </button>
                   </div>
                   <div className="square-item">
                     <div className="logo alumni-logo"></div>
                     <h3>Alumni</h3>
-                    <button onClick={() => navigate("/user-alumni")}>
+                    <button onClick={() => handleNavigation("/user-alumni")}>
                       Alumni Network
                     </button>
                   </div>
                   <div className="square-item">
                     <div className="logo chatbot-logo"></div>
                     <h3>Chatbot</h3>
-                    <button onClick={() => navigate("/user-chatbot")}>
+                    <button onClick={() => handleNavigation("/user-chatbot")}>
                       Chat with Us
                     </button>
                   </div>

@@ -3,6 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
+const path = require("path");
 
 const authenticateJWT = require("./middleware/auth"); // Middleware for JWT auth
 
@@ -12,6 +13,9 @@ const port = process.env.PORT || 6001;
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
+
+// Serve static files from the frontend dist folder
+app.use(express.static(path.join(__dirname, "../frontend/dist"))); // Adjust path based on where your backend is relative to the frontend build
 
 const corsOptions = {
   origin: process.env.FRONTEND, // Frontend origin
@@ -71,6 +75,9 @@ app.use("/jobs", adminJobsRoutes);
 app.use(express.json({ limit: "10mb" })); // Increase to 10MB for JSON data
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html")); // Ensure this path points to the correct location of index.html
+});
 // Basic Route
 app.get("/", (req, res) => {
   res.send("Hello World!");

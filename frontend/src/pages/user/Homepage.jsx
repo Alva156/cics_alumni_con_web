@@ -200,14 +200,15 @@ const Homepage = () => {
                       {news[currentNewsIndex].description.slice(0, 100)}...
                     </p>
   
-                    {/* Read More Link */}
-                    <a
-                      href="#"
-                      style={{ color: "#be142e" }}
-                      className="text-sm font-medium hover:underline"
-                    >
-                      Read More
-                    </a>
+                    {/* Read More Link for News */}
+<a
+  href="#"
+  style={{ color: "#be142e" }}
+  className="text-sm font-medium hover:underline"
+  onClick={() => navigate(`/user-news?id=${news[currentNewsIndex]._id}`)}
+>
+  Read More
+</a>
                   </div>
                 </div>
               )}
@@ -256,13 +257,15 @@ const Homepage = () => {
                     <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
                       {events[currentEventsIndex].description.slice(0, 100)}...
                     </p>
-                    <a
-                      href="#"
-                      style={{ color: "#be142e" }}
-                      className="text-sm font-medium hover:underline"
-                    >
-                      Read More
-                    </a>
+                    {/* Read More Link for Events */}
+<a
+  href="#"
+  style={{ color: "#be142e" }}
+  className="text-sm font-medium hover:underline"
+  onClick={() => navigate(`/user-events?id=${events[currentEventsIndex]._id}`)}
+>
+  Read More
+</a>
                   </div>
                 </div>
               )}

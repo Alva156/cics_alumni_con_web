@@ -123,7 +123,7 @@ const Homepage = () => {
             className="background-section"
             style={{
               position: "relative",
-              width: "60%",
+              width: "70%",
               marginTop: "30px",
             }}
           >
@@ -158,7 +158,7 @@ const Homepage = () => {
           {/* News and Events Carousel Section */}
           <div
             style={{
-              width: "30%",
+              width: "40%",
               display: "flex",
               flexDirection: "column",
               padding: "20px",
@@ -168,7 +168,7 @@ const Homepage = () => {
             <div
               className="news-carousel-container"
               data-aos="fade-up"
-              style={{ position: "relative", width: "110%", maxWidth: "430px" }}
+              style={{ position: "relative", width: "110%", maxWidth: "500px" }}
             >
               <h2 className="text-2xl font-medium mb-4">Latest News</h2>
               <div className="flex justify-center items-center">
@@ -222,7 +222,7 @@ const Homepage = () => {
               style={{
                 position: "relative",
                 width: "110%",
-                maxWidth: "430px",
+                maxWidth: "500px",
                 marginTop: "20px",
               }}
             >

@@ -3,6 +3,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
+const path = require("path");
 
 const authenticateJWT = require("./middleware/auth"); // Middleware for JWT auth
 
@@ -12,6 +13,14 @@ const port = process.env.PORT || 6001;
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
+
+// Serve static files from the frontend's dist directory
+app.use(express.static(path.join(__dirname, "frontend", "dist")));
+
+// Add this catch-all route
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+});
 
 const corsOptions = {
   origin: process.env.FRONTEND, // Frontend origin

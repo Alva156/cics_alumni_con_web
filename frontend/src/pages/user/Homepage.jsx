@@ -168,7 +168,7 @@ const Homepage = () => {
           <div
             className="news-carousel-container"
             data-aos="fade-up"
-            style={{ position: "relative", maxWidth: "500px" }} // Adjusted for maximum width
+            style={{ position: "relative", maxWidth: "600px" }} // Adjusted for maximum width
           >
             <h2 className="text-2xl font-medium mb-4">Latest News</h2>
             <div className="flex justify-center items-center">
@@ -232,7 +232,7 @@ const Homepage = () => {
             data-aos="fade-up"
             style={{
               position: "relative",
-              maxWidth: "500px",
+              maxWidth: "600px",
               marginTop: "20px",
             }}
           >

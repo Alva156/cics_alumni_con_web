@@ -5,6 +5,9 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: "dist", // Ensure the output directory matches your deployment settings
+    outDir: "dist",
+  },
+  server: {
+    historyApiFallback: true, // This ensures the client-side routing works correctly
   },
 });

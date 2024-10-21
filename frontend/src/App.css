@@ -444,3 +444,65 @@ screens */
     margin-bottom: var(--section-spacing); /* Add bottom margin */
   }
 }
+
+/* Fading effect for the news and events carousels */
+.carousel-container .fade {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.carousel-container .carousel-content {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Carousel buttons */
+.carousel-button {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.carousel-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Slide-in animation for news and events */
+.news-carousel-container,
+.events-carousel-container {
+  position: relative;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.news-carousel-container.enter,
+.events-carousel-container.enter {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+.news-carousel-container.active,
+.events-carousel-container.active {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.slide-out {
+  animation: slide-out 0.5s forwards;
+}
+
+
+
+@keyframes slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-20px);
+  }
+}

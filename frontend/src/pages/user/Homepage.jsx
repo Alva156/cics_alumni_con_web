@@ -410,7 +410,11 @@ const Homepage = () => {
                     currentImage === index ? "active" : ""
                   }`}
                 >
-                  <img src={image} alt={`carousel-${index}`} />
+                  <img src={image} alt={`carousel-${index}`} style={{
+            width: "100%",        // Make sure image covers the width of the container
+            height: "100%",       // Make sure image covers the height of the container
+            objectFit: "cover",   // Cover the container without stretching
+          }}/>
                   <div
                     className="absolute bottom-4 right-4 bg-black text-white text-sm p-2 rounded"
                     style={{
@@ -424,6 +428,7 @@ const Homepage = () => {
                       fontSize: "14px",
                       zIndex: "20",
                       textAlign: "right",
+                      objectFit: "fill",
                     }}
                   >
                     {credits[index]}{" "}

@@ -24,7 +24,6 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: 10px; /* Rounded corners for the video */
-  z-index: 1;
 }
 
 

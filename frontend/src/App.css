@@ -438,19 +438,3 @@ screens */
   overflow: hidden;
 }
 
-.news-carousel-container {
-  width: 100%; /* Full width for the news carousel */
-  display: flex;
-  flex-direction: column; /* Stack news items vertically */
-  justify-content: center;
-  padding: 20px;
-}
-
-.events-carousel-container {
-  width: 100%; /* Full width for the events carousel */
-  display: flex;
-  flex-direction: column; /* Stack events items vertically */
-  justify-content: center;
-  padding: 20px;
-}
-

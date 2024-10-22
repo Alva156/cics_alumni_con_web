@@ -183,7 +183,7 @@ function Alumni() {
                 {selectedAlumni.profileImage && (
                   <div className="mb-4">
                     <img
-                      src={selectedAlumni.profileImage}
+                      src={`${backendUrl}${selectedAlumni.profileImage}`}
                       alt="Alumni"
                       className="w-32 h-32"
                     />

@@ -47,13 +47,17 @@ function UserProfile() {
   const [initialAccountEmail, setInitialAccountEmail] = useState("");
   const [profileId, setProfileId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDeleteAttachmentModalOpen, setIsDeleteAttachmentModalOpen] = useState(false);
+  const [isDeleteAttachmentModalOpen, setIsDeleteAttachmentModalOpen] =
+    useState(false);
   const [sectionToDelete, setSectionToDelete] = useState(null);
   const [attachmentToDelete, setAttachmentToDelete] = useState(null);
 
-  const [hasUnsavedSecondaryChanges, setHasUnsavedSecondaryChanges] = useState(false);
-  const [hasUnsavedTertiaryChanges, setHasUnsavedTertiaryChanges] = useState(false);
-  const [hasUnsavedCompanyChanges, setHasUnsavedCompanyChanges] = useState(false);
+  const [hasUnsavedSecondaryChanges, setHasUnsavedSecondaryChanges] =
+    useState(false);
+  const [hasUnsavedTertiaryChanges, setHasUnsavedTertiaryChanges] =
+    useState(false);
+  const [hasUnsavedCompanyChanges, setHasUnsavedCompanyChanges] =
+    useState(false);
 
   const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState("");
@@ -76,29 +80,151 @@ function UserProfile() {
     },
   ]);
 
-  
-
   const collegePrograms = {
-    "UST-AMV College of Accountancy": ["Accountancy", "Accounting Information System", "Management Accounting"],
-    "College of Architecture": ["Architecture",],
-    "Faculty of Arts and Letters": ["Asian Studies", "Behavioral Science", "Communication", "Creative Writing", "Economics", "English Language Studies", "History", "Journalism", "Legal Management", "Literature", "Philosophy", "Political Science", "Sociology"],
+    "UST-AMV College of Accountancy": [
+      "Accountancy",
+      "Accounting Information System",
+      "Management Accounting",
+    ],
+    "College of Architecture": ["Architecture"],
+    "Faculty of Arts and Letters": [
+      "Asian Studies",
+      "Behavioral Science",
+      "Communication",
+      "Creative Writing",
+      "Economics",
+      "English Language Studies",
+      "History",
+      "Journalism",
+      "Legal Management",
+      "Literature",
+      "Philosophy",
+      "Political Science",
+      "Sociology",
+    ],
     "Faculty of Civil Law": ["Juris Doctor"],
-    "College of Commerce and Business Administration": ["Business Administration, major in Business Economics", "Business Administration, major in Financial Management", "Business Administration, major in Human Resource Management", "Business Administration, major in Marketing Management", "Entrepreneurship"],
-    "College of Education": ["Secondary Education Major in English", "Secondary Education Major in Filipino", "Secondary Education Major in Mathematics", "Secondary Education Major in Religious and Values Education", "Secondary Education Major in Science", "Secondary Education Major in Social Studies", "Early Childhood Education", "Elementary Education", "Special Needs Education, major in Early Childhood Education", "Food Technology", "Nutrition and Dietetics", "Bachelor of Library and Information Science"],
-    "Faculty of Engineering": ["Chemical Engineering", "Civil Engineering", "Electrical Engineering", "Electronics Engineering", "Industrial Engineering", "Mechanical Engineering"],
-    "College of Fine Arts and Design": ["Fine Arts, major in Advertising Arts", "Fine Arts, major in Industrial Design", "Interior Design", "Fine Arts, major in Painting"],
-    "College of Information and Computing Sciences": ["Computer Science", "Information Systems", "Information Technology"],
-    "Faculty of Medicine and Surgery": ["Basic Human Studies", "Doctor of Medicine", "Master in Clinical Audiology", "Master in Pain Management"],
-    "Conservatory of Music": ["Performance, major in Bassoon", "Performance, major in Choral Conducting", "Performance, major in Clarinet", "Composition", "Performance, major in Double Bass", "Performance, major in Flute", "Performance, major in French Horn", "Performance, major in Guitar", "Jazz", "Musicology", "Music Education", "Music Theatre", "Music Technology", "Performance, major in Oboe", "Performance, major in Orchestral Conducting", "Performance, major in Percussion", "Performance, major in Piano", "Performance, major in Saxophone", "Performance, major in Trombone", "Performance, major in Trumpet", "Performance, major in Tuba", "Performance, major in Viola", "Performance, major in Violin", "Performance, major in Violoncello", "Performance, major in Voice"],
+    "College of Commerce and Business Administration": [
+      "Business Administration, major in Business Economics",
+      "Business Administration, major in Financial Management",
+      "Business Administration, major in Human Resource Management",
+      "Business Administration, major in Marketing Management",
+      "Entrepreneurship",
+    ],
+    "College of Education": [
+      "Secondary Education Major in English",
+      "Secondary Education Major in Filipino",
+      "Secondary Education Major in Mathematics",
+      "Secondary Education Major in Religious and Values Education",
+      "Secondary Education Major in Science",
+      "Secondary Education Major in Social Studies",
+      "Early Childhood Education",
+      "Elementary Education",
+      "Special Needs Education, major in Early Childhood Education",
+      "Food Technology",
+      "Nutrition and Dietetics",
+      "Bachelor of Library and Information Science",
+    ],
+    "Faculty of Engineering": [
+      "Chemical Engineering",
+      "Civil Engineering",
+      "Electrical Engineering",
+      "Electronics Engineering",
+      "Industrial Engineering",
+      "Mechanical Engineering",
+    ],
+    "College of Fine Arts and Design": [
+      "Fine Arts, major in Advertising Arts",
+      "Fine Arts, major in Industrial Design",
+      "Interior Design",
+      "Fine Arts, major in Painting",
+    ],
+    "College of Information and Computing Sciences": [
+      "Computer Science",
+      "Information Systems",
+      "Information Technology",
+    ],
+    "Faculty of Medicine and Surgery": [
+      "Basic Human Studies",
+      "Doctor of Medicine",
+      "Master in Clinical Audiology",
+      "Master in Pain Management",
+    ],
+    "Conservatory of Music": [
+      "Performance, major in Bassoon",
+      "Performance, major in Choral Conducting",
+      "Performance, major in Clarinet",
+      "Composition",
+      "Performance, major in Double Bass",
+      "Performance, major in Flute",
+      "Performance, major in French Horn",
+      "Performance, major in Guitar",
+      "Jazz",
+      "Musicology",
+      "Music Education",
+      "Music Theatre",
+      "Music Technology",
+      "Performance, major in Oboe",
+      "Performance, major in Orchestral Conducting",
+      "Performance, major in Percussion",
+      "Performance, major in Piano",
+      "Performance, major in Saxophone",
+      "Performance, major in Trombone",
+      "Performance, major in Trumpet",
+      "Performance, major in Tuba",
+      "Performance, major in Viola",
+      "Performance, major in Violin",
+      "Performance, major in Violoncello",
+      "Performance, major in Voice",
+    ],
     "College of Nursing": ["Nursing"],
-    "Faculty of Pharmacy": ["Biochemistry", "Medical Technology", "Pharmacy", "Pharmacy, major in Clinical Pharmacy", "Doctor of Pharmacy"],
-    "Institute of Physical Education and Athletics": ["Fitness and Sports Management"],
-    "College of Rehabilitation Sciences": ["Occupational Therapy", "Physical Therapy", "Speech-Language Pathology", "Sports Science"],
-    "College of Science": ["Applied Mathematics, major in Actuarial Science", "Applied Physics, major in Instrumentation", "Biology, major in Environmental Biology", "Biology, major in Medical Biology", "Bachelor of Science major in Molecular Biology and Biotechnology", "Chemistry", "Data Science and Analytics", "Microbiology", "Psychology"],
-    "College of Tourism and Hospitality Management": ["Hospitality Management, major in Culinary Entrepreneurship", "Hospitality Management, major in Hospitality Leadership", "Tourism Management, major in Recreation and Leisure Management", "Tourism Management, major in Travel Operation and Service Management"],
-    "Faculty of Canon Law": ["Doctor of Canon Law", "Licentiate in Canon Law", "Bachelor of Canon Law"],
-    "Faculty of Philosophy": ["Doctor of Philosophy", "Licentiate in Philosophy", "Bachelor of Philosophy (Classical)"],
-    "Faculty of Sacred Theology": ["Doctor of Sacred Theology", "Licentiate in Sacred Theology", "Bachelor of Sacred Theology"]
+    "Faculty of Pharmacy": [
+      "Biochemistry",
+      "Medical Technology",
+      "Pharmacy",
+      "Pharmacy, major in Clinical Pharmacy",
+      "Doctor of Pharmacy",
+    ],
+    "Institute of Physical Education and Athletics": [
+      "Fitness and Sports Management",
+    ],
+    "College of Rehabilitation Sciences": [
+      "Occupational Therapy",
+      "Physical Therapy",
+      "Speech-Language Pathology",
+      "Sports Science",
+    ],
+    "College of Science": [
+      "Applied Mathematics, major in Actuarial Science",
+      "Applied Physics, major in Instrumentation",
+      "Biology, major in Environmental Biology",
+      "Biology, major in Medical Biology",
+      "Bachelor of Science major in Molecular Biology and Biotechnology",
+      "Chemistry",
+      "Data Science and Analytics",
+      "Microbiology",
+      "Psychology",
+    ],
+    "College of Tourism and Hospitality Management": [
+      "Hospitality Management, major in Culinary Entrepreneurship",
+      "Hospitality Management, major in Hospitality Leadership",
+      "Tourism Management, major in Recreation and Leisure Management",
+      "Tourism Management, major in Travel Operation and Service Management",
+    ],
+    "Faculty of Canon Law": [
+      "Doctor of Canon Law",
+      "Licentiate in Canon Law",
+      "Bachelor of Canon Law",
+    ],
+    "Faculty of Philosophy": [
+      "Doctor of Philosophy",
+      "Licentiate in Philosophy",
+      "Bachelor of Philosophy (Classical)",
+    ],
+    "Faculty of Sacred Theology": [
+      "Doctor of Sacred Theology",
+      "Licentiate in Sacred Theology",
+      "Bachelor of Sacred Theology",
+    ],
   };
 
   const handleCollegeChange = (e) => {
@@ -109,57 +235,56 @@ function UserProfile() {
     setCollegeProgram(""); // Ensure college program resets
   };
 
-// Initialize attachments state
-const [attachments, setAttachments] = useState([
-  { _id: 1, file: null, filename: "", filepath: "" }, // Start with ID 1
-]);
-const [maxId, setMaxId] = useState(1); // Track the maximum ID
-
-const addAttachment = () => {
-  const newId = maxId + 1; // Calculate the new ID based on the current max ID
-  setAttachments((prev) => [
-    ...prev,
-    { _id: newId, file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
+  // Initialize attachments state
+  const [attachments, setAttachments] = useState([
+    { _id: 1, file: null, filename: "", filepath: "" }, // Start with ID 1
   ]);
-  setMaxId(newId); // Update the max ID
-};
+  const [maxId, setMaxId] = useState(1); // Track the maximum ID
 
-const handleFileChange = (e, index) => {
-  const file = e.target.files[0]; // Get the new file from the input
-  if (file) {
-    console.log(`Selected input field: ${index + 1}`);
-    
-    setAttachments((prevAttachments) => {
-      const updatedAttachments = [...prevAttachments];
-      const existingAttachment = updatedAttachments[index];
+  const addAttachment = () => {
+    const newId = maxId + 1; // Calculate the new ID based on the current max ID
+    setAttachments((prev) => [
+      ...prev,
+      { _id: newId, file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
+    ]);
+    setMaxId(newId); // Update the max ID
+  };
 
-      // Log the entire existing attachment for debugging
-      console.log('Existing attachment:', existingAttachment);
+  const handleFileChange = (e, index) => {
+    const file = e.target.files[0]; // Get the new file from the input
+    if (file) {
+      console.log(`Selected input field: ${index + 1}`);
 
-      // Only update if the file is different
-      if (existingAttachment.file !== file) {
-        console.log(`Replacing file: ${existingAttachment.filename}`);
+      setAttachments((prevAttachments) => {
+        const updatedAttachments = [...prevAttachments];
+        const existingAttachment = updatedAttachments[index];
 
-        // Ensure the ID is retained from the existing attachment
-        updatedAttachments[index] = {
-          ...existingAttachment, // Keep all existing data
-          file,  // Set the new file object
-          filename: file.name,  // Update the filename
-        };
+        // Log the entire existing attachment for debugging
+        console.log("Existing attachment:", existingAttachment);
 
-        console.log(`Old ID: ${existingAttachment._id}`); // Log the old ID
-        console.log(`New file: ${file.name}`); // Log the new file name
-      } else {
-        console.log(`No change in file for input field: ${index + 1}`);
-      }
+        // Only update if the file is different
+        if (existingAttachment.file !== file) {
+          console.log(`Replacing file: ${existingAttachment.filename}`);
 
-      return updatedAttachments; // Return the updated attachments array
-    });
-  } else {
-    console.log(`No file selected for input field: ${index + 1}`);
-  }
-};
+          // Ensure the ID is retained from the existing attachment
+          updatedAttachments[index] = {
+            ...existingAttachment, // Keep all existing data
+            file, // Set the new file object
+            filename: file.name, // Update the filename
+          };
 
+          console.log(`Old ID: ${existingAttachment._id}`); // Log the old ID
+          console.log(`New file: ${file.name}`); // Log the new file name
+        } else {
+          console.log(`No change in file for input field: ${index + 1}`);
+        }
+
+        return updatedAttachments; // Return the updated attachments array
+      });
+    } else {
+      console.log(`No file selected for input field: ${index + 1}`);
+    }
+  };
 
   const openConfirmationModal = (message, onConfirm) => {
     setConfirmationMessage(message);
@@ -168,87 +293,87 @@ const handleFileChange = (e, index) => {
   };
 
   const addSecondaryEducationSection = async () => {
-  if (hasUnsavedSecondaryChanges) {
-    openConfirmationModal(
-      "You have unsaved changes in the secondary education section. Do you want to proceed?",
-      async () => {
-        await handleSubmit(); // Handle any async submission
-        setSecondaryEducationSections((prev) => [
-          ...prev,
-          { schoolName: "", yearStarted: "", yearEnded: "" },
-        ]);
-        setHasUnsavedSecondaryChanges(true); // Mark unsaved changes
-      }
-    );
-    return; // Stop execution until user confirms
-  }
+    if (hasUnsavedSecondaryChanges) {
+      openConfirmationModal(
+        "You have unsaved changes in the secondary education section. Do you want to proceed?",
+        async () => {
+          await handleSubmit(); // Handle any async submission
+          setSecondaryEducationSections((prev) => [
+            ...prev,
+            { schoolName: "", yearStarted: "", yearEnded: "" },
+          ]);
+          setHasUnsavedSecondaryChanges(true); // Mark unsaved changes
+        }
+      );
+      return; // Stop execution until user confirms
+    }
 
-  setSecondaryEducationSections((prev) => [
-    ...prev,
-    { schoolName: "", yearStarted: "", yearEnded: "" },
-  ]);
-  setHasUnsavedSecondaryChanges(true); // Set unsaved changes
-};
+    setSecondaryEducationSections((prev) => [
+      ...prev,
+      { schoolName: "", yearStarted: "", yearEnded: "" },
+    ]);
+    setHasUnsavedSecondaryChanges(true); // Set unsaved changes
+  };
 
-// Function to add a new tertiary education section
-const addTertiaryEducationSection = async () => {
-  if (hasUnsavedTertiaryChanges) {
-    openConfirmationModal(
-      "You have unsaved changes in the tertiary education section. Do you want to proceed?",
-      async () => {
-        await handleSubmit(); // Handle any async submission
-        setTertiaryEducationSections((prev) => [
-          ...prev,
-          { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
-        ]);
-        setHasUnsavedTertiaryChanges(true);
-      }
-    );
-    return;
-  }
+  // Function to add a new tertiary education section
+  const addTertiaryEducationSection = async () => {
+    if (hasUnsavedTertiaryChanges) {
+      openConfirmationModal(
+        "You have unsaved changes in the tertiary education section. Do you want to proceed?",
+        async () => {
+          await handleSubmit(); // Handle any async submission
+          setTertiaryEducationSections((prev) => [
+            ...prev,
+            { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
+          ]);
+          setHasUnsavedTertiaryChanges(true);
+        }
+      );
+      return;
+    }
 
-  setTertiaryEducationSections((prev) => [
-    ...prev,
-    { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
-  ]);
-  setHasUnsavedTertiaryChanges(true);
-};
+    setTertiaryEducationSections((prev) => [
+      ...prev,
+      { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
+    ]);
+    setHasUnsavedTertiaryChanges(true);
+  };
 
-// Function to add a new company section
-const addCompanySection = async () => {
-  if (hasUnsavedCompanyChanges) {
-    openConfirmationModal(
-      "You have unsaved changes in the company section. Do you want to proceed?",
-      async () => {
-        await handleSubmit();
-        setCompanySections((prev) => [
-          ...prev,
-          {
-            id: uniqueId(),
-            companyName: "",
-            position: "",
-            yearStarted: "",
-            yearEnded: "",
-          },
-        ]);
-        setHasUnsavedCompanyChanges(true);
-      }
-    );
-    return;
-  }
+  // Function to add a new company section
+  const addCompanySection = async () => {
+    if (hasUnsavedCompanyChanges) {
+      openConfirmationModal(
+        "You have unsaved changes in the company section. Do you want to proceed?",
+        async () => {
+          await handleSubmit();
+          setCompanySections((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              companyName: "",
+              position: "",
+              yearStarted: "",
+              yearEnded: "",
+            },
+          ]);
+          setHasUnsavedCompanyChanges(true);
+        }
+      );
+      return;
+    }
 
-  setCompanySections((prev) => [
-    ...prev,
-    {
-      id: uniqueId(),
-      companyName: "",
-      position: "",
-      yearStarted: "",
-      yearEnded: "",
-    },
-  ]);
-  setHasUnsavedCompanyChanges(true);
-};
+    setCompanySections((prev) => [
+      ...prev,
+      {
+        id: uniqueId(),
+        companyName: "",
+        position: "",
+        yearStarted: "",
+        yearEnded: "",
+      },
+    ]);
+    setHasUnsavedCompanyChanges(true);
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -288,7 +413,7 @@ const addCompanySection = async () => {
   const initiateDeleteAttachment = (attachmentId) => {
     setIsDeleteAttachmentModalOpen(true);
     setAttachmentToDelete({ attachmentId });
-};
+  };
 
   const handleDeleteSection = async () => {
     if (!sectionToDelete) {
@@ -352,8 +477,8 @@ const addCompanySection = async () => {
 
   const handleDeleteAttachment = async () => {
     if (!attachmentToDelete) {
-        console.log("No attachment to delete.");
-        return;
+      console.log("No attachment to delete.");
+      return;
     }
 
     const { attachmentId } = attachmentToDelete;
@@ -362,43 +487,44 @@ const addCompanySection = async () => {
     console.log("Attachment ID in function:", attachmentId);
 
     if (!profileId || !attachmentId) {
-        console.log("Profile ID or Attachment ID is missing.");
-        return;
+      console.log("Profile ID or Attachment ID is missing.");
+      return;
     }
 
     try {
-        // Call the DELETE endpoint to remove the attachment from the database
-        const deleteAttachmentResponse = await axios.delete(
-            `${backendUrl}/profile/${profileId}/${attachmentId}`,
-            { withCredentials: true }
+      // Call the DELETE endpoint to remove the attachment from the database
+      const deleteAttachmentResponse = await axios.delete(
+        `${backendUrl}/profile/${profileId}/${attachmentId}`,
+        { withCredentials: true }
+      );
+
+      console.log("Delete response:", deleteAttachmentResponse);
+
+      if (deleteAttachmentResponse.status === 200) {
+        // Update the frontend state after successful deletion
+        setAttachments((prevAttachments) =>
+          prevAttachments.filter(
+            (attachment) => attachment._id !== attachmentId
+          )
         );
 
-        console.log("Delete response:", deleteAttachmentResponse);
+        // Set validation message for successful deletion
+        setValidationMessage("Attachment deleted successfully!");
+        setShowValidationMessage(true); // Show the validation message
 
-        if (deleteAttachmentResponse.status === 200) {
-            // Update the frontend state after successful deletion
-            setAttachments((prevAttachments) =>
-                prevAttachments.filter((attachment) => attachment._id !== attachmentId)
-            );
-
-            // Set validation message for successful deletion
-            setValidationMessage("Attachment deleted successfully!");
-            setShowValidationMessage(true); // Show the validation message
-
-            setTimeout(() => {
-                setShowValidationMessage(false);
-            }, 3000);
-        }
+        setTimeout(() => {
+          setShowValidationMessage(false);
+        }, 3000);
+      }
     } catch (error) {
-        console.error("Error deleting attachment:", error);
-        alert(`Failed to delete attachment. Please try again.`);
+      console.error("Error deleting attachment:", error);
+      alert(`Failed to delete attachment. Please try again.`);
     }
 
     // Close the modal and clear the attachmentToDelete
     setIsDeleteAttachmentModalOpen(false);
     setAttachmentToDelete(null);
-};
-
+  };
 
   const handleSave = async (e) => {
     e.preventDefault(); // Prevent default form submission
@@ -465,13 +591,11 @@ const addCompanySection = async () => {
         console.log("Appending attachment ID:", attachment._id); // Add the ID or empty string
       }
     });
-    
-    
 
-  if (profileImage) {
-    formData.append("profileImage", profileImage);
-    console.log("Appending profile image:", profileImage.name); // Log profile image name
-}
+    if (profileImage) {
+      formData.append("profileImage", profileImage);
+      console.log("Appending profile image:", profileImage.name); // Log profile image name
+    }
 
     try {
       // Check if the profile exists
@@ -491,8 +615,6 @@ const addCompanySection = async () => {
         withCredentials: true,
       });
 
-      
-
       // Re-fetch the profile to ensure we have the latest data
       const updatedProfileResponse = await axios.get(
         `${backendUrl}/profile/userprofile`,
@@ -507,12 +629,14 @@ const addCompanySection = async () => {
           withCredentials: true,
         }
       );
-      
-      setAttachments(updatedProfile.data.attachments.map((attachment) => ({
-        _id: attachment._id, // The unique ID from the backend
-        filename: attachment.filename,
-        filepath: attachment.filepath,
-      })));
+
+      setAttachments(
+        updatedProfile.data.attachments.map((attachment) => ({
+          _id: attachment._id, // The unique ID from the backend
+          filename: attachment.filename,
+          filepath: attachment.filepath,
+        }))
+      );
 
       setProfileImage(updatedProfile.data.profileImage); // Update the image state with new image
       setImagePreview(null); // Clear the preview after upload
@@ -524,7 +648,6 @@ const addCompanySection = async () => {
       setTertiaryEducationSections(
         updatedProfileResponse.data.tertiaryEducation || []
       );
-    
 
       // Check if the email has changed
       if (accountEmail !== initialAccountEmail) {
@@ -557,7 +680,9 @@ const addCompanySection = async () => {
           "Error saving profile:",
           error.response ? error.response.data : error.message
         );
-        setErrorMessage("Error saving profile. Please try again.");
+        setErrorMessage(
+          error.response.data.msg || "Error saving profile. Please try again."
+        );
         setShowErrorMessage(true);
         setTimeout(() => setShowErrorMessage(false), 3000);
       }
@@ -825,31 +950,31 @@ const addCompanySection = async () => {
         </div>
       )}
 
-{isConfirmationModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-      <h2 className="text-2xl mb-4">Confirm Action</h2>
-      <p>{confirmationMessage}</p>
-      <div className="flex justify-end mt-4">
-        <button
-          className="btn btn-sm w-24 bg-red text-white mr-2"
-          onClick={() => {
-            if (confirmCallback) confirmCallback(); // Execute the stored callback
-            setIsConfirmationModalOpen(false); // Close the modal
-          }}
-        >
-          Yes
-        </button>
-        <button
-          className="btn btn-sm w-24 bg-gray-500 text-white"
-          onClick={() => setIsConfirmationModalOpen(false)} // Close modal on cancel
-        >
-          No
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      {isConfirmationModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Confirm Action</h2>
+            <p>{confirmationMessage}</p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={() => {
+                  if (confirmCallback) confirmCallback(); // Execute the stored callback
+                  setIsConfirmationModalOpen(false); // Close the modal
+                }}
+              >
+                Yes
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsConfirmationModalOpen(false)} // Close modal on cancel
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -874,29 +999,28 @@ const addCompanySection = async () => {
         </div>
       )}
 
-{isDeleteAttachmentModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-      <h2 className="text-2xl mb-4">Delete Attachment</h2>
-      <p>Are you sure you want to delete this attachment?</p>
-      <div className="flex justify-end mt-4">
-        <button
-          className="btn btn-sm w-24 bg-red text-white mr-2"
-          onClick={handleDeleteAttachment} // Call the delete function for attachments on confirm
-        >
-          Delete
-        </button>
-        <button
-          className="btn btn-sm w-24 bg-gray-500 text-white"
-          onClick={() => setIsDeleteAttachmentModalOpen(false)} // Close the modal on cancel
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+      {isDeleteAttachmentModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Attachment</h2>
+            <p>Are you sure you want to delete this attachment?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={handleDeleteAttachment} // Call the delete function for attachments on confirm
+              >
+                Delete
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteAttachmentModalOpen(false)} // Close the modal on cancel
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -928,22 +1052,22 @@ const addCompanySection = async () => {
                   <div className="text-xl py-4">Primary Information</div>
 
                   {imagePreview ? (
-            <img
-              src={imagePreview}
-              alt="Image Preview"
-              className="h-40 w-40 border-2 mb-4"
-            />
-          ) : (
-            <img
-              src={
-                profileImage === blankprofilepic
-                  ? blankprofilepic
-                  : `${backendUrl}${profileImage}`
-              }
-              alt="Profile"
-              className="h-40 w-40 border-2 mb-4"
-            />
-          )}
+                    <img
+                      src={imagePreview}
+                      alt="Image Preview"
+                      className="h-40 w-40 border-2 mb-4"
+                    />
+                  ) : (
+                    <img
+                      src={
+                        profileImage === blankprofilepic
+                          ? blankprofilepic
+                          : `${backendUrl}${profileImage}`
+                      }
+                      alt="Profile"
+                      className="h-40 w-40 border-2 mb-4"
+                    />
+                  )}
 
                   <div className="mt-4">
                     <label className="pt-4 pb-2 text-sm">Profile Picture</label>
@@ -1018,11 +1142,11 @@ const addCompanySection = async () => {
                         Choose
                       </option>
                       {/* Dynamically render colleges */}
-          {Object.keys(collegePrograms).map((collegeName) => (
-            <option key={collegeName} value={collegeName}>
-              {collegeName}
-            </option>
-          ))}
+                      {Object.keys(collegePrograms).map((collegeName) => (
+                        <option key={collegeName} value={collegeName}>
+                          {collegeName}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -1039,12 +1163,12 @@ const addCompanySection = async () => {
                         Choose
                       </option>
                       {/* Dynamically render college programs based on selected college */}
-          {college &&
-            collegePrograms[college].map((program) => (
-              <option key={program} value={program}>
-                {program}
-              </option>
-            ))}
+                      {college &&
+                        collegePrograms[college].map((program) => (
+                          <option key={program} value={program}>
+                            {program}
+                          </option>
+                        ))}
                     </select>
                   </div>
 
@@ -1058,7 +1182,6 @@ const addCompanySection = async () => {
                       name="specialization"
                       value={specialization}
                     />
-                      
                   </div>
 
                   <div className="py-1">
@@ -1356,18 +1479,25 @@ const addCompanySection = async () => {
                 {attachments.map((attachment, index) => (
                   <div key={attachment.id}>
                     <div className="flex flex-row justify-between items-center w-full">
-                      <div className="left"><label className="pt-4 pb-2 text-sm">
-                      Attachment {index + 1}{" "}
-                      {/* Change to index + 1 for better user experience */}
-                    </label>
-                    <div className="text-sm text-gray-600">
-                      {attachment.filename || "No file uploaded."}
-                    </div></div>
+                      <div className="left">
+                        <label className="pt-4 pb-2 text-sm">
+                          Attachment {index + 1}{" "}
+                          {/* Change to index + 1 for better user experience */}
+                        </label>
+                        <div className="text-sm text-gray-600">
+                          {attachment.filename || "No file uploaded."}
+                        </div>
+                      </div>
                       <div className="right">
-                        <button className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2" onClick={() => initiateDeleteAttachment(attachment._id)}></button>
+                        <button
+                          className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2"
+                          onClick={() =>
+                            initiateDeleteAttachment(attachment._id)
+                          }
+                        ></button>
                       </div>
                     </div>
-                    
+
                     <input
                       type="file"
                       name={`attachment-${index}`}

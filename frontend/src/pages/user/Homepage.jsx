@@ -57,15 +57,16 @@ const Homepage = () => {
   }, [autoSlideNews, news]);
 
   useEffect(() => {
-    // Automatically slide events every 4 seconds
-    const autoSlideEvents = setInterval(() => {
+    // Automatically slide events every 3 seconds
+    const autoSlideInterval = setInterval(() => {
       if (autoSlideEvents) {
         nextEvent();
       }
     }, 3000); // 3 seconds
-
-    return () => clearInterval(autoSlideEvents); // Cleanup on unmount
+  
+    return () => clearInterval(autoSlideInterval); // Cleanup on unmount
   }, [autoSlideEvents, events]);
+  
 
   const fetchNews = async () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;

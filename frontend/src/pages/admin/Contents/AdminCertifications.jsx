@@ -304,7 +304,7 @@ function AdminCertifications() {
             <img
               src={`${backendUrl}${certifications.image}`}
               alt={certifications.name}
-              className="w-full h-48 object-cover rounded-t-lg mb-4"
+              className="w-full h-48 object-cover rounded-t-lg mb-4 mt-4"
             />
             <div className="absolute top-2 right-2 flex space-x-2">
               <div
@@ -320,6 +320,7 @@ function AdminCertifications() {
                 </span>
               </div>
               <div
+                style={{ marginRight: "8px" }}
                 className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
                 onClick={(e) => {
                   e.stopPropagation();

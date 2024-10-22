@@ -292,7 +292,7 @@ function AdminCompanies() {
             <img
               src={`${backendUrl}${company.image}`}
               alt={company.name}
-              className="w-full h-48 object-cover rounded-t-lg mb-4"
+              className="w-full h-48 object-cover rounded-t-lg mb-4 mt-4"
             />
             <div className="absolute top-2 right-2 flex space-x-2">
               <div
@@ -308,13 +308,14 @@ function AdminCompanies() {
                 </span>
               </div>
               <div
+                style={{ marginRight: "8px" }}
                 className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
                 onClick={(e) => {
                   e.stopPropagation();
                   openEditModal(company);
                 }}
               >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1 ">
                   Edit
                 </span>
               </div>

@@ -1,33 +1,7 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import AOS from "aos";
-import "aos/dist/aos.css";
-import ustbg from "../../assets/adminhomepage.mp4";
-import "../../App.css";
-=======
 import React, { useState, useEffect } from "react";
->>>>>>> parent of 0740d27 (admin homepage)
 import homepage1 from "../../assets/homepage1.jpg";
-import homepage2 from "../../assets/homepage2.png";
+import homepage2 from "../../assets/homepage2.jpg";
 
-<<<<<<< HEAD
-const AdminHomepage = () => {
-  const [currentPage, setCurrentPage] = useState(0);
-  const [fade, setFade] = useState(false);
-  const [currentImage, setCurrentImage] = useState(0);
-
-
-  const videoRef = useRef(null);
-  const navigate = useNavigate();
-
-
-  const images = [homepage1, homepage2, homepage3];
-  const credits = [
-    "Photo Courtesy of ICS",
-    "Photo Courtesy of ICS",
-    "Photo Courtesy of CSS",
-=======
 function AdminHomepage() {
   const images = [
     { src: homepage1, title: "", text: "Welcome to CICS Alumni Connect!" },
@@ -41,7 +15,6 @@ function AdminHomepage() {
       title: "Vision Statement",
       text: "To be the leading platform that bridges the gap between past and present CICS students, cultivating a global network of professionals who are committed to lifelong learning, collaboration, and the advancement of their respective fields. We envision a future where every CICS alumnus feels connected, valued, and inspired to make a difference.",
     },
->>>>>>> parent of 0740d27 (admin homepage)
   ];
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -77,73 +50,6 @@ function AdminHomepage() {
     return () => clearInterval(interval);
   }, []);
 
-<<<<<<< HEAD
- 
-  
-
-  const fetchNews = async () => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    try {
-      const response = await axios.get(`${backendUrl}/news/view`, {
-        withCredentials: true,
-      });
-      setNews(response.data);
-    } catch (error) {
-      console.error("Error fetching news:", error);
-    }
-  };
-
-  const fetchEvents = async () => {
-    const backendUrl = import.meta.env.VITE_BACKEND_URL;
-    try {
-      const response = await axios.get(`${backendUrl}/events/view`, {
-        withCredentials: true,
-      });
-      setEvents(response.data);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-    }
-  };
-
-  const nextPage = () => {
-    setFade(true);
-    setTimeout(() => {
-      setCurrentPage((prevPage) => (prevPage === 1 ? 0 : prevPage + 1));
-      setFade(false);
-    }, 500);
-  };
-
-  const prevPage = () => {
-    setFade(true);
-    setTimeout(() => {
-      setCurrentPage((prevPage) => (prevPage === 0 ? 1 : prevPage - 1));
-      setFade(false);
-    }, 500);
-  };
-
-  const nextImage = () => {
-    setCurrentImage((prevImage) =>
-      prevImage === images.length - 1 ? 0 : prevImage + 1
-    );
-  };
-
-  const prevImage = () => {
-    setCurrentImage((prevImage) =>
-      prevImage === 0 ? images.length - 1 : prevImage - 1
-    );
-  };
-
-
-
-
-
-  const handleNavigation = (path) => {
-    navigate(path);
-    window.scrollTo(0, 0); // Scroll to the top of the page
-  };
-
-=======
->>>>>>> parent of 0740d27 (admin homepage)
   return (
     <div>
       <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">

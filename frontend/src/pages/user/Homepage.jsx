@@ -186,7 +186,7 @@ const Homepage = () => {
                       <p className="text-sm text-gray-600 mb-4 overflow-hidden" style={{ maxHeight: "40px", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {news[currentNewsIndex].description.slice(0, 100)}...
                       </p>
-                      <a href="#" style={{ color: "#be142e" }} className="text-sm font-medium hover:underline" onClick={() => navigate(`/user-news?id=${news[currentNewsIndex]._id}`)}>
+                      <a href="#" style={{ color: "#be142e" }} className="text-sm font-medium hover:underline" onClick={() => handleNavigation(`/user-news?id=${news[currentNewsIndex]._id}`)}>
                         Read More
                       </a>
                     </div>
@@ -228,7 +228,7 @@ const Homepage = () => {
                       <p className="text-sm text-gray-600 mb-4 overflow-hidden" style={{ maxHeight: "40px", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {events[currentEventsIndex].description.slice(0, 100)}...
                       </p>
-                      <a href="#" style={{ color: "#be142e" }} className="text-sm font-medium hover:underline" onClick={() => navigate(`/user-events?id=${events[currentEventsIndex]._id}`)}>
+                      <a href="#" style={{ color: "#be142e" }} className="text-sm font-medium hover:underline" onClick={() => handleNavigation(`/user-events?id=${events[currentEventsIndex]._id}`)}>
                         Read More
                       </a>
                     </div>

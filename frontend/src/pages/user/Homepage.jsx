@@ -180,7 +180,7 @@ const Homepage = () => {
                     <div className="news-content">
                       <div className="carousel-news-title">{news[currentNewsIndex].name}</div>
                       <p className="news-description">
-                        {news[currentNewsIndex].description.slice(0, 45)}...
+                        {news[currentNewsIndex].description.slice(0, 30)}...
                       </p>
                       <a href="#" className="read-more-link" onClick={() => handleNavigation(`/user-news?id=${news[currentNewsIndex]._id}`)}>
                         Read More
@@ -212,7 +212,7 @@ const Homepage = () => {
                     <div className="events-content">
                       <div className="carousel-events-title">{events[currentEventsIndex].name}</div>
                       <p className="events-description">
-                        {events[currentEventsIndex].description.slice(0, 45)}...
+                        {events[currentEventsIndex].description.slice(0, 30)}...
                       </p>
                       <a href="#" className="read-more-link" onClick={() => handleNavigation(`/user-events?id=${events[currentEventsIndex]._id}`)}>
                         Read More

@@ -21,6 +21,7 @@ const Homepage = () => {
   const videoRef = useRef(null);
   const navigate = useNavigate();
   const newsCarouselRef = useRef(null); // Reference for news carousel
+  const eventsCarouselRef = useRef(null); // Reference for events carousel
 
   const images = [homepage1, homepage2, homepage3];
   const credits = [
@@ -43,13 +44,22 @@ const Homepage = () => {
   }, []);
 
   useEffect(() => {
-    // Automatically slide news every 10 seconds
+    // Automatically slide news every 8 seconds
     const autoSlide = setInterval(() => {
       nextNews();
     }, 8000); // 8 seconds
 
     return () => clearInterval(autoSlide); // Cleanup on unmount
   }, [news]);
+
+  useEffect(() => {
+    // Automatically slide events every 8 seconds
+    const autoSlideEvents = setInterval(() => {
+      nextEvent();
+    }, 8000); // 8 seconds
+
+    return () => clearInterval(autoSlideEvents); // Cleanup on unmount
+  }, [events]);
 
   const fetchNews = async () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -106,7 +116,7 @@ const Homepage = () => {
   const nextNews = () => {
     setCurrentNewsIndex((prevIndex) => {
       const nextIndex = prevIndex === news.length - 1 ? 0 : prevIndex + 1;
-      slideTo(nextIndex);
+      slideTo(nextIndex, newsCarouselRef);
       return nextIndex;
     });
   };
@@ -114,13 +124,29 @@ const Homepage = () => {
   const prevNews = () => {
     setCurrentNewsIndex((prevIndex) => {
       const prevIndexValue = prevIndex === 0 ? news.length - 1 : prevIndex - 1;
-      slideTo(prevIndexValue);
+      slideTo(prevIndexValue, newsCarouselRef);
       return prevIndexValue;
     });
   };
 
-  const slideTo = (index) => {
-    const carousel = newsCarouselRef.current;
+  const nextEvent = () => {
+    setCurrentEventsIndex((prevIndex) => {
+      const nextIndex = prevIndex === events.length - 1 ? 0 : prevIndex + 1;
+      slideTo(nextIndex, eventsCarouselRef);
+      return nextIndex;
+    });
+  };
+
+  const prevEvent = () => {
+    setCurrentEventsIndex((prevIndex) => {
+      const prevIndexValue = prevIndex === 0 ? events.length - 1 : prevIndex - 1;
+      slideTo(prevIndexValue, eventsCarouselRef);
+      return prevIndexValue;
+    });
+  };
+
+  const slideTo = (index, carouselRef) => {
+    const carousel = carouselRef.current;
     const scrollAmount = index * carousel.clientWidth; // Slide by one card
     carousel.scrollTo({
       left: scrollAmount,
@@ -128,30 +154,11 @@ const Homepage = () => {
     });
   };
 
-  const nextEvent = () => {
-    setFade(true);
-    setTimeout(() => {
-      setCurrentEventsIndex((prevIndex) =>
-        prevIndex === events.length - 1 ? 0 : prevIndex + 1
-      );
-      setFade(false);
-    }, 500); // Transition timing
-  };
-
-  const prevEvent = () => {
-    setFade(true);
-    setTimeout(() => {
-      setCurrentEventsIndex((prevIndex) =>
-        prevIndex === 0 ? events.length - 1 : prevIndex - 1
-      );
-      setFade(false);
-    }, 500); // Transition timing
-  };
-
   const handleNavigation = (path) => {
     navigate(path);
     window.scrollTo(0, 0); // Scroll to the top of the page
   };
+
 
 
   return (
@@ -198,7 +205,7 @@ const Homepage = () => {
                       <p className="news-description">
                         {item.description.slice(0, 30)}...
                       </p>
-                      <a href="#" className="read-more-link">
+                      <a href="#" className="read-more-link" onClick={() => handleNavigation(`/user-news?id=${news[currentNewsIndex]._id}`)}>
                         Read More
                       </a>
                     </div>
@@ -215,36 +222,43 @@ const Homepage = () => {
             </button>
             </div>
   
-            {/* Events Carousel Section */}
+            {/* Events Carousel */}
             <div className="events-carousel-container" data-aos="fade-up">
               <h2 className="events-title">
-                <Link to="/user-events" className="events-link">
+                <Link to="/events-news" className="events-link">
                   Upcoming Events
                 </Link>
               </h2>
   
               <div className="carousel-wrapper">
-                {events.length > 0 && (
-                  <div className="events-item">
+              <ul className="carousel-events" ref={eventsCarouselRef}>
+                {events.map((item, index) => (
+                  <li className="item" key={index}>
                     <img
-                      src={`${import.meta.env.VITE_BACKEND_URL}${events[currentEventsIndex].image}`}
-                      alt={events[currentEventsIndex].name}
+                      src={`${import.meta.env.VITE_BACKEND_URL}${item.image}`}
+                      alt={item.name}
                       className="events-image"
                     />
                     <div className="events-content">
-                      <div className="carousel-events-title">{events[currentEventsIndex].name}</div>
+                      <div className="carousel-events-title">{item.name}</div>
                       <p className="events-description">
-                        {events[currentEventsIndex].description.slice(0, 30)}...
+                        {item.description.slice(0, 30)}...
                       </p>
                       <a href="#" className="read-more-link" onClick={() => handleNavigation(`/user-events?id=${events[currentEventsIndex]._id}`)}>
                         Read More
                       </a>
                     </div>
-                  </div>
-                )}
-              </div>
-              <button className="carousel-button prev" onClick={prevEvent}>❮</button>
-              <button className="carousel-button next" onClick={nextEvent}>❯</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <button className="carousel-button prev" onClick={prevEvent}>
+              ❮
+            </button>
+            <button className="carousel-button next" onClick={nextEvent}>
+              ❯
+            </button>
             </div>
           </div>
         </div>

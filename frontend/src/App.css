@@ -179,6 +179,33 @@ body {
   }
 }
 
+.carousel-card {
+  max-width: 100%; /* Ensure cards do not exceed container width */
+}
+
+.news-title,
+.events-title {
+  max-width: 100%; /* Limit title width */
+  overflow: hidden; /* Prevent overflow */
+  white-space: nowrap; /* Prevent text wrapping */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+}
+
+.carousel-news-title,
+.carousel-events-title {
+  max-width: 95%; /* Limit title width */
+  overflow: hidden; /* Prevent overflow */
+  white-space: nowrap; /* Prevent text wrapping */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+}
+
+.news-description,
+.events-description {
+  max-width: 95%; /* Limit description width */
+  overflow: hidden; /* Prevent overflow */
+  white-space: nowrap; /* Prevent text wrapping */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+}
 
 
 

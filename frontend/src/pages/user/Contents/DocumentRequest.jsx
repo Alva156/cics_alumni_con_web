@@ -53,7 +53,9 @@ function Documents() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-2xl font-medium text-gray-700 mb-6">Document Request Steps</h1>
+      <h1 className="text-2xl font-medium text-gray-700 mb-6">
+        Document Request Steps
+      </h1>
 
       <div className="mb-4 relative">
         <input
@@ -112,7 +114,8 @@ function Documents() {
             </p>
             <a
               href="#"
-              className="text-blue-500 text-sm font-medium hover:underline"
+              style={{ color: "#be142e" }}
+              className="text-sm font-medium hover:underline"
             >
               Read More
             </a>
@@ -136,7 +139,9 @@ function Documents() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">{selectedDocument.name}</div>
+            <div className="text-2xl font-medium mb-2">
+              {selectedDocument.name}
+            </div>
             <div className="text-md mb-2">{selectedDocument.address}</div>
             {/* Conditional rendering for images and PDFs */}
             {selectedDocument.image.endsWith(".pdf") ? (

@@ -46,23 +46,23 @@ const Homepage = () => {
   }, []);
 
   useEffect(() => {
-    // Automatically slide news every 5 seconds
+    // Automatically slide news every 3 seconds
     const autoSlide = setInterval(() => {
       if (autoSlideNews) {
         nextNews();
       }
-    }, 5000); // 5 seconds
+    }, 3000); // 3 seconds
 
     return () => clearInterval(autoSlide); // Cleanup on unmount
   }, [autoSlideNews, news]);
 
   useEffect(() => {
-    // Automatically slide events every 5 seconds
+    // Automatically slide events every 4 seconds
     const autoSlideEvents = setInterval(() => {
       if (autoSlideEvents) {
         nextEvent();
       }
-    }, 5000); // 5 seconds
+    }, 3000); // 3 seconds
 
     return () => clearInterval(autoSlideEvents); // Cleanup on unmount
   }, [autoSlideEvents, events]);

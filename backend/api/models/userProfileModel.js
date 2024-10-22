@@ -66,17 +66,18 @@ const userProfileSchema = new Schema({
     },
     attachments: [
         {
-          filename: {
-            type: String, // The original file name
-            required: true,
-            trim: true,
-          },
-          filepath: {
-            type: String, // The path where the file is stored
-            required: true,
-          },
+            _id: { type: String, required: true },
+            filename: {
+                type: String, // The original file name
+                required: true,
+                trim: true,
+            },
+            filepath: {
+                type: String, // The path where the file is stored
+                required: true,
+            },
         },
-      ],
+    ],
     secondaryEducation: [
         {
             schoolName: String,

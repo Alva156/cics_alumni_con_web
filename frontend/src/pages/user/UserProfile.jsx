@@ -109,55 +109,52 @@ function UserProfile() {
 
 // Initialize attachments state
 const [attachments, setAttachments] = useState([
-  { id: uniqueId(), file: null, filename: "", filepath: "" },
+  { _id: uniqueId(), file: null, filename: "", filepath: "" },
 ]);
 
-  // Update attachments state after file upload
-  const handleFileChange = (e, index) => {
-    const file = e.target.files[0]; // Get the new file from the input
-    if (file) {
-      console.log(`Selected input field: ${index + 1}`);
-      
-      setAttachments((prevAttachments) => {
-        const updatedAttachments = [...prevAttachments];
-        const existingAttachment = updatedAttachments[index];
-  
-        // Log the entire existing attachment for debugging
-        console.log('Existing attachment:', existingAttachment);
-  
-        // Only update if the file is different
-        if (existingAttachment.file !== file) {
-          console.log(`Replacing file: ${existingAttachment.filename}`);
-          
-          // Ensure the ID is retained from the existing attachment
-          updatedAttachments[index] = {
-            ...existingAttachment, // Keep all existing data
-            file,  // Set the new file object
-            filename: file.name,  // Update the filename
-            id: existingAttachment.id, // Retain the old ID
-          };
-  
-          console.log(`Old ID: ${existingAttachment.id}`); // Log the old ID
-          console.log(`New file: ${file.name}`); // Log the new file name
-        } else {
-          console.log(`No change in file for input field: ${index + 1}`);
-        }
-  
-        return updatedAttachments; // Return the updated attachments array
-      });
-    } else {
-      console.log(`No file selected for input field: ${index + 1}`);
-    }
-  };
-  
-  // Function to add a new attachment field
-  const addAttachment = () => {
-    setAttachments((prev) => [
-      ...prev,
-      { id: uniqueId(), file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
-    ]);
-  };
+const handleFileChange = (e, index) => {
+  const file = e.target.files[0]; // Get the new file from the input
+  if (file) {
+    console.log(`Selected input field: ${index + 1}`);
+    
+    setAttachments((prevAttachments) => {
+      const updatedAttachments = [...prevAttachments];
+      const existingAttachment = updatedAttachments[index];
 
+      // Log the entire existing attachment for debugging
+      console.log('Existing attachment:', existingAttachment);
+
+      // Only update if the file is different
+      if (existingAttachment.file !== file) {
+        console.log(`Replacing file: ${existingAttachment.filename}`);
+
+        // Ensure the ID is retained from the existing attachment
+        updatedAttachments[index] = {
+          ...existingAttachment, // Keep all existing data
+          file,  // Set the new file object
+          filename: file.name,  // Update the filename
+        };
+
+        console.log(`Old ID: ${existingAttachment._id}`); // Log the old ID
+        console.log(`New file: ${file.name}`); // Log the new file name
+      } else {
+        console.log(`No change in file for input field: ${index + 1}`);
+      }
+
+      return updatedAttachments; // Return the updated attachments array
+    });
+  } else {
+    console.log(`No file selected for input field: ${index + 1}`);
+  }
+};
+
+// Function to add a new attachment field
+const addAttachment = () => {
+  setAttachments((prev) => [
+    ...prev,
+    { _id: uniqueId(), file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
+  ]);
+};
 
   const openConfirmationModal = (message, onConfirm) => {
     setConfirmationMessage(message);
@@ -401,10 +398,11 @@ const addCompanySection = async () => {
 
     const formData = new FormData();
 
-    attachments.forEach((attachment, index) => {
+    attachments.forEach((attachment) => {
       if (attachment.file) {
         formData.append("attachments", attachment.file);
-        formData.append("attachmentIds", attachment.id || ""); // Add the ID or empty string
+        formData.append("attachmentIds", attachment._id || "");
+        console.log("Appending attachment ID:", attachment._id); // Add the ID or empty string
       }
     });
     
@@ -421,17 +419,19 @@ const addCompanySection = async () => {
         withCredentials: true,
       });
 
-      // Update the existing profile
-      await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
-        withCredentials: true,
-      });
-
       await axios.put(`${backendUrl}/profile/updateprofile`, formData, {
         withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+
+      // Update the existing profile
+      await axios.put(`${backendUrl}/profile/updateprofile`, userData, {
+        withCredentials: true,
+      });
+
+      
 
       // Re-fetch the profile to ensure we have the latest data
       const updatedProfileResponse = await axios.get(
@@ -449,10 +449,11 @@ const addCompanySection = async () => {
       );
       
       setAttachments(updatedProfile.data.attachments.map((attachment) => ({
-        id: attachment.id, // The unique ID from the backend
+        _id: attachment._id, // The unique ID from the backend
         filename: attachment.filename,
         filepath: attachment.filepath,
       })));
+
       setProfileImage(updatedProfile.data.profileImage); // Update the image state with new image
       setImagePreview(null); // Clear the preview after upload
       // Update state with the newly fetched data

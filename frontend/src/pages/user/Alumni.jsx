@@ -160,7 +160,10 @@ function Alumni() {
               &times;
             </button>
 
-            <div role="tablist" className="tabs tabs-lifted mb-6">
+            <div
+              role="tablist"
+              className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg"
+            >
               <input
                 type="radio"
                 name="my_tabs_2"

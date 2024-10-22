@@ -117,6 +117,10 @@ body {
   text-decoration: none;
 }
 
+.read-more-link:hover {
+  text-decoration: underline; /* Add underline on hover */
+}
+
 .carousel-button {
   position: absolute;
   top: 50%;
@@ -143,6 +147,12 @@ body {
   font-size: 24px; /* Change to your desired font size */
   font-weight: bold; /* Change weight as needed */
   margin: 20px 0; /* Add margin for spacing */
+}
+
+/* Underline effect on hover */
+.news-title:hover, .events-title:hover {
+  text-decoration: underline; /* Add underline on hover */
+  color: #be142e;
 }
 
 .carousel-news-title, .carousel-events-title {

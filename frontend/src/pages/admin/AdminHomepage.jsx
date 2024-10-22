@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import ustbg from "../../assets/AdminHomepage.mp4";
+import ustbg from "../../assets/adminhomepage.mp4";
 import "../../App.css";
 import homepage1 from "../../assets/homepage1.jpg";
 import homepage2 from "../../assets/homepage2.jpg";
@@ -16,14 +16,11 @@ const AdminHomepage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [fade, setFade] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
-  const [news, setNews] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
-  const [currentEventsIndex, setCurrentEventsIndex] = useState(0);
+
+
   const videoRef = useRef(null);
   const navigate = useNavigate();
-  const newsCarouselRef = useRef(null); // Reference for news carousel
-  const eventsCarouselRef = useRef(null); // Reference for events carousel
+
 
   const images = [homepage1, homepage2, homepage3];
   const credits = [
@@ -100,65 +97,9 @@ const AdminHomepage = () => {
     );
   };
 
-  const nextNews = () => {
-    setCurrentNewsIndex((prevIndex) => {
-      const nextIndex = prevIndex === news.length - 1 ? 0 : prevIndex + 1;
-      slideTo(nextIndex, newsCarouselRef);
-      return nextIndex;
-    });
-    handleManualSlide('news');
-  };
 
-  const prevNews = () => {
-    setCurrentNewsIndex((prevIndex) => {
-      const prevIndexValue = prevIndex === 0 ? news.length - 1 : prevIndex - 1;
-      slideTo(prevIndexValue, newsCarouselRef);
-      return prevIndexValue;
-    });
-    handleManualSlide('news');
-  };
 
-  const nextEvent = () => {
-    setCurrentEventsIndex((prevIndex) => {
-      const nextIndex = prevIndex === events.length - 1 ? 0 : prevIndex + 1;
-      slideTo(nextIndex, eventsCarouselRef);
-      return nextIndex;
-    });
-    handleManualSlide('events');
-  };
 
-  const prevEvent = () => {
-    setCurrentEventsIndex((prevIndex) => {
-      const prevIndexValue = prevIndex === 0 ? events.length - 1 : prevIndex - 1;
-      slideTo(prevIndexValue, eventsCarouselRef);
-      return prevIndexValue;
-    });
-    handleManualSlide('events');
-  };
-
-  const slideTo = (index, carouselRef) => {
-    const carousel = carouselRef.current;
-    const scrollAmount = index * carousel.clientWidth; // Slide by one card
-    carousel.scrollTo({
-      left: scrollAmount,
-      behavior: "smooth",
-    });
-  };
-
-  const handleManualSlide = (type) => {
-    // Stop auto sliding
-    if (type === 'news') {
-      setAutoSlideNews(false);
-      setTimeout(() => {
-        setAutoSlideNews(true); // Resume auto sliding
-      }, 10000); // 10 seconds delay
-    } else if (type === 'events') {
-      setAutoSlideEvents(false);
-      setTimeout(() => {
-        setAutoSlideEvents(true); // Resume auto sliding
-      }, 10000); // 10 seconds delay
-    }
-  };
 
   const handleNavigation = (path) => {
     navigate(path);

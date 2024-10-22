@@ -47,7 +47,9 @@ function UserProfile() {
   const [initialAccountEmail, setInitialAccountEmail] = useState("");
   const [profileId, setProfileId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteAttachmentModalOpen, setIsDeleteAttachmentModalOpen] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState(null);
+  const [attachmentToDelete, setAttachmentToDelete] = useState(null);
 
   const [hasUnsavedSecondaryChanges, setHasUnsavedSecondaryChanges] = useState(false);
   const [hasUnsavedTertiaryChanges, setHasUnsavedTertiaryChanges] = useState(false);
@@ -109,8 +111,18 @@ function UserProfile() {
 
 // Initialize attachments state
 const [attachments, setAttachments] = useState([
-  { _id: 1, file: null, filename: "", filepath: "" },
+  { _id: 1, file: null, filename: "", filepath: "" }, // Start with ID 1
 ]);
+const [maxId, setMaxId] = useState(1); // Track the maximum ID
+
+const addAttachment = () => {
+  const newId = maxId + 1; // Calculate the new ID based on the current max ID
+  setAttachments((prev) => [
+    ...prev,
+    { _id: newId, file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
+  ]);
+  setMaxId(newId); // Update the max ID
+};
 
 const handleFileChange = (e, index) => {
   const file = e.target.files[0]; // Get the new file from the input
@@ -148,16 +160,6 @@ const handleFileChange = (e, index) => {
   }
 };
 
-// Function to add a new attachment field
-const [nextId, setNextId] = useState(2); // Start from 2 since 1 is already used
-
-  const addAttachment = () => {
-    setAttachments((prev) => [
-      ...prev,
-      { _id: nextId, file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
-    ]);
-    setNextId((prevId) => prevId + 1); // Increment ID for next attachment
-  };
 
   const openConfirmationModal = (message, onConfirm) => {
     setConfirmationMessage(message);
@@ -283,6 +285,11 @@ const addCompanySection = async () => {
     setSectionToDelete({ sectionType, sectionId }); // Store the section type and ID
   };
 
+  const initiateDeleteAttachment = (attachmentId) => {
+    setIsDeleteAttachmentModalOpen(true);
+    setAttachmentToDelete({ attachmentId });
+};
+
   const handleDeleteSection = async () => {
     if (!sectionToDelete) {
       return;
@@ -342,6 +349,56 @@ const addCompanySection = async () => {
     setIsDeleteModalOpen(false);
     setSectionToDelete(null);
   };
+
+  const handleDeleteAttachment = async () => {
+    if (!attachmentToDelete) {
+        console.log("No attachment to delete.");
+        return;
+    }
+
+    const { attachmentId } = attachmentToDelete;
+
+    console.log("Delete button clicked for attachment");
+    console.log("Attachment ID in function:", attachmentId);
+
+    if (!profileId || !attachmentId) {
+        console.log("Profile ID or Attachment ID is missing.");
+        return;
+    }
+
+    try {
+        // Call the DELETE endpoint to remove the attachment from the database
+        const deleteAttachmentResponse = await axios.delete(
+            `${backendUrl}/profile/${profileId}/${attachmentId}`,
+            { withCredentials: true }
+        );
+
+        console.log("Delete response:", deleteAttachmentResponse);
+
+        if (deleteAttachmentResponse.status === 200) {
+            // Update the frontend state after successful deletion
+            setAttachments((prevAttachments) =>
+                prevAttachments.filter((attachment) => attachment._id !== attachmentId)
+            );
+
+            // Set validation message for successful deletion
+            setValidationMessage("Attachment deleted successfully!");
+            setShowValidationMessage(true); // Show the validation message
+
+            setTimeout(() => {
+                setShowValidationMessage(false);
+            }, 3000);
+        }
+    } catch (error) {
+        console.error("Error deleting attachment:", error);
+        alert(`Failed to delete attachment. Please try again.`);
+    }
+
+    // Close the modal and clear the attachmentToDelete
+    setIsDeleteAttachmentModalOpen(false);
+    setAttachmentToDelete(null);
+};
+
 
   const handleSave = async (e) => {
     e.preventDefault(); // Prevent default form submission
@@ -817,6 +874,30 @@ const addCompanySection = async () => {
         </div>
       )}
 
+{isDeleteAttachmentModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+      <h2 className="text-2xl mb-4">Delete Attachment</h2>
+      <p>Are you sure you want to delete this attachment?</p>
+      <div className="flex justify-end mt-4">
+        <button
+          className="btn btn-sm w-24 bg-red text-white mr-2"
+          onClick={handleDeleteAttachment} // Call the delete function for attachments on confirm
+        >
+          Delete
+        </button>
+        <button
+          className="btn btn-sm w-24 bg-gray-500 text-white"
+          onClick={() => setIsDeleteAttachmentModalOpen(false)} // Close the modal on cancel
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
       <form onSubmit={handleSubmit}>
         <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
           <div className="flex items-center mb-4">
@@ -1274,13 +1355,19 @@ const addCompanySection = async () => {
 
                 {attachments.map((attachment, index) => (
                   <div key={attachment.id}>
-                    <label className="pt-4 pb-2 text-sm">
+                    <div className="flex flex-row justify-between items-center w-full">
+                      <div className="left"><label className="pt-4 pb-2 text-sm">
                       Attachment {index + 1}{" "}
                       {/* Change to index + 1 for better user experience */}
                     </label>
                     <div className="text-sm text-gray-600">
                       {attachment.filename || "No file uploaded."}
+                    </div></div>
+                      <div className="right">
+                        <button className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2" onClick={() => initiateDeleteAttachment(attachment._id)}></button>
+                      </div>
                     </div>
+                    
                     <input
                       type="file"
                       name={`attachment-${index}`}

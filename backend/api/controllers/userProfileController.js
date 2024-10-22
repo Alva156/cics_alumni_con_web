@@ -471,6 +471,70 @@ exports.changePassword = async (req, res) => {
   }
 };
 
+exports.deleteAttachment = async (req, res) => {
+  console.log("Delete Attachment function triggered");
+  console.log("Received parameters:", req.params);
+
+  const { profileId, attachmentId } = req.params;
+
+  // Token extraction and user identification
+  const token = req.cookies.token;
+  if (!token) {
+    console.log("Token is missing.");
+    return res.status(401).json({ message: "Unauthorized, token missing." });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(401).json({ message: "Unauthorized, invalid token." });
+  }
+
+  const userId = decoded.id; // Get userId from the decoded token
+
+  try {
+    // Check if the user profile exists
+    const userProfile = await UserProfile.findOne({ _id: profileId, userId });
+    if (!userProfile) {
+      console.log(`User profile not found for profile ID: ${profileId} and user ID: ${userId}`);
+      return res.status(404).json({ message: "User profile not found." });
+    }
+
+    // Find the attachment to delete
+    const attachmentIndex = userProfile.attachments.findIndex(att => att._id.toString() === attachmentId);
+    if (attachmentIndex === -1) {
+      return res.status(404).json({ message: "Attachment not found." });
+    }
+
+    // Delete the file from the server if necessary
+    const attachmentPath = path.join(__dirname, `../../${userProfile.attachments[attachmentIndex].filepath}`);
+    if (fs.existsSync(attachmentPath)) {
+      fs.unlinkSync(attachmentPath); // Remove old file from disk
+      console.log(`Deleted attachment file: ${attachmentPath}`);
+    }
+
+    // Use Mongoose's $pull operator to remove the attachment
+    userProfile.attachments.splice(attachmentIndex, 1); // Remove the attachment from the array
+
+    // Save the updated profile
+    await userProfile.save();
+
+    console.log(`Attachment with ID: ${attachmentId} deleted successfully for user ID: ${userId}`);
+    return res.status(200).json({
+      message: "Attachment deleted successfully.",
+    });
+  } catch (error) {
+    console.error(`Error deleting attachment:`, error);
+    return res.status(500).json({
+      message: "Error deleting attachment",
+      error: error.message,
+    });
+  }
+};
+
+
 exports.deleteSection = async (req, res) => {
   console.log("DeleteSection function triggered");
   console.log("Received parameters:", req.params);

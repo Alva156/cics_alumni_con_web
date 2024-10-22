@@ -31,6 +31,13 @@ router.delete(
   authenticateJWT,
   userProfileController.deleteSection
 );
+
+router.delete(
+  '/:profileId/:attachmentId',
+  authenticateJWT,
+  userProfileController.deleteAttachment
+);
+
 router.get(
   "/dashboard-stats",
   authenticateJWT,

@@ -24,8 +24,271 @@ body {
   height: 100%;
   object-fit: cover;
   border-radius: 10px; /* Rounded corners for the video */
-  z-index: 1;
 }
+
+
+
+
+
+
+
+
+
+
+
+.homepage-wrapper {
+  padding: 12px 45px;
+}
+
+.homepage-container {
+  display: flex;
+  flex-wrap: wrap; /* Flex wrapping for responsiveness */
+}
+
+.background-news-container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.background-section {
+  position: relative;
+  width: 60%;
+  margin-top: 30px;
+  height: 900px;
+}
+
+.background-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-footer {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 20;
+  text-align: right;
+}
+
+.news-events-section {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* News and Events shared styles */
+.carousel-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.news-item, .events-item {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+  
+}
+
+.news-image, .events-image {
+  width: 100%;
+  height: 265px;
+  object-fit: cover;
+  border-top-left-radius: 10px; /* Top left corner */
+  border-top-right-radius: 10px; /* Top right corner */
+}
+
+.news-image:hover,
+.events-image:hover {
+  transform: scale(1.01); /* Scale down on hover */
+  filter: brightness(0.8); /* Dim the image */
+}
+
+.news-content, .events-content {
+  padding: 10px;
+}
+
+.read-more-link {
+  color: #be142e;
+  text-decoration: none;
+}
+
+.read-more-link:hover {
+  text-decoration: underline; /* Add underline on hover */
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: transparent;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: black;
+  padding: 10px;
+}
+
+.carousel-button.prev {
+  left: 10px;
+}
+
+.carousel-button.next {
+  right: 10px;
+}
+
+/* Adjust styles for the news and events titles */
+.news-title, .events-title {
+  font-family: 'Arial', sans-serif; /* Change to your desired font */
+  font-size: 24px; /* Change to your desired font size */
+  font-weight: bold; /* Change weight as needed */
+  margin: 20px 0; /* Add margin for spacing */
+}
+
+/* Underline effect on hover */
+.news-title:hover, .events-title:hover {
+  color: #be142e;
+}
+
+.carousel-news-title, .carousel-events-title {
+  font-family: 'Arial', sans-serif; /* Change to your desired font */
+  font-size: 18px; /* Change to your desired font size */
+  font-weight: bold; /* Change weight as needed */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .background-news-container {
+    flex-direction: column; /* Stack video and carousels */
+  }
+
+  .background-section {
+    width: 100%;
+    height: 500px; /* Adjust height for smaller screens */
+  }
+
+  .news-events-section {
+    width: 103%; /* Stack news and events full-width */
+    margin-top: 5px;
+    margin-left: -7px;
+  }
+}
+
+.carousel-card {
+  max-width: 100%; /* Ensure cards do not exceed container width */
+}
+
+.news-title,
+.events-title {
+  max-width: 100%; /* Limit title width */
+  overflow: hidden; /* Prevent overflow */
+  white-space: nowrap; /* Prevent text wrapping */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+}
+
+.carousel-news-title,
+.carousel-events-title {
+  max-width: 95%; /* Limit title width */
+  overflow: hidden; /* Prevent overflow */
+  white-space: nowrap; /* Prevent text wrapping */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+}
+
+.news-description,
+.events-description {
+  max-width: 95%; /* Limit description width */
+  overflow: hidden; /* Prevent overflow */
+  white-space: nowrap; /* Prevent text wrapping */
+  text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+}
+
+
+/* Carousel Styling for Sliding Effect */
+.carousel-news {
+  display: flex;
+  scroll-snap-type: x mandatory;
+  overflow-x: scroll; /* Horizontal scrolling */
+  overflow: hidden; /* Hide the scrollbar */
+  scroll-padding: 0 24px;
+  scroll-behavior: smooth; /* Smooth sliding effect */
+  width: 100%; /* Ensure it takes the full width */
+  
+}
+
+.carousel-news .item { 
+  flex: none; /* Prevent items from shrinking */
+  scroll-snap-align: start;
+  width: 100%; /* Full width to ensure only one card is shown */
+  transition: transform 0.3s ease-in-out;
+  
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  height: 380px; /* Maintain a consistent height */
+
+  display: flex; /* Use flexbox for layout */
+  flex-direction: column; /* Stack children vertically */
+  margin: 0; /* No margin between items since only one will be displayed */
+}
+
+
+.carousel-events {
+  display: flex;
+  scroll-snap-type: x mandatory;
+  overflow-x: scroll; /* Horizontal scrolling */
+  overflow: hidden; /* Hide the scrollbar */
+  scroll-padding: 0 24px;
+  scroll-behavior: smooth; /* Smooth sliding effect */
+  width: 100%; /* Ensure it takes the full width */
+  
+}
+
+.carousel-events .item { 
+  flex: none; /* Prevent items from shrinking */
+  scroll-snap-align: start;
+  width: 100%; /* Full width to ensure only one card is shown */
+  transition: transform 0.3s ease-in-out;
+  
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  height: 380px; /* Maintain a consistent height */
+
+  display: flex; /* Use flexbox for layout */
+  flex-direction: column; /* Stack children vertically */
+  margin: 0; /* No margin between items since only one will be displayed */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Spacing Variable */
 :root {
@@ -219,10 +482,11 @@ cing */
   margin: var(--section-spacing) 0; /* Keep the top margin */
   margin-bottom: 80px; /* Increase the bottom margin for more space */
   height: 400px; /* Fixed height for consistency */
+  gap: 20px;   
 }
 
 .mission-vision-content {
-  flex: 0 0 30%; /* 30% width for mission/vision */
+  flex: 0 0 40%; /* 30% width for mission/vision */   
   padding: 20px;
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 8px;
@@ -370,6 +634,14 @@ cing */
   text-align: center;
 }
 
+@media(max-width: 1230px){
+  .mission-vision-section {
+    flex-direction: column; /* Stack vertically on smaller screens */
+    height: auto; /* Allow height to adjust */    
+    width: 100%;  
+  }
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
   .homepage-container {
@@ -440,30 +712,29 @@ screens */
 .background-news-container {
   display: flex; /* Aligns children (video and news carousel) in a row */
   width: 100%;
+
+/* Fading effect for the news and events carousels */
+.carousel-container .fade {
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
 }
 
-.background-section {
-  position: relative;
-  width: 100%; /* Full width for the section */
-  height: auto; /* Allow height to adjust based on content */
-  display: flex;
-  flex-direction: column; /* Stack children vertically */
-  justify-content: flex-start;
-  overflow: hidden;
+.carousel-container .carousel-content {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
 }
 
-.news-carousel-container {
-  width: 100%; /* Full width for the news carousel */
-  display: flex;
-  flex-direction: column; /* Stack news items vertically */
-  justify-content: center;
-  padding: 20px;
+/* Carousel buttons */
+.carousel-button {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.events-carousel-container {
-  width: 100%; /* Full width for the events carousel */
-  display: flex;
-  flex-direction: column; /* Stack events items vertically */
-  justify-content: center;
-  padding: 20px;
+.carousel-button:hover {
+  background: rgba(0, 0, 0, 0.7);
 }

@@ -53,7 +53,9 @@ function Certifications() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-2xl font-medium text-gray-700 mb-6">Certifications</h1>
+      <h1 className="text-2xl font-medium text-gray-700 mb-6">
+        Certifications
+      </h1>
 
       <div className="mb-4 relative">
         <input
@@ -103,7 +105,8 @@ function Certifications() {
             </p>
             <a
               href="#"
-              className="text-blue-500 text-sm font-medium hover:underline"
+              style={{ color: "#be142e" }}
+              className="text-sm font-medium hover:underline"
             >
               Read More
             </a>
@@ -127,14 +130,18 @@ function Certifications() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">{selectedCertification.name}</div>
+            <div className="text-2xl font-medium mb-2">
+              {selectedCertification.name}
+            </div>
             <div className="text-md mb-2">{selectedCertification.address}</div>
             <img
               src={`${backendUrl}${selectedCertification.image}`}
               alt={selectedCertification.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
-            <div className="text-sm mb-4">{selectedCertification.description}</div>
+            <div className="text-sm mb-4">
+              {selectedCertification.description}
+            </div>
             <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
               href={`mailto:${selectedCertification.contact}`}

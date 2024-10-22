@@ -103,7 +103,8 @@ function Events() {
             </p>
             <a
               href="#"
-              className="text-blue-500 text-sm font-medium hover:underline"
+              style={{ color: "#be142e" }}
+              className="text-sm font-medium hover:underline"
             >
               Read More
             </a>
@@ -127,7 +128,9 @@ function Events() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">{selectedEvents.name}</div>
+            <div className="text-2xl font-medium mb-2">
+              {selectedEvents.name}
+            </div>
             <div className="text-md mb-2">{selectedEvents.address}</div>
             <img
               src={`${backendUrl}${selectedEvents.image}`}

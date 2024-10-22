@@ -42,7 +42,7 @@ function Chatbot() {
     Chatbot: [
       "1. Sign In: Enter your registered credentials (username and password) to log in to the system.",
       "2. Navigate to Chatbot Page: Click on the 'Chatbot' tab in the navigation bar or scroll through the home page to find the “Chatbot” link.",
-      "3. View the Chatbot Page: Click the 'Get Started' button, and the inquiry options will be displayed. You can inquire about platform navigation, jobs, and information about CICS office; however, there will be no option to chat live with an administrator.",
+      "3. View the Chatbot Page: Click the 'Get Started' button, and the inquiry options will be displayed. You can inquire about platform navigation, colleges, jobs, and information about different colleges; however, there will be no option to chat live with an administrator.",
     ],
 
     // Jobs
@@ -487,15 +487,251 @@ function Chatbot() {
       "15. Religion Professor",
     ],
 
-    Schedule: ["Monday - Saturday", "8am to 5pm"],
-    Location: [
-      "CICS Office: 2nd Floor Blessed Pier Giorgio Frassati O.P., Building",
-      "UST: España Blvd, Sampaloc, Manila, 1008 Metro Manila",
+    "UST-Alfredo M. Velayo College of Accountancy Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Albertus Magnus Building, Ruaño Drive",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1612, +63-2-3406-1611 local 8372",
     ],
-    "Contact Details": [
-      "CICS Alumni Connect: cicsalumniconnect@gmail.com",
-      "CICS Office: cics@ust.edu.ph",
-      "Office of Alumni Relations: alumnirelations@ust.edu.ph",
+    "College of Architecture Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Beato Angelico Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8740-9721, +63-2-3406-1611 local 8229 / 4491, +63-2-8731-4343",
+    ],
+    "Faculty of Arts and Letters Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F St. Raymund de Peñafort Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8220",
+    ],
+    "Faculty of Civil Law Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 1/F Main Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8731-4027, +63-2-3406-1611 local 8225",
+    ],
+    "College of Commerce and Business Administration Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 4/F St. Raymund of Peñafort Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8258 / 8272, +63-2-8731-3124",
+    ],
+    "College of Education Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 3/F Albertus Magnus Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8731-4323, +63-2-3406-1611 local 8260, +63-2-8786-1611 local 8392",
+    ],
+    "Faculty of Engineering Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Roque Ruaño Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8275, +63-2-8731-4041",
+    ],
+    "College of Fine Arts and Design Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Beato Angelico Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8740-9703, +63-2-3406-1600, +63-2-3406-1611 local 8390 / 8800",
+    ],
+    "College of Information and Computing Sciences Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Blessed Pier Giorgio Frassati Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8518",
+    ],
+    "Faculty of Medicine and Surgery Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F St. Martin de Porres Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8741-5314, +63-2-3406-1611 local 8239 / 8244",
+    ],
+    "Conservatory of Music Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 5/F Albertus Magnus Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8246, +63-2-8731-3124",
+    ],
+    "College of Nursing Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 3/F St. Martin de Porres Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8241, +63-2-8731-5738",
+    ],
+    "Faculty of Pharmacy Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Main Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8223, +63-2-8731-4040",
+    ],
+    "Institute of Physical Education and Athletics Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Quadricentennial Pavilion",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8227",
+    ],
+    "College of Rehabilitation Sciences Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F San Martin de Porres Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8280, +63-2-8740-9713",
+    ],
+    "College of Science Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 3/F Main Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-8731-5728, +63-2-3406-1611 local 8224 / 8532, +63-2-8740-9730",
+    ],
+    "College of Tourism and Hospitality Management Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> 8/F Buenaventura G. Paredes, O.P. Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8531 / 4488, +63-2-8732-0188",
+    ],
+    "Faculty of Canon Law Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> Ground Floor, Central Seminary Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8261",
+    ],
+    "Faculty of Philosophy Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> Ground Floor, Central Seminary Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8261",
+    ],
+    "Faculty of Sacred Theology Office": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-building'></i> Location:</strong> Ground Floor, Central Seminary Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8261",
+    ],
+
+    "UST-Alfredo M. Velayo College of Accountancy": [
+      "Bachelor of Science in Accountancy",
+      "Bachelor of Science in Accounting Information System",
+      "Bachelor of Science in Management Accounting",
+    ],
+    "College of Architecture": ["Bachelor of Science in Architecture"],
+    "Faculty of Arts and Letters": [
+      "Bachelor of Arts in Asian Studies",
+      "Bachelor of Arts in Behavioral Science",
+      "Bachelor of Arts in Communication",
+      "Bachelor of Arts in Creative Writing",
+      "Bachelor of Arts in Economics",
+      "Bachelor of Arts in English Language Studies",
+      "Bachelor of Arts in History",
+      "Bachelor of Arts in Journalism",
+      "Bachelor of Arts in Legal Management",
+      "Bachelor of Arts in Literature",
+      "Bachelor of Arts in Philosophy",
+      "Bachelor of Arts in Political Science",
+      "Bachelor of Arts in Sociology",
+    ],
+    "Faculty of Civil Law": ["Juris Doctor"],
+    "College of Commerce and Business Administration": [
+      "Bachelor of Science in Business Administration, major in Business Economics",
+      "Bachelor of Science in Business Administration, major in Financial Management",
+      "Bachelor of Science in Business Administration, major in Human Resource Management",
+      "Bachelor of Science in Business Administration, major in Marketing Management",
+      "Bachelor of Science in Entrepreneurship",
+    ],
+    "College of Education": [
+      "Bachelor of Secondary Education, major in English",
+      "Bachelor of Secondary Education, major in Filipino",
+      "Bachelor of Secondary Education, major in Mathematics",
+      "Bachelor of Secondary Education, major in Religious and Values Education",
+      "Bachelor of Secondary Education, major in Science",
+      "Bachelor of Secondary Education, major in Social Studies",
+      "Bachelor of Early Childhood Education",
+      "Bachelor of Elementary Education",
+      "Bachelor of Special Needs Education, major in Early Childhood Education",
+      "Bachelor of Science in Food Technology",
+      "Bachelor of Science in Nutrition and Dietetics",
+      "Bachelor of Library and Information Science",
+    ],
+    "Faculty of Engineering": [
+      "Bachelor of Science in Chemical Engineering",
+      "Bachelor of Science in Civil Engineering",
+      "Bachelor of Science in Electrical Engineering",
+      "Bachelor of Science in Electronics Engineering",
+      "Bachelor of Science in Industrial Engineering",
+      "Bachelor of Science in Mechanical Engineering",
+    ],
+    "College of Fine Arts and Design": [
+      "Bachelor of Fine Arts, major in Advertising Arts",
+      "Bachelor of Fine Arts, major in Industrial Design",
+      "Bachelor of Science in Interior Design",
+      "Bachelor of Fine Arts, major in Painting",
+    ],
+    "College of Information and Computing Sciences": [
+      "Bachelor of Science in Computer Science",
+      "Bachelor of Science in Information Systems",
+      "Bachelor of Science in Information Technology",
+    ],
+    "Faculty of Medicine and Surgery": [
+      "Bachelor of Science in Basic Human Studies",
+      "Doctor of Medicine",
+      "Master in Clinical Audiology",
+      "Master in Pain Management",
+    ],
+    "Conservatory of Music": [
+      "Bachelor of Music in Performance, major in Bassoon",
+      "Bachelor of Music in Performance, major in Choral Conducting",
+      "Bachelor of Music in Performance, major in Clarinet",
+      "Bachelor of Music in Composition",
+      "Bachelor of Music in Performance, major in Double Bass",
+      "Bachelor of Music in Performance, major in Flute",
+      "Bachelor of Music in Performance, major in French Horn",
+      "Bachelor of Music in Performance, major in Guitar",
+      "Bachelor of Music in Jazz",
+      "Bachelor of Music in Musicology",
+      "Bachelor of Music in Music Education",
+      "Bachelor of Music in Music Theatre",
+      "Bachelor of Music in Music Technology",
+      "Bachelor of Music in Performance, major in Oboe",
+      "Bachelor of Music in Performance, major in Orchestral Conducting",
+      "Bachelor of Music in Performance, major in Percussion",
+      "Bachelor of Music in Performance, major in Piano",
+      "Bachelor of Music in Performance, major in Saxophone",
+      "Bachelor of Music in Performance, major in Trombone",
+      "Bachelor of Music in Performance, major in Trumpet",
+      "Bachelor of Music in Performance, major in Tuba",
+      "Bachelor of Music in Performance, major in Viola",
+      "Bachelor of Music in Performance, major in Violin",
+      "Bachelor of Music in Performance, major in Violoncello",
+      "Bachelor of Music in Performance, major in Voice",
+    ],
+    "College of Nursing": ["Bachelor of Science in Nursing"],
+    "Faculty of Pharmacy": [
+      "Faculty of Pharmacy",
+      "Bachelor of Science in Biochemistry",
+      "Bachelor of Science in Medical Technology",
+      "Bachelor of Science in Pharmacy",
+      "Bachelor of Science in Pharmacy, major in Clinical Pharmacy",
+      "Doctor of Pharmacy",
+    ],
+    "Institute of Physical Education and Athletics": [
+      "Bachelor of Science in Fitness and Sports Management",
+    ],
+    "College of Rehabilitation Sciences": [
+      "Bachelor of Science in Occupational Therapy",
+      "Bachelor of Science in Physical Therapy",
+      "Bachelor of Science in Speech-Language Pathology",
+      "Bachelor of Science in Sports Science",
+    ],
+    "College of Science": [
+      "Bachelor of Science in Applied Mathematics, major in Actuarial Science",
+      "Bachelor of Science in Applied Physics, major in Instrumentation",
+      "Bachelor of Science in Biology, major in Environmental Biology",
+      "Bachelor of Science in Biology, major in Medical Biology",
+      "Bachelor of Science major in Molecular Biology and Biotechnology",
+      "Bachelor of Science in Chemistry",
+      "Bachelor of Science in Data Science and Analytics",
+      "Bachelor of Science in Microbiology",
+      "Bachelor of Science in Psychology",
+    ],
+    "College of Tourism and Hospitality Management": [
+      "Bachelor of Science in Hospitality Management, major in Culinary Entrepreneurship",
+      "Bachelor of Science in Hospitality Management, major in Hospitality Leadership",
+      "Bachelor of Science in Tourism Management, major in Recreation and Leisure Management",
+      "Bachelor of Science in Tourism Management, major in Travel Operation and Service Management",
+    ],
+    "Faculty of Canon Law": [
+      "Doctor of Canon Law",
+      "Licentiate in Canon Law",
+      "Bachelor of Canon Law",
+    ],
+    "Faculty of Philosophy": [
+      "Doctor of Philosophy",
+      "Licentiate in Philosophy",
+      "Bachelor of Philosophy (Classical)",
+    ],
+    "Faculty of Sacred Theology": [
+      "Doctor of Sacred Theology",
+      "Licentiate in Sacred Theology",
+      "Bachelor of Sacred Theology",
     ],
   };
 
@@ -521,7 +757,12 @@ function Chatbot() {
       // Display options based on previous step
       if (previousStep === 2) {
         addChatMessage("chatbot", "Hi! Please choose an option:");
-        addChatMessage("chatbot", ["Navigation", "Jobs", "CICS Office"]);
+        addChatMessage("chatbot", [
+          "Navigation",
+          "Colleges",
+          "Jobs",
+          "College Office Information",
+        ]);
       } else if (previousStep === 3) {
         addChatMessage("chatbot", "You chose:");
         addChatMessage("chatbot", currentOptions); // Restore options from Step 3
@@ -532,7 +773,12 @@ function Chatbot() {
   const handleGetStarted = () => {
     addChatMessage("user", "Get Started");
     addChatMessage("chatbot", "Hello CICS Alumni! Please choose an option:");
-    addChatMessage("chatbot", ["Navigation", "Jobs", "CICS Office"]);
+    addChatMessage("chatbot", [
+      "Navigation",
+      "Colleges",
+      "Jobs",
+      "College Office Information",
+    ]);
     setStepHistory([1]);
     setStep(2);
   };
@@ -571,8 +817,54 @@ function Chatbot() {
           "Sacred Theology",
           "Go back",
         ];
-      } else if (option === "CICS Office") {
-        options = ["Schedule", "Location", "Contact Details", "Go back"];
+      } else if (option === "College Office Information") {
+        options = [
+          "UST-Alfredo M. Velayo College of Accountancy Office",
+          "College of Architecture Office",
+          "Faculty of Arts and Letters Office",
+          "Faculty of Civil Law Office",
+          "College of Commerce and Business Administration Office",
+          "College of Education Office",
+          "Faculty of Engineering Office",
+          "College of Fine Arts and Design Office",
+          "College of Information and Computing Sciences Office",
+          "Faculty of Medicine and Surgery Office",
+          "Conservatory of Music Office",
+          "College of Nursing Office",
+          "Faculty of Pharmacy Office",
+          "Institute of Physical Education and Athletics Office",
+          "College of Rehabilitation Sciences Office",
+          "College of Science Office",
+          "College of Tourism and Hospitality Management Office",
+          "Faculty of Canon Law Office",
+          "Faculty of Philosophy Office",
+          "Faculty of Sacred Theology Office",
+          "Go back",
+        ];
+      } else if (option === "Colleges") {
+        options = [
+          "UST-Alfredo M. Velayo College of Accountancy",
+          "College of Architecture",
+          "Faculty of Arts and Letters",
+          "Faculty of Civil Law",
+          "College of Commerce and Business Administration",
+          "College of Education",
+          "Faculty of Engineering",
+          "College of Fine Arts and Design",
+          "College of Information and Computing Sciences",
+          "Faculty of Medicine and Surgery",
+          "Conservatory of Music",
+          "College of Nursing",
+          "Faculty of Pharmacy",
+          "Institute of Physical Education and Athletics",
+          "College of Rehabilitation Sciences",
+          "College of Science",
+          "College of Tourism and Hospitality Management",
+          "Faculty of Canon Law",
+          "Faculty of Philosophy",
+          "Faculty of Sacred Theology",
+          "Go back",
+        ];
       }
       setCurrentOptions(options); // Save options for the current step
       addChatMessage("chatbot", options); // Display options for the current step
@@ -601,7 +893,9 @@ function Chatbot() {
 
       // If the result is an array, join it with <br /> for line breaks
       const formattedResult = Array.isArray(result)
-        ? result.join("<br />")
+        ? result
+            .map((item) => `<p style="margin-bottom: 10px;">${item}</p>`)
+            .join("")
         : result;
 
       addChatMessage("chatbot", formattedResult); // Ensure result is displayed properly

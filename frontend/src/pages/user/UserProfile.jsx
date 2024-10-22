@@ -689,7 +689,7 @@ function UserProfile() {
     }
 
     // Validation message for successful save (if email has not changed)
-    if (accountEmail === initialAccountEmail) {
+    if (accountEmail === initialAccountEmail && showErrorMessage) {
       setShowValidationMessage(true);
       setTimeout(() => setShowValidationMessage(false), 3000);
     }

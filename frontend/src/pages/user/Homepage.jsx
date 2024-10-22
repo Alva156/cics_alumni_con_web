@@ -140,116 +140,94 @@ const Homepage = () => {
   };
 
   return (
-    <div style={{ paddingTop: "12px", paddingRight: "45px", paddingLeft: "45px" }}>
-      <div className="homepage-container" style={{ display: "flex" }}>
-        <div className="background-news-container" style={{ display: "flex", width: "100%" }}>
+    <div className="homepage-wrapper">
+      <div className="homepage-container">
+        <div className="background-news-container">
           {/* Background Video Section */}
-          <div className="background-section" style={{ position: "relative", width: "60%", marginTop: "30px", height: "865px" }}>
+          <div className="background-section">
             <video
               autoPlay
               muted
               ref={videoRef}
               className="background-video"
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             >
               <source src={ustbg} type="video/mp4" />
               Your browser does not support the video tag.
             </video>
-            <div className="absolute" style={{ position: "absolute", bottom: "20px", right: "20px", backgroundColor: "rgba(0, 0, 0, 0.4)", color: "white", padding: "10px", borderRadius: "5px", zIndex: "20", textAlign: "right" }}>
+            <div className="video-footer">
               Photo Courtesy of UST SITE
             </div>
           </div>
-
+  
           {/* News and Events Carousel Section */}
-          <div style={{ width: "40%", display: "flex", flexDirection: "column", padding: "20px", flexShrink: 0 }}>
+          <div className="news-events-section">
             {/* News Carousel */}
-            <div className="news-carousel-container" data-aos="fade-up" style={{ position: "relative", maxWidth: "600px" }}>
-            <h2 className="text-2xl font-medium mb-4">
-  <Link to="/user-news" className="text-gray-700 hover:text-red-500 hover:underline">
-    Latest News
-  </Link>
-</h2>
-
-              <div className="flex justify-center items-center">
+            <div className="news-carousel-container" data-aos="fade-up">
+              <h2 className="news-title">
+                <Link to="/user-news" className="news-link">
+                  Latest News
+                </Link>
+              </h2>
+  
+              <div className="carousel-wrapper">
                 {news.length > 0 && (
-                  <div className={`bg-white border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow ${fade ? "slide-out" : ""}`} style={{ height: "380px", width: "100%", position: "relative" }}>
+                  <div className="news-item">
                     <img
                       src={`${import.meta.env.VITE_BACKEND_URL}${news[currentNewsIndex].image}`}
                       alt={news[currentNewsIndex].name}
-                      style={{ height: "240px", width: "100%", objectFit: "cover" }}
-                      className="w-full object-cover rounded-t-lg mb-1"
+                      className="news-image"
                     />
-                    <div className="p-3">
-                      <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis">
-                        {news[currentNewsIndex].name}
-                      </div>
-                      <p className="text-sm text-gray-600 mb-4 overflow-hidden" style={{ maxHeight: "40px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div className="news-content">
+                      <div className="carousel-news-title">{news[currentNewsIndex].name}</div>
+                      <p className="news-description">
                         {news[currentNewsIndex].description.slice(0, 100)}...
                       </p>
-                      <a href="#" style={{ color: "#be142e" }} className="text-sm font-medium hover:underline" onClick={() => handleNavigation(`/user-news?id=${news[currentNewsIndex]._id}`)}>
+                      <a href="#" className="read-more-link" onClick={() => handleNavigation(`/user-news?id=${news[currentNewsIndex]._id}`)}>
                         Read More
                       </a>
                     </div>
                   </div>
                 )}
               </div>
-              <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
-                <button className="carousel-button prev" onClick={prevNews}>
-                  ❮
-                </button>
-              </div>
-              <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-                <button className="carousel-button next" onClick={nextNews}>
-                  ❯
-                </button>
-              </div>
+              <button className="carousel-button prev" onClick={prevNews}>❮</button>
+              <button className="carousel-button next" onClick={nextNews}>❯</button>
             </div>
-
+  
             {/* Events Carousel Section */}
-            <div className="events-carousel-container" data-aos="fade-up" style={{ position: "relative", maxWidth: "600px", marginTop: "20px" }}>
-            <h2 className="text-2xl font-medium mb-4">
-  <Link to="/user-events" className="text-gray-700 hover:text-red-500 hover:underline">
-    Upcoming Events
-  </Link>
-</h2>
-              <div className="flex justify-center items-center">
+            <div className="events-carousel-container" data-aos="fade-up">
+              <h2 className="events-title">
+                <Link to="/user-events" className="events-link">
+                  Upcoming Events
+                </Link>
+              </h2>
+  
+              <div className="carousel-wrapper">
                 {events.length > 0 && (
-                  <div className={`bg-white border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow ${fade ? "slide-out" : ""}`} style={{ height: "380px", width: "100%", position: "relative" }}>
+                  <div className="events-item">
                     <img
                       src={`${import.meta.env.VITE_BACKEND_URL}${events[currentEventsIndex].image}`}
                       alt={events[currentEventsIndex].name}
-                      style={{ height: "240px", width: "100%", objectFit: "cover" }}
-                      className="w-full object-cover rounded-t-lg mb-1"
+                      className="events-image"
                     />
-                    <div className="p-3">
-                      <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis">
-                        {events[currentEventsIndex].name}
-                      </div>
-                      <p className="text-sm text-gray-600 mb-4 overflow-hidden" style={{ maxHeight: "40px", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div className="events-content">
+                      <div className="carousel-events-title">{events[currentEventsIndex].name}</div>
+                      <p className="events-description">
                         {events[currentEventsIndex].description.slice(0, 100)}...
                       </p>
-                      <a href="#" style={{ color: "#be142e" }} className="text-sm font-medium hover:underline" onClick={() => handleNavigation(`/user-events?id=${events[currentEventsIndex]._id}`)}>
+                      <a href="#" className="read-more-link" onClick={() => handleNavigation(`/user-events?id=${events[currentEventsIndex]._id}`)}>
                         Read More
                       </a>
                     </div>
                   </div>
                 )}
               </div>
-              <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
-                <button className="carousel-button prev" onClick={prevEvent}>
-                  ❮
-                </button>
-              </div>
-              <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-                <button className="carousel-button next" onClick={nextEvent}>
-                  ❯
-                </button>
-              </div>
+              <button className="carousel-button prev" onClick={prevEvent}>❮</button>
+              <button className="carousel-button next" onClick={nextEvent}>❯</button>
             </div>
           </div>
         </div>
-
-
+  
+  
 
 
 

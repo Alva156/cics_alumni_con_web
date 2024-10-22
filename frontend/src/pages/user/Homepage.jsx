@@ -24,6 +24,8 @@ const Homepage = () => {
   const navigate = useNavigate();
   const newsCarouselRef = useRef(null); // Reference for news carousel
   const eventsCarouselRef = useRef(null); // Reference for events carousel
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const images = [homepage1, homepage2, homepage3];
   const credits = [
@@ -184,9 +186,29 @@ const Homepage = () => {
     navigate(path);
     window.scrollTo(0, 0); // Scroll to the top of the page
   };
+  useEffect(() => {
+    const storedLoginStatus = localStorage.getItem("isLoggedIn");
+    const messageShown = sessionStorage.getItem("loginMessageShown");
+
+    setIsLoggedIn(storedLoginStatus === "true");
+
+    if (storedLoginStatus === "true" && messageShown !== "true") {
+      setShowLoginMessage(true);
+      sessionStorage.setItem("loginMessageShown", "true");
+
+      setTimeout(() => {
+        setShowLoginMessage(false);
+      }, 5000);
+    }
+  }, []);
 
   return (
     <div className="homepage-wrapper">
+      {showLoginMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+          <p>Login success!</p>
+        </div>
+      )}
       <div className="homepage-container">
         <div className="background-news-container">
           {/* Background Video Section */}

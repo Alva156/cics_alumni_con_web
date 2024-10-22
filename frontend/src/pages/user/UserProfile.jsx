@@ -109,7 +109,7 @@ function UserProfile() {
 
 // Initialize attachments state
 const [attachments, setAttachments] = useState([
-  { _id: uniqueId(), file: null, filename: "", filepath: "" },
+  { _id: 1, file: null, filename: "", filepath: "" },
 ]);
 
 const handleFileChange = (e, index) => {
@@ -149,12 +149,15 @@ const handleFileChange = (e, index) => {
 };
 
 // Function to add a new attachment field
-const addAttachment = () => {
-  setAttachments((prev) => [
-    ...prev,
-    { _id: uniqueId(), file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
-  ]);
-};
+const [nextId, setNextId] = useState(2); // Start from 2 since 1 is already used
+
+  const addAttachment = () => {
+    setAttachments((prev) => [
+      ...prev,
+      { _id: nextId, file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
+    ]);
+    setNextId((prevId) => prevId + 1); // Increment ID for next attachment
+  };
 
   const openConfirmationModal = (message, onConfirm) => {
     setConfirmationMessage(message);

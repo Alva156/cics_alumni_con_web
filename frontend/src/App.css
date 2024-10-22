@@ -109,6 +109,12 @@ body {
   object-fit: cover;
 }
 
+.news-image:hover,
+.events-image:hover {
+  transform: scale(1.01); /* Scale down on hover */
+  filter: brightness(0.8); /* Dim the image */
+}
+
 .news-content, .events-content {
   padding: 10px;
 }

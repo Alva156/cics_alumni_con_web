@@ -18,6 +18,8 @@ const Homepage = () => {
   const [events, setEvents] = useState([]);
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentEventsIndex, setCurrentEventsIndex] = useState(0);
+  const [autoSlideNews, setAutoSlideNews] = useState(true);
+  const [autoSlideEvents, setAutoSlideEvents] = useState(true);
   const videoRef = useRef(null);
   const navigate = useNavigate();
   const newsCarouselRef = useRef(null); // Reference for news carousel
@@ -44,22 +46,26 @@ const Homepage = () => {
   }, []);
 
   useEffect(() => {
-    // Automatically slide news every 5 seconds
+    // Automatically slide news every 4 seconds
     const autoSlide = setInterval(() => {
-      nextNews();
-    }, 5000); // 5 seconds
+      if (autoSlideNews) {
+        nextNews();
+      }
+    }, 4000); // 4 seconds
 
     return () => clearInterval(autoSlide); // Cleanup on unmount
-  }, [news]);
+  }, [autoSlideNews, news]);
 
   useEffect(() => {
-    // Automatically slide events every 5 seconds
+    // Automatically slide events every 4 seconds
     const autoSlideEvents = setInterval(() => {
-      nextEvent();
-    }, 5000); // 5 seconds
+      if (autoSlideEvents) {
+        nextEvent();
+      }
+    }, 4000); // 4 seconds
 
     return () => clearInterval(autoSlideEvents); // Cleanup on unmount
-  }, [events]);
+  }, [autoSlideEvents, events]);
 
   const fetchNews = async () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -119,6 +125,7 @@ const Homepage = () => {
       slideTo(nextIndex, newsCarouselRef);
       return nextIndex;
     });
+    handleManualSlide('news');
   };
 
   const prevNews = () => {
@@ -127,6 +134,7 @@ const Homepage = () => {
       slideTo(prevIndexValue, newsCarouselRef);
       return prevIndexValue;
     });
+    handleManualSlide('news');
   };
 
   const nextEvent = () => {
@@ -135,6 +143,7 @@ const Homepage = () => {
       slideTo(nextIndex, eventsCarouselRef);
       return nextIndex;
     });
+    handleManualSlide('events');
   };
 
   const prevEvent = () => {
@@ -143,6 +152,7 @@ const Homepage = () => {
       slideTo(prevIndexValue, eventsCarouselRef);
       return prevIndexValue;
     });
+    handleManualSlide('events');
   };
 
   const slideTo = (index, carouselRef) => {
@@ -154,11 +164,25 @@ const Homepage = () => {
     });
   };
 
+  const handleManualSlide = (type) => {
+    // Stop auto sliding
+    if (type === 'news') {
+      setAutoSlideNews(false);
+      setTimeout(() => {
+        setAutoSlideNews(true); // Resume auto sliding
+      }, 10000); // 10 seconds delay
+    } else if (type === 'events') {
+      setAutoSlideEvents(false);
+      setTimeout(() => {
+        setAutoSlideEvents(true); // Resume auto sliding
+      }, 10000); // 10 seconds delay
+    }
+  };
+
   const handleNavigation = (path) => {
     navigate(path);
     window.scrollTo(0, 0); // Scroll to the top of the page
   };
-
 
 
   return (

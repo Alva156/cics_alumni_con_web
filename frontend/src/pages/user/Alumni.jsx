@@ -4,13 +4,17 @@ import axios from "axios";
 function Alumni() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [alumni, setAlumni] = useState([]);
-  const [selectedAlumni, setSelectedAlumni] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedProgram, setSelectedProgram] = useState("");
   const [activeTab, setActiveTab] = useState("primary");
   const modalRef = useRef(null);
+  const [selectedAlumni, setSelectedAlumni] = useState({
+    secondaryEducation: [],
+    tertiaryEducation: [],
+    careerBackground: [],
+  });
 
   const formatDate = (dateString) => {
     if (!dateString) return " ";
@@ -182,7 +186,7 @@ function Alumni() {
                 {selectedAlumni.profileImage && (
                   <div className="mb-4">
                     <img
-                      src={selectedAlumni.profileImage}
+                      src={`${backendUrl}${selectedAlumni.profileImage}`}
                       alt="Alumni"
                       className="w-32 h-32"
                     />
@@ -277,24 +281,67 @@ function Alumni() {
               >
                 <h1 className="text-xl mb-4">Contacts</h1>
                 <p className="text-xs mb-1/2">Facebook</p>
+                {selectedAlumni.contactInformation?.facebook ? (
+                  <a
+                    href={selectedAlumni.contactInformation.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                  >
+                    {selectedAlumni.contactInformation.facebook}
+                  </a>
+                ) : (
+                  <p className="text-s mb-2 font-bold"></p>
+                )}
+                <p className="text-xs mt-2 mb-1/2">LinkedIn</p>
+                {selectedAlumni.contactInformation?.linkedIn ? (
+                  <a
+                    href={selectedAlumni.contactInformation.linkedIn}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                  >
+                    {selectedAlumni.contactInformation.linkedIn}
+                  </a>
+                ) : (
+                  <p className="text-s mb-2 font-bold"></p>
+                )}
+                <p className="text-xs mt-2 mb-1/2">Instagram</p>
+                {selectedAlumni.contactInformation?.instagram ? (
+                  <a
+                    href={selectedAlumni.contactInformation.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                  >
+                    {selectedAlumni.contactInformation.instagram}
+                  </a>
+                ) : (
+                  <p className="text-s mb-2 font-bold"></p>
+                )}
+                <p className="text-xs mt-2 mb-1/2">Email</p>
+                {selectedAlumni.contactInformation?.email ? (
+                  <a
+                    href={`mailto:${selectedAlumni.contactInformation.email}`}
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                  >
+                    {selectedAlumni.contactInformation.email}
+                  </a>
+                ) : (
+                  <p className="text-s mb-2 font-bold"></p>
+                )}
+                <p className="text-xs mt-2 mb-1/2">Mobile Number</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.facebook}
-                </p>
-                <p className="text-xs mb-1/2">LinkedIn</p>
-                <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.linkedIn}
-                </p>
-                <p className="text-xs mb-1/2">Instagram</p>
-                <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.instagram}
-                </p>
-                <p className="text-xs mb-1/2">Email</p>
-                <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.email}
-                </p>
-                <p className="text-xs mb-1/2">Mobile Number</p>
-                <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.contactInformation?.mobileNumber}
+                  {selectedAlumni.contactInformation?.mobileNumber ? (
+                    <a
+                      href={`tel:${selectedAlumni.contactInformation.mobileNumber}`}
+                      className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                    >
+                      {selectedAlumni.contactInformation.mobileNumber}
+                    </a>
+                  ) : (
+                    <p className="text-s mb-2 font-bold"></p>
+                  )}
                 </p>
               </div>
 
@@ -326,22 +373,25 @@ function Alumni() {
               >
                 <h1 className="text-xl mb-4">Educational Background</h1>
                 <p className="text-xs mb-1">Secondary Education</p>
-                <p className="text-s font-bold">
-                  {selectedAlumni.secondaryeducation}
-                </p>
-                <p className="text-xs mb-2">
-                  {selectedAlumni.secondaryeducationyear}
-                </p>
+
+                {selectedAlumni.secondaryEducation.map((edu, index) => (
+                  <div key={index}>
+                    <p className="text-s font-bold">{edu.schoolName}</p>
+                    <p className="text-xs mb-2">
+                      {edu.yearStarted} - {edu.yearEnded}
+                    </p>
+                  </div>
+                ))}
                 <p className="text-xs mb-1 mt-3">Tertiary Education</p>
-                <p className="text-s font-bold">
-                  {selectedAlumni.tertiaryeducation}
-                </p>
-                <p className="text-xs mb-1 italic">
-                  {selectedAlumni.tertiaryeducationdegree}
-                </p>
-                <p className="text-xs mb-2">
-                  {selectedAlumni.tertiaryeducationyear}
-                </p>
+                {selectedAlumni.tertiaryEducation.map((edu, index) => (
+                  <div key={index}>
+                    <p className="text-s font-bold">{edu.schoolName}</p>
+                    <p className="text-xs mb-1 italic">{edu.program}</p>
+                    <p className="text-xs mb-2">
+                      {edu.yearStarted} - {edu.yearEnded}
+                    </p>
+                  </div>
+                ))}
               </div>
 
               <input
@@ -356,11 +406,15 @@ function Alumni() {
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6"
               >
                 <h1 className="text-xl mb-4">Career Background</h1>
-                <p className="text-s font-bold">{selectedAlumni.career}</p>
-                <p className="text-xs mb-1 italic">
-                  {selectedAlumni.careerposition}
-                </p>
-                <p className="text-xs mb-2">{selectedAlumni.careeryear}</p>
+                {selectedAlumni.careerBackground.map((career, index) => (
+                  <div key={index}>
+                    <p className="text-s font-bold">{career.companyName}</p>
+                    <p className="text-xs mb-1 italic">{career.position}</p>
+                    <p className="text-xs mb-2">
+                      {career.yearStarted} - {career.yearEnded}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

@@ -4,20 +4,61 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
+// Set storage engine for profile images
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Directory where files will be saved
+    if (file.fieldname === "profileImage") {
+      cb(null, "./uploads/profileimg"); // Save profile images in 'uploads/profileimg'
+    } else if (file.fieldname === "attachments") {
+      cb(null, "./uploads/attachments"); // Save attachments in 'uploads/attachments'
+    }
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`); // Ensure unique filenames
+    cb(null, `${Date.now()}-${file.originalname}`);
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
+  fileFilter: (req, file, cb) => {
+    let filetypes;
+    
+    // Determine allowed file types based on field name
+    if (file.fieldname === "profileImage") {
+      filetypes = /jpeg|jpg|png/; // Only allow image formats for profile image
+    } else if (file.fieldname === "attachments") {
+      filetypes = /jpeg|jpg|png|pdf|doc|docx/; // Allow image and document formats for attachments
+    } else {
+      return cb(new Error("Invalid field name."));
+    }
 
-// Middleware for file upload
-exports.uploadFile = upload.single("file"); // Use 'file' as the field name for uploads
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+
+    if (!mimetype || !extname) {
+      return cb(new Error("Invalid file format."));
+    }
+
+    cb(null, true);
+  },
+}).fields([
+  { name: "profileImage", maxCount: 1 }, // Single profile image
+  { name: "attachments", maxCount: 10 }, // Up to 10 attachments
+]);
+
+
+
+// Function to delete previous image
+const deletePreviousImage = (filePath) => {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error("Error deleting image:", err);
+    }
+  });
+};
 
 exports.getProfile = async (req, res) => {
   try {
@@ -53,80 +94,107 @@ exports.getProfile = async (req, res) => {
 };
 
 exports.createProfile = async (req, res) => {
-  try {
-    // Extract the token from cookies
-    const token = req.cookies.token;
-    if (!token) {
-      return res.status(401).json({ error: "Token missing, please log in." });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from token
-
-    // Check if a profile already exists for the user
-    const existingProfile = await UserProfile.findOne({ userId });
-    if (existingProfile) {
-      return res.status(400).json({
-        error: "Profile already exists. Please update your profile instead.",
-      });
-    }
-
-    // Extract profile details from request body
-    const profileData = {
-      userId,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      birthday: req.body.birthday,
-      careerBackground: req.body.careerBackground,
-      collegeProgram: req.body.collegeProgram,
-      contactInformation: req.body.contactInformation,
-      employmentStatus: req.body.employmentStatus,
-      maritalStatus: req.body.maritalStatus,
-      placeOfEmployment: req.body.placeOfEmployment,
-      profession: req.body.profession,
-      professionAlignment: req.body.professionAlignment,
-      profileImage: req.body.profileImage,
-      salaryRange: req.body.salaryRange,
-      accountEmail: req.body.accountEmail,
-      secondaryEducation: req.body.secondaryEducation,
-      specialization: req.body.specialization,
-      tertiaryEducation: req.body.tertiaryEducation,
-      timeToJob: req.body.timeToJob,
-      workIndustry: req.body.workIndustry,
-      yearGraduatedCollege: req.body.yearGraduatedCollege,
-      yearStartedCollege: req.body.yearStartedCollege,
-      attachments: req.body.attachments || [],
-    };
-
-    // Validate required fields (this can be customized based on your requirements)
-    const requiredFields = ["firstName", "lastName", "birthday"];
-    for (const field of requiredFields) {
-      if (!profileData[field]) {
-        return res.status(400).json({ error: `${field} is required.` });
+  upload(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res
+          .status(400)
+          .json({ msg: "Image size exceeds the limit of 5MB." });
       }
+      return res.status(400).json({ msg: err.message });
     }
+    try {
+      // Extract the token from cookies
+      const token = req.cookies.token;
+      if (!token) {
+        return res.status(401).json({ error: "Token missing, please log in." });
+      }
 
-    // Create a new UserProfile instance
-    const newProfile = new UserProfile(profileData);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decoded.id; // Get userId from token
 
-    // Save the profile
-    await newProfile.save();
-    console.log(
-      `User profile for ${profileData.firstName} ${profileData.lastName} created successfully.`
-    );
+      // Check if a profile already exists for the user
+      const existingProfile = await UserProfile.findOne({ userId });
+      if (existingProfile) {
+        return res.status(400).json({
+          error: "Profile already exists. Please update your profile instead.",
+        });
+      }
 
-    res.status(201).json({
-      message: "Profile created successfully!",
-      profile: newProfile,
-    });
-  } catch (error) {
-    console.error("Error creating profile:", error); // Log the error for debugging
-    res
-      .status(500)
-      .json({ error: "Failed to create profile", details: error.message });
-  }
+      // Handle profileImage
+      const profileImage = req.files && req.files.profileImage
+        ? `/uploads/profileimg/${req.files.profileImage[0].filename}`
+        : null; // Set profile image path
+
+      // Handle attachments array
+      const attachments = req.files && req.files.attachments
+  ? req.files.attachments.map(file => ({
+      filename: file.originalname, // Store original filename
+      filepath: `/uploads/attachments/${file.filename}`, // Store file path
+    }))
+  : [];
+
+      // Extract profile details from request body
+      const profileData = {
+        userId,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        birthday: req.body.birthday,
+        careerBackground: req.body.careerBackground,
+        college: req.body.college,
+        collegeProgram: req.body.collegeProgram,
+        contactInformation: req.body.contactInformation,
+        employmentStatus: req.body.employmentStatus,
+        maritalStatus: req.body.maritalStatus,
+        placeOfEmployment: req.body.placeOfEmployment,
+        profession: req.body.profession,
+        professionAlignment: req.body.professionAlignment,
+        profileImage, // Use new profile image handling logic
+        salaryRange: req.body.salaryRange,
+        accountEmail: req.body.accountEmail,
+        secondaryEducation: req.body.secondaryEducation,
+        specialization: req.body.specialization,
+        tertiaryEducation: req.body.tertiaryEducation,
+        timeToJob: req.body.timeToJob,
+        workIndustry: req.body.workIndustry,
+        yearGraduatedCollege: req.body.yearGraduatedCollege,
+        yearStartedCollege: req.body.yearStartedCollege,
+        attachments, // Use new attachments handling logic
+      };
+
+      // Validate required fields (this can be customized based on your requirements)
+      const requiredFields = ["firstName", "lastName", "birthday"];
+      for (const field of requiredFields) {
+        if (!profileData[field]) {
+          return res.status(400).json({ error: `${field} is required.` });
+        }
+      }
+
+      // Create a new UserProfile instance
+      const newProfile = new UserProfile(profileData);
+
+      // Save the profile
+      await newProfile.save();
+      console.log(
+        `User profile for ${profileData.firstName} ${profileData.lastName} created successfully.`
+      );
+
+      res.status(201).json({
+        message: "Profile created successfully!",
+        profile: newProfile,
+      });
+    } catch (error) {
+      console.error("Error creating profile:", error); // Log the error for debugging
+      res
+        .status(500)
+        .json({ error: "Failed to create profile", details: error.message });
+    }
+  });
 };
 
+
+
+//after regis, this is executed
 exports.createUserProfile = async (req, res) => {
   try {
     const { firstName, lastName, birthday } = req.body;
@@ -173,48 +241,32 @@ exports.createUserProfile = async (req, res) => {
   }
 };
 
+// Update an existing profile
 exports.updateProfile = async (req, res) => {
-  try {
-    // Extract the token from cookies
-    const token = req.cookies.token;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get userId from token
+  upload(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res
+          .status(400)
+          .json({ msg: "Image size exceeds the limit of 5MB." });
+      }
+      return res.status(400).json({ msg: err.message });
+    }
 
-    // Extract profile details from request body
-    const {
-      firstName,
-      lastName,
-      birthday,
-      careerBackground,
-      accountEmail,
-      collegeProgram,
-      contactInformation,
-      employmentStatus,
-      maritalStatus,
-      placeOfEmployment,
-      profession,
-      professionAlignment,
-      profileImage,
-      salaryRange,
-      secondaryEducation,
-      specialization,
-      tertiaryEducation,
-      timeToJob,
-      workIndustry,
-      yearGraduatedCollege,
-      yearStartedCollege,
-      attachments,
-    } = req.body;
+    try {
+      // Extract the token from cookies
+      const token = req.cookies.token;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userId = decoded.id; // Get userId from token
 
-    // Find the existing profile and update it
-    const updatedProfile = await UserProfile.findOneAndUpdate(
-      { userId }, // Find profile by userId
-      {
+      // Extract profile details from request body
+      const {
         firstName,
         lastName,
         birthday,
         careerBackground,
         accountEmail,
+        college,
         collegeProgram,
         contactInformation,
         employmentStatus,
@@ -222,7 +274,6 @@ exports.updateProfile = async (req, res) => {
         placeOfEmployment,
         profession,
         professionAlignment,
-        profileImage,
         salaryRange,
         secondaryEducation,
         specialization,
@@ -231,40 +282,151 @@ exports.updateProfile = async (req, res) => {
         workIndustry,
         yearGraduatedCollege,
         yearStartedCollege,
-        attachments: attachments || [],
-      },
-      { new: true, upsert: false } // Return the updated document, don't create if it doesn't exist
-    );
+        attachmentIds = [],
+      } = req.body;
 
-    if (!updatedProfile) {
-      return res
-        .status(404)
-        .json({ error: "Profile not found. Please create a profile first." });
-    }
-    // If accountEmail is provided, update the email in User model
-    if (accountEmail) {
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { email: accountEmail }, // Update the user's email with the new accountEmail
-        { new: true, upsert: false } // Don't create a new user if not found
-      );
-      if (!updatedUser) {
+      // Find the existing profile
+      const userProfile = await UserProfile.findOne({ userId });
+      if (!userProfile) {
         return res
           .status(404)
-          .json({ error: "User not found while updating email." });
+          .json({ error: "Profile not found. Please create a profile first." });
       }
-    }
 
-    res.status(200).json({
-      message: "Profile updated successfully!",
-      profile: updatedProfile,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Failed to update profile", details: error.message });
-  }
+      // If a new image is uploaded, delete the old one
+      if (req.files && req.files.profileImage && userProfile.profileImage) {
+        const previousImagePath = path.join(
+          __dirname,
+          "../../",
+          userProfile.profileImage
+        );
+        deletePreviousImage(previousImagePath);
+      }
+
+      // Handle profileImage
+      const profileImage = req.files && req.files.profileImage
+        ? `/uploads/profileimg/${req.files.profileImage[0].filename}`
+        : userProfile.profileImage; // Keep old image if none uploaded
+
+      // Handle attachments array
+      const existingAttachments = userProfile.attachments || [];
+
+      // Process new attachments (from uploaded files)
+      const newAttachments = req.files && req.files.attachments
+        ? req.files.attachments.map((file, index) => {
+            const attachmentId = attachmentIds[index] || null;
+            return {
+              _id: attachmentId, // Existing ID from frontend
+              filename: file.originalname,
+              filepath: `/uploads/attachments/${file.filename}`,
+            };
+          })
+        : [];
+
+      console.log("New attachments processed:", newAttachments);
+
+      // Updated attachments by replacing existing ones if IDs match
+      const updatedAttachments = existingAttachments.map(existingAttachment => {
+        const matchingNewAttachment = newAttachments.find(newAtt => newAtt._id === existingAttachment._id);
+
+        if (matchingNewAttachment) {
+          // Log the matching case
+          console.log(`Replacing existing attachment with ID: ${existingAttachment._id}`);
+          console.log("Existing attachment:", existingAttachment);
+          console.log("New attachment:", matchingNewAttachment);
+
+          // Delete old file before replacing it
+          const oldAttachmentPath = path.join(__dirname, `../../${existingAttachment.filepath}`);
+          if (fs.existsSync(oldAttachmentPath)) {
+            fs.unlinkSync(oldAttachmentPath); // Remove old file from disk
+            console.log(`Deleted old file: ${existingAttachment.filename}`);
+          } else {
+            console.log(`Old file not found for deletion: ${existingAttachment.filename}`);
+          }
+
+          // Replace with new attachment (while keeping the ID)
+          return {
+            _id: existingAttachment._id, // Keep the old ID
+            filename: matchingNewAttachment.filename, // Replace filename
+            filepath: matchingNewAttachment.filepath, // Replace filepath
+          };
+        }
+
+        // Log when an attachment is kept unchanged
+        console.log(`Keeping existing attachment with ID: ${existingAttachment._id}`);
+        return existingAttachment;
+      });
+
+      // Add new attachments that don't have a match in existingAttachments
+      const finalAttachments = [
+        ...updatedAttachments, // Replaced or unchanged existing attachments
+        ...newAttachments.filter(newAtt => !existingAttachments.some(existing => existing._id === newAtt._id)),
+      ];
+
+      console.log("Final attachments after update:", finalAttachments);
+
+      // Update profile data
+      const updatedProfileData = {
+        firstName,
+        lastName,
+        birthday,
+        careerBackground,
+        accountEmail,
+        college,
+        collegeProgram,
+        contactInformation,
+        employmentStatus,
+        maritalStatus,
+        placeOfEmployment,
+        profession,
+        professionAlignment,
+        profileImage, // Use new profile image handling logic
+        salaryRange,
+        secondaryEducation,
+        specialization,
+        tertiaryEducation,
+        timeToJob,
+        workIndustry,
+        yearGraduatedCollege,
+        yearStartedCollege,
+        attachments: finalAttachments, // Use new attachments handling logic
+      };
+
+      // Update the profile in the database
+      const updatedProfile = await UserProfile.findOneAndUpdate(
+        { userId },
+        updatedProfileData,
+        { new: true }
+      );
+
+      // If accountEmail is provided, update the email in the User model
+      if (accountEmail) {
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { email: accountEmail },
+          { new: true, upsert: false }
+        );
+        if (!updatedUser) {
+          return res
+            .status(404)
+            .json({ error: "User not found while updating email." });
+        }
+      }
+
+      // Respond with success
+      res.status(200).json({
+        message: "Profile updated successfully!",
+        profile: updatedProfile,
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res
+        .status(500)
+        .json({ error: "Failed to update profile", details: error.message });
+    }
+  });
 };
+
 
 exports.changePassword = async (req, res) => {
   try {
@@ -308,6 +470,70 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ error: "Server error", message: error.message });
   }
 };
+
+exports.deleteAttachment = async (req, res) => {
+  console.log("Delete Attachment function triggered");
+  console.log("Received parameters:", req.params);
+
+  const { profileId, attachmentId } = req.params;
+
+  // Token extraction and user identification
+  const token = req.cookies.token;
+  if (!token) {
+    console.log("Token is missing.");
+    return res.status(401).json({ message: "Unauthorized, token missing." });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(401).json({ message: "Unauthorized, invalid token." });
+  }
+
+  const userId = decoded.id; // Get userId from the decoded token
+
+  try {
+    // Check if the user profile exists
+    const userProfile = await UserProfile.findOne({ _id: profileId, userId });
+    if (!userProfile) {
+      console.log(`User profile not found for profile ID: ${profileId} and user ID: ${userId}`);
+      return res.status(404).json({ message: "User profile not found." });
+    }
+
+    // Find the attachment to delete
+    const attachmentIndex = userProfile.attachments.findIndex(att => att._id.toString() === attachmentId);
+    if (attachmentIndex === -1) {
+      return res.status(404).json({ message: "Attachment not found." });
+    }
+
+    // Delete the file from the server if necessary
+    const attachmentPath = path.join(__dirname, `../../${userProfile.attachments[attachmentIndex].filepath}`);
+    if (fs.existsSync(attachmentPath)) {
+      fs.unlinkSync(attachmentPath); // Remove old file from disk
+      console.log(`Deleted attachment file: ${attachmentPath}`);
+    }
+
+    // Use Mongoose's $pull operator to remove the attachment
+    userProfile.attachments.splice(attachmentIndex, 1); // Remove the attachment from the array
+
+    // Save the updated profile
+    await userProfile.save();
+
+    console.log(`Attachment with ID: ${attachmentId} deleted successfully for user ID: ${userId}`);
+    return res.status(200).json({
+      message: "Attachment deleted successfully.",
+    });
+  } catch (error) {
+    console.error(`Error deleting attachment:`, error);
+    return res.status(500).json({
+      message: "Error deleting attachment",
+      error: error.message,
+    });
+  }
+};
+
 
 exports.deleteSection = async (req, res) => {
   console.log("DeleteSection function triggered");

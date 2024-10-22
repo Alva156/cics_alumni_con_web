@@ -13,6 +13,8 @@ const port = process.env.PORT || 6001;
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
+app.use("/uploads/profileimg", express.static("uploads/profileimg"));
+app.use("/uploads/attachments", express.static("uploads/attachments"));
 
 // Serve static files from the frontend dist folder
 app.use(express.static(path.join(__dirname, "../frontend/dist"))); // Adjust path based on where your backend is relative to the frontend build

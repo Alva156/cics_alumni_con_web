@@ -74,10 +74,7 @@ function UserProfile() {
     },
   ]);
 
-  // Initialize attachments state
-  const [attachments, setAttachments] = useState([
-    { id: uniqueId(), file: null, filename: "", filepath: "" },
-  ]);
+  
 
   const collegePrograms = {
     "UST-AMV College of Accountancy": ["Accountancy", "Accounting Information System", "Management Accounting"],
@@ -110,22 +107,49 @@ function UserProfile() {
     setCollegeProgram(""); // Ensure college program resets
   };
 
-  // Handler for file selection
+// Initialize attachments state
+const [attachments, setAttachments] = useState([
+  { id: uniqueId(), file: null, filename: "", filepath: "" },
+]);
 
   // Update attachments state after file upload
   const handleFileChange = (e, index) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]; // Get the new file from the input
     if (file) {
-      const newAttachments = [...attachments];
-      newAttachments[index] = {
-        ...newAttachments[index],
-        file, // Set the file directly in the attachment object
-        filename: file.name, // Set the filename from the selected file
-      };
-      setAttachments(newAttachments);
+      console.log(`Selected input field: ${index + 1}`);
+      
+      setAttachments((prevAttachments) => {
+        const updatedAttachments = [...prevAttachments];
+        const existingAttachment = updatedAttachments[index];
+  
+        // Log the entire existing attachment for debugging
+        console.log('Existing attachment:', existingAttachment);
+  
+        // Only update if the file is different
+        if (existingAttachment.file !== file) {
+          console.log(`Replacing file: ${existingAttachment.filename}`);
+          
+          // Ensure the ID is retained from the existing attachment
+          updatedAttachments[index] = {
+            ...existingAttachment, // Keep all existing data
+            file,  // Set the new file object
+            filename: file.name,  // Update the filename
+            id: existingAttachment.id, // Retain the old ID
+          };
+  
+          console.log(`Old ID: ${existingAttachment.id}`); // Log the old ID
+          console.log(`New file: ${file.name}`); // Log the new file name
+        } else {
+          console.log(`No change in file for input field: ${index + 1}`);
+        }
+  
+        return updatedAttachments; // Return the updated attachments array
+      });
+    } else {
+      console.log(`No file selected for input field: ${index + 1}`);
     }
   };
-
+  
   // Function to add a new attachment field
   const addAttachment = () => {
     setAttachments((prev) => [
@@ -377,14 +401,14 @@ const addCompanySection = async () => {
 
     const formData = new FormData();
 
-    attachments.forEach((attachment) => {
+    attachments.forEach((attachment, index) => {
       if (attachment.file) {
-        console.log(`Appending attachment: ${attachment.filename}`); // Log the filename
-        formData.append('attachments', attachment.file); // Just append the file without index
-      } else {
-        console.warn(`Attachment is undefined or not selected for ${attachment.filename}`); // Log a warning if no file
+        formData.append("attachments", attachment.file);
+        formData.append("attachmentIds", attachment.id || ""); // Add the ID or empty string
       }
     });
+    
+    
 
   if (profileImage) {
     formData.append("profileImage", profileImage);
@@ -424,7 +448,11 @@ const addCompanySection = async () => {
         }
       );
       
-      setAttachments(updatedProfile.data.attachments || []);
+      setAttachments(updatedProfile.data.attachments.map((attachment) => ({
+        id: attachment.id, // The unique ID from the backend
+        filename: attachment.filename,
+        filepath: attachment.filepath,
+      })));
       setProfileImage(updatedProfile.data.profileImage); // Update the image state with new image
       setImagePreview(null); // Clear the preview after upload
       // Update state with the newly fetched data
@@ -1251,6 +1279,7 @@ const addCompanySection = async () => {
                     </div>
                     <input
                       type="file"
+                      name={`attachment-${index}`}
                       accept="application/pdf"
                       className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
                       onChange={(e) => handleFileChange(e, index)} // Pass the correct index

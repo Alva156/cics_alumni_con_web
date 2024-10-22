@@ -282,6 +282,7 @@ exports.updateProfile = async (req, res) => {
         workIndustry,
         yearGraduatedCollege,
         yearStartedCollege,
+        attachmentIds = [],
       } = req.body;
 
       // Find the existing profile
@@ -310,32 +311,49 @@ exports.updateProfile = async (req, res) => {
       // Handle attachments array
       const existingAttachments = userProfile.attachments || [];
 
-      // Process new attachments
-      const newAttachments = req.files && req.files.attachments
-        ? req.files.attachments.map(file => ({
-            filename: file.originalname,
-            filepath: `/uploads/attachments/${file.filename}`,
-            // Assuming each attachment has an `id` field from the frontend
-            // id: uniqueId() // Generate a unique ID for the new attachment
-          }))
-        : []; // No new attachments
+// Process new attachments
+const newAttachments = req.files && req.files.attachments
+  ? req.files.attachments.map((file, index) => {
+      // Check if there's an ID from the frontend
+      const attachmentId = attachmentIds[index] || null;
 
-      // Update attachments: replace old ones if the IDs match
-      const updatedAttachments = existingAttachments.map(existingAttachment => {
-        const matchingNewAttachment = newAttachments.find(newAtt => newAtt.id === existingAttachment.id);
-        if (matchingNewAttachment) {
-          // Delete the old file before replacing it
-          deletePreviousImage(existingAttachment.filepath); // Remove the old file
-          return matchingNewAttachment; // Replace with the new attachment
-        }
-        return existingAttachment; // Keep the old attachment if no new match
-      });
+      return {
+        id: attachmentId, // Use the existing ID from the frontend
+        filename: file.originalname,
+        filepath: `/uploads/attachments/${file.filename}`,
+      };
+    })
+  : [];
 
-      // Add new attachments that don't have a match in existingAttachments
-      const finalAttachments = [
-        ...updatedAttachments,
-        ...newAttachments.filter(newAtt => !existingAttachments.some(existing => existing.id === newAtt.id))
-      ];
+// Update attachments: Replace old ones if the IDs match
+const updatedAttachments = existingAttachments.map(existingAttachment => {
+  // Find a matching new attachment using the existing attachment's ID
+  const matchingNewAttachment = newAttachments.find(newAtt => newAtt.id === existingAttachment.id);
+
+  if (matchingNewAttachment) {
+    // Delete the old file before replacing it
+    const oldAttachmentPath = path.join(__dirname, `../../../${existingAttachment.filepath}`);
+    if (fs.existsSync(oldAttachmentPath)) {
+      fs.unlinkSync(oldAttachmentPath); // Remove the old file from disk
+      console.log(`Deleted old file: ${existingAttachment.filename}`); // Log deletion
+    }
+
+    // Return the new attachment, replacing the old one while keeping the ID
+    return {
+      ...existingAttachment, // Keep the old attachment's ID
+      filename: matchingNewAttachment.filename, // Update filename
+      filepath: matchingNewAttachment.filepath, // Update filepath
+    };
+  }
+
+  return existingAttachment; // Keep the old attachment if no new match
+});
+
+// Add new attachments that don't have a match in existingAttachments
+const finalAttachments = [
+  ...updatedAttachments,
+  ...newAttachments.filter(newAtt => !existingAttachments.some(existing => existing.id === newAtt.id)),
+].filter(att => att.id); // Filter out any attachments without an ID
 
       // Update profile data
       const updatedProfileData = {

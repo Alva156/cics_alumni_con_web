@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import sampleidpic from "../../assets/sampleidpic.jpg";
 import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function AdminThreads() {
@@ -868,7 +867,10 @@ function AdminThreads() {
         </div>
       )}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+          style={{ zIndex: 9999 }}
+        >
           {showErrorMessage && (
             <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
               <p>{errorMessage}</p>

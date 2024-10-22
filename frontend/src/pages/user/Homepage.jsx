@@ -10,7 +10,6 @@ import homepage3 from "../../assets/homepage3.jpg";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-
 const Homepage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [fade, setFade] = useState(false);
@@ -21,6 +20,7 @@ const Homepage = () => {
   const [currentEventsIndex, setCurrentEventsIndex] = useState(0);
   const videoRef = useRef(null);
   const navigate = useNavigate();
+  const newsCarouselRef = useRef(null); // Reference for news carousel
 
   const images = [homepage1, homepage2, homepage3];
   const credits = [
@@ -41,6 +41,15 @@ const Homepage = () => {
 
     return () => clearInterval(imageInterval); // Clear interval on component unmount
   }, []);
+
+  useEffect(() => {
+    // Automatically slide news every 10 seconds
+    const autoSlide = setInterval(() => {
+      nextNews();
+    }, 8000); // 8 seconds
+
+    return () => clearInterval(autoSlide); // Cleanup on unmount
+  }, [news]);
 
   const fetchNews = async () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -65,7 +74,7 @@ const Homepage = () => {
       console.error("Error fetching events:", error);
     }
   };
-  
+
   const nextPage = () => {
     setFade(true);
     setTimeout(() => {
@@ -95,23 +104,28 @@ const Homepage = () => {
   };
 
   const nextNews = () => {
-    setFade(true);
-    setTimeout(() => {
-      setCurrentNewsIndex((prevIndex) =>
-        prevIndex === news.length - 1 ? 0 : prevIndex + 1
-      );
-      setFade(false);
-    }, 500); // Transition timing
+    setCurrentNewsIndex((prevIndex) => {
+      const nextIndex = prevIndex === news.length - 1 ? 0 : prevIndex + 1;
+      slideTo(nextIndex);
+      return nextIndex;
+    });
   };
 
   const prevNews = () => {
-    setFade(true);
-    setTimeout(() => {
-      setCurrentNewsIndex((prevIndex) =>
-        prevIndex === 0 ? news.length - 1 : prevIndex - 1
-      );
-      setFade(false);
-    }, 500); // Transition timing
+    setCurrentNewsIndex((prevIndex) => {
+      const prevIndexValue = prevIndex === 0 ? news.length - 1 : prevIndex - 1;
+      slideTo(prevIndexValue);
+      return prevIndexValue;
+    });
+  };
+
+  const slideTo = (index) => {
+    const carousel = newsCarouselRef.current;
+    const scrollAmount = index * carousel.clientWidth; // Slide by one card
+    carousel.scrollTo({
+      left: scrollAmount,
+      behavior: "smooth",
+    });
   };
 
   const nextEvent = () => {
@@ -138,6 +152,7 @@ const Homepage = () => {
     navigate(path);
     window.scrollTo(0, 0); // Scroll to the top of the page
   };
+
 
   return (
     <div className="homepage-wrapper">
@@ -170,27 +185,34 @@ const Homepage = () => {
               </h2>
   
               <div className="carousel-wrapper">
-                {news.length > 0 && (
-                  <div className="news-item">
+              <ul className="carousel-news" ref={newsCarouselRef}>
+                {news.map((item, index) => (
+                  <li className="item" key={index}>
                     <img
-                      src={`${import.meta.env.VITE_BACKEND_URL}${news[currentNewsIndex].image}`}
-                      alt={news[currentNewsIndex].name}
+                      src={`${import.meta.env.VITE_BACKEND_URL}${item.image}`}
+                      alt={item.name}
                       className="news-image"
                     />
                     <div className="news-content">
-                      <div className="carousel-news-title">{news[currentNewsIndex].name}</div>
+                      <div className="carousel-news-title">{item.name}</div>
                       <p className="news-description">
-                        {news[currentNewsIndex].description.slice(0, 30)}...
+                        {item.description.slice(0, 30)}...
                       </p>
-                      <a href="#" className="read-more-link" onClick={() => handleNavigation(`/user-news?id=${news[currentNewsIndex]._id}`)}>
+                      <a href="#" className="read-more-link">
                         Read More
                       </a>
                     </div>
-                  </div>
-                )}
-              </div>
-              <button className="carousel-button prev" onClick={prevNews}>❮</button>
-              <button className="carousel-button next" onClick={nextNews}>❯</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <button className="carousel-button prev" onClick={prevNews}>
+              ❮
+            </button>
+            <button className="carousel-button next" onClick={nextNews}>
+              ❯
+            </button>
             </div>
   
             {/* Events Carousel Section */}

@@ -176,7 +176,13 @@ const AdminDashboard = () => {
   };
 
   const data5 = {
-    labels: ["Employed", "Unemployed", "Underemployed", "Retired"],
+    labels: [
+      "Employed",
+      "Self-Employed",
+      "Unemployed",
+      "Underemployed",
+      "Freelancing",
+    ],
     datasets: [
       {
         label: "Number of Alumni",
@@ -188,7 +194,7 @@ const AdminDashboard = () => {
   };
 
   const data6 = {
-    labels: ["Local", "International"],
+    labels: ["Public", "Private"],
     datasets: [
       {
         label: "Number of Alumni",
@@ -254,7 +260,7 @@ const AdminDashboard = () => {
       <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
         <div>
           <div className="text-sm text-black-600">
-            Number of currently employed users
+            Number of currently working users
           </div>
           <div className="text-lg font-medium mb-1 mt-2">
             {dashboardData.employedUsers}

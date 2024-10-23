@@ -750,9 +750,13 @@ exports.getDashboardStats = async (req, res) => {
     // Calculate number of users
     const numberOfUsers = filteredAlumni.length;
 
-    // Number of employed users
+    // Number of working users
     const employedUsers = filteredAlumni.filter(
-      (profile) => profile.employmentStatus === "Employed"
+      (profile) =>
+        profile.employmentStatus === "Employed" ||
+        profile.employmentStatus === "Self-employed" ||
+        profile.employmentStatus === "Underemployed" ||
+        profile.employmentStatus === "Freelancing"
     ).length;
 
     //users per college
@@ -807,9 +811,10 @@ exports.getDashboardStats = async (req, res) => {
     // Employment status
     const employmentStatus = [
       "Employed",
+      "Self-employed",
       "Unemployed",
       "Underemployed",
-      "Freelance",
+      "Freelancing",
     ];
     const usersPerEmploymentStatus = employmentStatus.map(
       (status) =>
@@ -818,7 +823,7 @@ exports.getDashboardStats = async (req, res) => {
     );
 
     // Work industries
-    const workIndustries = ["Local", "International"];
+    const workIndustries = ["Public", "Private"];
     const usersPerWorkIndustry = workIndustries.map(
       (industry) =>
         filteredAlumni.filter((profile) => profile.workIndustry === industry)

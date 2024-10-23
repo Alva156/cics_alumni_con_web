@@ -827,21 +827,37 @@ function AdminReports() {
         </div>
         <div className="">
           <CSVLink
-            data={alumni.map((row) => ({
-              FirstName: row.firstName,
-              LastName: row.lastName,
-              Birthday: formatDate(row.birthday),
-              ...(selectedFields.includes("All Fields") ||
-              selectedFields.length === 0
-                ? availableFields.reduce((acc, field) => {
-                    acc[field] = getNestedValue(row, fieldToKeyMap[field]);
-                    return acc;
-                  }, {})
-                : selectedFields.reduce((acc, field) => {
-                    acc[field] = getNestedValue(row, fieldToKeyMap[field]);
-                    return acc;
-                  }, {})),
-            }))}
+            data={filteredData.map((row) => {
+              // Default fields that will always be included
+              const defaultFields = {
+                FirstName: row.firstName || "---------",
+                LastName: row.lastName || "---------",
+                Birthday: formatDate(row.birthday) || "---------",
+              };
+
+              // Dynamically add selected fields or all available fields if no specific fields are selected
+              const dynamicFields =
+                selectedFields.includes("All Fields") ||
+                selectedFields.length === 0
+                  ? availableFields.reduce((acc, field) => {
+                      acc[field] =
+                        getNestedValue(row, fieldToKeyMap[field]) ||
+                        "---------";
+                      return acc;
+                    }, {})
+                  : selectedFields.reduce((acc, field) => {
+                      acc[field] =
+                        getNestedValue(row, fieldToKeyMap[field]) ||
+                        "---------";
+                      return acc;
+                    }, {});
+
+              // Combine default fields with dynamic fields
+              return {
+                ...defaultFields,
+                ...dynamicFields,
+              };
+            })}
             filename="cicsalumniconnect_report.csv"
             className="btn md:w-64 w-52 bg-green text-white"
           >

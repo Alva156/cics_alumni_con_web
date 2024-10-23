@@ -25,7 +25,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
   fileFilter: (req, file, cb) => {
     let filetypes;
-    
+
     // Determine allowed file types based on field name
     if (file.fieldname === "profileImage") {
       filetypes = /jpeg|jpg|png/; // Only allow image formats for profile image
@@ -35,7 +35,9 @@ const upload = multer({
       return cb(new Error("Invalid field name."));
     }
 
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
     const mimetype = filetypes.test(file.mimetype);
 
     if (!mimetype || !extname) {
@@ -48,8 +50,6 @@ const upload = multer({
   { name: "profileImage", maxCount: 1 }, // Single profile image
   { name: "attachments", maxCount: 10 }, // Up to 10 attachments
 ]);
-
-
 
 // Function to delete previous image
 const deletePreviousImage = (filePath) => {
@@ -122,17 +122,19 @@ exports.createProfile = async (req, res) => {
       }
 
       // Handle profileImage
-      const profileImage = req.files && req.files.profileImage
-        ? `/uploads/profileimg/${req.files.profileImage[0].filename}`
-        : null; // Set profile image path
+      const profileImage =
+        req.files && req.files.profileImage
+          ? `/uploads/profileimg/${req.files.profileImage[0].filename}`
+          : null; // Set profile image path
 
       // Handle attachments array
-      const attachments = req.files && req.files.attachments
-  ? req.files.attachments.map(file => ({
-      filename: file.originalname, // Store original filename
-      filepath: `/uploads/attachments/${file.filename}`, // Store file path
-    }))
-  : [];
+      const attachments =
+        req.files && req.files.attachments
+          ? req.files.attachments.map((file) => ({
+              filename: file.originalname, // Store original filename
+              filepath: `/uploads/attachments/${file.filename}`, // Store file path
+            }))
+          : [];
 
       // Extract profile details from request body
       const profileData = {
@@ -191,8 +193,6 @@ exports.createProfile = async (req, res) => {
     }
   });
 };
-
-
 
 //after regis, this is executed
 exports.createUserProfile = async (req, res) => {
@@ -304,63 +304,81 @@ exports.updateProfile = async (req, res) => {
       }
 
       // Handle profileImage
-      const profileImage = req.files && req.files.profileImage
-        ? `/uploads/profileimg/${req.files.profileImage[0].filename}`
-        : userProfile.profileImage; // Keep old image if none uploaded
+      const profileImage =
+        req.files && req.files.profileImage
+          ? `/uploads/profileimg/${req.files.profileImage[0].filename}`
+          : userProfile.profileImage; // Keep old image if none uploaded
 
       // Handle attachments array
       const existingAttachments = userProfile.attachments || [];
 
       // Process new attachments (from uploaded files)
-      const newAttachments = req.files && req.files.attachments
-        ? req.files.attachments.map((file, index) => {
-            const attachmentId = attachmentIds[index] || null;
-            return {
-              _id: attachmentId, // Existing ID from frontend
-              filename: file.originalname,
-              filepath: `/uploads/attachments/${file.filename}`,
-            };
-          })
-        : [];
+      const newAttachments =
+        req.files && req.files.attachments
+          ? req.files.attachments.map((file, index) => {
+              const attachmentId = attachmentIds[index] || null;
+              return {
+                _id: attachmentId, // Existing ID from frontend
+                filename: file.originalname,
+                filepath: `/uploads/attachments/${file.filename}`,
+              };
+            })
+          : [];
 
       console.log("New attachments processed:", newAttachments);
 
       // Updated attachments by replacing existing ones if IDs match
-      const updatedAttachments = existingAttachments.map(existingAttachment => {
-        const matchingNewAttachment = newAttachments.find(newAtt => newAtt._id === existingAttachment._id);
+      const updatedAttachments = existingAttachments.map(
+        (existingAttachment) => {
+          const matchingNewAttachment = newAttachments.find(
+            (newAtt) => newAtt._id === existingAttachment._id
+          );
 
-        if (matchingNewAttachment) {
-          // Log the matching case
-          console.log(`Replacing existing attachment with ID: ${existingAttachment._id}`);
-          console.log("Existing attachment:", existingAttachment);
-          console.log("New attachment:", matchingNewAttachment);
+          if (matchingNewAttachment) {
+            // Log the matching case
+            console.log(
+              `Replacing existing attachment with ID: ${existingAttachment._id}`
+            );
+            console.log("Existing attachment:", existingAttachment);
+            console.log("New attachment:", matchingNewAttachment);
 
-          // Delete old file before replacing it
-          const oldAttachmentPath = path.join(__dirname, `../../${existingAttachment.filepath}`);
-          if (fs.existsSync(oldAttachmentPath)) {
-            fs.unlinkSync(oldAttachmentPath); // Remove old file from disk
-            console.log(`Deleted old file: ${existingAttachment.filename}`);
-          } else {
-            console.log(`Old file not found for deletion: ${existingAttachment.filename}`);
+            // Delete old file before replacing it
+            const oldAttachmentPath = path.join(
+              __dirname,
+              `../../${existingAttachment.filepath}`
+            );
+            if (fs.existsSync(oldAttachmentPath)) {
+              fs.unlinkSync(oldAttachmentPath); // Remove old file from disk
+              console.log(`Deleted old file: ${existingAttachment.filename}`);
+            } else {
+              console.log(
+                `Old file not found for deletion: ${existingAttachment.filename}`
+              );
+            }
+
+            // Replace with new attachment (while keeping the ID)
+            return {
+              _id: existingAttachment._id, // Keep the old ID
+              filename: matchingNewAttachment.filename, // Replace filename
+              filepath: matchingNewAttachment.filepath, // Replace filepath
+            };
           }
 
-          // Replace with new attachment (while keeping the ID)
-          return {
-            _id: existingAttachment._id, // Keep the old ID
-            filename: matchingNewAttachment.filename, // Replace filename
-            filepath: matchingNewAttachment.filepath, // Replace filepath
-          };
+          // Log when an attachment is kept unchanged
+          console.log(
+            `Keeping existing attachment with ID: ${existingAttachment._id}`
+          );
+          return existingAttachment;
         }
-
-        // Log when an attachment is kept unchanged
-        console.log(`Keeping existing attachment with ID: ${existingAttachment._id}`);
-        return existingAttachment;
-      });
+      );
 
       // Add new attachments that don't have a match in existingAttachments
       const finalAttachments = [
         ...updatedAttachments, // Replaced or unchanged existing attachments
-        ...newAttachments.filter(newAtt => !existingAttachments.some(existing => existing._id === newAtt._id)),
+        ...newAttachments.filter(
+          (newAtt) =>
+            !existingAttachments.some((existing) => existing._id === newAtt._id)
+        ),
       ];
 
       console.log("Final attachments after update:", finalAttachments);
@@ -426,7 +444,6 @@ exports.updateProfile = async (req, res) => {
     }
   });
 };
-
 
 exports.changePassword = async (req, res) => {
   try {
@@ -498,18 +515,25 @@ exports.deleteAttachment = async (req, res) => {
     // Check if the user profile exists
     const userProfile = await UserProfile.findOne({ _id: profileId, userId });
     if (!userProfile) {
-      console.log(`User profile not found for profile ID: ${profileId} and user ID: ${userId}`);
+      console.log(
+        `User profile not found for profile ID: ${profileId} and user ID: ${userId}`
+      );
       return res.status(404).json({ message: "User profile not found." });
     }
 
     // Find the attachment to delete
-    const attachmentIndex = userProfile.attachments.findIndex(att => att._id.toString() === attachmentId);
+    const attachmentIndex = userProfile.attachments.findIndex(
+      (att) => att._id.toString() === attachmentId
+    );
     if (attachmentIndex === -1) {
       return res.status(404).json({ message: "Attachment not found." });
     }
 
     // Delete the file from the server if necessary
-    const attachmentPath = path.join(__dirname, `../../${userProfile.attachments[attachmentIndex].filepath}`);
+    const attachmentPath = path.join(
+      __dirname,
+      `../../${userProfile.attachments[attachmentIndex].filepath}`
+    );
     if (fs.existsSync(attachmentPath)) {
       fs.unlinkSync(attachmentPath); // Remove old file from disk
       console.log(`Deleted attachment file: ${attachmentPath}`);
@@ -521,7 +545,9 @@ exports.deleteAttachment = async (req, res) => {
     // Save the updated profile
     await userProfile.save();
 
-    console.log(`Attachment with ID: ${attachmentId} deleted successfully for user ID: ${userId}`);
+    console.log(
+      `Attachment with ID: ${attachmentId} deleted successfully for user ID: ${userId}`
+    );
     return res.status(200).json({
       message: "Attachment deleted successfully.",
     });
@@ -533,7 +559,6 @@ exports.deleteAttachment = async (req, res) => {
     });
   }
 };
-
 
 exports.deleteSection = async (req, res) => {
   console.log("DeleteSection function triggered");
@@ -643,6 +668,74 @@ exports.getAllAlumni = async (req, res) => {
     });
   }
 };
+exports.getAttachments = async (req, res) => {
+  try {
+    // Fetch all user profiles and include attachments
+    const userProfiles = await UserProfile.find().select("attachments");
+
+    if (!userProfiles || userProfiles.length === 0) {
+      return res.status(404).json({ msg: "No attachments found" });
+    }
+
+    // Aggregate all attachments from different user profiles
+    const allAttachments = userProfiles
+      .flatMap((profile) => profile.attachments)
+      .filter(Boolean); // Ensure to filter out any undefined values
+
+    res.status(200).json({ attachments: allAttachments });
+  } catch (error) {
+    console.error("Error fetching attachments:", error);
+    res.status(500).json({ error: "Server Error", message: error.message });
+  }
+};
+
+exports.downloadAttachment = async (req, res) => {
+  try {
+    const { filename } = req.params;
+
+    // Find the user profile containing the attachment
+    const userProfile = await UserProfile.findOne({
+      "attachments.filename": filename,
+    });
+
+    if (!userProfile) {
+      return res.status(404).json({ msg: "Attachment not found" });
+    }
+
+    // Locate the specific attachment by filename
+    const attachment = userProfile.attachments.find(
+      (att) => att.filename === filename
+    );
+
+    if (!attachment) {
+      return res.status(404).json({ msg: "Attachment data not found" });
+    }
+
+    // Construct the full path to the file, assuming 'filepath' is a relative path like 'example.pdf'
+    const filePath = path.join(__dirname, "../..", attachment.filepath);
+
+    // Log the final file path for debugging
+    console.log("File path for download:", filePath);
+
+    // Check if the file exists at the computed path
+    if (!fs.existsSync(filePath)) {
+      console.log("File not found at path:", filePath); // Log the path for debugging
+      return res.status(404).json({ msg: "File not found on the server" });
+    }
+
+    // Send the file as a download
+    res.download(filePath, filename, (err) => {
+      if (err) {
+        console.error("Error during file download:", err);
+        res.status(500).json({ error: "Error downloading the file" });
+      }
+    });
+  } catch (error) {
+    console.error("Error downloading attachment:", error);
+    res.status(500).json({ error: "Server Error", message: error.message });
+  }
+};
+
 // DASHBOARD
 exports.getDashboardStats = async (req, res) => {
   try {

@@ -15,6 +15,7 @@ function Alumni() {
     tertiaryEducation: [],
     careerBackground: [],
   });
+  const [attachments, setAttachments] = useState([]);
 
   const formatDate = (dateString) => {
     if (!dateString) return " ";
@@ -23,6 +24,43 @@ function Alumni() {
     return date.toLocaleDateString(undefined, options);
   };
 
+  useEffect(() => {
+    const fetchAttachments = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/profile/attachments`, {
+          withCredentials: true,
+        });
+        // Assuming attachments is an array of objects with a filename property
+        setAttachments(response.data.attachments || []);
+      } catch (error) {
+        console.error("Error fetching attachments:", error);
+      }
+    };
+
+    fetchAttachments();
+  }, [backendUrl]);
+
+  const renderAttachment = (attachment) => {
+    if (typeof attachment !== "object" || !attachment.filename) {
+      return <p key="invalid">Invalid attachment data</p>;
+    }
+
+    const { filename } = attachment;
+
+    return (
+      <div key={filename} className="mb-4">
+        <a
+          href={`${backendUrl}/profile/attachments/download/${filename}`}
+          download
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline"
+        >
+          {filename}
+        </a>
+      </div>
+    );
+  };
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
@@ -222,7 +260,6 @@ function Alumni() {
                   {selectedAlumni.timeToJob}
                 </p>
               </div>
-
               <input
                 type="radio"
                 name="my_tabs_2"
@@ -264,7 +301,6 @@ function Alumni() {
                   {selectedAlumni.placeOfEmployment}
                 </p>
               </div>
-
               <input
                 type="radio"
                 name="my_tabs_2"
@@ -341,7 +377,6 @@ function Alumni() {
                   )}
                 </p>
               </div>
-
               <input
                 type="radio"
                 name="my_tabs_2"
@@ -354,7 +389,15 @@ function Alumni() {
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6"
               >
                 <h1 className="text-xl mb-4">Attachments</h1>
-                {/* Add any attachment display logic here */}
+                <div className="attachments-container">
+                  {attachments.length > 0 ? (
+                    attachments.map((attachment) =>
+                      renderAttachment(attachment)
+                    )
+                  ) : (
+                    <p>No attachments available.</p>
+                  )}
+                </div>
               </div>
 
               <input
@@ -390,7 +433,6 @@ function Alumni() {
                   </div>
                 ))}
               </div>
-
               <input
                 type="radio"
                 name="my_tabs_2"

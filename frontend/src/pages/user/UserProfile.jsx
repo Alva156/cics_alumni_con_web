@@ -1262,6 +1262,7 @@ function UserProfile() {
                       Choose
                     </option>
                     <option>Employed</option>
+                    <option>Self-employed</option>
                     <option>Unemployed</option>
                     <option>Underemployed</option>
                     <option>Freelancing</option>
@@ -1279,8 +1280,8 @@ function UserProfile() {
                     <option value="" disabled>
                       Choose
                     </option>
-                    <option>Local</option>
-                    <option>International</option>
+                    <option>Public</option>
+                    <option>Private</option>
                   </select>
                 </div>
 

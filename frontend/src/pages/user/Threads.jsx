@@ -707,7 +707,11 @@ function Threads() {
                   className="p-4 border border-black rounded-lg flex items-start mb-2"
                 >
                   <img
-                    src={reply.userProfileId.profileImage || blankprofilepic}
+                    src={
+                      reply.userProfileId.profileImage
+                        ? `${backendUrl}${reply.userProfileId.profileImage}`
+                        : blankprofilepic
+                    }
                     alt="User Avatar"
                     className="w-10 h-10 mr-3"
                   />

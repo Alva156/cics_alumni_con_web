@@ -272,7 +272,7 @@ const Homepage = () => {
             {/* Events Carousel */}
             <div className="events-carousel-container" data-aos="fade-up">
               <h2 className="events-title">
-                <Link to="/events-news" className="events-link">
+                <Link to="/user-events" className="events-link">
                   Upcoming Events
                 </Link>
               </h2>

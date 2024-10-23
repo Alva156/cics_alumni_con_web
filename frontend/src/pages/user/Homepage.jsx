@@ -414,9 +414,9 @@ const Homepage = () => {
                   </div>
                   <div className="square-item">
                     <div className="logo chatbot-logo"></div>
-                    <h3>Chatbot</h3>
+                    <h3>FAQs</h3>
                     <button onClick={() => handleNavigation("/user-chatbot")}>
-                      Chat with Us
+                      Ask Questions
                     </button>
                   </div>
                 </div>

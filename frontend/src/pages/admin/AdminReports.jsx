@@ -7,6 +7,153 @@ import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
 import cicslogo from "../../assets/cicslogo.png";
 
 function AdminReports() {
+
+  const collegePrograms = {
+    "UST-AMV College of Accountancy": [
+      "Accountancy",
+      "Accounting Information System",
+      "Management Accounting",
+    ],
+    "College of Architecture": ["Architecture"],
+    "Faculty of Arts and Letters": [
+      "Asian Studies",
+      "Behavioral Science",
+      "Communication",
+      "Creative Writing",
+      "Economics",
+      "English Language Studies",
+      "History",
+      "Journalism",
+      "Legal Management",
+      "Literature",
+      "Philosophy",
+      "Political Science",
+      "Sociology",
+    ],
+    "Faculty of Civil Law": ["Juris Doctor"],
+    "College of Commerce and Business Administration": [
+      "Business Administration, major in Business Economics",
+      "Business Administration, major in Financial Management",
+      "Business Administration, major in Human Resource Management",
+      "Business Administration, major in Marketing Management",
+      "Entrepreneurship",
+    ],
+    "College of Education": [
+      "Secondary Education Major in English",
+      "Secondary Education Major in Filipino",
+      "Secondary Education Major in Mathematics",
+      "Secondary Education Major in Religious and Values Education",
+      "Secondary Education Major in Science",
+      "Secondary Education Major in Social Studies",
+      "Early Childhood Education",
+      "Elementary Education",
+      "Special Needs Education, major in Early Childhood Education",
+      "Food Technology",
+      "Nutrition and Dietetics",
+      "Bachelor of Library and Information Science",
+    ],
+    "Faculty of Engineering": [
+      "Chemical Engineering",
+      "Civil Engineering",
+      "Electrical Engineering",
+      "Electronics Engineering",
+      "Industrial Engineering",
+      "Mechanical Engineering",
+    ],
+    "College of Fine Arts and Design": [
+      "Fine Arts, major in Advertising Arts",
+      "Fine Arts, major in Industrial Design",
+      "Interior Design",
+      "Fine Arts, major in Painting",
+    ],
+    "College of Information and Computing Sciences": [
+      "Computer Science",
+      "Information Systems",
+      "Information Technology",
+    ],
+    "Faculty of Medicine and Surgery": [
+      "Basic Human Studies",
+      "Doctor of Medicine",
+      "Master in Clinical Audiology",
+      "Master in Pain Management",
+    ],
+    "Conservatory of Music": [
+      "Performance, major in Bassoon",
+      "Performance, major in Choral Conducting",
+      "Performance, major in Clarinet",
+      "Composition",
+      "Performance, major in Double Bass",
+      "Performance, major in Flute",
+      "Performance, major in French Horn",
+      "Performance, major in Guitar",
+      "Jazz",
+      "Musicology",
+      "Music Education",
+      "Music Theatre",
+      "Music Technology",
+      "Performance, major in Oboe",
+      "Performance, major in Orchestral Conducting",
+      "Performance, major in Percussion",
+      "Performance, major in Piano",
+      "Performance, major in Saxophone",
+      "Performance, major in Trombone",
+      "Performance, major in Trumpet",
+      "Performance, major in Tuba",
+      "Performance, major in Viola",
+      "Performance, major in Violin",
+      "Performance, major in Violoncello",
+      "Performance, major in Voice",
+    ],
+    "College of Nursing": ["Nursing"],
+    "Faculty of Pharmacy": [
+      "Biochemistry",
+      "Medical Technology",
+      "Pharmacy",
+      "Pharmacy, major in Clinical Pharmacy",
+      "Doctor of Pharmacy",
+    ],
+    "Institute of Physical Education and Athletics": [
+      "Fitness and Sports Management",
+    ],
+    "College of Rehabilitation Sciences": [
+      "Occupational Therapy",
+      "Physical Therapy",
+      "Speech-Language Pathology",
+      "Sports Science",
+    ],
+    "College of Science": [
+      "Applied Mathematics, major in Actuarial Science",
+      "Applied Physics, major in Instrumentation",
+      "Biology, major in Environmental Biology",
+      "Biology, major in Medical Biology",
+      "Bachelor of Science major in Molecular Biology and Biotechnology",
+      "Chemistry",
+      "Data Science and Analytics",
+      "Microbiology",
+      "Psychology",
+    ],
+    "College of Tourism and Hospitality Management": [
+      "Hospitality Management, major in Culinary Entrepreneurship",
+      "Hospitality Management, major in Hospitality Leadership",
+      "Tourism Management, major in Recreation and Leisure Management",
+      "Tourism Management, major in Travel Operation and Service Management",
+    ],
+    "Faculty of Canon Law": [
+      "Doctor of Canon Law",
+      "Licentiate in Canon Law",
+      "Bachelor of Canon Law",
+    ],
+    "Faculty of Philosophy": [
+      "Doctor of Philosophy",
+      "Licentiate in Philosophy",
+      "Bachelor of Philosophy (Classical)",
+    ],
+    "Faculty of Sacred Theology": [
+      "Doctor of Sacred Theology",
+      "Licentiate in Sacred Theology",
+      "Bachelor of Sacred Theology",
+    ],
+  };
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedPrograms, setSelectedPrograms] = useState(["All Programs"]);
   const [selectedFields, setSelectedFields] = useState(["All Fields"]);
@@ -15,6 +162,11 @@ function AdminReports() {
   const [availableBatches, setAvailableBatches] = useState([]);
   const [openDropdown, setOpenDropdown] = useState("");
   const [alumni, setAlumni] = useState([]);
+  const availableColleges = Object.keys(collegePrograms);
+  const [availablePrograms, setAvailablePrograms] = useState([]);
+
+
+  
 
   const getBase64 = async (url) => {
     const response = await fetch(url);
@@ -34,6 +186,64 @@ function AdminReports() {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
+
+  const handleCollegeSelection = (e) => {
+    const selectedCollege = e.target.value;
+    const isChecked = e.target.checked;
+  
+    if (selectedCollege === "All Colleges") {
+      if (isChecked) {
+        // Select all colleges but don't visually check them
+        setSelectedColleges(["All Colleges"]);
+      } else {
+        // Deselect all colleges
+        setSelectedColleges([]);
+      }
+    } else {
+      // Handle individual college selection
+      const updatedSelectedColleges = isChecked
+        ? [...selectedColleges, selectedCollege]
+        : selectedColleges.filter((college) => college !== selectedCollege);
+  
+      // Remove "All Colleges" if any specific college is unchecked
+      if (updatedSelectedColleges.includes("All Colleges")) {
+        setSelectedColleges(updatedSelectedColleges.filter((college) => college !== "All Colleges"));
+      } else {
+        setSelectedColleges(updatedSelectedColleges);
+      }
+    }
+  };
+  
+  const handleProgramSelection = (event) => {
+    const selectedProgram = event.target.value;
+    setSelectedPrograms((prevSelectedPrograms) => {
+      if (selectedProgram === "All Programs") {
+        return ["All Programs"];
+      }
+      if (prevSelectedPrograms.includes("All Programs")) {
+        return [selectedProgram];
+      }
+      if (prevSelectedPrograms.includes(selectedProgram)) {
+        return prevSelectedPrograms.filter((program) => program !== selectedProgram);
+      } else {
+        return [...prevSelectedPrograms, selectedProgram];
+      }
+    });
+  };
+  
+  // Dynamically update the available programs
+  useEffect(() => {
+    if (selectedColleges.includes("All Colleges") || selectedColleges.length === 0) {
+      // If "All Colleges" is selected or no college is selected, show all programs
+      const allPrograms = availableColleges.flatMap((college) => collegePrograms[college]);
+      setAvailablePrograms(allPrograms);
+    } else {
+      // Show programs related to selected colleges
+      const filteredPrograms = selectedColleges.flatMap((college) => collegePrograms[college]);
+      setAvailablePrograms(filteredPrograms);
+    }
+  }, [selectedColleges]);
+
 
   const fieldToKeyMap = {
     Profession: "profession",
@@ -58,139 +268,7 @@ function AdminReports() {
   };
 
   const availableFields = Object.keys(fieldToKeyMap);
-  const availablePrograms = [
-    "Accountancy",
-    "Accounting Information System",
-    "Management Accounting",
-    "Architecture",
-    "Asian Studies",
-    "Behavioral Science",
-    "Communication",
-    "Creative Writing",
-    "Economics",
-    "English Language Studies",
-    "History",
-    "Journalism",
-    "Legal Management",
-    "Literature",
-    "Philosophy",
-    "Political Science",
-    "Sociology",
-    "Business Administration, major in Business Economics",
-    "Business Administration, major in Financial Management",
-    "Business Administration, major in Human Resource Management",
-    "Business Administration, major in Marketing Management",
-    "Entrepreneurship",
-    "Secondary Education Major in English",
-    "Secondary Education Major in Filipino",
-    "Secondary Education Major in Mathematics",
-    "Secondary Education Major in Religious and Values Education",
-    "Secondary Education Major in Science",
-    "Secondary Education Major in Social Studies",
-    "Early Childhood Education",
-    "Elementary Education",
-    "Special Needs Education, major in Early Childhood Education",
-    "Food Technology",
-    "Nutrition and Dietetics",
-    "Bachelor of Library and Information Science",
-    "Chemical Engineering",
-    "Civil Engineering",
-    "Electrical Engineering",
-    "Electronics Engineering",
-    "Industrial Engineering",
-    "Mechanical Engineering",
-    "Fine Arts, major in Advertising Arts",
-    "Fine Arts, major in Industrial Design",
-    "Interior Design",
-    "Fine Arts, major in Painting",
-    "Computer Science",
-    "Information Systems",
-    "Information Technology",
-    "Basic Human Studies",
-    "Doctor of Medicine",
-    "Master in Clinical Audiology",
-    "Master in Pain Management",
-    "Performance, major in Bassoon",
-    "Performance, major in Choral Conducting",
-    "Performance, major in Clarinet",
-    "Composition",
-    "Performance, major in Double Bass",
-    "Performance, major in Flute",
-    "Performance, major in French Horn",
-    "Performance, major in Guitar",
-    "Jazz",
-    "Musicology",
-    "Music Education",
-    "Music Theatre",
-    "Music Technology",
-    "Performance, major in Oboe",
-    "Performance, major in Orchestral Conducting",
-    "Performance, major in Percussion",
-    "Performance, major in Piano",
-    "Performance, major in Saxophone",
-    "Performance, major in Trombone",
-    "Performance, major in Trumpet",
-    "Performance, major in Tuba",
-    "Performance, major in Viola",
-    "Performance, major in Violin",
-    "Performance, major in Violoncello",
-    "Performance, major in Voice",
-    "Nursing",
-    "Biochemistry",
-    "Medical Technology",
-    "Pharmacy",
-    "Pharmacy, major in Clinical Pharmacy",
-    "Doctor of Pharmacy",
-    "Fitness and Sports Management",
-    "Occupational Therapy",
-    "Physical Therapy",
-    "Speech-Language Pathology",
-    "Sports Science",
-    "Applied Mathematics, major in Actuarial Science",
-    "Applied Physics, major in Instrumentation",
-    "Biology, major in Environmental Biology",
-    "Biology, major in Medical Biology",
-    "Bachelor of Science major in Molecular Biology and Biotechnology",
-    "Chemistry",
-    "Data Science and Analytics",
-    "Microbiology",
-    "Psychology",
-    "Hospitality Management, major in Culinary Entrepreneurship",
-    "Hospitality Management, major in Hospitality Leadership",
-    "Tourism Management, major in Recreation and Leisure Management",
-    "Tourism Management, major in Travel Operation and Service Management",
-    "Doctor of Canon Law",
-    "Licentiate in Canon Law",
-    "Bachelor of Canon Law",
-    "Doctor of Philosophy",
-    "Licentiate in Philosophy",
-    "Bachelor of Philosophy (Classical)",
-    "Doctor of Sacred Theology",
-    "Licentiate in Sacred Theology",
-    "Bachelor of Sacred Theology",
-  ];
-  const availableColleges = [
-    "UST-AMV College of Accountancy",
-    "College of Architecture",
-    "Faculty of Arts and Letters",
-    "Faculty of Civil Law",
-    "College of Commerce and Business Administration",
-    "College of Education",
-    "Faculty of Engineering",
-    "College of Fine Arts and Design",
-    "College of Information and Computing Sciences",
-    "Faculty of Medicine and Surgery",
-    "Conservatory of Music",
-    "College of Nursing",
-    "Faculty of Pharmacy",
-    "Institute of Physical Education and Athletics",
-    "College of Rehabilitation Sciences",
-    "College of Science",
-    "College of Tourism and Hospitality Management",
-    "Faculty of Canon Law",
-    "Faculty of Philosophy",
-    "Faculty of Sacred Theology",
-  ];
+  
 
   // Fetch Alumni Data
 
@@ -241,24 +319,8 @@ function AdminReports() {
   const toggleDropdown = (type) => {
     setOpenDropdown((prev) => (prev === type ? "" : type));
   };
-  const handleCollegeSelection = (event) => {
-    const selectedCollege = event.target.value;
-    setSelectedColleges((prevSelectedColleges) => {
-      if (selectedCollege === "All Colleges") {
-        return ["All Colleges"];
-      }
-      if (prevSelectedColleges.includes("All Colleges")) {
-        return [selectedCollege];
-      }
-      if (prevSelectedColleges.includes(selectedCollege)) {
-        return prevSelectedColleges.filter(
-          (college) => college !== selectedCollege
-        );
-      } else {
-        return [...prevSelectedColleges, selectedCollege];
-      }
-    });
-  };
+
+  
 
   // Handle Batch Selection
   const handleBatchSelection = (event) => {
@@ -278,24 +340,7 @@ function AdminReports() {
     });
   };
 
-  const handleProgramSelection = (event) => {
-    const selectedProgram = event.target.value;
-    setSelectedPrograms((prevSelectedPrograms) => {
-      if (selectedProgram === "All Programs") {
-        return ["All Programs"];
-      }
-      if (prevSelectedPrograms.includes("All Programs")) {
-        return [selectedProgram];
-      }
-      if (prevSelectedPrograms.includes(selectedProgram)) {
-        return prevSelectedPrograms.filter(
-          (program) => program !== selectedProgram
-        );
-      } else {
-        return [...prevSelectedPrograms, selectedProgram];
-      }
-    });
-  };
+  
 
   const handleFieldSelection = (event) => {
     const selectedField = event.target.value;
@@ -468,7 +513,7 @@ function AdminReports() {
           {openDropdown === "colleges" && (
             <div
               ref={dropdownRef}
-              className="z-10 absolute sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
+              className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
             >
               <ul className="p-3 space-y-3 text-sm text-gray-700">
                 {["All Colleges", ...availableColleges].map((college, idx) => (
@@ -482,6 +527,56 @@ function AdminReports() {
                     />
                     <label className="ms-2 sm:text-xs font-medium">
                       {college}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* College Program Dropdown */}
+        <div className="relative mb-6">
+          <button
+            onClick={() => toggleDropdown("programs")}
+            className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+          >
+            <span>College Program</span>
+            <svg
+              className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                openDropdown === "programs" ? "rotate-180" : ""
+              }`}
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
+              />
+            </svg>
+          </button>
+          {openDropdown === "programs" && (
+            <div
+              ref={dropdownRef}
+              className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
+            >
+              <ul className="p-3 space-y-3 text-sm text-gray-700">
+                {["All Programs", ...availablePrograms].map((program, idx) => (
+                  <li key={idx} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      value={program}
+                      checked={selectedPrograms.includes(program)}
+                      onChange={handleProgramSelection}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                    />
+                    <label className="ms-2 sm:text-xs font-medium">
+                      {program}
                     </label>
                   </li>
                 ))}
@@ -518,7 +613,7 @@ function AdminReports() {
           {openDropdown === "batches" && (
             <div
               ref={dropdownRef}
-              className="z-10 absolute sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
+              className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
             >
               <ul className="p-3 space-y-3 text-sm text-gray-700">
                 {["All Batches", ...availableBatches].map((batch, idx) => (
@@ -539,54 +634,7 @@ function AdminReports() {
             </div>
           )}
         </div>
-        <div className="relative mb-6">
-          <button
-            onClick={() => toggleDropdown("programs")}
-            className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
-          >
-            <span>College Program</span>
-            <svg
-              className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-                openDropdown === "programs" ? "rotate-180" : ""
-              }`}
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 10 6"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m1 1 4 4 4-4"
-              />
-            </svg>
-          </button>
-          {openDropdown === "programs" && (
-            <div
-              ref={dropdownRef}
-              className="z-10 absolute sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
-            >
-              <ul className="p-3 space-y-3 text-sm text-gray-700">
-                {["All Programs", ...availablePrograms].map((program, idx) => (
-                  <li key={idx} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      value={program}
-                      checked={selectedPrograms.includes(program)}
-                      onChange={handleProgramSelection}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
-                    />
-                    <label className="ms-2 sm:text-xs font-medium">
-                      {program}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+        
 
         <div className="relative mb-6">
           <button

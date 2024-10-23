@@ -298,51 +298,76 @@ function AdminDocuments() {
 
       <hr className="mb-6 border-black" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDocuments.map((documents) => (
-          <div
-            key={documents._id}
-            className="relative mb-4 p-4 border border-black rounded-lg flex flex-col hover:bg-gray-200 transition-colors cursor-pointer"
-            onClick={() => openViewModal(documents)}
-          >
-            <img
-              src={`${backendUrl}${documents.image}`}
-              alt={documents.name}
-              className="w-full h-48 object-cover rounded-t-lg mb-4 mt-4"
-            />
-            <div className="absolute top-2 right-2 flex space-x-2">
-              <div
-                className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedDocuments(documents);
-                  setIsDeleteModalOpen(true);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Delete
-                </span>
-              </div>
-              <div
-                style={{ marginRight: "8px" }}
-                className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEditModal(documents);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Edit
-                </span>
-              </div>
-            </div>
-            <div>
-              <div className="text-md font-medium mb-1">{documents.name}</div>
-              <div className="text-sm text-black-600">{documents.address}</div>
-            </div>
-          </div>
-        ))}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {filteredDocuments.map((documents) => (
+    <div
+      key={documents._id}
+      className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer relative" // Added relative position
+      onClick={() => openViewModal(documents)}
+    >
+      {documents.image.endsWith(".pdf") ? (
+        <iframe
+          src={`${backendUrl}${documents.image}`}
+          title={documents.name}
+          className="w-full h-48 object-cover rounded-t-lg mb-4"
+          frameBorder="0"
+        />
+      ) : (
+        <img
+          src={`${backendUrl}${documents.image}`}
+          alt={documents.name}
+          className="w-full h-48 object-cover rounded-t-lg mb-4"
+        />
+      )}
+
+      <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+        {documents.name}
       </div>
+      <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+        {documents.description.slice(0, 100)}...
+      </p>
+
+      {/* Button container */}
+      <div className="absolute top-4 right-4 flex space-x-2">
+        <div
+          className="w-8 h-8 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedDocuments(documents);
+            setIsDeleteModalOpen(true);
+          }}
+        >
+          <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Delete
+          </span>
+          <i className="fas fa-trash text-white"></i> {/* Icon for Delete */}
+        </div>
+        <div
+          className="w-8 h-8 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            openEditModal(documents);
+          }}
+        >
+          <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Edit
+          </span>
+          <i className="fas fa-edit text-white"></i> {/* Icon for Edit */}
+        </div>
+      </div>
+
+      <a
+        href="#"
+        style={{ color: "#be142e" }}
+        className="text-sm font-medium hover:underline"
+      >
+        Read More
+      </a>
+    </div>
+  ))}
+</div>
+
+
 
       {/* View Modal */}
       {isViewModalOpen && selectedDocuments && (

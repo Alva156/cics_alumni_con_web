@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const authenticateJWT = require("../../middleware/auth");
 
 const userProfileController = require("../controllers/userProfileController");
@@ -33,7 +34,7 @@ router.delete(
 );
 
 router.delete(
-  '/:profileId/:attachmentId',
+  "/:profileId/:attachmentId",
   authenticateJWT,
   userProfileController.deleteAttachment
 );
@@ -42,6 +43,15 @@ router.get(
   "/dashboard-stats",
   authenticateJWT,
   userProfileController.getDashboardStats
+);
+router.get(
+  "/attachments",
+  authenticateJWT,
+  userProfileController.getAttachments
+);
+router.get(
+  "/attachments/download/:filename",
+  userProfileController.downloadAttachment
 );
 
 module.exports = router;

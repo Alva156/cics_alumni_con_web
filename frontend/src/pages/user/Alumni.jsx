@@ -543,35 +543,35 @@ function Alumni() {
                 </p>
                 <p className="text-xs mb-1/2">Profession</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.profession}
+                  {selectedAlumni.profession || "-"}
                 </p>
                 <p className="text-xs mb-1/2">College</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.college}
+                  {selectedAlumni.college || "-"}
                 </p>
                 <p className="text-xs mb-1/2">College Program</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.collegeProgram}
+                  {selectedAlumni.collegeProgram || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Specialization</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.specialization}
+                  {selectedAlumni.specialization || "-"}
                 </p>
                 <p className="text-xs mb-1/2">
                   Year Started on College Program
                 </p>
                 <p className="text-s mb-2 font-bold">
-                  {formatDate(selectedAlumni.yearStartedCollege)}
+                  {selectedAlumni.yearStartedCollege || "-"}
                 </p>
                 <p className="text-xs mb-1/2">
                   Year Graduated on College Program
                 </p>
                 <p className="text-s mb-2 font-bold">
-                  {formatDate(selectedAlumni.yearGraduatedCollege)}
+                  {selectedAlumni.yearGraduatedCollege || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Time to Land a Job (Months)</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.timeToJob}
+                  {selectedAlumni.timeToJob || "-"}
                 </p>
               </div>
               <input
@@ -588,31 +588,31 @@ function Alumni() {
                 <h1 className="text-xl mb-4">Secondary Information</h1>
                 <p className="text-xs mb-1/2">Employment Status</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.employmentStatus}
+                  {selectedAlumni.employmentStatus || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Work Industry</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.workIndustry}
+                  {selectedAlumni.workIndustry || "-"}
                 </p>
                 <p className="text-xs mb-1/2">
                   Is current profession in line with college degree
                 </p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.professionAlignment}
+                  {selectedAlumni.professionAlignment || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Marital Status</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.maritalStatus}
+                  {selectedAlumni.maritalStatus || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Salary range (PHP)</p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.salaryRange}
+                  {selectedAlumni.salaryRange || "-"}
                 </p>
                 <p className="text-xs mb-1/2">
                   Place of employment (Local or International)
                 </p>
                 <p className="text-s mb-2 font-bold">
-                  {selectedAlumni.placeOfEmployment}
+                  {selectedAlumni.placeOfEmployment || "-"}
                 </p>
               </div>
               <input
@@ -638,7 +638,7 @@ function Alumni() {
                     {selectedAlumni.contactInformation.facebook}
                   </a>
                 ) : (
-                  <p className="text-s mb-2 font-bold"></p>
+                  <p className="text-s mb-2 font-bold">-</p>
                 )}
                 <p className="text-xs mt-2 mb-1/2">LinkedIn</p>
                 {selectedAlumni.contactInformation?.linkedIn ? (
@@ -651,7 +651,7 @@ function Alumni() {
                     {selectedAlumni.contactInformation.linkedIn}
                   </a>
                 ) : (
-                  <p className="text-s mb-2 font-bold"></p>
+                  <p className="text-s mb-2 font-bold">-</p>
                 )}
                 <p className="text-xs mt-2 mb-1/2">Instagram</p>
                 {selectedAlumni.contactInformation?.instagram ? (
@@ -664,7 +664,7 @@ function Alumni() {
                     {selectedAlumni.contactInformation.instagram}
                   </a>
                 ) : (
-                  <p className="text-s mb-2 font-bold"></p>
+                  <p className="text-s mb-2 font-bold">-</p>
                 )}
                 <p className="text-xs mt-2 mb-1/2">Email</p>
                 {selectedAlumni.contactInformation?.email ? (
@@ -675,7 +675,7 @@ function Alumni() {
                     {selectedAlumni.contactInformation.email}
                   </a>
                 ) : (
-                  <p className="text-s mb-2 font-bold"></p>
+                  <p className="text-s mb-2 font-bold">-</p>
                 )}
                 <p className="text-xs mt-2 mb-1/2">Mobile Number</p>
                 <p className="text-s mb-2 font-bold">
@@ -687,7 +687,7 @@ function Alumni() {
                       {selectedAlumni.contactInformation.mobileNumber}
                     </a>
                   ) : (
-                    <p className="text-s mb-2 font-bold"></p>
+                    <p className="text-s mb-2 font-bold">-</p>
                   )}
                 </p>
               </div>
@@ -704,10 +704,11 @@ function Alumni() {
               >
                 <h1 className="text-xl mb-4">Attachments</h1>
                 <div className="attachments-container">
-                  {attachments.length > 0 ? (
-                    attachments.map((attachment) =>
-                      renderAttachment(attachment)
-                    )
+                  {selectedAlumni.attachments &&
+                  selectedAlumni.attachments.length > 0 ? (
+                    selectedAlumni.attachments.map((attachment, index) => (
+                      <div key={index}>{renderAttachment(attachment)}</div>
+                    ))
                   ) : (
                     <p>No attachments available.</p>
                   )}

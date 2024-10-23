@@ -645,9 +645,11 @@ function AdminThreads() {
               <div className="flex items-center">
                 <img
                   src={
-                    selectedThread.userProfileId.profileImage || blankprofilepic
+                    selectedThread.userProfileId.profileImage
+                      ? `${backendUrl}${selectedThread.userProfileId.profileImage}`
+                      : blankprofilepic
                   } // Replace with dynamic user avatar
-                  alt="User Avatar"
+                  alt={blankprofilepic}
                   className="w-14 h-14 mr-3"
                 />
                 <div>

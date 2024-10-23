@@ -29,6 +29,20 @@ const AdminDashboard = () => {
   const gradYears = Object.keys(dashboardData.usersPerGradYear || {});
   const timeToJobKeys = Object.keys(dashboardData.usersPerTimeToJob || {});
   const timeToJobValues = Object.values(dashboardData.usersPerTimeToJob || {});
+  const collegeKeys = Object.keys(dashboardData.usersPerCollege || {});
+  const collegeValues = Object.values(dashboardData.usersPerCollege || {});
+  const collegeProgramKeys = Object.keys(
+    dashboardData.usersPerCollegeProgram || {}
+  );
+  const collegeProgramValues = Object.values(
+    dashboardData.usersPerCollegeProgram || {}
+  );
+  const specializationKeys = Object.keys(
+    dashboardData.usersPerSpecialization || {}
+  );
+  const specializationValues = Object.values(
+    dashboardData.usersPerSpecialization || {}
+  );
   const dashboardRef = useRef(null);
 
   function getFontSize() {
@@ -114,11 +128,11 @@ const AdminDashboard = () => {
   const options2 = createOptions(2);
 
   const data1 = {
-    labels: ["IT", "CS", "IS"],
+    labels: collegeKeys,
     datasets: [
       {
         label: "Number of Alumni",
-        data: dashboardData.usersPerProgram,
+        data: collegeValues,
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -126,11 +140,11 @@ const AdminDashboard = () => {
   };
 
   const data2 = {
-    labels: ["Web Development", "Networking", "Automation"], // Fetch specializations as labels
+    labels: collegeProgramKeys, // Fetch specializations as labels
     datasets: [
       {
         label: "Number of Alumni",
-        data: dashboardData.usersPerSpecialization,
+        data: collegeProgramValues,
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -162,7 +176,13 @@ const AdminDashboard = () => {
   };
 
   const data5 = {
-    labels: ["Employed", "Unemployed", "Underemployed", "Retired"],
+    labels: [
+      "Employed",
+      "Self-Employed",
+      "Unemployed",
+      "Underemployed",
+      "Freelancing",
+    ],
     datasets: [
       {
         label: "Number of Alumni",
@@ -174,7 +194,7 @@ const AdminDashboard = () => {
   };
 
   const data6 = {
-    labels: ["Local", "International"],
+    labels: ["Public", "Private"],
     datasets: [
       {
         label: "Number of Alumni",
@@ -191,6 +211,17 @@ const AdminDashboard = () => {
       {
         label: "Number of Alumni",
         data: timeToJobValues,
+        backgroundColor: "#BE142E",
+        borderRadius: 4,
+      },
+    ],
+  };
+  const data8 = {
+    labels: specializationKeys,
+    datasets: [
+      {
+        label: "Number of Alumni",
+        data: specializationValues,
         backgroundColor: "#BE142E",
         borderRadius: 4,
       },
@@ -229,7 +260,7 @@ const AdminDashboard = () => {
       <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
         <div>
           <div className="text-sm text-black-600">
-            Number of currently employed users
+            Number of currently working users
           </div>
           <div className="text-lg font-medium mb-1 mt-2">
             {dashboardData.employedUsers}
@@ -239,7 +270,9 @@ const AdminDashboard = () => {
 
       <div className="chart mb-4 p-6 border border-black rounded-lg cursor-pointer">
         <div>
-          <div className="text-sm text-black-600">Academic Program</div>
+          <div className="text-sm text-black-600">
+            Number of Alumni per College
+          </div>
           <div className="h-48 mt-8">
             <Bar data={data1} options={options1} />
           </div>
@@ -247,9 +280,21 @@ const AdminDashboard = () => {
       </div>
       <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
         <div>
-          <div className="text-sm text-black-600">Academic Specialization</div>
+          <div className="text-sm text-black-600">
+            Number of Alumni per College Program
+          </div>
           <div className="h-48 mt-8">
             <Bar data={data2} options={options1} />
+          </div>
+        </div>
+      </div>
+      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
+        <div>
+          <div className="text-sm text-black-600">
+            Number of Alumni per Specialization
+          </div>
+          <div className="h-48 mt-8">
+            <Bar data={data8} options={options1} />
           </div>
         </div>
       </div>
@@ -263,7 +308,7 @@ const AdminDashboard = () => {
       </div>
       <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
         <div>
-          <div className="text-sm text-black-600">Year Graduated</div>
+          <div className="text-sm text-black-600">Batch (Year Graduated)</div>
           <div className="h-48 mt-8">
             <Bar data={data4} options={options1} />
           </div>

@@ -750,32 +750,41 @@ exports.getDashboardStats = async (req, res) => {
     // Calculate number of users
     const numberOfUsers = filteredAlumni.length;
 
-    // Number of employed users
+    // Number of working users
     const employedUsers = filteredAlumni.filter(
-      (profile) => profile.employmentStatus === "Employed"
+      (profile) =>
+        profile.employmentStatus === "Employed" ||
+        profile.employmentStatus === "Self-employed" ||
+        profile.employmentStatus === "Underemployed" ||
+        profile.employmentStatus === "Freelancing"
     ).length;
 
-    // Users per academic program
-    const academicPrograms = [
-      "Information Technology",
-      "Computer Science",
-      "Information Systems",
-    ];
-    const usersPerProgram = academicPrograms.map(
-      (program) =>
-        filteredAlumni.filter((profile) => profile.collegeProgram === program)
-          .length
-    );
-
-    // Users per specialization
-    const specializations = ["Web Development", "Networking", "Automation"];
-
-    const usersPerSpecialization = specializations.map(
-      (specialization) =>
-        filteredAlumni.filter(
-          (profile) => profile.specialization === specialization
-        ).length
-    );
+    //users per college
+    const usersPerCollege = {};
+    filteredAlumni.forEach((profile) => {
+      const college = profile.college; // Ensure the key is correctly spelled
+      if (college) {
+        usersPerCollege[college] = (usersPerCollege[college] || 0) + 1;
+      }
+    });
+    //users per college program
+    const usersPerCollegeProgram = {};
+    filteredAlumni.forEach((profile) => {
+      const collegeProgram = profile.collegeProgram; // Ensure the key is correctly spelled
+      if (collegeProgram) {
+        usersPerCollegeProgram[collegeProgram] =
+          (usersPerCollegeProgram[collegeProgram] || 0) + 1;
+      }
+    });
+    //users per college program
+    const usersPerSpecialization = {};
+    filteredAlumni.forEach((profile) => {
+      const specialization = profile.specialization; // Ensure the key is correctly spelled
+      if (specialization) {
+        usersPerSpecialization[specialization] =
+          (usersPerSpecialization[specialization] || 0) + 1;
+      }
+    });
 
     // Users per year started and graduated (updated to extract only the year)
     const usersPerStartYear = {};
@@ -802,9 +811,10 @@ exports.getDashboardStats = async (req, res) => {
     // Employment status
     const employmentStatus = [
       "Employed",
+      "Self-employed",
       "Unemployed",
       "Underemployed",
-      "Freelance",
+      "Freelancing",
     ];
     const usersPerEmploymentStatus = employmentStatus.map(
       (status) =>
@@ -813,7 +823,7 @@ exports.getDashboardStats = async (req, res) => {
     );
 
     // Work industries
-    const workIndustries = ["Local", "International"];
+    const workIndustries = ["Public", "Private"];
     const usersPerWorkIndustry = workIndustries.map(
       (industry) =>
         filteredAlumni.filter((profile) => profile.workIndustry === industry)
@@ -832,7 +842,8 @@ exports.getDashboardStats = async (req, res) => {
     res.status(200).json({
       numberOfUsers,
       employedUsers,
-      usersPerProgram,
+      usersPerCollege,
+      usersPerCollegeProgram,
       usersPerSpecialization,
       usersPerStartYear,
       usersPerGradYear,

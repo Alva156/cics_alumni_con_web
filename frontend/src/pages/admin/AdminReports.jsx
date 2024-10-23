@@ -7,7 +7,6 @@ import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
 import cicslogo from "../../assets/cicslogo.png";
 
 function AdminReports() {
-
   const collegePrograms = {
     "UST-AMV College of Accountancy": [
       "Accountancy",
@@ -165,9 +164,6 @@ function AdminReports() {
   const availableColleges = Object.keys(collegePrograms);
   const [availablePrograms, setAvailablePrograms] = useState([]);
 
-
-  
-
   const getBase64 = async (url) => {
     const response = await fetch(url);
     const blob = await response.blob();
@@ -190,7 +186,7 @@ function AdminReports() {
   const handleCollegeSelection = (e) => {
     const selectedCollege = e.target.value;
     const isChecked = e.target.checked;
-  
+
     if (selectedCollege === "All Colleges") {
       if (isChecked) {
         // Select all colleges but don't visually check them
@@ -204,16 +200,20 @@ function AdminReports() {
       const updatedSelectedColleges = isChecked
         ? [...selectedColleges, selectedCollege]
         : selectedColleges.filter((college) => college !== selectedCollege);
-  
+
       // Remove "All Colleges" if any specific college is unchecked
       if (updatedSelectedColleges.includes("All Colleges")) {
-        setSelectedColleges(updatedSelectedColleges.filter((college) => college !== "All Colleges"));
+        setSelectedColleges(
+          updatedSelectedColleges.filter(
+            (college) => college !== "All Colleges"
+          )
+        );
       } else {
         setSelectedColleges(updatedSelectedColleges);
       }
     }
   };
-  
+
   const handleProgramSelection = (event) => {
     const selectedProgram = event.target.value;
     setSelectedPrograms((prevSelectedPrograms) => {
@@ -224,26 +224,34 @@ function AdminReports() {
         return [selectedProgram];
       }
       if (prevSelectedPrograms.includes(selectedProgram)) {
-        return prevSelectedPrograms.filter((program) => program !== selectedProgram);
+        return prevSelectedPrograms.filter(
+          (program) => program !== selectedProgram
+        );
       } else {
         return [...prevSelectedPrograms, selectedProgram];
       }
     });
   };
-  
+
   // Dynamically update the available programs
   useEffect(() => {
-    if (selectedColleges.includes("All Colleges") || selectedColleges.length === 0) {
+    if (
+      selectedColleges.includes("All Colleges") ||
+      selectedColleges.length === 0
+    ) {
       // If "All Colleges" is selected or no college is selected, show all programs
-      const allPrograms = availableColleges.flatMap((college) => collegePrograms[college]);
+      const allPrograms = availableColleges.flatMap(
+        (college) => collegePrograms[college]
+      );
       setAvailablePrograms(allPrograms);
     } else {
       // Show programs related to selected colleges
-      const filteredPrograms = selectedColleges.flatMap((college) => collegePrograms[college]);
+      const filteredPrograms = selectedColleges.flatMap(
+        (college) => collegePrograms[college]
+      );
       setAvailablePrograms(filteredPrograms);
     }
   }, [selectedColleges]);
-
 
   const fieldToKeyMap = {
     Profession: "profession",
@@ -268,7 +276,6 @@ function AdminReports() {
   };
 
   const availableFields = Object.keys(fieldToKeyMap);
-  
 
   // Fetch Alumni Data
 
@@ -320,8 +327,6 @@ function AdminReports() {
     setOpenDropdown((prev) => (prev === type ? "" : type));
   };
 
-  
-
   // Handle Batch Selection
   const handleBatchSelection = (event) => {
     const selectedBatch = event.target.value;
@@ -339,8 +344,6 @@ function AdminReports() {
       }
     });
   };
-
-  
 
   const handleFieldSelection = (event) => {
     const selectedField = event.target.value;
@@ -392,9 +395,6 @@ function AdminReports() {
 
     // Add CICS logo (left side)
     doc.addImage(cicsLogoBase64, "PNG", 40, 30, 48, 48); // Left-side logo
-
-    // Title and headers beside the CICS logo
-
     doc.setFontSize(10);
     doc.setTextColor("#000000");
     doc.text("University of Santo Tomas", 100, 52); // Align beside the logo
@@ -412,29 +412,91 @@ function AdminReports() {
     ); // Right-side logo
 
     // Add "Alumni Connect" text beside AlumniConnect logo
-    // "Alumni" (black)
     const textY = 60;
-    doc.setFontSize(20); // Adjust font size as needed
-    doc.setFont("helvetica", "bold"); // Bold font for "Alumni"
-    doc.setTextColor("#2d2b2b"); // Set color to black
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#2d2b2b");
     const alumniTextWidth = doc.getTextWidth("Alumni");
     const alumniTextX = doc.internal.pageSize.width - 250; // Position text beside logo
-    doc.text("Alumni", alumniTextX, textY); // Positioning Alumni
-
-    // "Connect" (red)
-    doc.setTextColor("#be142e"); // Set color to red
+    doc.text("Alumni", alumniTextX, textY);
+    doc.setTextColor("#be142e");
     const connectTextX = alumniTextX + alumniTextWidth + 5; // Slight gap after "Alumni"
-    doc.text("Connect", connectTextX, textY); // Place "Connect" after "Alumni"
+    doc.text("Connect", connectTextX, textY);
 
     doc.setFontSize(20);
-    doc.setFont("helvetica", "normal"); // Reset to normal font
-    doc.setTextColor("#000000"); // Set text color to black
-    doc.text("CICS Alumni Report", doc.internal.pageSize.width / 2, 100, {
-      align: "center",
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor("#000000");
+    doc.text(
+      "CICS Alumni Connect Report",
+      doc.internal.pageSize.width / 2,
+      100,
+      {
+        align: "center",
+      }
+    );
+
+    // Calculate counts
+    const alumniCountByBatch = {};
+    const alumniCountByCollege = {};
+    const alumniCountByProgram = {};
+
+    filteredData.forEach((row) => {
+      const batchYear = row.yearGraduatedCollege?.split("-")[0];
+      const college = row.college;
+      const program = row.collegeProgram;
+
+      if (batchYear) {
+        alumniCountByBatch[batchYear] =
+          (alumniCountByBatch[batchYear] || 0) + 1;
+      }
+      if (college) {
+        alumniCountByCollege[college] =
+          (alumniCountByCollege[college] || 0) + 1;
+      }
+      if (program) {
+        alumniCountByProgram[program] =
+          (alumniCountByProgram[program] || 0) + 1;
+      }
+    });
+
+    // Apply table style to Alumni Summary with three columns
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor("#be142e");
+    doc.text("Alumni Summary", 40, 160); // Section title with red color
+
+    // Prepare the summary data, repeating the category for each entry
+    const summaryData = [];
+
+    Object.entries(alumniCountByBatch).forEach(([year, count]) => {
+      summaryData.push(["Batch", year, count]);
+    });
+
+    Object.entries(alumniCountByCollege).forEach(([college, count]) => {
+      summaryData.push(["College", college, count]);
+    });
+
+    Object.entries(alumniCountByProgram).forEach(([program, count]) => {
+      summaryData.push(["Program", program, count]);
+    });
+
+    // Add table with 3 columns: Category, Field, and Count (with repeating categories)
+    autoTable(doc, {
+      startY: 170,
+      head: [["Category", "Field", "Count"]], // Table headers
+      body: summaryData,
+      styles: { fontSize: 10, textColor: "#333" },
+      headStyles: { fillColor: "#be142e", textColor: "#fff" }, // Red header
+      columnStyles: {
+        0: { cellWidth: 100 },
+        1: { cellWidth: 200 },
+        2: { cellWidth: 80 },
+      },
+      margin: { top: 5, bottom: 10, left: 40, right: 40 },
     });
 
     // Adjusting the Y-coordinate for the next element
-    let startY = 120; // This creates a margin of 20 points below the title
+    let startY = doc.autoTable.previous.finalY + 20;
 
     // Filtered data to be displayed in the table
     filteredData.forEach((row, index) => {
@@ -445,7 +507,6 @@ function AdminReports() {
         ["Program", row.collegeProgram || "---------"],
       ];
 
-      // Add selected fields dynamically
       const dynamicFields =
         selectedFields.length === 0 || selectedFields.includes("All Fields")
           ? availableFields.map((field) => [
@@ -457,21 +518,34 @@ function AdminReports() {
               getNestedValue(row, fieldToKeyMap[field]) || "---------",
             ]);
 
-      // Add table for current alumni
       autoTable(doc, {
-        head: [[`Alumni ${index + 1}`, "Field", "Value"]], // Adjusted header order
+        head: [[`Alumni ${index + 1}`, "Field", "Value"]],
         body: [
-          ...defaultFields.map((field) => ["", field[0], field[1]]), // Adjusted body to match new header order
-          ...dynamicFields.map((field) => ["", field[0], field[1]]), // Adjusted dynamic fields too
+          ...defaultFields.map((field) => ["", field[0], field[1]]),
+          ...dynamicFields.map((field) => ["", field[0], field[1]]),
         ],
         startY,
         styles: { fontSize: 10, textColor: "#333" },
-        headStyles: { fillColor: "#d9534f", textColor: "#fff" }, // Red header
+        headStyles: { fillColor: "#be142e", textColor: "#fff" },
       });
 
-      // Update the Y position for the next alumni
       startY = doc.autoTable.previous.finalY + 20; // Adds space after the table
     });
+
+    // Add page numbers at the bottom of each page
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 30,
+        {
+          align: "center",
+        }
+      );
+    }
 
     // Save the generated PDF
     doc.save("cicsalumniconnect_report.pdf");
@@ -634,7 +708,6 @@ function AdminReports() {
             </div>
           )}
         </div>
-        
 
         <div className="relative mb-6">
           <button

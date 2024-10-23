@@ -7,11 +7,162 @@ import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
 import cicslogo from "../../assets/cicslogo.png";
 
 function AdminReports() {
+  const collegePrograms = {
+    "UST-AMV College of Accountancy": [
+      "Accountancy",
+      "Accounting Information System",
+      "Management Accounting",
+    ],
+    "College of Architecture": ["Architecture"],
+    "Faculty of Arts and Letters": [
+      "Asian Studies",
+      "Behavioral Science",
+      "Communication",
+      "Creative Writing",
+      "Economics",
+      "English Language Studies",
+      "History",
+      "Journalism",
+      "Legal Management",
+      "Literature",
+      "Philosophy",
+      "Political Science",
+      "Sociology",
+    ],
+    "Faculty of Civil Law": ["Juris Doctor"],
+    "College of Commerce and Business Administration": [
+      "Business Administration, major in Business Economics",
+      "Business Administration, major in Financial Management",
+      "Business Administration, major in Human Resource Management",
+      "Business Administration, major in Marketing Management",
+      "Entrepreneurship",
+    ],
+    "College of Education": [
+      "Secondary Education Major in English",
+      "Secondary Education Major in Filipino",
+      "Secondary Education Major in Mathematics",
+      "Secondary Education Major in Religious and Values Education",
+      "Secondary Education Major in Science",
+      "Secondary Education Major in Social Studies",
+      "Early Childhood Education",
+      "Elementary Education",
+      "Special Needs Education, major in Early Childhood Education",
+      "Food Technology",
+      "Nutrition and Dietetics",
+      "Bachelor of Library and Information Science",
+    ],
+    "Faculty of Engineering": [
+      "Chemical Engineering",
+      "Civil Engineering",
+      "Electrical Engineering",
+      "Electronics Engineering",
+      "Industrial Engineering",
+      "Mechanical Engineering",
+    ],
+    "College of Fine Arts and Design": [
+      "Fine Arts, major in Advertising Arts",
+      "Fine Arts, major in Industrial Design",
+      "Interior Design",
+      "Fine Arts, major in Painting",
+    ],
+    "College of Information and Computing Sciences": [
+      "Computer Science",
+      "Information Systems",
+      "Information Technology",
+    ],
+    "Faculty of Medicine and Surgery": [
+      "Basic Human Studies",
+      "Doctor of Medicine",
+      "Master in Clinical Audiology",
+      "Master in Pain Management",
+    ],
+    "Conservatory of Music": [
+      "Performance, major in Bassoon",
+      "Performance, major in Choral Conducting",
+      "Performance, major in Clarinet",
+      "Composition",
+      "Performance, major in Double Bass",
+      "Performance, major in Flute",
+      "Performance, major in French Horn",
+      "Performance, major in Guitar",
+      "Jazz",
+      "Musicology",
+      "Music Education",
+      "Music Theatre",
+      "Music Technology",
+      "Performance, major in Oboe",
+      "Performance, major in Orchestral Conducting",
+      "Performance, major in Percussion",
+      "Performance, major in Piano",
+      "Performance, major in Saxophone",
+      "Performance, major in Trombone",
+      "Performance, major in Trumpet",
+      "Performance, major in Tuba",
+      "Performance, major in Viola",
+      "Performance, major in Violin",
+      "Performance, major in Violoncello",
+      "Performance, major in Voice",
+    ],
+    "College of Nursing": ["Nursing"],
+    "Faculty of Pharmacy": [
+      "Biochemistry",
+      "Medical Technology",
+      "Pharmacy",
+      "Pharmacy, major in Clinical Pharmacy",
+      "Doctor of Pharmacy",
+    ],
+    "Institute of Physical Education and Athletics": [
+      "Fitness and Sports Management",
+    ],
+    "College of Rehabilitation Sciences": [
+      "Occupational Therapy",
+      "Physical Therapy",
+      "Speech-Language Pathology",
+      "Sports Science",
+    ],
+    "College of Science": [
+      "Applied Mathematics, major in Actuarial Science",
+      "Applied Physics, major in Instrumentation",
+      "Biology, major in Environmental Biology",
+      "Biology, major in Medical Biology",
+      "Bachelor of Science major in Molecular Biology and Biotechnology",
+      "Chemistry",
+      "Data Science and Analytics",
+      "Microbiology",
+      "Psychology",
+    ],
+    "College of Tourism and Hospitality Management": [
+      "Hospitality Management, major in Culinary Entrepreneurship",
+      "Hospitality Management, major in Hospitality Leadership",
+      "Tourism Management, major in Recreation and Leisure Management",
+      "Tourism Management, major in Travel Operation and Service Management",
+    ],
+    "Faculty of Canon Law": [
+      "Doctor of Canon Law",
+      "Licentiate in Canon Law",
+      "Bachelor of Canon Law",
+    ],
+    "Faculty of Philosophy": [
+      "Doctor of Philosophy",
+      "Licentiate in Philosophy",
+      "Bachelor of Philosophy (Classical)",
+    ],
+    "Faculty of Sacred Theology": [
+      "Doctor of Sacred Theology",
+      "Licentiate in Sacred Theology",
+      "Bachelor of Sacred Theology",
+    ],
+  };
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [selectedPrograms, setSelectedPrograms] = useState(["All Programs"]);
   const [selectedFields, setSelectedFields] = useState(["All Fields"]);
+  const [selectedColleges, setSelectedColleges] = useState(["All Colleges"]);
+  const [selectedBatches, setSelectedBatches] = useState(["All Batches"]);
+  const [availableBatches, setAvailableBatches] = useState([]);
   const [openDropdown, setOpenDropdown] = useState("");
   const [alumni, setAlumni] = useState([]);
+  const availableColleges = Object.keys(collegePrograms);
+  const [availablePrograms, setAvailablePrograms] = useState([]);
 
   const getBase64 = async (url) => {
     const response = await fetch(url);
@@ -32,8 +183,79 @@ function AdminReports() {
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
+  const handleCollegeSelection = (e) => {
+    const selectedCollege = e.target.value;
+    const isChecked = e.target.checked;
+
+    if (selectedCollege === "All Colleges") {
+      if (isChecked) {
+        // Select all colleges but don't visually check them
+        setSelectedColleges(["All Colleges"]);
+      } else {
+        // Deselect all colleges
+        setSelectedColleges([]);
+      }
+    } else {
+      // Handle individual college selection
+      const updatedSelectedColleges = isChecked
+        ? [...selectedColleges, selectedCollege]
+        : selectedColleges.filter((college) => college !== selectedCollege);
+
+      // Remove "All Colleges" if any specific college is unchecked
+      if (updatedSelectedColleges.includes("All Colleges")) {
+        setSelectedColleges(
+          updatedSelectedColleges.filter(
+            (college) => college !== "All Colleges"
+          )
+        );
+      } else {
+        setSelectedColleges(updatedSelectedColleges);
+      }
+    }
+  };
+
+  const handleProgramSelection = (event) => {
+    const selectedProgram = event.target.value;
+    setSelectedPrograms((prevSelectedPrograms) => {
+      if (selectedProgram === "All Programs") {
+        return ["All Programs"];
+      }
+      if (prevSelectedPrograms.includes("All Programs")) {
+        return [selectedProgram];
+      }
+      if (prevSelectedPrograms.includes(selectedProgram)) {
+        return prevSelectedPrograms.filter(
+          (program) => program !== selectedProgram
+        );
+      } else {
+        return [...prevSelectedPrograms, selectedProgram];
+      }
+    });
+  };
+
+  // Dynamically update the available programs
+  useEffect(() => {
+    if (
+      selectedColleges.includes("All Colleges") ||
+      selectedColleges.length === 0
+    ) {
+      // If "All Colleges" is selected or no college is selected, show all programs
+      const allPrograms = availableColleges.flatMap(
+        (college) => collegePrograms[college]
+      );
+      setAvailablePrograms(allPrograms);
+    } else {
+      // Show programs related to selected colleges
+      const filteredPrograms = selectedColleges.flatMap(
+        (college) => collegePrograms[college]
+      );
+      setAvailablePrograms(filteredPrograms);
+    }
+  }, [selectedColleges]);
+
   const fieldToKeyMap = {
     Profession: "profession",
+    College: "college",
     "College Program": "collegeProgram",
     Specialization: "specialization",
     "Year Started on College Program": "yearStartedCollege",
@@ -54,13 +276,9 @@ function AdminReports() {
   };
 
   const availableFields = Object.keys(fieldToKeyMap);
-  const availablePrograms = [
-    "Computer Science",
-    "Information Systems",
-    "Information Technology",
-  ];
 
   // Fetch Alumni Data
+
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
@@ -69,13 +287,19 @@ function AdminReports() {
         });
 
         const alumniData = response.data.alumni || response.data;
-        alumniData.forEach((alum) => {
-          alum.yearStartedCollege = formatDate(alum.yearStartedCollege);
-          alum.yearGraduatedCollege = formatDate(alum.yearGraduatedCollege);
-          // Format other date fields as needed
-        });
 
         setAlumni(alumniData);
+
+        // Extract unique graduation years for the batch dropdown,
+        // filtering out null or undefined values
+        const uniqueBatches = [
+          ...new Set(
+            alumniData
+              .map((alum) => alum.yearGraduatedCollege?.split("-")[0]) // Extract only the year
+              .filter((year) => year !== undefined) // Exclude undefined values
+          ),
+        ];
+        setAvailableBatches(uniqueBatches);
       } catch (error) {
         console.error("Error fetching alumni:", error);
       }
@@ -103,21 +327,20 @@ function AdminReports() {
     setOpenDropdown((prev) => (prev === type ? "" : type));
   };
 
-  const handleProgramSelection = (event) => {
-    const selectedProgram = event.target.value;
-    setSelectedPrograms((prevSelectedPrograms) => {
-      if (selectedProgram === "All Programs") {
-        return ["All Programs"];
+  // Handle Batch Selection
+  const handleBatchSelection = (event) => {
+    const selectedBatch = event.target.value;
+    setSelectedBatches((prevSelectedBatches) => {
+      if (selectedBatch === "All Batches") {
+        return ["All Batches"];
       }
-      if (prevSelectedPrograms.includes("All Programs")) {
-        return [selectedProgram];
+      if (prevSelectedBatches.includes("All Batches")) {
+        return [selectedBatch];
       }
-      if (prevSelectedPrograms.includes(selectedProgram)) {
-        return prevSelectedPrograms.filter(
-          (program) => program !== selectedProgram
-        );
+      if (prevSelectedBatches.includes(selectedBatch)) {
+        return prevSelectedBatches.filter((batch) => batch !== selectedBatch);
       } else {
-        return [...prevSelectedPrograms, selectedProgram];
+        return [...prevSelectedBatches, selectedBatch];
       }
     });
   };
@@ -144,12 +367,20 @@ function AdminReports() {
     return path.split(".").reduce((acc, part) => acc && acc[part], obj);
   };
 
-  // Filtered data based on selected programs
-  const filteredData = alumni.filter(
-    (row) =>
+  // Filtered data based on selected programs, colleges, and batches
+  const filteredData = alumni.filter((row) => {
+    const programMatches =
       selectedPrograms.includes("All Programs") ||
-      selectedPrograms.includes(row.collegeProgram)
-  );
+      selectedPrograms.includes(row.collegeProgram);
+    const collegeMatches =
+      selectedColleges.includes("All Colleges") ||
+      selectedColleges.includes(row.college);
+    const batchMatches =
+      selectedBatches.includes("All Batches") ||
+      selectedBatches.includes(row.yearGraduatedCollege?.split("-")[0]); // Match by year only, using optional chaining
+
+    return programMatches && collegeMatches && batchMatches;
+  });
 
   const generatePDF = async () => {
     const doc = new jsPDF({
@@ -164,9 +395,6 @@ function AdminReports() {
 
     // Add CICS logo (left side)
     doc.addImage(cicsLogoBase64, "PNG", 40, 30, 48, 48); // Left-side logo
-
-    // Title and headers beside the CICS logo
-
     doc.setFontSize(10);
     doc.setTextColor("#000000");
     doc.text("University of Santo Tomas", 100, 52); // Align beside the logo
@@ -184,29 +412,91 @@ function AdminReports() {
     ); // Right-side logo
 
     // Add "Alumni Connect" text beside AlumniConnect logo
-    // "Alumni" (black)
     const textY = 60;
-    doc.setFontSize(20); // Adjust font size as needed
-    doc.setFont("helvetica", "bold"); // Bold font for "Alumni"
-    doc.setTextColor("#2d2b2b"); // Set color to black
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#2d2b2b");
     const alumniTextWidth = doc.getTextWidth("Alumni");
     const alumniTextX = doc.internal.pageSize.width - 250; // Position text beside logo
-    doc.text("Alumni", alumniTextX, textY); // Positioning Alumni
-
-    // "Connect" (red)
-    doc.setTextColor("#be142e"); // Set color to red
+    doc.text("Alumni", alumniTextX, textY);
+    doc.setTextColor("#be142e");
     const connectTextX = alumniTextX + alumniTextWidth + 5; // Slight gap after "Alumni"
-    doc.text("Connect", connectTextX, textY); // Place "Connect" after "Alumni"
+    doc.text("Connect", connectTextX, textY);
 
     doc.setFontSize(20);
-    doc.setFont("helvetica", "normal"); // Reset to normal font
-    doc.setTextColor("#000000"); // Set text color to black
-    doc.text("CICS Alumni Report", doc.internal.pageSize.width / 2, 100, {
-      align: "center",
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor("#000000");
+    doc.text(
+      "CICS Alumni Connect Report",
+      doc.internal.pageSize.width / 2,
+      100,
+      {
+        align: "center",
+      }
+    );
+
+    // Calculate counts
+    const alumniCountByBatch = {};
+    const alumniCountByCollege = {};
+    const alumniCountByProgram = {};
+
+    filteredData.forEach((row) => {
+      const batchYear = row.yearGraduatedCollege?.split("-")[0];
+      const college = row.college;
+      const program = row.collegeProgram;
+
+      if (batchYear) {
+        alumniCountByBatch[batchYear] =
+          (alumniCountByBatch[batchYear] || 0) + 1;
+      }
+      if (college) {
+        alumniCountByCollege[college] =
+          (alumniCountByCollege[college] || 0) + 1;
+      }
+      if (program) {
+        alumniCountByProgram[program] =
+          (alumniCountByProgram[program] || 0) + 1;
+      }
+    });
+
+    // Apply table style to Alumni Summary with three columns
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor("#be142e");
+    doc.text("Alumni Summary", 40, 160); // Section title with red color
+
+    // Prepare the summary data, repeating the category for each entry
+    const summaryData = [];
+
+    Object.entries(alumniCountByBatch).forEach(([year, count]) => {
+      summaryData.push(["Batch", year, count]);
+    });
+
+    Object.entries(alumniCountByCollege).forEach(([college, count]) => {
+      summaryData.push(["College", college, count]);
+    });
+
+    Object.entries(alumniCountByProgram).forEach(([program, count]) => {
+      summaryData.push(["Program", program, count]);
+    });
+
+    // Add table with 3 columns: Category, Field, and Count (with repeating categories)
+    autoTable(doc, {
+      startY: 170,
+      head: [["Category", "Field", "Count"]], // Table headers
+      body: summaryData,
+      styles: { fontSize: 10, textColor: "#333" },
+      headStyles: { fillColor: "#be142e", textColor: "#fff" }, // Red header
+      columnStyles: {
+        0: { cellWidth: 100 },
+        1: { cellWidth: 200 },
+        2: { cellWidth: 80 },
+      },
+      margin: { top: 5, bottom: 10, left: 40, right: 40 },
     });
 
     // Adjusting the Y-coordinate for the next element
-    let startY = 120; // This creates a margin of 20 points below the title
+    let startY = doc.autoTable.previous.finalY + 20;
 
     // Filtered data to be displayed in the table
     filteredData.forEach((row, index) => {
@@ -217,7 +507,6 @@ function AdminReports() {
         ["Program", row.collegeProgram || "---------"],
       ];
 
-      // Add selected fields dynamically
       const dynamicFields =
         selectedFields.length === 0 || selectedFields.includes("All Fields")
           ? availableFields.map((field) => [
@@ -229,21 +518,34 @@ function AdminReports() {
               getNestedValue(row, fieldToKeyMap[field]) || "---------",
             ]);
 
-      // Add table for current alumni
       autoTable(doc, {
-        head: [[`Alumni ${index + 1}`, "Field", "Value"]], // Adjusted header order
+        head: [[`Alumni ${index + 1}`, "Field", "Value"]],
         body: [
-          ...defaultFields.map((field) => ["", field[0], field[1]]), // Adjusted body to match new header order
-          ...dynamicFields.map((field) => ["", field[0], field[1]]), // Adjusted dynamic fields too
+          ...defaultFields.map((field) => ["", field[0], field[1]]),
+          ...dynamicFields.map((field) => ["", field[0], field[1]]),
         ],
         startY,
         styles: { fontSize: 10, textColor: "#333" },
-        headStyles: { fillColor: "#d9534f", textColor: "#fff" }, // Red header
+        headStyles: { fillColor: "#be142e", textColor: "#fff" },
       });
 
-      // Update the Y position for the next alumni
       startY = doc.autoTable.previous.finalY + 20; // Adds space after the table
     });
+
+    // Add page numbers at the bottom of each page
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 30,
+        {
+          align: "center",
+        }
+      );
+    }
 
     // Save the generated PDF
     doc.save("cicsalumniconnect_report.pdf");
@@ -257,12 +559,63 @@ function AdminReports() {
 
       <div className="text-sm mb-4">Filters:</div>
       <div className="sm:flex block sm:space-x-4">
+        {/* College Dropdown */}
+        <div className="relative mb-6">
+          <button
+            onClick={() => toggleDropdown("colleges")}
+            className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+          >
+            <span>College</span>
+            <svg
+              className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                openDropdown === "colleges" ? "rotate-180" : ""
+              }`}
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
+              />
+            </svg>
+          </button>
+          {openDropdown === "colleges" && (
+            <div
+              ref={dropdownRef}
+              className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
+            >
+              <ul className="p-3 space-y-3 text-sm text-gray-700">
+                {["All Colleges", ...availableColleges].map((college, idx) => (
+                  <li key={idx} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      value={college}
+                      checked={selectedColleges.includes(college)}
+                      onChange={handleCollegeSelection}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                    />
+                    <label className="ms-2 sm:text-xs font-medium">
+                      {college}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* College Program Dropdown */}
         <div className="relative mb-6">
           <button
             onClick={() => toggleDropdown("programs")}
             className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
           >
-            <span>Program</span>
+            <span>College Program</span>
             <svg
               className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
                 openDropdown === "programs" ? "rotate-180" : ""
@@ -284,7 +637,7 @@ function AdminReports() {
           {openDropdown === "programs" && (
             <div
               ref={dropdownRef}
-              className="z-10 absolute sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
+              className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
             >
               <ul className="p-3 space-y-3 text-sm text-gray-700">
                 {["All Programs", ...availablePrograms].map((program, idx) => (
@@ -298,6 +651,56 @@ function AdminReports() {
                     />
                     <label className="ms-2 sm:text-xs font-medium">
                       {program}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* Batch Dropdown */}
+        <div className="relative mb-6">
+          <button
+            onClick={() => toggleDropdown("batches")}
+            className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+          >
+            <span>Batch (Year Graduated)</span>
+            <svg
+              className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                openDropdown === "batches" ? "rotate-180" : ""
+              }`}
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
+              />
+            </svg>
+          </button>
+          {openDropdown === "batches" && (
+            <div
+              ref={dropdownRef}
+              className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
+            >
+              <ul className="p-3 space-y-3 text-sm text-gray-700">
+                {["All Batches", ...availableBatches].map((batch, idx) => (
+                  <li key={idx} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      value={batch}
+                      checked={selectedBatches.includes(batch)}
+                      onChange={handleBatchSelection}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                    />
+                    <label className="ms-2 sm:text-xs font-medium">
+                      {batch} {/* Display only the year */}
                     </label>
                   </li>
                 ))}

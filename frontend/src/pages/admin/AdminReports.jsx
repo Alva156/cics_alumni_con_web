@@ -203,17 +203,15 @@ function AdminReports() {
 
         const alumniData = response.data.alumni || response.data;
 
-        alumniData.forEach((alum) => {
-          alum.yearStartedCollege = formatDate(alum.yearStartedCollege);
-          alum.yearGraduatedCollege = formatDate(alum.yearGraduatedCollege);
-        });
-
         setAlumni(alumniData);
 
-        // Extract unique graduation years for the batch dropdown
+        // Extract unique graduation years for the batch dropdown,
+        // filtering out null or undefined values
         const uniqueBatches = [
           ...new Set(
-            alumniData.map((alum) => alum.yearGraduatedCollege.split("-")[0]) // Extract only the year
+            alumniData
+              .map((alum) => alum.yearGraduatedCollege?.split("-")[0]) // Extract only the year
+              .filter((year) => year !== undefined) // Exclude undefined values
           ),
         ];
         setAvailableBatches(uniqueBatches);
@@ -331,7 +329,7 @@ function AdminReports() {
       selectedColleges.includes(row.college);
     const batchMatches =
       selectedBatches.includes("All Batches") ||
-      selectedBatches.includes(row.yearGraduatedCollege.split("-")[0]); // Match by year only
+      selectedBatches.includes(row.yearGraduatedCollege?.split("-")[0]); // Match by year only, using optional chaining
 
     return programMatches && collegeMatches && batchMatches;
   });

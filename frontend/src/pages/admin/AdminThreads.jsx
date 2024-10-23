@@ -649,7 +649,7 @@ function AdminThreads() {
                       ? `${backendUrl}${selectedThread.userProfileId.profileImage}`
                       : blankprofilepic
                   } // Replace with dynamic user avatar
-                  alt={blankprofilepic}
+                  alt="User Avatar"
                   className="w-14 h-14 mr-3"
                 />
                 <div>

@@ -356,13 +356,7 @@ function AdminDocuments() {
         </div>
       </div>
 
-      <a
-        href="#"
-        style={{ color: "#be142e" }}
-        className="text-sm font-medium hover:underline"
-      >
-        Read More
-      </a>
+   
     </div>
   ))}
 </div>

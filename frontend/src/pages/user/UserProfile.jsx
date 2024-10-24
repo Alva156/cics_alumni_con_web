@@ -1414,7 +1414,7 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Email Address</label>
+                  <label className="pt-4 pb-2 text-sm">Alternative Email Address</label>
                   <input
                     type="email"
                     placeholder="Type here"

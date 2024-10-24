@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
 import Homepage from "../pages/User/homepage";
 import Survey from "../pages/User/Survey";
 import User from "../layout/user";
@@ -34,6 +34,7 @@ import VerifyAccount from "../pages/authentication/VerifyAccount";
 import DataPrivacy from "../pages/authentication/DataPrivacy";
 import PrivateRoute from "../components/PrivateRoute";
 import ErrorPage from "../components/ErrorPage";
+
 
 const ErrorFallback = () => {
   return <ErrorPage />;

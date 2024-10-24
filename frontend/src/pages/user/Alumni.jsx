@@ -286,7 +286,7 @@ function Alumni() {
                 <p className="text-s mb-2 font-bold">
                   {selectedAlumni.contactInformation?.instagram}
                 </p>
-                <p className="text-xs mb-1/2">Email</p>
+                <p className="text-xs mb-1/2">Alternative Email Address</p>
                 <p className="text-s mb-2 font-bold">
                   {selectedAlumni.contactInformation?.email}
                 </p>

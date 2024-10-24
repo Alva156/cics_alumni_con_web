@@ -658,7 +658,7 @@ function AdminAlumni() {
                 ) : (
                   <p className="text-s mb-2 font-bold">-</p>
                 )}
-                <p className="text-xs mt-2 mb-1/2">Email</p>
+                <p className="text-xs mt-2 mb-1/2">Alternative Email Address</p>
                 {selectedAlumni.contactInformation?.email ? (
                   <a
                     href={`mailto:${selectedAlumni.contactInformation.email}`}

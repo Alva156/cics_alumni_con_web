@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import sampleidpic from "../../assets/sampleidpic.jpg";
 import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function AdminThreads() {
@@ -375,8 +374,8 @@ function AdminThreads() {
   };
 
   return (
-    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
+    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-2 mb-12">
+      <div className="carousel relative bg-white max-w-full overflow-hidden">
         {showErrorMessage && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
             <p>{errorMessage}</p>
@@ -646,7 +645,9 @@ function AdminThreads() {
               <div className="flex items-center">
                 <img
                   src={
-                    selectedThread.userProfileId.profileImage || blankprofilepic
+                    selectedThread.userProfileId.profileImage
+                      ? `${backendUrl}${selectedThread.userProfileId.profileImage}`
+                      : blankprofilepic
                   } // Replace with dynamic user avatar
                   alt="User Avatar"
                   className="w-14 h-14 mr-3"
@@ -708,7 +709,11 @@ function AdminThreads() {
                   className="p-4 border border-black rounded-lg flex items-start mb-2"
                 >
                   <img
-                    src={reply.userProfileId.profileImage || blankprofilepic}
+                    src={
+                      reply.userProfileId.profileImage
+                        ? `${backendUrl}${reply.userProfileId.profileImage}`
+                        : blankprofilepic
+                    }
                     alt="User Avatar"
                     className="w-10 h-10 mr-3"
                   />
@@ -868,7 +873,10 @@ function AdminThreads() {
         </div>
       )}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+          style={{ zIndex: 9999 }}
+        >
           {showErrorMessage && (
             <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
               <p>{errorMessage}</p>

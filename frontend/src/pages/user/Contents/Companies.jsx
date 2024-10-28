@@ -103,7 +103,8 @@ function Companies() {
             </p>
             <a
               href="#"
-              className="text-blue-500 text-sm font-medium hover:underline"
+              style={{ color: "#be142e" }}
+              className=" text-sm font-medium hover:underline"
             >
               Read More
             </a>
@@ -127,7 +128,9 @@ function Companies() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">{selectedCompany.name}</div>
+            <div className="text-2xl font-medium mb-2">
+              {selectedCompany.name}
+            </div>
             <div className="text-md mb-2">{selectedCompany.address}</div>
             <img
               src={`${backendUrl}${selectedCompany.image}`}

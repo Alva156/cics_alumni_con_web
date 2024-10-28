@@ -282,43 +282,53 @@ function AdminJobs() {
 
       <hr className="mb-6 border-black" />
 
-      {filteredJobs.map((jobs) => (
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {filteredJobs.map((jobs) => (
+    <div
+      key={jobs._id}
+      className="relative mb-4 p-4 border border-black rounded-lg flex flex-col hover:bg-gray-200 transition-colors cursor-pointer"
+      onClick={() => openViewModal(jobs)}
+    >
+      <img
+        src={`${backendUrl}${jobs.image}`}
+        alt={jobs.name}
+        className="w-full h-48 object-cover rounded-t-lg mb-4 mt-4"
+      />
+      <div className="absolute top-2 right-2 flex space-x-2">
         <div
-          key={jobs._id}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
-          onClick={() => openViewModal(jobs)}
+          className="w-8 h-8 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedJobs(jobs);
+            setIsDeleteModalOpen(true);
+          }}
         >
-          <div>
-            <div className="text-md font-medium mb-1">{jobs.name}</div>
-            <div className="text-sm text-black-600">{jobs.address}</div>
-          </div>
-          <div className="flex items-center">
-            <div
-              className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-4 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedJobs(jobs); // Set the jobs to delete
-                setIsDeleteModalOpen(true); // Open the delete modal
-              }}
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Delete
-              </span>
-            </div>
-            <div
-              className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                openEditModal(jobs);
-              }}
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Edit
-              </span>
-            </div>
-          </div>
+          <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Delete
+          </span>
+          <i className="fas fa-trash text-white"></i> {/* Icon for Delete */}
         </div>
-      ))}
+        <div
+          className="w-8 h-8 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            openEditModal(jobs);
+          }}
+        >
+          <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Edit
+          </span>
+          <i className="fas fa-edit text-white"></i> {/* Icon for Edit */}
+        </div>
+      </div>
+      <div>
+        <div className="text-md font-medium mb-1">{jobs.name}</div>
+        <div className="text-sm text-black-600">{jobs.address}</div>
+      </div>
+    </div>
+  ))}
+</div>
+
 
       {/* View Modal */}
       {isViewModalOpen && selectedJobs && (

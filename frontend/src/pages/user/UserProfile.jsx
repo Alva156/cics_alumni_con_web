@@ -19,6 +19,7 @@ function UserProfile() {
   const [showErrorMessage2, setShowErrorMessage2] = useState(false);
   const [errorMessage2, setErrorMessage2] = useState("");
   const [isPassModalOpen, setIsPassModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -561,7 +562,6 @@ function UserProfile() {
       lastName,
       birthday,
       profession,
-      accountEmail,
       college,
       collegeProgram,
       specialization,
@@ -847,6 +847,14 @@ function UserProfile() {
     setIsPassModalOpen(false);
   };
 
+  const openEmailModal = () => {
+    setIsEmailModalOpen(true);
+  }
+
+  const closeEmailModal = () => {
+    setIsEmailModalOpen(false);
+  }
+
   return (
     <>
       {/* Password Modal */}
@@ -959,6 +967,140 @@ function UserProfile() {
           </div>
         </div>
       )}
+
+      {/* Email Modal */}
+      {isEmailModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          {showErrorMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2  bg-red text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{errorMessage2}</p>
+            </div>
+          )}
+          {showValidationMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2  bg-green text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{validationMessage2}</p>
+            </div>
+          )}
+
+          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
+            <button
+              onClick={closeEmailModal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+
+            <div className="mb-4">
+              <div className="block mb-2 text-sm font-medium">
+                Update your account email address using the available options.
+              </div>
+
+              <div className="block mb-2 text-sm font-light">
+                Choose preferred platform to send OTP  
+              </div>
+
+              
+            </div>
+            <div className="mb-2">
+              <label className="block mb-2 text-sm font-medium">
+                Mobile Number
+              </label>
+              <input
+                type="text"
+                name=""
+                placeholder=""
+                className="input input-sm input-bordered w-full h-10"
+                value=""
+                required
+              />
+              <button
+                onClick=""
+                className="btn btn-sm mt-2 w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Send SMS
+              </button>
+            </div>
+            
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">
+                Email
+              </label>
+              <input
+                type="text"
+                name=""
+                placeholder=""
+                className="input input-sm input-bordered w-full h-10"
+                value=""
+                required
+              />
+              <button
+                onClick=""
+                className="btn btn-sm mt-2 w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Send Email
+              </button>
+            </div>
+
+            <div className="mb-2 mt-2">
+              <label className="block mt-2 mb-2 text-sm font-medium">
+                Enter OTP
+              </label>
+              <input
+                type="text"
+                name=""
+                placeholder=""
+                className="input input-sm input-bordered w-full h-10"
+                value=""
+                required
+              />
+              {/* INSERT CODE FOR THE OTP TIMER */}
+              <button
+                onClick=""
+                className="btn btn-sm mt-2 w-28 md:btn-md md:w-52 lg:w-60 bg-[#056E34] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Confirm
+              </button>
+              <br />
+              <button
+                onClick=""
+                className="btn btn-sm mt-1 w-28 md:btn-md md:w-52 lg:w-60 bg-[#BE142E] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Resend OTP
+              </button>
+            </div>
+
+            <div className="flex justify-center gap-2 mt-8">
+              <button
+                onClick=""
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Save
+              </button>
+              <button
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+                onClick=""
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal */}
       {modalVisible && (
         <dialog id="my_modal_5" className="modal modal-middle " open>
@@ -1903,6 +2045,16 @@ function UserProfile() {
                     className="input input-sm input-bordered w-full h-10"
                   />
                 </div>
+
+                <div className="py-1">
+            <button
+              className="btn md:w-64 w-52 bg-orange text-white" // Add a function to handle saving
+              onClick={openEmailModal}
+              aria-label="Save" // Added aria-label for accessibility
+            >
+              Verify New Email
+            </button>
+          </div>
               </div>
               {/* END OF SETTINGS */}
             </div>

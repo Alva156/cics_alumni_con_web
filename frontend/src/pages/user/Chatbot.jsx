@@ -923,7 +923,7 @@ function Chatbot() {
       <div className="flex items-center mb-4">
         <img src={chatbotsymbol} alt="Logo" className="w-10 h-10 mr-2" />
         <h1 className="text-2xl font-medium text-gray-700">
-          AlumniConnect Chatbot
+          AlumniConnect FAQs
         </h1>
       </div>
       {/* Chat Container */}
@@ -988,7 +988,7 @@ function Chatbot() {
             }}
           >
             <div className="mb-4 font-bold sm:text-2xl text-xl text-white">
-              Welcome to Chatbot! Please click Get Started to continue.
+              Welcome to FAQs! Please click Get Started to continue.
             </div>
             <button
               className="btn bg-gray-600 text-white py-2 px-4 rounded-lg text-xl w-72"

@@ -60,4 +60,11 @@ router.get(
   authenticateJWT,
   userProfileController.previewAttachment
 );
+router.post("/send-otp", authenticateJWT, userProfileController.sendOTP);
+router.post(
+  "/verify-otp",
+  authenticateJWT,
+  userProfileController.verifyOTPAndUpdateEmail
+);
+
 module.exports = router;

@@ -272,7 +272,7 @@ const Homepage = () => {
             {/* Events Carousel */}
             <div className="events-carousel-container" data-aos="fade-up">
               <h2 className="events-title">
-                <Link to="/events-news" className="events-link">
+                <Link to="/user-events" className="events-link">
                   Upcoming Events
                 </Link>
               </h2>
@@ -414,9 +414,9 @@ const Homepage = () => {
                   </div>
                   <div className="square-item">
                     <div className="logo chatbot-logo"></div>
-                    <h3>Chatbot</h3>
+                    <h3>FAQs</h3>
                     <button onClick={() => handleNavigation("/user-chatbot")}>
-                      Chat with Us
+                      Ask Questions
                     </button>
                   </div>
                 </div>

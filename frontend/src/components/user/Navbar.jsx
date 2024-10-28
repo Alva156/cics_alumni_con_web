@@ -263,7 +263,7 @@ const Navbar = () => {
                 className="font-bold text-gray-700"
                 onClick={() => navigate("/user-chatbot")}
               >
-                Chatbot
+                FAQs
               </button>
             </li>
           </ul>

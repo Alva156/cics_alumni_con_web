@@ -60,6 +60,7 @@ const adminDocumentsRoutes = require("./api/routes/Contents/adminDocumentsRoutes
 const adminJobsRoutes = require("./api/routes/Contents/adminJobsRoutes");
 const threadsRoutes = require("./api/routes/threadsRoutes");
 const repliesRoutes = require("./api/routes/repliesRoutes");
+const surveyRoutes = require(".api/routes/surveyRoutes");
 
 app.use("/companies", adminCompaniesRoutes);
 app.use("/profile", userProfileRoutes);
@@ -73,6 +74,7 @@ app.use("/events", adminEventsRoutes);
 app.use("/certifications", adminCertificationsRoutes);
 app.use("/documents", adminDocumentsRoutes);
 app.use("/jobs", adminJobsRoutes);
+app.use("/survey", surveyRoutes);
 
 app.use(express.json({ limit: "10mb" })); // Increase to 10MB for JSON data
 app.use(express.urlencoded({ limit: "10mb", extended: true }));

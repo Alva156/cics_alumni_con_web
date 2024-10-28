@@ -1004,35 +1004,17 @@ function UserProfile() {
             </button>
 
             <div className="mb-4">
-              <div className="block mb-2 text-sm font-medium">
-                Update your account email address using the available options.
+            <div className="block mb-2 text-sm font-medium">
+                Updating Email Address
+              </div>
+              <div className="block mb-2 text-sm font-light">
+                Update your account email address using the email OTP option.
               </div>
 
-              <div className="block mb-2 text-sm font-light">
-                Choose preferred platform to send OTP  
-              </div>
 
               
             </div>
-            <div className="mb-2">
-              <label className="block mb-2 text-sm font-medium">
-                Mobile Number
-              </label>
-              <input
-                type="text"
-                name=""
-                placeholder=""
-                className="input input-sm input-bordered w-full h-10"
-                value=""
-                required
-              />
-              <button
-                onClick=""
-                className="btn btn-sm mt-2 w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
-              >
-                Send SMS
-              </button>
-            </div>
+            
             
 
             <div className="mb-4">

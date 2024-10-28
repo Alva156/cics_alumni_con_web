@@ -453,12 +453,14 @@ exports.changePassword = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.id; // Get the userId from the token
+    const userId = decoded.id;
 
-    const { newPassword } = req.body;
+    const { oldPassword, newPassword } = req.body;
 
-    if (!newPassword) {
-      return res.status(400).json({ error: "New password is required." });
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ error: "Old and new passwords are required." });
     }
 
     // Fetch the user
@@ -467,7 +469,13 @@ exports.changePassword = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    // Check password complexity (Optional: adjust this as needed)
+    // Compare oldPassword with the user's current password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Old password does not match." });
+    }
+
+    // Check password complexity (optional)
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
     if (!passwordRegex.test(newPassword)) {

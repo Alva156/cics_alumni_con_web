@@ -14,9 +14,14 @@ function UserProfile() {
   const [validationMessage, setValidationMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showValidationMessage2, setShowValidationMessage2] = useState(false);
+  const [validationMessage2, setValidationMessage2] = useState("");
+  const [showErrorMessage2, setShowErrorMessage2] = useState(false);
+  const [errorMessage2, setErrorMessage2] = useState("");
   const [isPassModalOpen, setIsPassModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthday, setBirthday] = useState("");
@@ -542,9 +547,9 @@ function UserProfile() {
 
     // Validate required fields
     if (!firstName || !lastName) {
-      setValidationMessage("First Name and Last Name are required.");
-      setShowValidationMessage(true);
-      setTimeout(() => setShowValidationMessage(false), 3000);
+      setErrorMessage("First Name and Last Name are required.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
       return; // Prevent submission
     }
 
@@ -759,12 +764,12 @@ function UserProfile() {
 
   const handlePasswordSub = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
+    setErrorMessage2("");
 
-    if (!newPassword || !confirmPassword) {
-      setErrorMessage("All fields are required.");
-      setShowErrorMessage(true);
-      setTimeout(() => setShowErrorMessage(false), 3000);
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setErrorMessage2("All fields are required.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
       return;
     }
 
@@ -772,41 +777,48 @@ function UserProfile() {
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
     if (!passwordRegex.test(newPassword)) {
-      setErrorMessage("Password must meet the complexity requirements.");
-      setShowErrorMessage(true);
-      setTimeout(() => setShowErrorMessage(false), 3000);
+      setErrorMessage2("Password must meet the complexity requirements.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      setShowErrorMessage(true);
-      setTimeout(() => setShowErrorMessage(false), 3000);
+      setErrorMessage2("New and Confirm Passwords do not match.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
       return;
     }
 
     try {
       const response = await axios.post(
         `${backendUrl}/profile/changepassword`,
-        { newPassword }, // Only new password
+        { oldPassword, newPassword }, // Include old password in the request
         { withCredentials: true }
       );
 
       if (response.status === 200) {
-        setValidationMessage(
+        setValidationMessage2(
           "Password changed successfully! Please log in using your new password."
         );
         setModalVisible(true);
       } else {
-        setErrorMessage("Failed to reset password.");
-        setShowErrorMessage(true);
-        setTimeout(() => setShowErrorMessage(false), 3000);
+        setErrorMessage2(response.data.error || "Failed to reset password.");
+        setShowErrorMessage2(true);
+        setTimeout(() => setShowErrorMessage2(false), 3000);
       }
     } catch (err) {
       console.error("Error resetting password:", err);
-      setErrorMessage("Server error occurred.");
-      setShowErrorMessage(true);
-      setTimeout(() => setShowErrorMessage(false), 3000);
+
+      // Check if error response from server exists and has a message
+      if (err.response && err.response.data && err.response.data.error) {
+        setErrorMessage2(err.response.data.error);
+      } else {
+        setErrorMessage2("Server error occurred.");
+      }
+
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
     }
   };
 
@@ -839,8 +851,19 @@ function UserProfile() {
     <>
       {/* Password Modal */}
       {isPassModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
-          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4 ">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          {showErrorMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2  bg-red text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{errorMessage2}</p>
+            </div>
+          )}
+          {showValidationMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2  bg-green text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{validationMessage2}</p>
+            </div>
+          )}
+
+          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
             <button
               onClick={closePassModal}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
@@ -861,6 +884,20 @@ function UserProfile() {
               </svg>
             </button>
 
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">
+                Old Password
+              </label>
+              <input
+                type="password"
+                name="oldPassword"
+                placeholder="Old Password"
+                className="input input-sm input-bordered w-full h-10"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                required
+              />
+            </div>
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium">
                 New Password
@@ -926,7 +963,8 @@ function UserProfile() {
       {modalVisible && (
         <dialog id="my_modal_5" className="modal modal-middle " open>
           <div className="modal-box">
-            <p className="py-4">{validationMessage}</p>
+            <p className="py-4">{validationMessage || validationMessage2}</p>
+
             <div className="modal-action">
               <button
                 onClick={handleExitModal}
@@ -1414,7 +1452,7 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Email Address</label>
+                  <label className="pt-4 pb-2 text-sm">Alternative Email Address</label>
                   <input
                     type="email"
                     placeholder="Type here"

@@ -282,51 +282,53 @@ function AdminCompanies() {
       </div>
       <hr className="mb-6 border-black" />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCompanies.map((company) => (
-          <div
-            key={company._id}
-            className="relative mb-4 p-4 border border-black rounded-lg flex flex-col hover:bg-gray-200 transition-colors cursor-pointer"
-            onClick={() => openViewModal(company)}
-          >
-            <img
-              src={`${backendUrl}${company.image}`}
-              alt={company.name}
-              className="w-full h-48 object-cover rounded-t-lg mb-4 mt-4"
-            />
-            <div className="absolute top-2 right-2 flex space-x-2">
-              <div
-                className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedCompany(company);
-                  setIsDeleteModalOpen(true);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Delete
-                </span>
-              </div>
-              <div
-                style={{ marginRight: "8px" }}
-                className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEditModal(company);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1 ">
-                  Edit
-                </span>
-              </div>
-            </div>
-            <div>
-              <div className="text-md font-medium mb-1">{company.name}</div>
-              <div className="text-sm text-black-600">{company.address}</div>
-            </div>
-          </div>
-        ))}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {filteredCompanies.map((company) => (
+    <div
+      key={company._id}
+      className="relative mb-4 p-4 border border-black rounded-lg flex flex-col hover:bg-gray-200 transition-colors cursor-pointer"
+      onClick={() => openViewModal(company)}
+    >
+      <img
+        src={`${backendUrl}${company.image}`}
+        alt={company.name}
+        className="w-full h-48 object-cover rounded-t-lg mb-4 mt-4"
+      />
+      <div className="absolute top-2 right-2 flex space-x-2">
+        <div
+          className="w-8 h-8 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedCompany(company);
+            setIsDeleteModalOpen(true);
+          }}
+        >
+          <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Delete
+          </span>
+          <i className="fas fa-trash text-white"></i> {/* Icon for Delete */}
+        </div>
+        <div
+          className="w-8 h-8 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            openEditModal(company);
+          }}
+        >
+          <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Edit
+          </span>
+          <i className="fas fa-edit text-white"></i> {/* Icon for Edit */}
+        </div>
       </div>
+      <div>
+        <div className="text-md font-medium mb-1">{company.name}</div>
+        <div className="text-sm text-black-600">{company.address}</div>
+      </div>
+    </div>
+  ))}
+</div>
+
 
       {/* View Modal */}
       {isViewModalOpen && selectedCompany && (

@@ -5,6 +5,8 @@ function Alumni() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [alumni, setAlumni] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // New modal state
+  const [previewAttachment, setPreviewAttachment] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
   const [selectedProgram, setSelectedProgram] = useState("");
@@ -24,13 +26,6 @@ function Alumni() {
   });
   const [attachments, setAttachments] = useState([]);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return " ";
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    const date = new Date(dateString);
-    return date.toLocaleDateString(undefined, options);
-  };
-
   useEffect(() => {
     const fetchAttachments = async () => {
       try {
@@ -47,6 +42,16 @@ function Alumni() {
     fetchAttachments();
   }, [backendUrl]);
 
+  const openPreviewModal = (attachment) => {
+    setPreviewAttachment(attachment);
+    setIsPreviewModalOpen(true);
+  };
+
+  const closePreviewModal = () => {
+    setIsPreviewModalOpen(false);
+    setPreviewAttachment(null);
+  };
+
   const renderAttachment = (attachment) => {
     if (typeof attachment !== "object" || !attachment.filename) {
       return <p key="invalid">Invalid attachment data</p>;
@@ -56,15 +61,12 @@ function Alumni() {
 
     return (
       <div key={filename} className="mb-4">
-        <a
-          href={`${backendUrl}/profile/attachments/download/${filename}`}
-          download
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline"
+        <button
+          onClick={() => openPreviewModal(attachment)}
+          className="text-black hover:underline"
         >
           {filename}
-        </a>
+        </button>
       </div>
     );
   };
@@ -83,6 +85,7 @@ function Alumni() {
   }, []);
 
   const openModal = (alumni) => {
+    setIsPreviewModalOpen(false);
     setSelectedAlumni(alumni);
     setIsModalOpen(true);
     setActiveTab("primary");
@@ -510,6 +513,45 @@ function Alumni() {
             >
               &times;
             </button>
+            {/* Preview Modal */}
+            {isPreviewModalOpen && previewAttachment && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+                style={{ zIndex: 9999 }}
+              >
+                <div
+                  ref={modalRef}
+                  className="bg-white p-4 sm:p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-3xl h-auto overflow-y-auto max-h-full relative"
+                >
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 text-center">
+                    {previewAttachment.filename}
+                  </h2>
+                  <iframe
+                    src={`${backendUrl}/profile/attachments/preview/${previewAttachment.filename}`}
+                    className="mb-4 w-full h-64"
+                    title="File Preview"
+                    frameBorder="0"
+                  ></iframe>
+
+                  <div className="flex justify-end space-x-2 sm:space-x-4 mt-4">
+                    <button
+                      onClick={closePreviewModal}
+                      className="px-3 py-2 bg-gray-300 rounded-md text-sm sm:text-base hover:bg-gray-400 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={() => {
+                        window.location.href = `${backendUrl}/profile/attachments/download/${previewAttachment.filename}`;
+                      }}
+                      className="px-3 py-2 bg-blue text-white rounded-md text-sm sm:text-base hover:bg-blue-700 transition-colors"
+                    >
+                      Download
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div
               role="tablist"
@@ -666,7 +708,7 @@ function Alumni() {
                 ) : (
                   <p className="text-s mb-2 font-bold">-</p>
                 )}
-                <p className="text-xs mt-2 mb-1/2">Email</p>
+                <p className="text-xs mt-2 mb-1/2">Alternative Email Address</p>
                 {selectedAlumni.contactInformation?.email ? (
                   <a
                     href={`mailto:${selectedAlumni.contactInformation.email}`}

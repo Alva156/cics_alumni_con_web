@@ -51,7 +51,13 @@ router.get(
 );
 router.get(
   "/attachments/download/:filename",
+  authenticateJWT,
   userProfileController.downloadAttachment
 );
 
+router.get(
+  "/attachments/preview/:filename",
+  authenticateJWT,
+  userProfileController.previewAttachment
+);
 module.exports = router;

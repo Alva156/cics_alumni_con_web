@@ -46,7 +46,17 @@ const PrivateRoute = ({ children, requiredRole }) => {
   }
 
   if (requiredRole && userRole !== requiredRole) {
-    return <ErrorFallback />;
+    // User tries to access an admin page
+    if (userRole === "user") {
+      return <Navigate to="/" replace />; // Redirect user to homepage
+    }
+    // Admin tries to access a user page
+    if (userRole === "admin") {
+      return <Navigate to="/admin/homepage" replace />; // Redirect admin to admin homepage
+    }
+
+    // For other roles or mismatches, you can still show an error page if you want
+    return <ErrorPage />;
   }
 
   return children;

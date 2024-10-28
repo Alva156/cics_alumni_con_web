@@ -541,7 +541,11 @@ exports.resetPassword = async (req, res) => {
     await user.save();
 
     // Clear the JWT token cookie after the password is reset
-    res.clearCookie("resetToken");
+    res.clearCookie("resetToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
 
     return res.status(200).json({ msg: "Password reset successfully" });
   } catch (err) {

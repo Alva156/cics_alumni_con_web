@@ -697,11 +697,10 @@ exports.getAttachments = async (req, res) => {
   }
 };
 
-exports.downloadAttachment = async (req, res) => {
+exports.previewAttachment = async (req, res) => {
   try {
     const { filename } = req.params;
 
-    // Find the user profile containing the attachment
     const userProfile = await UserProfile.findOne({
       "attachments.filename": filename,
     });
@@ -710,7 +709,6 @@ exports.downloadAttachment = async (req, res) => {
       return res.status(404).json({ msg: "Attachment not found" });
     }
 
-    // Locate the specific attachment by filename
     const attachment = userProfile.attachments.find(
       (att) => att.filename === filename
     );
@@ -719,19 +717,47 @@ exports.downloadAttachment = async (req, res) => {
       return res.status(404).json({ msg: "Attachment data not found" });
     }
 
-    // Construct the full path to the file, assuming 'filepath' is a relative path like 'example.pdf'
     const filePath = path.join(__dirname, "../..", attachment.filepath);
 
-    // Log the final file path for debugging
-    console.log("File path for download:", filePath);
-
-    // Check if the file exists at the computed path
     if (!fs.existsSync(filePath)) {
-      console.log("File not found at path:", filePath); // Log the path for debugging
       return res.status(404).json({ msg: "File not found on the server" });
     }
 
-    // Send the file as a download
+    // Serve file for preview (inline view)
+    res.sendFile(filePath, { headers: { "Content-Disposition": "inline" } });
+  } catch (error) {
+    console.error("Error previewing attachment:", error);
+    res.status(500).json({ error: "Server Error", message: error.message });
+  }
+};
+
+exports.downloadAttachment = async (req, res) => {
+  try {
+    const { filename } = req.params;
+
+    const userProfile = await UserProfile.findOne({
+      "attachments.filename": filename,
+    });
+
+    if (!userProfile) {
+      return res.status(404).json({ msg: "Attachment not found" });
+    }
+
+    const attachment = userProfile.attachments.find(
+      (att) => att.filename === filename
+    );
+
+    if (!attachment) {
+      return res.status(404).json({ msg: "Attachment data not found" });
+    }
+
+    const filePath = path.join(__dirname, "../..", attachment.filepath);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ msg: "File not found on the server" });
+    }
+
+    // Trigger file download
     res.download(filePath, filename, (err) => {
       if (err) {
         console.error("Error during file download:", err);

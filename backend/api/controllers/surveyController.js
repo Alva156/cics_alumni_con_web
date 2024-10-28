@@ -2,7 +2,6 @@ const Survey = require("../models/surveyModel");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
-const Survey = require("../models/Survey"); // Import the Survey model
 
 // Get all surveys
 exports.getAllSurveys = async (req, res) => {

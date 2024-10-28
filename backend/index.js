@@ -60,7 +60,7 @@ const adminDocumentsRoutes = require("./api/routes/Contents/adminDocumentsRoutes
 const adminJobsRoutes = require("./api/routes/Contents/adminJobsRoutes");
 const threadsRoutes = require("./api/routes/threadsRoutes");
 const repliesRoutes = require("./api/routes/repliesRoutes");
-const surveyRoutes = require(".api/routes/surveyRoutes");
+const surveyRoutes = require("./api/routes/surveyRoutes");
 
 app.use("/companies", adminCompaniesRoutes);
 app.use("/profile", userProfileRoutes);

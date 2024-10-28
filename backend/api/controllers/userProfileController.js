@@ -1,10 +1,17 @@
 const UserProfile = require("../models/userProfileModel");
+const OTP = require("../models/otpModel");
 const User = require("../models/userModel");
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+
+// Helper function to generate a 6-digit OTP
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000); // 6 digit OTP
+}
 
 // Set storage engine for profile images
 const storage = multer.diskStorage({
@@ -653,6 +660,113 @@ exports.deleteSection = async (req, res) => {
       message: `Error deleting ${sectionType.replace("-", " ")} section`,
       error: error.message,
     });
+  }
+};
+// Send OTP to New Email
+exports.sendOTP = async (req, res) => {
+  try {
+    const { newEmail } = req.body;
+
+    if (!newEmail) {
+      return res.status(400).json({ msg: "New email is required" });
+    }
+
+    const otp = generateOTP();
+    const newOTP = new OTP({ email: newEmail, otp, createdAt: new Date() });
+    await newOTP.save();
+
+    // Setup Nodemailer transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+    const htmlContent = `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f8f8; border-radius: 8px;">
+        <div style="background-color: #ff4b4b; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+        </div>
+        <div style="background-color: #fff; padding: 40px; border-radius: 0 0 8px 8px;">
+          <h2 style="color: #ff4b4b; text-align: center;">Your OTP Code</h2>
+          <p style="text-align: center; font-size: 16px; color: #333;">
+            Hello,
+          </p>
+          <p style="text-align: center; font-size: 16px; color: #333;">
+            To continue with changing your email, please use the following One-Time Password (OTP):
+          </p>
+          <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px;">
+            <h1 style="color: #ff4b4b; font-size: 32px; letter-spacing: 2px;">${otp}</h1>
+          </div>
+          <p style="text-align: center; font-size: 14px; color: #777;">
+            This OTP will expire in 5 minutes.
+          </p>
+          <p style="text-align: center; font-size: 14px; color: #777;">
+            If you didn’t request this, please ignore this email.
+          </p>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <p style="font-size: 12px; color: #999;">
+          © 2024 CICS Alumni Connect. All rights reserved.
+        </p>
+      </div>
+    </div>
+  `;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: newEmail,
+      subject: "Your OTP Code",
+      text: `Your OTP code is ${otp}`,
+      html: htmlContent,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ msg: "OTP sent successfully" });
+  } catch (err) {
+    console.error("Error sending OTP:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
+
+// Verify OTP and Update Email
+exports.verifyOTPAndUpdateEmail = async (req, res) => {
+  try {
+    const { newEmail, otp } = req.body;
+    const token = req.cookies.token; // Ensure this token has the necessary information
+
+    if (!token) {
+      return res.status(401).json({ msg: "Unauthorized" });
+    }
+
+    // Decode the profile ID from the JWT token
+    const { profileId } = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Find the User associated with the profileId
+    const userProfile = await UserProfile.findById(profileId);
+    if (!userProfile) {
+      return res.status(404).json({ msg: "User profile not found" });
+    }
+
+    // Find the OTP record
+    const otpRecord = await OTP.findOne({ email: newEmail, otp });
+    if (!otpRecord) {
+      return res.status(400).json({ msg: "Invalid OTP" });
+    }
+
+    // Update the email in User and UserProfile models
+    await User.findByIdAndUpdate(userProfile.userId, { email: newEmail }); // Update User's email
+    await UserProfile.findByIdAndUpdate(profileId, { accountEmail: newEmail }); // Update UserProfile's accountEmail
+
+    // Remove the OTP record after successful verification
+    await OTP.deleteOne({ email: newEmail, otp });
+
+    res.status(200).json({ success: true, msg: "Email updated successfully" });
+  } catch (err) {
+    console.error("Error verifying OTP:", err);
+    res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
 

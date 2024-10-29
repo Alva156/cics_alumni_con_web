@@ -439,6 +439,28 @@ useEffect(() => {
   fetchSurveys(); // Call it here, but now it's also available for other functions
 }, []);
 
+useEffect(() => {
+  if (isEditModalOpen && selectedSurvey) {
+    setSelectedSurvey((prevSurvey) => {
+      const lastQuestion = prevSurvey.questions[prevSurvey.questions.length - 1];
+
+      // Check if the last question is empty; if not, add a new empty question
+      if (lastQuestion && lastQuestion.questionText === "") {
+        return prevSurvey; // No change if the last question is already empty
+      }
+      
+      return {
+        ...prevSurvey,
+        questions: [
+          ...prevSurvey.questions,
+          { questionText: "", questionType: "", choices: [""] }, // New empty question
+        ],
+      };
+    });
+  }
+}, [isEditModalOpen]);
+
+const questionRefs = useRef([]);
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -715,136 +737,111 @@ useEffect(() => {
   </div>
 )}
 
-      {isEditModalOpen && selectedSurvey && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div
-            ref={modalRef}
-            className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
-          >
-            <button
-              className="absolute top-4 right-4 text-black text-2xl"
-              onClick={closeModal}
-            >
-              &times;
-            </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedSurvey
-                ? `Edit Survey: ${selectedSurvey.name}`
-                : "New Survey"}
-            </div>
 
-            <div className="mb-4">
-              <label className="block text-sm mb-1">Survey Title</label>
-              <input
-                type="text"
-                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                value={selectedSurvey.name}
-                onChange={(e) => {
-                  const updatedSurvey = {
-                      ...selectedSurvey,
-                      name: e.target.value, // Update the title here
-                  };
-                  setSelectedSurvey(updatedSurvey);
-              }}
-              />
-            </div>
+{/* EDIT MODAL */}
+{isEditModalOpen && selectedSurvey && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div
+      ref={modalRef}
+      className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
+    >
+      <button
+        className="absolute top-4 right-4 text-black text-2xl"
+        onClick={closeModal}
+      >
+        &times;
+      </button>
+      <div className="text-2xl font-medium mb-2">
+        {selectedSurvey ? `Edit Survey: ${selectedSurvey.name}` : "New Survey"}
+      </div>
 
-            {selectedSurvey.questions.map((question, questionIndex) => (
-              <div key={questionIndex}>
-                <div className="mb-4">
-                  <label className="block text-sm mb-1">
-                    Question {questionIndex + 1}
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                    value={question.questionText}
-                    onChange={(e) => {
-                      const updatedQuestions = [...selectedSurvey.questions];
-                      updatedQuestions[questionIndex].questionText =
-                        e.target.value;
-                      setSelectedSurvey({
-                        ...selectedSurvey,
-                        questions: updatedQuestions,
-                      });
-                    }}
-                  />
-                </div>
+      <div className="mb-4">
+        <label className="block text-sm mb-1">Survey Title</label>
+        <input
+          type="text"
+          className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+          value={selectedSurvey.name}
+          onChange={(e) => {
+            const updatedSurvey = { ...selectedSurvey, name: e.target.value };
+            setSelectedSurvey(updatedSurvey);
+          }}
+        />
+      </div>
 
-                <div className="mb-4">
-                  <select
-                    className="select select-sm select-bordered w-full max-w-xs"
-                    value={question.questionType}
-                    onChange={(e) => {
-                      const updatedQuestions = [...selectedSurvey.questions];
-                      const newType = e.target.value;
-                      const updatedQuestion = {
-                        ...updatedQuestions[questionIndex],
-                        questionType: newType,
-                      };
-
-                      // Adjust options based on the new type
-                      if (newType === "radio" || newType === "checkbox") {
-                        updatedQuestion.choices = updatedQuestion.choices || [
-                          "",
-                        ];
-                      } else {
-                        updatedQuestion.choices = [];
-                      }
-
-                      updatedQuestions[questionIndex] = updatedQuestion;
-                      setSelectedSurvey({
-                        ...selectedSurvey,
-                        questions: updatedQuestions,
-                      });
-                    }}
-                  >
-                    <option disabled value="">
-                      Question Type
-                    </option>
-                    <option value="radio">Multiple choices</option>
-                    <option value="checkbox">Checkboxes</option>
-                    <option value="textInput">Short answer</option>
-                    <option value="textArea">Multi-line answer</option>
-                  </select>
-                </div>
-
-                {renderOptionInputs(question, questionIndex)}
-                {question.questionType === "radio" ||
-                question.questionType === "checkbox" ? (
-                  <button
-                    className="btn btn-sm bg-blue text-white mt-2"
-                    onClick={() => handleAddOption(questionIndex)}
-                  >
-                    Add Option
-                  </button>
-                ) : null}
-
-                <hr className="my-4 border-black" />
-              </div>
-            ))}
-
-            <div className="flex justify-center mt-16 space-x-3">
-              <div className="">
-                <button
-                  className="btn md:w-64 w-44 bg-fgray text-white"
-                  onClick={closeModal}
-                >
-                  Cancel
-                </button>
-              </div>
-              <div className="">
-                <button
-                  className="btn md:w-64 w-44 bg-green text-white"
-                  onClick={handleUpdateSurvey}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
+      {/* Map through existing questions */}
+      {questions.map((question, questionIndex) => (
+        <div key={questionIndex}>
+          <div className="mb-4">
+            <label className="block text-sm mb-1">
+              Question {questionIndex + 1}
+            </label>
+            <input
+              type="text"
+              className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+              value={question.questionText}
+              onChange={(e) => handleQuestionChange(questionIndex, e.target.value)}
+            />
           </div>
+
+          <div className="mb-4">
+            <select
+              className="select select-sm select-bordered w-full max-w-xs"
+              value={question.questionType}
+              onChange={(e) => handleQuestionTypeChange(questionIndex, e.target.value)}
+            >
+              <option disabled value="">
+                Question Type
+              </option>
+              <option value="radio">Multiple choices</option>
+              <option value="checkbox">Checkboxes</option>
+              <option value="textInput">Short answer</option>
+              <option value="textArea">Multi-line answer</option>
+            </select>
+          </div>
+
+          {/* Render Options using renderOptionInputs */}
+          {renderOptionInputs(question, questionIndex)}
+
+          {/* Add Option button for radio/checkbox types */}
+          {(question.questionType === "radio" || question.questionType === "checkbox") && (
+            <button
+              className="btn btn-sm bg-blue text-white mt-2"
+              onClick={() => handleAddOption(questionIndex)}
+            >
+              Add Option
+            </button>
+          )}
+
+          <hr className="my-4 border-black" />
         </div>
-      )}
+      ))}
+
+      {/* Button to add a new question */}
+      <div className="mb-6">
+        <button
+          className="btn md:w-64 w-44 bg-green text-white"
+          onClick={() => {
+            setQuestions([...questions, { questionText: "", questionType: "", choices: [""] }]);
+          }}
+        >
+          Add Question
+        </button>
+      </div>
+
+      <div className="flex justify-center mt-16 space-x-3">
+        <button className="btn md:w-64 w-44 bg-fgray text-white" onClick={closeModal}>
+          Cancel
+        </button>
+        <button className="btn md:w-64 w-44 bg-green text-white" onClick={handleUpdateSurvey}>
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
 
       {/* ADD MODAL */}
 {isAddModalOpen && (

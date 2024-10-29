@@ -348,7 +348,7 @@ const handleDeleteSurvey = async () => {
 const handleUpdateSurvey = async () => {
   // Prepare the survey data to be updated
   const surveyData = {
-      title: selectedSurvey?.title || "Updated Survey", // Ensure this matches the field being updated
+      title: selectedSurvey.name, // Ensure this matches the field being updated
       questions: selectedSurvey.questions.filter(q => q.questionText && q.questionType) // Ensure valid questions
   };
 
@@ -685,11 +685,11 @@ useEffect(() => {
                 value={selectedSurvey.name}
                 onChange={(e) => {
                   const updatedSurvey = {
-                    ...selectedSurvey,
-                    name: e.target.value,
+                      ...selectedSurvey,
+                      name: e.target.value, // Update the title here
                   };
                   setSelectedSurvey(updatedSurvey);
-                }}
+              }}
               />
             </div>
 

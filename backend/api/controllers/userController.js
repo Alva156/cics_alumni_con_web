@@ -172,7 +172,7 @@ exports.sendOTP = async (req, res) => {
     <div style="font-family: Arial, sans-serif; color: #333;">
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f8f8; border-radius: 8px;">
         <div style="background-color: #ff4b4b; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-          <img src="https://yourlogo.com/logo.png" alt="Logo" style="width: 120px;">
+         
         </div>
         <div style="background-color: #fff; padding: 40px; border-radius: 0 0 8px 8px;">
           <h2 style="color: #ff4b4b; text-align: center;">Your OTP Code</h2>
@@ -438,7 +438,7 @@ exports.forgotPassword = async (req, res) => {
     <div style="font-family: Arial, sans-serif; color: #333;">
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f8f8; border-radius: 8px;">
         <div style="background-color: #ff4b4b; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-          <img src="https://yourlogo.com/logo.png" alt="Logo" style="width: 120px;">
+         
         </div>
         <div style="background-color: #fff; padding: 40px; border-radius: 0 0 8px 8px;">
           <h2 style="color: #ff4b4b; text-align: center;">Your OTP Code</h2>

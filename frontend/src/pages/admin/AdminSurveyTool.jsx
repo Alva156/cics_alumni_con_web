@@ -5,6 +5,9 @@ import { uniqueId } from "lodash"; // Make sure you import uniqueId
 
 function AdminSurveyTool() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [showMessage, setshowMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(false);
   const [surveys, setSurveys] = useState([]);
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -343,74 +346,63 @@ const handleDeleteSurvey = async () => {
 };
 
 const handleUpdateSurvey = async () => {
-  if (!selectedSurvey) return;
+  // Prepare the survey data to be updated
+  const surveyData = {
+      title: selectedSurvey?.title || "Updated Survey", // Ensure this matches the field being updated
+      questions: selectedSurvey.questions.filter(q => q.questionText && q.questionType) // Ensure valid questions
+  };
 
-  // Check if required fields are filled in
-  if (!selectedSurvey.title || !selectedSurvey.questions || selectedSurvey.questions.length === 0) {
-    setshowMessage("Please fill in all required fields.");
-    setErrorMessage(true);
-    setTimeout(() => setErrorMessage(false), 3000);
-    return;
+  // Ensure at least one question is valid
+  if (!surveyData.questions.length) {
+      alert("At least one question must be provided with valid text and type.");
+      return;
   }
-
-  const surveyData = new FormData();
-  surveyData.append("title", selectedSurvey.title);
-  surveyData.append("questions", JSON.stringify(selectedSurvey.questions)); // Assuming questions is an array of objects
-
-  const image = document.getElementById("survey-image").files[0]; // Adjust this ID based on your input
-  if (image) {
-    surveyData.append("image", image);
-  }
-  setLoading(true); // Start loading
 
   try {
-    const response = await axios.put(
-      `${backendUrl}/surveys/update-survey/${selectedSurvey._id}`,
-      surveyData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
+      console.log("Attempting to update survey:", surveyData);
+      const response = await axios.put(
+          `${backendUrl}/survey/update/${selectedSurvey._id}`, // Ensure the URL is correct
+          surveyData,
+          {
+              withCredentials: true,
+          }
+      );
+
+      // Check the response structure
+      if (response && response.data && response.data.survey) {
+          console.log("Updated survey response data:", response.data.survey);
+          setSurveys(prevSurveys => 
+              prevSurveys.map(survey => 
+                  survey._id === selectedSurvey._id ? response.data.survey : survey
+              )
+          );
+          closeModal();
+          setshowMessage("Survey updated successfully!");
+          setSuccessMessage(true);
+          setTimeout(() => {
+              setSuccessMessage(false);
+          }, 3000);
+      } else {
+          console.error("Unexpected response structure:", response);
       }
-    );
-
-    // Update the survey in the local state
-    setSurveys((prevSurveys) =>
-      prevSurveys.map((survey) =>
-        survey._id === selectedSurvey._id
-          ? response.data
-          : survey
-      )
-    );
-
-    closeModal();
-    setshowMessage("Survey updated successfully!");
-    setSuccessMessage(true);
-    setTimeout(() => {
-      setSuccessMessage(false);
-    }, 3000);
   } catch (error) {
-    console.error("Error updating survey:", error);
-    if (error.response) {
-      setshowMessage(error.response.data.msg);
-      setErrorMessage(true);
-      setTimeout(() => setErrorMessage(false), 3000);
-    }
-  } finally {
-    setLoading(false); // Stop loading
+      console.error("Failed to update survey:", error.message || error);
+      alert("Failed to update survey.");
+      if (error.response) {
+          setshowMessage(error.response.data.message); // Ensure this matches your backend response
+          setErrorMessage(true);
+          setTimeout(() => setErrorMessage(false), 3000);
+      }
   }
 };
-
-
 
 useEffect(() => {
   const fetchSurveys = async () => {
     try {
-      const response = await fetch(`${backendUrl}/survey/view`); // Adjust the endpoint as necessary
+      const response = await fetch(`${backendUrl}/survey/view`);
       const data = await response.json();
-      console.log('Fetched Surveys:', data);
-      setSurveys(data); // Assuming you're using useState for surveys
+      console.log('Fetched Surveys:', data); // Check the structure of data
+      setSurveys(data);
     } catch (error) {
       console.error('Error fetching surveys:', error);
     }
@@ -640,7 +632,7 @@ useEffect(() => {
           <div className="font-medium ">
             {index + 1}
             <span className="mr-2">.</span>
-            {question.questionContent}
+            {question.questionText}
           </div>
           <div className="flex justify-between mt-2">
             <div>{renderInputField(question)}</div>
@@ -710,10 +702,10 @@ useEffect(() => {
                   <input
                     type="text"
                     className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                    value={question.questionContent}
+                    value={question.questionText}
                     onChange={(e) => {
                       const updatedQuestions = [...selectedSurvey.questions];
-                      updatedQuestions[questionIndex].questionContent =
+                      updatedQuestions[questionIndex].questionText =
                         e.target.value;
                       setSelectedSurvey({
                         ...selectedSurvey,
@@ -788,14 +780,7 @@ useEffect(() => {
               <div className="">
                 <button
                   className="btn md:w-64 w-44 bg-green text-white"
-                  onClick={() => {
-                    // Logic to save the updated survey details
-                    const updatedSurveys = surveys.map((survey) =>
-                      survey.id === selectedSurvey.id ? selectedSurvey : survey
-                    );
-                    setSurveys(updatedSurveys);
-                    closeModal();
-                  }}
+                  onClick={handleUpdateSurvey}
                 >
                   Save
                 </button>

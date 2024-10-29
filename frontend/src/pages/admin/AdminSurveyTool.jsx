@@ -117,9 +117,22 @@ function AdminSurveyTool() {
     });
   };
 
+  const handleDeleteOption = (questionIndex, optionIndex) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestions = [...prevQuestions];
+      const updatedChoices = [...updatedQuestions[questionIndex].choices];
+  
+      // Remove the selected choice by its index
+      updatedChoices.splice(optionIndex, 1);
+      updatedQuestions[questionIndex].choices = updatedChoices;
+  
+      return updatedQuestions;
+    });
+  };
+
   const renderOptionInputs = (question, questionIndex) => {
     const { questionType, choices } = question;
-
+  
     if (questionType === "radio" || questionType === "checkbox") {
       return choices.map((option, optionIndex) => (
         <div key={optionIndex} className="flex items-center mb-2">
@@ -137,6 +150,12 @@ function AdminSurveyTool() {
               handleOptionChange(questionIndex, optionIndex, e.target.value)
             }
           />
+          <button
+            className="ml-2 w-4 h-4 rounded-full bg-[#BE142E]"
+            onClick={() => handleDeleteOption(questionIndex, optionIndex)}
+          >
+            
+          </button>
         </div>
       ));
     } else if (questionType === "textInput") {
@@ -156,6 +175,7 @@ function AdminSurveyTool() {
     }
     return null;
   };
+  
 
   useEffect(() => {
     const handleClickOutside = (event) => {

@@ -277,7 +277,7 @@ const sendEmailNotification = async (emailAddresses, subject, message) => {
       </div>`;
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: '"CICS Alumni Connect" <' + process.env.EMAIL_USER + ">",
       bcc: emailAddresses, // Use 'bcc' to hide recipients
       subject: subject,
       html: htmlContent,

@@ -1,53 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import { uniqueId } from "lodash"; // Make sure you import uniqueId
 
 function AdminSurveyTool() {
-  const [surveys, setSurveys] = useState([
-    {
-      id: 1,
-      name: "Survey Name 1",
-      response: "999 responses",
-      answered: false,
-      questions: [
-        {
-          question: "Question 1",
-          questionContent: "hello world",
-          questionType: "radio",
-          choices: ["choice 1", "choice 2", "choice 3"],
-        },
-        {
-          question: "Question 2",
-          questionContent: "hello world",
-          questionType: "checkbox",
-          choices: ["choice 1", "choice 2", "choice 3"],
-        },
-        {
-          question: "Question 3",
-          questionContent: "hello world",
-          questionType: "textInput",
-        },
-        {
-          question: "Question 4",
-          questionContent: "hello world",
-          questionType: "textArea",
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Survey Name 2",
-      response: "500 responses",
-      answered: true,
-      questions: [
-        {
-          question: "Question 1",
-          questionContent: "another question content",
-          questionType: "radio",
-          choices: ["option 1", "option 2"],
-        },
-      ],
-    },
-  ]);
-
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [surveys, setSurveys] = useState([]);
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -213,13 +171,49 @@ function AdminSurveyTool() {
     );
   };
 
-  const handlePublishSurvey = (id) => {
-    setSurveys((prevSurveys) =>
-      prevSurveys.map((survey) =>
-        survey.id === id ? { ...survey, answered: !survey.answered } : survey
-      )
-    );
-  };
+  const handlePublishSurvey = async (id) => {
+    console.log("Publishing survey with ID:", id); // Log the ID
+    if (!id) {
+        console.error("Survey ID is undefined"); // Log error if ID is not available
+        return;
+    }
+
+    const surveyToUpdate = surveys.find(survey => survey.id === id);
+    if (!surveyToUpdate) {
+        console.error("Survey not found in local state");
+        return;
+    }
+
+    // Log details about the survey before publishing
+    console.log("Survey to update:", surveyToUpdate);
+
+    const updatedPublishedStatus = !surveyToUpdate.published;
+
+    try {
+        const response = await fetch(`${backendUrl}/survey/publish/${id}`, {
+            method: 'PATCH', // Use PATCH for updating
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ published: updatedPublishedStatus }), // Send published status
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            setSurveys((prevSurveys) =>
+                prevSurveys.map((survey) =>
+                    survey.id === id ? { ...survey, published: updatedPublishedStatus } : survey
+                )
+            );
+            console.log(data.message);
+        } else {
+            console.error(data.message);
+        }
+    } catch (error) {
+        console.error('Error publishing survey:', error);
+    }
+};
 
   const renderInputField = (question) => {
     switch (question.questionType) {
@@ -281,6 +275,73 @@ function AdminSurveyTool() {
       survey.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const createSurvey = async (surveyData) => {
+      try {
+          // Assuming you store your token in localStorage; adjust if stored elsewhere
+          const token = localStorage.getItem("token");
+          
+          const response = await axios.post(
+              `${backendUrl}/survey/create`,
+              surveyData,
+              {
+                  headers: {
+                      Authorization: `Bearer ${token}`, // Send token as a Bearer token
+                  },
+                  withCredentials: true, // Important if the token is in cookies
+              }
+          );
+          
+          console.log("Survey created successfully, response:", response);
+          return response;
+      } catch (error) {
+          console.error("Error in createSurvey:", error.response || error.message || error);
+          throw error;
+      }
+  };
+  
+  const handleSaveSurvey = async () => {
+    const surveyData = {
+        title: selectedSurvey?.name || "New Survey", // Ensure this is 'title'
+        questions: questions.filter(q => q.questionText && q.questionType) // Ensure valid questions
+    };
+
+    // Ensure at least one question is valid
+    if (!surveyData.questions.length) {
+        alert("At least one question must be provided with valid text and type.");
+        return;
+    }
+
+    try {
+        console.log("Attempting to save survey:", surveyData);
+        const response = await createSurvey(surveyData);
+        if (response && response.data && response.data.survey) {
+            console.log("Survey response data:", response.data.survey);
+            setSurveys(prevSurveys => [...prevSurveys, response.data.survey]);
+            closeModal();
+        } else {
+            console.error("Unexpected response structure:", response);
+        }
+    } catch (error) {
+        console.error("Failed to create survey:", error.message || error);
+        alert("Failed to create survey.");
+    }
+};
+
+useEffect(() => {
+  const fetchSurveys = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/survey/view`); // Adjust the endpoint as necessary
+      const data = await response.json();
+      console.log('Fetched Surveys:', data);
+      setSurveys(data); // Assuming you're using useState for surveys
+    } catch (error) {
+      console.error('Error fetching surveys:', error);
+    }
+  };
+  fetchSurveys();
+}, []);
+
+
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       <div className="flex items-center mb-4">
@@ -322,184 +383,202 @@ function AdminSurveyTool() {
       </div>
 
       <hr className="mb-6 border-black" />
-
-      {unansweredSurveys.map((survey, index) => (
+      {unansweredSurveys.length > 0 ? (
+  unansweredSurveys.map((survey, index) => (
+    <div
+      key={index}
+      className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+      onClick={() => openViewModal(survey)}
+    >
+      <div>
+        <div className="text-md font-medium mb-1">{survey.name}</div>
+        <div className="text-sm text-black-600">{survey.response || "No responses yet."}</div>
+      </div>
+      <div className="flex items-center">
+        {/* Delete Button */}
         <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openViewModal(survey)}
+          className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteSurvey(survey.id);
+          }}
         >
-          <div>
-            <div className="text-md font-medium mb-1">{survey.name}</div>
-            <div className="text-sm text-black-600">{survey.response}</div>
-          </div>
-          <div className="flex items-center">
-            <div
-              className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteSurvey(survey.id);
-              }}
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Delete
-              </span>
-            </div>
-            <div
-              className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                openEditModal(survey);
-              }}
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Edit
-              </span>
-            </div>
-            <div
-              className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePublishSurvey(survey.id);
-              }}
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Publish
-              </span>
-            </div>
-          </div>
+          <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Delete
+          </span>
         </div>
-      ))}
-
-      <div className="text-lg mb-4">Published</div>
-
-      <hr className="mb-6 border-black" />
-
-      {answeredSurveys.map((survey) => (
+        {/* Edit Button */}
         <div
-          key={survey.id}
-          className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openViewModal(survey)} // Update to open ViewModal
+          className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            openEditModal(survey);
+          }}
         >
-          <div>
-            <div className="text-md font-medium mb-1">{survey.name}</div>
-            <div className="text-sm text-black-600">{survey.response}</div>
-          </div>
-          <div className="flex items-center">
-            <div
-              className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteSurvey(survey.id);
-              }}
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Delete
-              </span>
-            </div>
-            <div
-              className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                openEditModal(survey);
-              }} // Update to open EditModal
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Edit
-              </span>
-            </div>
-            <div
-              className="w-4 h-4 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePublishSurvey(survey.id);
-              }}
-            >
-              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                Unpublish
-              </span>
-            </div>
-          </div>
+          <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Edit
+          </span>
         </div>
-      ))}
+        {/* Publish Button */}
+<div
+    className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+    onClick={(e) => {
+        e.stopPropagation();
+        handlePublishSurvey(survey.id); // Call the function to handle publishing
+    }}
+    role="button" // Make it clear it's a button
+    tabIndex={0} // Make it focusable
+    onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') { // Allow activation via keyboard
+            e.stopPropagation();
+            handlePublishSurvey(survey.id);
+        }
+    }}
+>
+    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+        Publish
+    </span>
+</div>
+      </div>
+    </div>
+  ))
+) : (
+  <div className="mb-4 text-center text-gray-500">No unanswered surveys available.</div>
+)}
+
+<div className="text-lg mb-4">Published Surveys</div>
+<hr className="mb-6 border-black" />
+
+{answeredSurveys.length > 0 ? (
+  answeredSurveys.map((survey, index) => (
+    <div
+      key={index}
+      className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+      onClick={() => openViewModal(survey)} // Update to open ViewModal
+    >
+      <div>
+        <div className="text-md font-medium mb-1">{survey.name}</div>
+        <div className="text-sm text-black-600">{survey.response || "No responses recorded."}</div>
+      </div>
+      <div className="flex items-center">
+        {/* Delete Button */}
+        <div
+          className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteSurvey(survey.id);
+          }}
+        >
+          <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Delete
+          </span>
+        </div>
+        {/* Edit Button */}
+        <div
+          className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            openEditModal(survey); // Update to open EditModal
+          }}
+        >
+          <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Edit
+          </span>
+        </div>
+        {/* Unpublish Button */}
+        <div
+          className="w-4 h-4 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log("Attempting to publish survey with ID:", survey.id); // Log ID
+            handlePublishSurvey(survey.id);}}
+        >
+          <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Unpublish
+          </span>
+        </div>
+      </div>
+    </div>
+  ))
+) : (
+  <div className="mb-4 text-center text-gray-500">No answered surveys available.</div>
+)}
 
       {/* VIEW MODAL */}
-      {isViewModalOpen && selectedSurvey && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div
-            ref={modalRef}
-            className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
-          >
-            <button
-              className="absolute top-4 right-4 text-black text-2xl"
-              onClick={closeModal}
-            >
-              &times;
-            </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedSurvey.name}
-            </div>
-            <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 border border-fgray">
-              <div className="text-xs font-light">Responses</div>
-              <div className="text-xl font-normal">999</div>
-            </div>
+{isViewModalOpen && selectedSurvey && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-105">
+    <div
+      ref={modalRef}
+      className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
+    >
+      <button
+        className="absolute top-4 right-4 text-black text-2xl"
+        onClick={closeModal}
+      >
+        &times;
+      </button>
+      <div className="text-2xl font-medium mb-2">
+        {selectedSurvey.name}
+      </div>
+      <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 border border-fgray">
+        <div className="text-xs font-light">Responses</div>
+        <div className="text-xl font-normal">999</div>
+      </div>
 
-            <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 mt-2 border border-fgray">
-              <div className="text-xs font-light">Date Created</div>
-              <div className="text-xl font-normal">August 20, 2024</div>
-            </div>
+      <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 mt-2 border border-fgray">
+        <div className="text-xs font-light">Date Created</div>
+        <div className="text-xl font-normal">August 20, 2024</div>
+      </div>
 
-            <div className="flex mt-4 space-x-3">
-              <div className="">
-                <button className="btn md:w-64 w-32 bg-blue text-white ">
-                  Export to PDF
-                </button>
-              </div>
-              <div className="">
-                <button className="btn md:w-64 w-32 bg-green text-white">
-                  Export to Excel
-                </button>
-              </div>
-            </div>
+      <div className="flex mt-4 space-x-3">
+        <div>
+          <button className="btn md:w-64 w-32 bg-blue text-white ">
+            Export to PDF
+          </button>
+        </div>
+        <div>
+          <button className="btn md:w-64 w-32 bg-green text-white">
+            Export to Excel
+          </button>
+        </div>
+      </div>
 
-            <div className="mt-6">Results Summary</div>
+      <div className="mt-6">Results Summary</div>
 
-            {selectedSurvey.questions.map((question, index) => (
-              <div
-                key={index}
-                className="w-full rounded px-4 py-2 border border-black my-2"
-              >
-                <div className="font-medium ">
-                  {index + 1}
-                  <span className="mr-2">.</span>
-                  {question.questionContent}
-                </div>
-                <div className="flex justify-between mt-2">
-                  <div className="">{renderInputField(question)}</div>
-                  <div className="text-center">
-                    {renderInputField(question)}
-                  </div>
-                  <div className="text-center">hello worlds</div>
-                </div>
-              </div>
-            ))}
-
-            {/* BOTTOM BUTTONS */}
-            <div className="flex justify-center mt-16 space-x-3">
-              <div className="">
-                <button className="btn md:w-64 w-44 bg-fgray text-white">
-                  Cancel
-                </button>
-              </div>
-              <div className="">
-                <button className="btn md:w-64 w-44 bg-green text-white">
-                  Save
-                </button>
-              </div>
-            </div>
+      {selectedSurvey.questions.map((question, index) => (
+        <div
+          key={index}
+          className="w-full rounded px-4 py-2 border border-black my-2"
+        >
+          <div className="font-medium ">
+            {index + 1}
+            <span className="mr-2">.</span>
+            {question.questionContent}
+          </div>
+          <div className="flex justify-between mt-2">
+            <div>{renderInputField(question)}</div>
+            <div className="text-center">{renderInputField(question)}</div>
+            <div className="text-center">hello worlds</div>
           </div>
         </div>
-      )}
+      ))}
+
+      {/* BOTTOM BUTTONS */}
+      <div className="flex justify-center mt-16 space-x-3">
+        <div>
+          <button className="btn md:w-64 w-44 bg-fgray text-white">
+            Cancel
+          </button>
+        </div>
+        <div>
+          <button className="btn md:w-64 w-44 bg-green text-white">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
       {isEditModalOpen && selectedSurvey && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -640,98 +719,99 @@ function AdminSurveyTool() {
       )}
 
       {/* ADD MODAL */}
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div
-            ref={modalRef}
-            className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
-          >
-            <button
-              className="absolute top-4 right-4 text-black text-2xl"
-              onClick={closeModal}
-            >
-              &times;
-            </button>
-            <div className="mb-4">
-              <label className="block text-sm mb-1">Survey Title</label>
-              <input
-                type="text"
-                className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-              />
-            </div>
-            {questions.map((question, questionIndex) => (
-              <div key={questionIndex} className="mb-6">
-                <div className="mb-4">
-                  <label className="block text-sm mb-1">
-                    Question {questionIndex + 1}
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                    value={question.questionText}
-                    onChange={(e) =>
-                      handleQuestionChange(questionIndex, e.target.value)
-                    }
-                  />
-                </div>
-                <div className="mb-4">
-                  <select
-                    className="select select-sm select-bordered w-full max-w-xs"
-                    value={question.questionType}
-                    onChange={(e) =>
-                      handleQuestionTypeChange(questionIndex, e.target.value)
-                    }
-                  >
-                    <option disabled value="">
-                      Question Type
-                    </option>
-                    <option value="radio">Multiple choices</option>
-                    <option value="checkbox">Checkboxes</option>
-                    <option value="textInput">Short answer</option>
-                    <option value="textArea">Multi-line answer</option>
-                  </select>
-                </div>
-                {renderOptionInputs(question, questionIndex)}
-                {question.questionType === "radio" ||
-                question.questionType === "checkbox" ? (
-                  <button
-                    className="btn btn-sm bg-blue text-white mt-2"
-                    onClick={() => handleAddOption(questionIndex)}
-                  >
-                    Add Option
-                  </button>
-                ) : null}
-                <hr className="my-4 border-black" />
-              </div>
-            ))}
-            <div className="flex justify-center mt-16 space-x-3">
-              <div className="">
-                <button
-                  className="btn md:w-64 w-44 bg-fgray text-white"
-                  onClick={closeModal}
-                >
-                  Cancel
-                </button>
-              </div>
-              <div className="">
-                <button
-                  className="btn md:w-64 w-44 bg-green text-white"
-                  onClick={() => {
-                    // Logic to save the updated survey details
-                    const updatedSurveys = surveys.map((survey) =>
-                      survey.id === selectedSurvey.id ? selectedSurvey : survey
-                    );
-                    setSurveys(updatedSurveys);
-                    closeModal();
-                  }}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
+{isAddModalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-1000">
+    <div
+      ref={modalRef}
+      className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
+    >
+      <button
+        className="absolute top-4 right-4 text-black text-2xl"
+        onClick={closeModal}
+      >
+        &times;
+      </button>
+      <div className="mb-4">
+        <label className="block text-sm mb-1">Survey Title</label>
+        <input
+          type="text"
+          className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+          value={selectedSurvey?.name || ""}
+          onChange={(e) => {
+            setSelectedSurvey((prevSurvey) => ({
+              ...prevSurvey,
+              name: e.target.value,
+            }));
+          }}
+        />
+      </div>
+      {questions.map((question, questionIndex) => (
+        <div key={questionIndex} className="mb-6">
+          <div className="mb-4">
+            <label className="block text-sm mb-1">
+              Question {questionIndex + 1}
+            </label>
+            <input
+              type="text"
+              className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
+              value={question.questionText}
+              onChange={(e) =>
+                handleQuestionChange(questionIndex, e.target.value)
+              }
+            />
           </div>
+          <div className="mb-4">
+            <select
+              className="select select-sm select-bordered w-full max-w-xs"
+              value={question.questionType}
+              onChange={(e) =>
+                handleQuestionTypeChange(questionIndex, e.target.value)
+              }
+            >
+              <option disabled value="">
+                Question Type
+              </option>
+              <option value="radio">Multiple choices</option>
+              <option value="checkbox">Checkboxes</option>
+              <option value="textInput">Short answer</option>
+              <option value="textArea">Multi-line answer</option>
+            </select>
+          </div>
+          {renderOptionInputs(question, questionIndex)}
+          {question.questionType === "radio" ||
+          question.questionType === "checkbox" ? (
+            <button
+              className="btn btn-sm bg-blue text-white mt-2"
+              onClick={() => handleAddOption(questionIndex)}
+            >
+              Add Option
+            </button>
+          ) : null}
+          <hr className="my-4 border-black" />
         </div>
-      )}
+      ))}
+      <div className="flex justify-center mt-16 space-x-3">
+        <div className="">
+          <button
+            className="btn md:w-64 w-44 bg-fgray text-white"
+            onClick={closeModal}
+          >
+            Cancel
+          </button>
+        </div>
+        <div className="">
+          <button
+            className="btn md:w-64 w-44 bg-green text-white"
+            onClick={handleSaveSurvey}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+<div className="h-128">asdasdas</div>
     </div>
   );
 }

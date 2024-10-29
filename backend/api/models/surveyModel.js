@@ -3,17 +3,15 @@ const { Schema } = mongoose;
 
 // Schema to store individual question details
 const questionSchema = new Schema({
-    questionText: {
-        type: String,
-        required: true,
-    },
+    questionText: { type: String, required: true },
     questionType: {
         type: String,
         enum: ["radio", "checkbox", "textInput", "textArea"],
         required: true,
     },
     choices: {
-        type: [String], // Choices are only relevant for radio and checkbox types
+        type: [String],
+        default: [], // Provide a default empty array
         required: function () {
             return this.questionType === "radio" || this.questionType === "checkbox";
         },
@@ -48,30 +46,31 @@ const responseSchema = new Schema({
 });
 
 // Schema to represent a survey
-const surveySchema = new Schema(
-    {
-        userId: {
-            type: mongoose.Schema.Types.ObjectId, // Reference to the admin user who created the survey
-            ref: "User",
-            required: true,
-        },
-        name: {
-            type: String,
-            required: true,
-        },
-        responseCount: {
-            type: Number,
-            default: 0,
-        },
-        answered: {
-            type: Boolean,
-            default: false,
-        },
-        questions: [questionSchema], // Embedded array of questions
-        responses: [responseSchema], // Embedded array of responses from users
+const surveySchema = new Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // Assuming you have a User model
+        required: true,
     },
-    { timestamps: true }
-);
+    name: { 
+        type: String, 
+        required: true 
+    },
+    responseCount: { 
+        type: Number, 
+        default: 0 
+    },
+    answered: { 
+        type: Boolean, 
+        default: false 
+    },
+    published: { // New field to track if the survey is published
+        type: Boolean,
+        default: false,
+    },
+    questions: [questionSchema],
+    responses: [responseSchema],
+}, { timestamps: true });
 
 const Survey = mongoose.model("Survey", surveySchema);
 

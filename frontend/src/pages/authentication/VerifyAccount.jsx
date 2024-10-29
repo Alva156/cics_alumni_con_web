@@ -148,36 +148,6 @@ function VerifyAccount() {
     setLoading(false);
   };
 
-  const handleResendOtp = async () => {
-    setLoading(true); // Start loading
-    setError("");
-    setSuccess("");
-
-    try {
-      const response = await axios.post(
-        `${backendUrl}/users/sendotp`,
-        {}, // No need to send any data, email is retrieved from the token
-        {
-          withCredentials: true, // Ensure cookies are sent
-        }
-      );
-
-      if (response.data.msg === "OTP sent successfully") {
-        setSuccess("OTP resent successfully");
-        setTimer(300); // Reset the timer for 5 minutes
-        clearSuccessAfterDelay();
-      } else {
-        setError("Failed to resend OTP");
-      }
-    } catch (error) {
-      console.error("Error resending OTP:", error);
-      setError("Error occurred while resending OTP");
-      clearErrorAfterDelay();
-    }
-
-    setLoading(false); // Stop loading
-  };
-
   const handleCloseModal = async () => {
     try {
       const response = await axios.post(
@@ -259,25 +229,27 @@ function VerifyAccount() {
                 Verify your account using the OTP code to be sent to your mobile
                 number or personal email.
               </p>
-              <div className="text-red mb-4">
-                <p>{error}</p>
+              <div className="h-4">
+                {error && <p className="text-red text-xs mb-4">{error}</p>}
               </div>
 
-              <p className="text-left text-sm md:text-base">
+              <p className="text-left text-sm md:text-base mt-4">
                 Choose preferred platform to send OTP
               </p>
             </div>
 
-            <button className="bg-[#3D3C3C] text-white text-lg py-2 px-6 w-64 mb-2 mt-0 transition duration-300 ease-in-out hover:bg-[#2C2C2C]">
-              SMS
+            <button className="btn md:w-64 w-52 bg-black text-white hover:bg-black hover:text-white">
+              Send OTP (SMS)
             </button>
 
             <button
               onClick={() => handleOtpTypeSelection("Email")}
-              className="bg-[#3D3C3C] text-white text-lg py-2 px-6 w-64 mb-0 mt-0 transition duration-300 ease-in-out hover:bg-[#2C2C2C]"
+              className="btn md:w-64 w-52 bg-black text-white mt-2 hover:bg-black hover:text-white"
               disabled={loading}
             >
-              Email
+              {otpSent && otpType === "Email" && timer > 0
+                ? "Resend OTP (Email)"
+                : "Send OTP (Email)"}
             </button>
 
             <label className="block mb-2 mt-6 text-sm font-medium">
@@ -291,11 +263,12 @@ function VerifyAccount() {
               style={{ height: "40px" }}
               disabled={loading}
             />
-            <div className="text-green mb-4">
-              <p>{success}</p>
+            <div className="h-4">
+              {success && <p className="text-green text-xs mb-4">{success}</p>}
             </div>
+
             {otpSent && (
-              <div className="mb-4">
+              <div className="mb-4 mt-4">
                 <p className="text-left text-sm md:text-base">
                   OTP valid for: {formatTime(timer)}
                 </p>
@@ -303,23 +276,15 @@ function VerifyAccount() {
             )}
             <button
               onClick={handleOtpSubmit}
-              className="bg-[#056E34] text-white text-lg py-2 px-6 w-64 mb-2 mt-0 transition duration-300 ease-in-out hover:bg-[#004A1C]"
+              className="btn md:w-64 w-52 bg-green text-white hover:bg-green hover:text-white"
               disabled={loading}
             >
               Confirm
             </button>
 
             <button
-              onClick={handleResendOtp}
-              className="bg-[#BE142E] text-white text-lg py-2 px-6 w-64 mb-2 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
-              disabled={loading}
-            >
-              Resend OTP
-            </button>
-
-            <button
               onClick={() => setModal2Visible(true)}
-              className="bg-[#C5C5C5] text-black text-lg py-2 px-6 w-64 transition duration-300 ease-in-out hover:bg-[#A8A8A8]"
+              className=" btn md:w-64 w-52 bg-[#C5C5C5] text-black hover:bg-[#C5C5C5] hover:text-black mt-2"
             >
               Cancel
             </button>

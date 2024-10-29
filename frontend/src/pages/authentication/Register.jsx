@@ -313,7 +313,7 @@ function Register() {
             <button
               type="submit"
               onClick={handleSubmit}
-              className="bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 transition duration-300 ease-in-out hover:bg-[#a10c2b] mt-4"
+              className="btn bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 mt-4 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
             >
               SIGN UP
             </button>
@@ -322,7 +322,7 @@ function Register() {
               Already have an account?
             </p>
             <button
-              className="bg-[#2D2B2B] text-white font-bold text-l py-2 px-3 w-full transition duration-300 ease-in-out hover:bg-[#1a1a1a]"
+              className=" btn bg-[#2D2B2B] text-white font-bold text-l py-2 px-3 w-full mb-3  transition duration-300 ease-in-out hover:bg-[#1a1a1a]"
               onClick={() => navigate("/login")}
             >
               SIGN IN

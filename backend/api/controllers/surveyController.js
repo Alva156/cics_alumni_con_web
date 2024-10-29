@@ -167,51 +167,25 @@ exports.deleteSurvey = async (req, res) => {
 };
 
 exports.publishSurvey = async (req, res) => {
-    const { published } = req.body; // Expecting { published: true/false }
-    const { id } = req.params; // Get the ID from the request parameters
+    const surveyId = req.params.id;
+    const survey = await Survey.findById(surveyId);
 
-    console.log("Received request to publish survey:", { id, published }); // Log the incoming request
-
-    // Ensure id is defined
-    if (!id) {
-        return res.status(400).json({ message: "Survey ID is required" });
+    if (!survey) {
+        return res.status(404).json({ msg: "Survey not found" });
     }
 
+    // Toggle the published status
+    survey.published = !survey.published;
+    
     try {
-        // Verify JWT token
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized, token missing." });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.id;
-        const userRole = decoded.role;
-
-        // Find the survey by ID
-        const survey = await Survey.findById(id);
-        if (!survey) {
-            return res.status(404).json({ message: "Survey not found" });
-        }
-
-        // Optionally, check user authorization if needed
-        // if (userRole !== "admin" && survey.userId.toString() !== userId) {
-        //     return res.status(403).json({ message: "Unauthorized" });
-        // }
-
-        // Update the published status
-        survey.published = published !== undefined ? published : !survey.published; // Use provided status or toggle if not provided
-        await survey.save(); // Save the updated survey
-
-        // Send email notification if necessary
-        // Example: await sendEmailNotification([recipient], subject, message);
-
-        return res.status(200).json({ message: 'Survey updated successfully', survey });
+        await survey.save();
+        res.status(200).json(survey); // Return the updated survey
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error publishing/unpublishing survey", error });
+        console.error("Error updating survey:", error);
+        res.status(500).json({ msg: "Server Error", error: error.message });
     }
 };
+
 
 
 

@@ -165,55 +165,49 @@ function AdminSurveyTool() {
     }
   }, [isViewModalOpen, isEditModalOpen, isAddModalOpen]);
 
-  const handleDeleteSurvey = (id) => {
-    setSurveys((prevSurveys) =>
-      prevSurveys.filter((survey) => survey.id !== id)
-    );
-  };
+  // const handleDeleteSurvey = (id) => {
+  //   setSurveys((prevSurveys) =>
+  //     prevSurveys.filter((survey) => survey.id !== id)
+  //   );
+  // };
 
-  const handlePublishSurvey = async (id) => {
-    console.log("Publishing survey with ID:", id); // Log the ID
-    if (!id) {
-        console.error("Survey ID is undefined"); // Log error if ID is not available
-        return;
-    }
+  const handlePublishSurvey = async (surveyId) => {
+    console.log("Toggling publish status for survey with ID:", surveyId);
 
-    const surveyToUpdate = surveys.find(survey => survey.id === id);
-    if (!surveyToUpdate) {
+    // Find the survey to publish
+    const surveyToToggle = surveys.find(survey => survey._id === surveyId);
+    if (!surveyToToggle) {
         console.error("Survey not found in local state");
         return;
     }
 
-    // Log details about the survey before publishing
-    console.log("Survey to update:", surveyToUpdate);
-
-    const updatedPublishedStatus = !surveyToUpdate.published;
-
     try {
-        const response = await fetch(`${backendUrl}/survey/publish/${id}`, {
-            method: 'PATCH', // Use PATCH for updating
+        const response = await fetch(`${backendUrl}/survey/publish/${surveyId}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ published: updatedPublishedStatus }), // Send published status
+            body: JSON.stringify({ published: !surveyToToggle.published }) // Toggle the published status
         });
 
-        const data = await response.json();
-
-        if (response.ok) {
-            setSurveys((prevSurveys) =>
-                prevSurveys.map((survey) =>
-                    survey.id === id ? { ...survey, published: updatedPublishedStatus } : survey
-                )
-            );
-            console.log(data.message);
-        } else {
-            console.error(data.message);
+        if (!response.ok) {
+            throw new Error('Failed to toggle publish status for the survey');
         }
+
+        // Update the surveys array to reflect the new published status
+        setSurveys(prevSurveys => 
+            prevSurveys.map(survey =>
+                survey._id === surveyId ? { ...survey, published: !survey.published } : survey
+            )
+        );
+
+        console.log("Survey publish status toggled successfully");
     } catch (error) {
-        console.error('Error publishing survey:', error);
+        console.error("Error toggling publish status for survey:", error);
     }
 };
+
+
 
   const renderInputField = (question) => {
     switch (question.questionType) {
@@ -263,17 +257,8 @@ function AdminSurveyTool() {
   };
 
   // Filter surveys based on search term
-  const unansweredSurveys = surveys
-    .filter((survey) => !survey.answered)
-    .filter((survey) =>
-      survey.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-  const answeredSurveys = surveys
-    .filter((survey) => survey.answered)
-    .filter((survey) =>
-      survey.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  const unansweredSurveys = surveys.filter(survey => !survey.published);
+const answeredSurveys = surveys.filter(survey => survey.published);
 
     const createSurvey = async (surveyData) => {
       try {
@@ -326,6 +311,98 @@ function AdminSurveyTool() {
         alert("Failed to create survey.");
     }
 };
+
+const handleDeleteSurvey = async () => {
+  if (!selectedSurvey) {
+    console.log("No survey selected for deletion.");
+    return;
+  }
+
+  console.log("Deleting survey with ID:", selectedSurvey._id); // Debugging line
+
+  try {
+    const response = await axios.delete(
+      `${backendUrl}/surveys/delete-survey/${selectedSurvey._id}`,
+      { withCredentials: true }
+    );
+
+    console.log("Delete response:", response.data); // Debugging line
+    fetchSurveys(); // Refresh surveys list
+    closeModal(); // Close modal after deleting
+    setshowMessage("Survey deleted successfully!");
+    setSuccessMessage(true);
+    setTimeout(() => {
+      setSuccessMessage(false);
+    }, 3000);
+  } catch (error) {
+    console.error(
+      "Error deleting survey:",
+      error.response ? error.response.data : error.message
+    );
+  }
+};
+
+const handleUpdateSurvey = async () => {
+  if (!selectedSurvey) return;
+
+  // Check if required fields are filled in
+  if (!selectedSurvey.title || !selectedSurvey.questions || selectedSurvey.questions.length === 0) {
+    setshowMessage("Please fill in all required fields.");
+    setErrorMessage(true);
+    setTimeout(() => setErrorMessage(false), 3000);
+    return;
+  }
+
+  const surveyData = new FormData();
+  surveyData.append("title", selectedSurvey.title);
+  surveyData.append("questions", JSON.stringify(selectedSurvey.questions)); // Assuming questions is an array of objects
+
+  const image = document.getElementById("survey-image").files[0]; // Adjust this ID based on your input
+  if (image) {
+    surveyData.append("image", image);
+  }
+  setLoading(true); // Start loading
+
+  try {
+    const response = await axios.put(
+      `${backendUrl}/surveys/update-survey/${selectedSurvey._id}`,
+      surveyData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
+    );
+
+    // Update the survey in the local state
+    setSurveys((prevSurveys) =>
+      prevSurveys.map((survey) =>
+        survey._id === selectedSurvey._id
+          ? response.data
+          : survey
+      )
+    );
+
+    closeModal();
+    setshowMessage("Survey updated successfully!");
+    setSuccessMessage(true);
+    setTimeout(() => {
+      setSuccessMessage(false);
+    }, 3000);
+  } catch (error) {
+    console.error("Error updating survey:", error);
+    if (error.response) {
+      setshowMessage(error.response.data.msg);
+      setErrorMessage(true);
+      setTimeout(() => setErrorMessage(false), 3000);
+    }
+  } finally {
+    setLoading(false); // Stop loading
+  }
+};
+
+
 
 useEffect(() => {
   const fetchSurveys = async () => {
@@ -420,25 +497,25 @@ useEffect(() => {
           </span>
         </div>
         {/* Publish Button */}
-<div
-    className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-    onClick={(e) => {
-        e.stopPropagation();
-        handlePublishSurvey(survey.id); // Call the function to handle publishing
-    }}
-    role="button" // Make it clear it's a button
-    tabIndex={0} // Make it focusable
-    onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') { // Allow activation via keyboard
+        <div
+          className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+          onClick={(e) => {
             e.stopPropagation();
-            handlePublishSurvey(survey.id);
-        }
-    }}
->
-    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-        Publish
-    </span>
-</div>
+            handlePublishSurvey(survey._id); // Call the function to handle publishing
+          }}
+          role="button" // Make it clear it's a button
+          tabIndex={0} // Make it focusable
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') { // Allow activation via keyboard
+              e.stopPropagation();
+              handlePublishSurvey(survey._id);
+            }
+          }}
+        >
+          <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+            Publish
+          </span>
+        </div>
       </div>
     </div>
   ))
@@ -490,8 +567,17 @@ useEffect(() => {
           className="w-4 h-4 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
           onClick={(e) => {
             e.stopPropagation();
-            console.log("Attempting to publish survey with ID:", survey.id); // Log ID
-            handlePublishSurvey(survey.id);}}
+            console.log("Attempting to unpublish survey with ID:", survey._id); // Log ID
+            handlePublishSurvey(survey._id); // Call to handle publishing/unpublishing
+        }}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+                handlePublishSurvey(survey._id);
+            }
+        }}
         >
           <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
             Unpublish
@@ -503,6 +589,7 @@ useEffect(() => {
 ) : (
   <div className="mb-4 text-center text-gray-500">No answered surveys available.</div>
 )}
+
 
       {/* VIEW MODAL */}
 {isViewModalOpen && selectedSurvey && (

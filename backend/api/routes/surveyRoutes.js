@@ -10,7 +10,7 @@ router.get('/view', surveyController.getAllSurveys);
 router.get('/:id', surveyController.getSurveyById);
 
 router.post('/create', surveyController.createSurvey);
-router.patch('/publish/:id', surveyController.publishSurvey);
+router.put('/publish/:id', surveyController.publishSurvey);
 
 
 module.exports = router;

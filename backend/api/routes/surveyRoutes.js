@@ -12,6 +12,6 @@ router.get('/:id', surveyController.getSurveyById);
 router.post('/create', surveyController.createSurvey);
 router.put('/publish/:id', surveyController.publishSurvey);
 router.put('/update/:id', surveyController.updateSurvey);
-
+router.delete('/delete/:id', surveyController.deleteSurvey);
 
 module.exports = router;

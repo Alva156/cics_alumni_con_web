@@ -151,34 +151,40 @@ exports.updateSurvey = async (req, res) => {
     }
 };
 
-
-
 // Delete a survey
 exports.deleteSurvey = async (req, res) => {
     try {
-        const token = req.cookies.token;
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized, token missing." });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userProfileId = decoded.profileId;
-
-        const survey = await Survey.findById(req.params.id);
-        if (!survey) {
-            return res.status(404).json({ message: "Survey not found" });
-        }
-
-        if (survey.userProfileId.toString() !== userProfileId) {
-            return res.status(403).json({ message: "Unauthorized" });
-        }
-
-        await Survey.deleteOne({ _id: req.params.id });
-        res.status(200).json({ message: "Survey deleted successfully" });
+      const token = req.cookies.token;
+      if (!token) {
+        return res.status(401).json({ message: "Unauthorized, token missing." });
+      }
+  
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userProfileId = decoded.profileId;
+  
+      const survey = await Survey.findById(req.params.id);
+      if (!survey) {
+        return res.status(404).json({ message: "Survey not found." });
+      }
+  
+      // Check if the `userId` exists before trying to access it
+      if (!survey.userId) {
+        return res.status(500).json({ message: "Survey is missing user profile information." });
+      }
+  
+      // Ensure the user is authorized to delete the survey
+      if (survey.userId.toString() !== userProfileId) {
+        return res.status(403).json({ message: "Unauthorized to delete this survey." });
+      }
+  
+      await Survey.deleteOne({ _id: req.params.id });
+      res.status(200).json({ message: "Survey deleted successfully." });
     } catch (error) {
-        res.status(500).json({ message: "Error deleting survey", error });
+      console.error("Error deleting survey:", error);
+      res.status(500).json({ message: "Error deleting survey", error });
     }
-};
+  };
+  
 
 exports.publishSurvey = async (req, res) => {
     const surveyId = req.params.id;

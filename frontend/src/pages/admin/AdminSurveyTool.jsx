@@ -5,6 +5,7 @@ import { uniqueId } from "lodash"; // Make sure you import uniqueId
 
 function AdminSurveyTool() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showMessage, setshowMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
@@ -40,6 +41,8 @@ function AdminSurveyTool() {
     );
     setIsEditModalOpen(true);
   };
+
+  
 
   const openAddModal = () => {
     setSelectedSurvey(null);
@@ -315,17 +318,22 @@ const answeredSurveys = surveys.filter(survey => survey.published);
     }
 };
 
-const handleDeleteSurvey = async () => {
-  if (!selectedSurvey) {
+const openDeleteModal = (survey) => {
+  setSelectedSurvey(survey);
+  setIsDeleteModalOpen(true);
+};
+
+const handleDeleteSurvey = async (survey) => {
+  if (!survey) {
     console.log("No survey selected for deletion.");
     return;
   }
 
-  console.log("Deleting survey with ID:", selectedSurvey._id); // Debugging line
+  console.log("Deleting survey with ID:", survey._id); // Debugging line
 
   try {
     const response = await axios.delete(
-      `${backendUrl}/surveys/delete-survey/${selectedSurvey._id}`,
+      `${backendUrl}/survey/delete/${survey._id}`,
       { withCredentials: true }
     );
 
@@ -396,23 +404,51 @@ const handleUpdateSurvey = async () => {
   }
 };
 
+const fetchSurveys = async () => {
+  try {
+    const response = await fetch(`${backendUrl}/survey/view`);
+    const data = await response.json();
+    console.log('Fetched Surveys:', data); // Check the structure of data
+    setSurveys(data);
+  } catch (error) {
+    console.error('Error fetching surveys:', error);
+  }
+};
+
 useEffect(() => {
-  const fetchSurveys = async () => {
-    try {
-      const response = await fetch(`${backendUrl}/survey/view`);
-      const data = await response.json();
-      console.log('Fetched Surveys:', data); // Check the structure of data
-      setSurveys(data);
-    } catch (error) {
-      console.error('Error fetching surveys:', error);
-    }
-  };
-  fetchSurveys();
+  fetchSurveys(); // Call it here, but now it's also available for other functions
 }, []);
 
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+
+{isDeleteModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+      <h2 className="text-2xl mb-4">Delete Survey</h2>
+      <p>Are you sure you want to delete this survey?</p>
+      <div className="flex justify-end mt-4">
+        <button
+          className="btn btn-sm w-24 bg-red text-white mr-2"
+          onClick={async () => {
+            await handleDeleteSurvey(selectedSurvey); // Call delete function
+            setIsDeleteModalOpen(false); // Close the modal after deletion
+          }}
+        >
+          Delete
+        </button>
+        <button
+          className="btn btn-sm w-24 bg-gray-500 text-white"
+          onClick={() => setIsDeleteModalOpen(false)}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       <div className="flex items-center mb-4">
         <h1 className="text-2xl font-medium text-gray-700">Survey Tool</h1>
       </div>
@@ -469,7 +505,7 @@ useEffect(() => {
           className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
           onClick={(e) => {
             e.stopPropagation();
-            handleDeleteSurvey(survey.id);
+            openDeleteModal(survey); // Open the modal and pass the full survey object
           }}
         >
           <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
@@ -535,7 +571,7 @@ useEffect(() => {
           className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
           onClick={(e) => {
             e.stopPropagation();
-            handleDeleteSurvey(survey.id);
+            openDeleteModal(survey); // Open the modal and pass the full survey object
           }}
         >
           <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">

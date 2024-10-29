@@ -156,10 +156,10 @@ function ResetPassword() {
               <p className="text-left font-bold text-sm mb-3 md:text-base">
                 Please provide a new password for your account.
               </p>
-            </div>
-            <div className="mb-4">
-              {success && <p className="text-green">{success}</p>}
-              {error && <p className="text-red">{error}</p>}
+              <div className="h-4 mt-4 mb-1">
+                {error && <p className="text-red text-xs">{error}</p>}
+                {success && <p className="text-green text-xs">{success}</p>}
+              </div>
             </div>
 
             <label className="block mb-2 text-sm font-medium">

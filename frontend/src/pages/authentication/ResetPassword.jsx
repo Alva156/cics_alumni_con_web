@@ -228,14 +228,14 @@ function ResetPassword() {
 
             <button
               onClick={handleSubmit}
-              className="bg-[#056E34] text-white text-lg py-2 px-6 w-64 mb-2 mt-0 transition duration-300 ease-in-out hover:bg-[#004A1C]"
+              className="btn md:w-64 w-52 bg-green text-white mt-2 hover:bg-green hover:text-white"
             >
               Confirm
             </button>
 
             <button
               onClick={() => setModal2Visible(true)}
-              className="bg-[#C5C5C5] text-black text-lg py-2 px-6 w-64 transition duration-300 ease-in-out hover:bg-[#A8A8A8]"
+              className="btn md:w-64 w-52 bg-[#C5C5C5] text-black hover:bg-[#C5C5C5] hover:text-black mt-2"
             >
               Cancel
             </button>

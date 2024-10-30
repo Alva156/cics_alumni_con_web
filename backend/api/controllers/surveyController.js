@@ -106,50 +106,49 @@ exports.createSurvey = async (req, res) => {
 
 exports.updateSurvey = async (req, res) => {
     try {
-        const token = req.cookies.token;
-        if (!token) return res.status(401).json({ error: "Token missing" });
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userProfileId = decoded.profileId;
-
-        // Fetch the survey to update
-        const survey = await Survey.findById(req.params.id);
-        if (!survey) {
-            return res.status(404).json({ message: "Survey not found" });
-        }
-
-        // Check if the user is the owner of the survey
-        if (survey.userId.toString() !== userProfileId) {
-            return res.status(403).json({ message: "Unauthorized to update this survey" });
-        }
-
-        // Update the survey fields
-        survey.name = req.body.title; // Update the title
-        survey.questions = req.body.questions; // Update the questions array
-
-        // Save the updated survey
-        const updatedSurvey = await survey.save();
-
-        // Populate the updated survey for response
-        const populatedSurvey = await Survey.findById(updatedSurvey._id)
-            .populate("userId", "firstName lastName profileImage profession")
-            .lean();
-
-        // Count responses for the updated survey
-        const responseCount = updatedSurvey.responses.length;
-
-        res.status(200).json({
-            message: "Survey updated successfully!",
-            survey: {
-                ...populatedSurvey,
-                responseCount, // Include response count in the response
-            },
-        });
+      const token = req.cookies.token;
+      if (!token) return res.status(401).json({ error: "Token missing" });
+  
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const userProfileId = decoded.profileId;
+  
+      const survey = await Survey.findById(req.params.id);
+      if (!survey) return res.status(404).json({ message: "Survey not found" });
+  
+      if (survey.userId.toString() !== userProfileId) {
+        return res.status(403).json({ message: "Unauthorized to update this survey" });
+      }
+  
+      // Update the survey's properties
+      survey.name = req.body.title; // Update the title
+      survey.questions = req.body.questions; // Update questions directly
+  
+      // Validate questions to ensure they have required fields
+      const invalidQuestions = survey.questions.filter(
+        (question) => !question.questionText || !question.questionType
+      );
+      
+      if (invalidQuestions.length) {
+        return res.status(400).json({ error: "All questions must have a text and a type." });
+      }
+  
+      const updatedSurvey = await survey.save();
+  
+      const populatedSurvey = await Survey.findById(updatedSurvey._id)
+        .populate("userId", "firstName lastName profileImage profession")
+        .lean();
+  
+      const responseCount = updatedSurvey.responses.length;
+      res.status(200).json({
+        message: "Survey updated successfully!",
+        survey: { ...populatedSurvey, responseCount },
+      });
     } catch (error) {
-        console.error("Error updating survey:", error.message);
-        res.status(500).json({ message: "Error updating survey", error });
+      console.error("Error updating survey:", error);
+      res.status(500).json({ message: "Error updating survey", error });
     }
-};
+  };
+  
 
 // Delete a survey
 exports.deleteSurvey = async (req, res) => {

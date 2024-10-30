@@ -85,13 +85,6 @@ function AdminSurveyTool() {
     const newQuestions = [...questions];
     newQuestions[questionIndex].questionText = value;
     setQuestions(newQuestions);
-
-    if (value !== "" && questionIndex === newQuestions.length - 1) {
-      setQuestions([
-        ...newQuestions,
-        { questionText: "", questionType: "", choices: [""] },
-      ]);
-    }
   };
 
   const handleQuestionTypeChange = (questionIndex, newType) => {
@@ -176,6 +169,18 @@ function AdminSurveyTool() {
     return null;
   };
   
+  const addQuestion = () => {
+    // Add a new question with default values
+    setQuestions((prevQuestions) => [
+      ...prevQuestions,
+      { questionText: "", questionType: "", choices: [""] },
+    ]);
+  };
+
+  const handleDeleteQuestion = (questionIndex) => {
+    const updatedQuestions = questions.filter((_, index) => index !== questionIndex);
+    setQuestions(updatedQuestions);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -770,18 +775,25 @@ const questionRefs = useRef([]);
 
       {/* Map through existing questions */}
       {questions.map((question, questionIndex) => (
-        <div key={questionIndex}>
-          <div className="mb-4">
-            <label className="block text-sm mb-1">
+        <div key={questionIndex} className="mb-6">
+          <div className="flex items-center mb-2">
+            <label className="block text-sm  flex-1">
               Question {questionIndex + 1}
             </label>
-            <input
-              type="text"
-              className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-              value={question.questionText}
-              onChange={(e) => handleQuestionChange(questionIndex, e.target.value)}
-            />
+            {/* Delete Question Button */}
+            <button
+              className="ml-2 w-4 h-4 rounded-full bg-[#BE142E] text-sm rounded text-white"
+              onClick={() => handleDeleteQuestion(questionIndex)}
+            >
+              
+            </button>
           </div>
+          <input
+            type="text"
+            className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm mb-3"
+            value={question.questionText}
+            onChange={(e) => handleQuestionChange(questionIndex, e.target.value)}
+          />
 
           <div className="mb-4">
             <select
@@ -841,10 +853,8 @@ const questionRefs = useRef([]);
 )}
 
 
-
-
       {/* ADD MODAL */}
-{isAddModalOpen && (
+      {isAddModalOpen && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-1000">
     <div
       ref={modalRef}
@@ -856,6 +866,7 @@ const questionRefs = useRef([]);
       >
         &times;
       </button>
+      
       <div className="mb-4">
         <label className="block text-sm mb-1">Survey Title</label>
         <input
@@ -870,21 +881,28 @@ const questionRefs = useRef([]);
           }}
         />
       </div>
+      
       {questions.map((question, questionIndex) => (
         <div key={questionIndex} className="mb-6">
-          <div className="mb-4">
-            <label className="block text-sm mb-1">
+          <div className="flex items-center mb-2">
+            <label className="block text-sm  flex-1">
               Question {questionIndex + 1}
             </label>
-            <input
-              type="text"
-              className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-              value={question.questionText}
-              onChange={(e) =>
-                handleQuestionChange(questionIndex, e.target.value)
-              }
-            />
+            {/* Delete Question Button */}
+            <button
+              className="ml-2 w-4 h-4 rounded-full bg-[#BE142E] text-sm rounded text-white"
+              onClick={() => handleDeleteQuestion(questionIndex)}
+            >
+              
+            </button>
           </div>
+          <input
+            type="text"
+            className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm mb-3"
+            value={question.questionText}
+            onChange={(e) => handleQuestionChange(questionIndex, e.target.value)}
+          />
+
           <div className="mb-4">
             <select
               className="select select-sm select-bordered w-full max-w-xs"
@@ -903,39 +921,40 @@ const questionRefs = useRef([]);
             </select>
           </div>
           {renderOptionInputs(question, questionIndex)}
-          {question.questionType === "radio" ||
-          question.questionType === "checkbox" ? (
+          {(question.questionType === "radio" || question.questionType === "checkbox") && (
             <button
               className="btn btn-sm bg-blue text-white mt-2"
               onClick={() => handleAddOption(questionIndex)}
             >
               Add Option
             </button>
-          ) : null}
+          )}
           <hr className="my-4 border-black" />
         </div>
       ))}
+
+      {/* Button to add a new question */}
+      <div className="mb-6">
+        <button
+          className="btn md:w-64 w-44 bg-green text-white"
+          onClick={addQuestion}
+        >
+          Add Question
+        </button>
+      </div>
+      
       <div className="flex justify-center mt-16 space-x-3">
-        <div className="">
-          <button
-            className="btn md:w-64 w-44 bg-fgray text-white"
-            onClick={closeModal}
-          >
-            Cancel
-          </button>
-        </div>
-        <div className="">
-          <button
-            className="btn md:w-64 w-44 bg-green text-white"
-            onClick={handleSaveSurvey}
-          >
-            Save
-          </button>
-        </div>
+        <button className="btn md:w-64 w-44 bg-fgray text-white" onClick={closeModal}>
+          Cancel
+        </button>
+        <button className="btn md:w-64 w-44 bg-green text-white" onClick={handleSaveSurvey}>
+          Save
+        </button>
       </div>
     </div>
   </div>
 )}
+
 <div className="h-128">asdasdas</div>
     </div>
   );

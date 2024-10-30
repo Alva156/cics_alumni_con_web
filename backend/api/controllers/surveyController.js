@@ -2,7 +2,9 @@ const Survey = require("../models/surveyModel");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 
+// ADMIN-SIDE
 
+// Display all surveys
 exports.getAllSurveys = async (req, res) => {
     try {
         const token = req.cookies.token;
@@ -38,7 +40,6 @@ exports.getAllSurveys = async (req, res) => {
         res.status(500).json({ message: "Error fetching surveys", error: error.message });
     }
 };
-
 
 // Get a single survey by ID
 exports.getSurveyById = async (req, res) => {
@@ -101,9 +102,7 @@ exports.createSurvey = async (req, res) => {
     }
 };
 
-
 // Update a survey
-
 exports.updateSurvey = async (req, res) => {
     try {
       const token = req.cookies.token;
@@ -149,7 +148,6 @@ exports.updateSurvey = async (req, res) => {
     }
   };
   
-
 // Delete a survey
 exports.deleteSurvey = async (req, res) => {
     try {
@@ -184,7 +182,7 @@ exports.deleteSurvey = async (req, res) => {
     }
   };
   
-
+// Toggle publish and unpublish
 exports.publishSurvey = async (req, res) => {
     const surveyId = req.params.id;
     const survey = await Survey.findById(surveyId);
@@ -206,10 +204,15 @@ exports.publishSurvey = async (req, res) => {
 };
 
 
+// USER-SIDE
 
+// Display all published surveys
+
+// Get a single survey by ID
+
+// Toggle Answered and Unanswered
 
 // Submit survey response (user-side)
-
 exports.submitSurveyResponse = async (req, res) => {
     const { id } = req.params;
     const { responses } = req.body; // Expecting array of user responses

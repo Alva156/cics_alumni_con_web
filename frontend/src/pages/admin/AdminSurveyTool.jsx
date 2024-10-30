@@ -799,7 +799,7 @@ function AdminSurveyTool() {
                             className="ml-2 w-4 h-4 rounded-full bg-[#BE142E] text-sm rounded text-white"
                             onClick={() => handleDeleteQuestion(questionIndex)}
                         >
-                            &times;
+                            
                         </button>
                     </div>
                     <input

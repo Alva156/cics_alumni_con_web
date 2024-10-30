@@ -61,8 +61,9 @@ const surveySchema = new Schema({
         default: 0 
     },
     answered: { 
-        type: Boolean, 
-        default: false 
+        type: [mongoose.Schema.Types.ObjectId], // Array to store IDs of users who have answered
+        ref: "User", // Reference to the User model
+        default: [] // Default to an empty array
     },
     published: { // New field to track if the survey is published
         type: Boolean,

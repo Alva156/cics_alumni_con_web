@@ -207,29 +207,124 @@ exports.publishSurvey = async (req, res) => {
 // USER-SIDE
 
 // Display all published surveys
+exports.getPublished = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    let userProfileId = null;
+
+    // Decode the token if it exists
+    if (token) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userProfileId = decoded.profileId;
+    }
+
+    // Find all surveys and populate userId and questions
+    const surveys = await Survey.find({published:true})
+        .populate("userId", "firstName lastName profileImage profession") // Populating userId
+        .populate("questions") // Populating questions
+        .lean();
+
+    // Enhance each survey with response count and ownership status
+    const surveysWithResponseCount = surveys.map(survey => {
+        // Count responses related to this survey
+        const responseCount = survey.responses.length; // Since responses is an array
+        return {
+            ...survey,
+            responseCount,
+            isOwner: userProfileId && survey.userId._id.toString() === userProfileId.toString(), // Check ownership
+        };
+    });
+
+    // Return enhanced surveys
+    res.status(200).json(surveysWithResponseCount);
+} catch (error) {
+    console.error("Error fetching surveys:", error); // Log the error for debugging
+    res.status(500).json({ message: "Error fetching surveys", error: error.message });
+}
+};
+
+// Get a single published survey by ID
+exports.getPublishedById = async (req, res) => {
+  try {
+      // Find the survey by ID, ensuring it's published, and populate userId and questions
+      const survey = await Survey.findOne({ _id: req.params.id, published: true })
+          .populate("userId", "firstName lastName profileImage profession")
+          .populate("questions")
+          .lean();
+
+      if (!survey) {
+          return res.status(404).json({ message: "Survey not found or not published" });
+      }
+
+      res.status(200).json(survey);
+  } catch (error) {
+      console.error("Error fetching published survey by ID:", error);
+      res.status(500).json({ message: "Error fetching survey", error: error.message });
+  }
+};
+
 
 // Get a single survey by ID
 
 // Toggle Answered and Unanswered
 
 // Submit survey response (user-side)
-exports.submitSurveyResponse = async (req, res) => {
-    const { id } = req.params;
-    const { responses } = req.body; // Expecting array of user responses
-    try {
-        const survey = await Survey.findById(id);
-        if (!survey) {
-            return res.status(404).json({ message: "Survey not found" });
-        }
 
-        // Logic to process user responses
-        // Update the response count (this is a simplified example)
-        survey.response = `${parseInt(survey.response) + 1} responses`;
+const authenticateUser = async (req, res, next) => {
+  const token = req.cookies.token; // Assuming you're storing the JWT in a cookie
 
-        await survey.save();
-        res.status(200).json({ message: "Response submitted successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Error submitting response", error });
-    }
+  if (!token) {
+      return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET); // Replace with your secret
+      req.userId = decoded.id; // Store the user ID in the request object
+      next();
+  } catch (error) {
+      return res.status(401).json({ message: 'Invalid token' });
+  }
 };
+
+
+exports.saveSurveyResponse = async (req, res) => {
+  const { surveyId, answers } = req.body; // Expect surveyId and answers from the request body
+  const userId = req.userId; // Get userId from request object
+
+  try {
+      // Find the survey by ID
+      const survey = await Survey.findById(surveyId);
+      if (!survey) {
+          return res.status(404).json({ message: "Survey not found" });
+      }
+
+      // Create or update response for the user
+      const existingResponse = survey.responses.find(response => response.userId.toString() === userId);
+
+      if (existingResponse) {
+          // Update the existing response
+          existingResponse.answers = answers; // Update answers
+      } else {
+          // Create a new response
+          survey.responses.push({
+              userId: userId, // Ensure this is set correctly
+              answers,
+          });
+      }
+
+      // Mark the survey as answered
+      survey.answered = true; // Set to boolean
+      // Increment the response count
+      survey.responseCount += 1;
+
+      // Save the updated survey
+      await survey.save();
+
+      res.status(200).json({ message: "Response saved successfully", survey });
+  } catch (error) {
+      console.error("Error saving survey response:", error);
+      res.status(500).json({ message: "Error saving response", error: error.message });
+  }
+};
+
 

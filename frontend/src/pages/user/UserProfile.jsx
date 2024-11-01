@@ -2196,6 +2196,7 @@ function UserProfile() {
 
                 <div className="py-1">
                   <button
+                    type="button"
                     className="btn md:w-64 w-52 bg-orange text-white" // Add a function to handle saving
                     onClick={openEmailModal}
                     aria-label="Save" // Added aria-label for accessibility

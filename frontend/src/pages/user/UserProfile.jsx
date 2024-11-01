@@ -56,6 +56,28 @@ function UserProfile() {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(0);
   const [otpSent, setOtpSent] = useState(false);
+  const [isDeleteModalPicOpen, setIsDeleteModalPicOpen] = useState(false);
+  const handleDeleteProfileImage = async () => {
+    try {
+      await axios.delete(`${backendUrl}/profile/deleteProfileImage`, {
+        withCredentials: true,
+      });
+      // Reset to the blank profile image and clear the preview
+      setProfileImage(blankprofilepic);
+      setValidationMessage("Profile image deleted successfully!");
+      setShowValidationMessage(true);
+      setImagePreview(null);
+      setIsDeleteModalPicOpen(false); // Close the modal
+      setTimeout(() => {
+        setShowValidationMessage(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error deleting profile image:", error);
+      setErrorMessage("Failed to delete profile image. Please try again.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
+    }
+  };
 
   useEffect(() => {
     if (timer > 0 && otpSent) {
@@ -1084,6 +1106,28 @@ function UserProfile() {
           </div>
         </div>
       )}
+      {isDeleteModalPicOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Profile Image</h2>
+            <p>Are you sure you want to delete your Profile Image?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={handleDeleteProfileImage} // Trigger the delete function
+              >
+                Delete
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteModalPicOpen(false)} // Close the modal on cancel
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Email Modal */}
       {isEmailModalOpen && (
@@ -1326,29 +1370,36 @@ function UserProfile() {
                   {/* PRIMARY INFORMATION */}
                   <div className="text-xl py-4">Primary Information</div>
 
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="Image Preview"
-                      className="h-40 w-40 border-2 mb-4"
-                    />
-                  ) : (
-                    <img
-                      src={
-                        profileImage === blankprofilepic
-                          ? blankprofilepic
-                          : `${backendUrl}${profileImage}`
-                      }
-                      alt="Profile"
-                      className="h-40 w-40 border-2 mb-4"
-                    />
-                  )}
+                  <div className="py-1">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Image Preview"
+                        className="h-40 w-40 border-2 mb-4"
+                      />
+                    ) : (
+                      <img
+                        src={
+                          profileImage === blankprofilepic
+                            ? blankprofilepic
+                            : `${backendUrl}${profileImage}`
+                        }
+                        alt="Profile"
+                        className="h-40 w-40 border-2 mb-4"
+                      />
+                    )}
+                    <div className="flex justify-between items-center pt-4">
+                      <label className="text-sm">Profile Picture</label>
+                      <button
+                        type="button"
+                        onClick={() => setIsDeleteModalPicOpen(true)}
+                        className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer"
+                      ></button>
+                    </div>
 
-                  <div className="mt-4">
-                    <label className="pt-4 pb-2 text-sm">Profile Picture</label>
                     <input
                       type="file"
-                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10"
+                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mt-2"
                       onChange={handleImageChange}
                       accept="image/*"
                     />

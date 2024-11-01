@@ -451,6 +451,52 @@ exports.updateProfile = async (req, res) => {
     }
   });
 };
+// Delete profile image endpoint
+exports.deleteProfileImage = async (req, res) => {
+  console.log("Delete profile image request received.");
+
+  try {
+    // Retrieve the token from cookies
+    const token = req.cookies.token;
+    if (!token) {
+      console.error("Authentication token missing.");
+      return res.status(401).json({ error: "Authentication token missing." });
+    }
+
+    // Verify and decode the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const profileId = decoded.profileId; // Use profileId from the decoded token
+    console.log(`Decoded token. Profile ID: ${profileId}`);
+
+    // Find the user profile by profileId
+    const userProfile = await UserProfile.findById(profileId);
+
+    if (!userProfile) {
+      return res.status(404).json({ error: "Profile not found." });
+    }
+
+    if (!userProfile.profileImage) {
+      return res.status(404).json({ error: "Profile image not found." });
+    }
+
+    // Path to the image file on the server
+    const imagePath = path.join(__dirname, "../../", userProfile.profileImage);
+    console.log("Deleting image from path:", imagePath);
+
+    // Delete the image file
+    deletePreviousImage(imagePath);
+
+    // Update the profile to remove the profileImage field
+    userProfile.profileImage = undefined;
+    await userProfile.save();
+
+    console.log("Profile image deleted successfully.");
+    res.status(200).json({ message: "Profile image deleted successfully!" });
+  } catch (error) {
+    console.error("Error deleting profile image:", error);
+    res.status(500).json({ error: "Failed to delete profile image" });
+  }
+};
 
 exports.changePassword = async (req, res) => {
   try {

@@ -66,5 +66,10 @@ router.post(
   authenticateJWT,
   userProfileController.verifyOTPAndUpdateEmail
 );
+router.delete(
+  "/deleteProfileImage",
+  authenticateJWT,
+  userProfileController.deleteProfileImage
+);
 
 module.exports = router;

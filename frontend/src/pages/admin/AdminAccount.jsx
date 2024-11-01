@@ -31,6 +31,8 @@ function AdminAccount() {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(0);
   const [otpSent, setOtpSent] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [profileId, setProfileId] = useState("");
 
   useEffect(() => {
     if (timer > 0 && otpSent) {
@@ -154,7 +156,8 @@ function AdminAccount() {
         setLastName(lastName || "");
         setAccountEmail(accountEmail || "");
         setInitialAccountEmail(accountEmail || "");
-        setProfileImage(profileImage || blankprofilepic); // Store original profile image for display
+        setProfileImage(profileImage || blankprofilepic);
+        setProfileId(profileId);
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -348,6 +351,28 @@ function AdminAccount() {
     setOtp("");
   };
 
+  const handleDeleteProfileImage = async () => {
+    try {
+      await axios.delete(`${backendUrl}/profile/deleteProfileImage`, {
+        withCredentials: true,
+      });
+      // Reset to the blank profile image and clear the preview
+      setProfileImage(blankprofilepic);
+      setValidationMessage("Profile image deleted successfully!");
+      setShowValidationMessage(true);
+      setImagePreview(null);
+      setIsDeleteModalOpen(false); // Close the modal
+      setTimeout(() => {
+        setShowValidationMessage(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error deleting profile image:", error);
+      setErrorMessage("Failed to delete profile image. Please try again.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
+    }
+  };
+
   return (
     <div className="admin-account">
       {showErrorMessage && (
@@ -358,6 +383,28 @@ function AdminAccount() {
       {showValidationMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2  bg-green text-white p-4 rounded-lg shadow-lg z-50">
           <p>{validationMessage}</p>
+        </div>
+      )}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Profile Image</h2>
+            <p>Are you sure you want to delete your Profile Image?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={handleDeleteProfileImage} // Trigger the delete function
+              >
+                Delete
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteModalOpen(false)} // Close the modal on cancel
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -387,7 +434,15 @@ function AdminAccount() {
               className="h-40 w-40 border-2 mb-4"
             />
           )}
-          <label className="pt-4 pb-2 text-sm">Profile Picture</label>
+          <div className="flex justify-between items-center pt-4">
+            <label className="text-sm">Profile Picture</label>
+            <button
+              type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer"
+            ></button>
+          </div>
+
           <input
             type="file"
             className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mt-2"

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import sampleidpic from "../../assets/sampleidpic.jpg";
 import blankprofilepic from "../../assets/blankprofilepic.jpg";
+import { Filter } from "bad-words";
 
 function AdminThreads() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -31,6 +33,109 @@ function AdminThreads() {
   const [selectedReply, setSelectedReply] = useState(null);
   const [isDeleteReplyModalOpen, setIsDeleteReplyModalOpen] = useState(false);
   const [replyToDelete, setReplyToDelete] = useState(null);
+  const filter = new Filter();
+  const customBadWords = [
+    "putang ina",
+    "bobo",
+    "tanga",
+    "sira ulo",
+    "gago",
+    "bwisit",
+    "hayop",
+    "bastard",
+    "peste",
+    "ulol",
+    "tarantado",
+    "hinayupak",
+    "lintik",
+    "demonyo",
+    "salot",
+    "lecheng",
+    "putik",
+    "inutil",
+    "lapastangan",
+    "walang hiya",
+    "punyeta",
+    "hudas",
+    "yawa",
+    "burat",
+    "titi",
+    "kupal",
+    "unggoy",
+    "gunggong",
+    "ulupong",
+    "buwisit",
+    "tang ina",
+    "puke",
+    "kantot",
+    "kantutan",
+    "kantotan",
+    "torjak",
+    "dede",
+    "pepe",
+    "puday",
+    "bilat",
+    "tae",
+    "mangmang",
+    "iyot",
+    "shet",
+    "pakyu",
+    "damn",
+    "shit",
+    "fuck",
+    "fucker",
+    "bitch",
+    "asshole",
+    "bastard",
+    "dickhead",
+    "motherfucker",
+    "son of a bitch",
+    "whore",
+    "slut",
+    "cunt",
+    "jerk",
+    "idiot",
+    "bitchass",
+    "nigger",
+    "shitty",
+    "bullshit",
+    "laspag",
+    "pakyu",
+    "tangina",
+    "batugan",
+    "tameme",
+    "santong kabayo",
+    "abnoy",
+    "duwag",
+    "tuta",
+    "bakla",
+    "tomboy",
+    "bading",
+    "bugok",
+    "gagu",
+    "kingina",
+    "putragis",
+    "yabag",
+    "bayag",
+    "katangahan",
+    "kasumpa-sumpa",
+    "kagaguhan",
+    "putres",
+    "leche",
+    "puta",
+    "bobong",
+    "pakyong ina",
+    "shithead",
+    "faggot",
+    "moron",
+    "crap",
+    "anus",
+    "motherfreaker",
+    "gaylord",
+    "jabol",
+  ];
+
+  filter.addWords(...customBadWords);
 
   const showValidation = (message) => {
     setValidationMessage(message);
@@ -88,6 +193,14 @@ function AdminThreads() {
       showError("Please fill in both the title and content fields.");
       return;
     }
+    // Check for bad words in the title and content
+    if (
+      filter.isProfane(newThread.title) ||
+      filter.isProfane(newThread.content)
+    ) {
+      showError("Your post contains prohibited words and cannot be posted.");
+      return;
+    }
     try {
       const response = await axios.post(
         `${backendUrl}/threads/create`,
@@ -113,6 +226,14 @@ function AdminThreads() {
   const handleUpdateThread = async () => {
     if (!selectedThread.title || !selectedThread.content) {
       showError("Please fill in both the title and content fields.");
+      return;
+    }
+    // Check for bad words in the title and content
+    if (
+      filter.isProfane(selectedThread.title) ||
+      filter.isProfane(selectedThread.content)
+    ) {
+      showError("Your post contains prohibited words and cannot be posted.");
       return;
     }
     if (!selectedThread) return;
@@ -199,6 +320,11 @@ function AdminThreads() {
       showError("Reply content cannot be empty.");
       return;
     }
+    // Check for bad words in the reply content
+    if (filter.isProfane(newReply)) {
+      showError("Your reply contains prohibited words and cannot be posted.");
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -245,6 +371,11 @@ function AdminThreads() {
   const handleUpdateReply = async (replyId) => {
     if (!selectedReply.content.trim()) {
       showError("Reply content cannot be empty.");
+      return;
+    }
+    // Check for bad words in the updated reply content
+    if (filter.isProfane(selectedReply.content)) {
+      showError("Your reply contains prohibited words and cannot be updated.");
       return;
     }
 
@@ -307,6 +438,7 @@ function AdminThreads() {
   };
 
   const openViewModal = (thread) => {
+    setNewReply("");
     setSelectedThread(thread);
     setIsViewModalOpen(true);
     fetchReplies(thread._id);
@@ -374,8 +506,8 @@ function AdminThreads() {
   };
 
   return (
-    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-2 mb-12">
-      <div className="carousel relative bg-white max-w-full overflow-hidden">
+    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-0 mb-12">
+      <div className="carousel relative bg-white m-3 max-w-full overflow-hidden">
         {showErrorMessage && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
             <p>{errorMessage}</p>
@@ -387,10 +519,7 @@ function AdminThreads() {
           </div>
         )}
       </div>
-
-      <div className="flex items-center mb-4">
-        <h1 className="text-2xl font-medium text-gray-700">Threads</h1>
-      </div>
+      <h1 className="text-2xl font-medium text-gray-700 mb-6">Threads</h1>
       <div className="mb-4 relative">
         <input
           type="text"
@@ -873,10 +1002,7 @@ function AdminThreads() {
         </div>
       )}
       {isAddModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
-          style={{ zIndex: 9999 }}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           {showErrorMessage && (
             <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
               <p>{errorMessage}</p>

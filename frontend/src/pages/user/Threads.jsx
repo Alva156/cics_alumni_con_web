@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import sampleidpic from "../../assets/sampleidpic.jpg";
 import blankprofilepic from "../../assets/blankprofilepic.jpg";
+import { Filter } from "bad-words";
 
 function Threads() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -32,6 +33,109 @@ function Threads() {
   const [selectedReply, setSelectedReply] = useState(null);
   const [isDeleteReplyModalOpen, setIsDeleteReplyModalOpen] = useState(false);
   const [replyToDelete, setReplyToDelete] = useState(null);
+  const filter = new Filter();
+  const customBadWords = [
+    "putang ina",
+    "bobo",
+    "tanga",
+    "sira ulo",
+    "gago",
+    "bwisit",
+    "hayop",
+    "bastard",
+    "peste",
+    "ulol",
+    "tarantado",
+    "hinayupak",
+    "lintik",
+    "demonyo",
+    "salot",
+    "lecheng",
+    "putik",
+    "inutil",
+    "lapastangan",
+    "walang hiya",
+    "punyeta",
+    "hudas",
+    "yawa",
+    "burat",
+    "titi",
+    "kupal",
+    "unggoy",
+    "gunggong",
+    "ulupong",
+    "buwisit",
+    "tang ina",
+    "puke",
+    "kantot",
+    "kantutan",
+    "kantotan",
+    "torjak",
+    "dede",
+    "pepe",
+    "puday",
+    "bilat",
+    "tae",
+    "mangmang",
+    "iyot",
+    "shet",
+    "pakyu",
+    "damn",
+    "shit",
+    "fuck",
+    "fucker",
+    "bitch",
+    "asshole",
+    "bastard",
+    "dickhead",
+    "motherfucker",
+    "son of a bitch",
+    "whore",
+    "slut",
+    "cunt",
+    "jerk",
+    "idiot",
+    "bitchass",
+    "nigger",
+    "shitty",
+    "bullshit",
+    "laspag",
+    "pakyu",
+    "tangina",
+    "batugan",
+    "tameme",
+    "santong kabayo",
+    "abnoy",
+    "duwag",
+    "tuta",
+    "bakla",
+    "tomboy",
+    "bading",
+    "bugok",
+    "gagu",
+    "kingina",
+    "putragis",
+    "yabag",
+    "bayag",
+    "katangahan",
+    "kasumpa-sumpa",
+    "kagaguhan",
+    "putres",
+    "leche",
+    "puta",
+    "bobong",
+    "pakyong ina",
+    "shithead",
+    "faggot",
+    "moron",
+    "crap",
+    "anus",
+    "motherfreaker",
+    "gaylord",
+    "jabol",
+  ];
+
+  filter.addWords(...customBadWords);
 
   const showValidation = (message) => {
     setValidationMessage(message);
@@ -89,6 +193,14 @@ function Threads() {
       showError("Please fill in both the title and content fields.");
       return;
     }
+    // Check for bad words in the title and content
+    if (
+      filter.isProfane(newThread.title) ||
+      filter.isProfane(newThread.content)
+    ) {
+      showError("Your post contains prohibited words and cannot be posted.");
+      return;
+    }
     try {
       const response = await axios.post(
         `${backendUrl}/threads/create`,
@@ -114,6 +226,14 @@ function Threads() {
   const handleUpdateThread = async () => {
     if (!selectedThread.title || !selectedThread.content) {
       showError("Please fill in both the title and content fields.");
+      return;
+    }
+    // Check for bad words in the title and content
+    if (
+      filter.isProfane(selectedThread.title) ||
+      filter.isProfane(selectedThread.content)
+    ) {
+      showError("Your post contains prohibited words and cannot be posted.");
       return;
     }
     if (!selectedThread) return;
@@ -200,6 +320,11 @@ function Threads() {
       showError("Reply content cannot be empty.");
       return;
     }
+    // Check for bad words in the reply content
+    if (filter.isProfane(newReply)) {
+      showError("Your reply contains prohibited words and cannot be posted.");
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -246,6 +371,11 @@ function Threads() {
   const handleUpdateReply = async (replyId) => {
     if (!selectedReply.content.trim()) {
       showError("Reply content cannot be empty.");
+      return;
+    }
+    // Check for bad words in the updated reply content
+    if (filter.isProfane(selectedReply.content)) {
+      showError("Your reply contains prohibited words and cannot be updated.");
       return;
     }
 
@@ -308,6 +438,7 @@ function Threads() {
   };
 
   const openViewModal = (thread) => {
+    setNewReply("");
     setSelectedThread(thread);
     setIsViewModalOpen(true);
     fetchReplies(thread._id);

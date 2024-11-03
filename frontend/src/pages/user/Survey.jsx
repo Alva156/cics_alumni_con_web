@@ -176,18 +176,19 @@ function Survey() {
   const fetchSurveyById = async (surveyId) => {
     try {
       const response = await axios.get(
-        `${backendUrl}/survey/viewpublish/${surveyId}`
+        `${backendUrl}/survey/viewpublish/${surveyId}`,
+        { withCredentials: true } // Ensures cookies are sent with the request
       );
-      setSelectedSurvey(response.data);
+      const surveyData = response.data;
+      setSelectedSurvey(surveyData);
 
-      // Set existing user responses or initialize as empty
-      const existingResponses = response.data.questions.reduce(
-        (acc, question) => {
-          acc[question._id] = userResponses[question._id] || ""; // Keep previous responses or set as empty
-          return acc;
-        },
-        {}
-      );
+      const existingResponses = surveyData.questions.reduce((acc, question) => {
+        const previousAnswer = surveyData.previousAnswers.find(
+          (answer) => answer.questionId === question._id
+        );
+        acc[question._id] = previousAnswer ? previousAnswer.answer : "";
+        return acc;
+      }, {});
       setUserResponses(existingResponses);
 
       setIsModalOpen(true);

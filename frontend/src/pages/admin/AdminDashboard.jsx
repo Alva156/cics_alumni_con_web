@@ -260,7 +260,7 @@ const AdminDashboard = () => {
       <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
         <div>
           <div className="text-sm text-black-600">
-            Number of currently working users
+            Number of currently working alumni
           </div>
           <div className="text-lg font-medium mb-1 mt-2">
             {dashboardData.employedUsers}

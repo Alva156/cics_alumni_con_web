@@ -367,20 +367,23 @@ function AdminReports() {
     return path.split(".").reduce((acc, part) => acc && acc[part], obj);
   };
 
-  // Filtered data based on selected programs, colleges, and batches
-  const filteredData = alumni.filter((row) => {
-    const programMatches =
-      selectedPrograms.includes("All Programs") ||
-      selectedPrograms.includes(row.collegeProgram);
-    const collegeMatches =
-      selectedColleges.includes("All Colleges") ||
-      selectedColleges.includes(row.college);
-    const batchMatches =
-      selectedBatches.includes("All Batches") ||
-      selectedBatches.includes(row.yearGraduatedCollege?.split("-")[0]); // Match by year only, using optional chaining
-
-    return programMatches && collegeMatches && batchMatches;
-  });
+  const [filteredData, setFilteredData] = useState([]);
+  const filteredAlumniCount = filteredData ? filteredData.length : 0;
+  useEffect(() => {
+    const filtered = alumni.filter((row) => {
+      const programMatches =
+        selectedPrograms.includes("All Programs") ||
+        selectedPrograms.includes(row.collegeProgram);
+      const collegeMatches =
+        selectedColleges.includes("All Colleges") ||
+        selectedColleges.includes(row.college);
+      const batchMatches =
+        selectedBatches.includes("All Batches") ||
+        selectedBatches.includes(row.yearGraduatedCollege?.split("-")[0]);
+      return programMatches && collegeMatches && batchMatches;
+    });
+    setFilteredData(filtered);
+  }, [alumni, selectedPrograms, selectedColleges, selectedBatches]);
 
   const generatePDF = async () => {
     const doc = new jsPDF({
@@ -468,6 +471,9 @@ function AdminReports() {
     // Prepare the summary data, repeating the category for each entry
     const summaryData = [];
 
+    // Add total alumni count to the summary
+    summaryData.push(["Total Alumni", "", filteredData.length]);
+
     Object.entries(alumniCountByBatch).forEach(([year, count]) => {
       summaryData.push(["Batch", year, count]);
     });
@@ -540,7 +546,7 @@ function AdminReports() {
       doc.text(
         `Page ${i} of ${pageCount}`,
         doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 30,
+        doc.internal.pageSize.height - 15,
         {
           align: "center",
         }
@@ -757,6 +763,9 @@ function AdminReports() {
             </div>
           )}
         </div>
+      </div>
+      <div className="text-sm mt-4 mb-4">
+        Number of Alumni: {filteredAlumniCount}
       </div>
 
       <div className="overflow-x-auto mt-6">

@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
-import { uniqueId } from "lodash";
 
 function Survey() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -56,8 +54,8 @@ function Survey() {
   //   },
   // ];
 
-  const openModal = (survey) => {
-    fetchSurveyById(survey._id);
+  const openModal = async (survey) => {
+    await fetchSurveyById(survey._id);
 };
 
   const closeModal = () => {
@@ -81,81 +79,103 @@ function Survey() {
 
   const renderInputField = (question) => {
     switch (question.questionType) {
-      case "radio":
-        return question.choices.map((choice, idx) => (
-          <div key={idx} className="flex items-center mb-2">
-            <input
-              type="radio"
-              name={question.question}
-              value={choice}
-              className="mr-2"
-            />
-            <label>{choice}</label>
-          </div>
-        ));
-      case "checkbox":
-        return question.choices.map((choice, idx) => (
-          <div key={idx} className="flex items-center mb-2">
-            <input
-              type="checkbox"
-              name={question.question}
-              value={choice}
-              className="mr-2"
-            />
-            <label>{choice}</label>
-          </div>
-        ));
-      case "textInput":
-        return (
-          <input
-            type="text"
-            name={question.question}
-            className="w-full px-2 py-1 border rounded mb-2"
-          />
-        );
-      case "textArea":
-        return (
-          <textarea
-            name={question.question}
-            className="w-full px-2 py-1 border rounded mb-2"
-            rows="4"
-          ></textarea>
-        );
-      default:
-        return null;
+        case "radio":
+            return question.choices.map((choice, idx) => (
+                <div key={idx} className="flex items-center mb-2">
+                    <input
+                        type="radio"
+                        name={question._id}
+                        value={choice}
+                        onChange={() => handleResponseChange(question._id, choice, "radio")}
+                        className="mr-2"
+                    />
+                    <label>{choice}</label>
+                </div>
+            ));
+        case "checkbox":
+            return question.choices.map((choice, idx) => (
+                <div key={idx} className="flex items-center mb-2">
+                    <input
+                        type="checkbox"
+                        name={question._id}
+                        value={choice}
+                        onChange={() => handleResponseChange(question._id, choice, "checkbox")}
+                        className="mr-2"
+                    />
+                    <label>{choice}</label>
+                </div>
+            ));
+        case "textInput":
+            return (
+                <input
+                    type="text"
+                    name={question._id}
+                    onChange={(e) => handleResponseChange(question._id, e.target.value, "textInput")}
+                    className="w-full px-2 py-1 border rounded mb-2"
+                />
+            );
+        case "textArea":
+            return (
+                <textarea
+                    name={question._id}
+                    onChange={(e) => handleResponseChange(question._id, e.target.value, "textArea")}
+                    className="w-full px-2 py-1 border rounded mb-2"
+                    rows="4"
+                ></textarea>
+            );
+        default:
+            return null;
     }
-  };
+};
 
   // Filter surveys based on whether they are answered or not
   const unansweredSurveys = surveys.filter((survey) => !survey.answered);
   const answeredSurveys = surveys.filter((survey) => survey.answered);
 
-  const handleResponseChange = (questionId, answer) => {
-    // Update user responses based on input changes
+  const handleResponseChange = (questionId, answer, type) => {
     setUserResponses(prev => ({
-      ...prev,
-      [questionId]: answer,
+        ...prev,
+        [questionId]: type === "checkbox" 
+          ? (prev[questionId] || []).includes(answer)
+              ? prev[questionId].filter(item => item !== answer)
+              : [...(prev[questionId] || []), answer]
+          : answer,
     }));
-  };
-
-  const handleSaveResponse = async () => {
-    try {
-        const answers = Object.entries(userResponses).map(([questionId, answer]) => ({
-            questionId,
-            answer,
-        }));
-
-        const response = await axios.post(`${backendUrl}/survey/respond`, {
-            surveyId: selectedSurvey._id,
-            answers,
-        });
-
-        console.log("Response saved:", response.data);
-        closeModal(); // Close the modal after saving
-    } catch (error) {
-        console.error("Error saving response:", error.message);
-    }
 };
+
+const handleSaveResponse = async () => {
+  try {
+      const answers = Object.entries(userResponses).map(([questionId, answer]) => ({
+          questionId,
+          answer,
+      }));
+
+      // Log the data being sent to the backend
+      console.log("Sending response to backend:", {
+          surveyId: selectedSurvey._id,
+          answers,
+      });
+
+      // Make sure the token is included in the request cookies
+      const response = await axios.post(`${backendUrl}/survey/respond`, {
+          surveyId: selectedSurvey._id,
+          answers,
+      }, { withCredentials: true }); // Enable withCredentials to send cookies
+
+      console.log("Response saved successfully:", response.data);
+      closeModal();
+  } catch (error) {
+      if (error.response) {
+          console.error("Error saving response:", error.response.data);
+          console.error("HTTP status code:", error.response.status);
+      } else if (error.request) {
+          console.error("No response received:", error.request);
+      } else {
+          console.error("Error setting up request:", error.message);
+      }
+  }
+};
+
 
   const fetchSurveys = async () => {
     try {
@@ -183,6 +203,15 @@ const fetchSurveyById = async (surveyId) => {
   try {
       const response = await axios.get(`${backendUrl}/survey/viewpublish/${surveyId}`);
       setSelectedSurvey(response.data);
+
+      // Set existing user responses or initialize as empty
+      const existingResponses = response.data.questions.reduce((acc, question) => {
+          const existingAnswer = userResponses[question._id] || '';
+          acc[question._id] = existingAnswer; // Initialize with existing answer or empty
+          return acc;
+      }, {});
+      setUserResponses(existingResponses);
+
       setIsModalOpen(true);
   } catch (error) {
       console.error("Error fetching survey by ID:", error.message);
@@ -240,60 +269,60 @@ const fetchSurveyById = async (surveyId) => {
 
       <hr className="mb-6 border-black" />
 
-      {answeredSurveys.map((survey, index) => (
-        <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openModal(survey)}
-          aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
-        >
-          <div className="text-md font-medium mb-1">{survey.name}</div>
-          <div className="text-sm text-gray-600">
-            <strong>{survey.responseCount}</strong> responses
-          </div>
-        </div>
-      ))}
+      {/* {surveys.map((survey) => (
+  <div
+    key={survey._id} // Use survey ID for unique keys
+    className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+    onClick={() => openModal(survey)}
+    aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
+    role="button"
+    tabIndex={0}
+    onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
+  >
+    <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
+    <p className="text-sm text-gray-600">
+      <span className="font-bold">{survey.responseCount}</span> responses
+    </p>
+  </div>
+))} */}
 
 
       {/* Modal */}
       {isModalOpen && selectedSurvey && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div ref={modalRef} className="bg-white p-6 rounded-lg w-full h-auto overflow-y-auto relative">
-          <button className="absolute top-4 right-4 text-black text-2xl" onClick={closeModal}>
-            &times;
-          </button>
-          <div className="text-2xl font-medium mb-2">{selectedSurvey.name}</div>
+            <button className="absolute top-4 right-4 text-black text-2xl" onClick={closeModal}>
+                &times;
+            </button>
+            <div className="text-2xl font-medium mb-2">{selectedSurvey.name}</div>
 
-          {selectedSurvey.questions.map((question, index) => (
-            <div key={index} className="w-full rounded px-4 py-2 border border-black my-2">
-              <div className="font-medium ">
-                {index + 1}
-                <span className="mr-2">.</span>
-                {question.questionText}
-              </div>
-              <div>{renderInputField(question)}</div>
-            </div>
-          ))}
+            {selectedSurvey.questions.map((question, index) => (
+                <div key={index} className="w-full rounded px-4 py-2 border border-black my-2">
+                    <div className="font-medium ">
+                        {index + 1}
+                        <span className="mr-2">.</span>
+                        {question.questionContent}
+                    </div>
+                    <div>{renderInputField({ ...question, answer: userResponses[question._id] })}</div>
+                </div>
+            ))}
 
-          {/* BOTTOM BUTTONS */}
-          <div className="flex justify-center mt-16 space-x-3">
-            <div className="">
-              <button className="btn md:w-64 w-52 bg-fgray text-white" onClick={closeModal}>
-                Cancel
-              </button>
+            {/* BOTTOM BUTTONS */}
+            <div className="flex justify-center mt-16 space-x-3">
+                <div className="">
+                    <button className="btn md:w-64 w-52 bg-fgray text-white" onClick={closeModal}>
+                        Cancel
+                    </button>
+                </div>
+                <div className="">
+                    <button className="btn md:w-64 w-52 bg-green text-white" onClick={handleSaveResponse}>
+                        Save
+                    </button>
+                </div>
             </div>
-            <div className="">
-              <button className="btn md:w-64 w-52 bg-green text-white" onClick={handleSaveResponse}>
-                Save
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
-    )}
+    </div>
+)}
   
     </div>
   );

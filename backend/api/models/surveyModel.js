@@ -34,8 +34,7 @@ const answerSchema = new Schema({
 // Schema to store responses from each user for a survey
 const responseSchema = new Schema({
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Reference to the user model
+        type: String, // Change to String if you are using String for user IDs
         required: true,
     },
     answers: [answerSchema], // Array of answers to the survey questions
@@ -61,8 +60,7 @@ const surveySchema = new Schema({
         default: 0 
     },
     answered: { 
-        type: [mongoose.Schema.Types.ObjectId], // Array to store IDs of users who have answered
-        ref: "User", // Reference to the User model
+        type: [String], // Change to array of Strings for user profile IDs
         default: [] // Default to an empty array
     },
     published: { // New field to track if the survey is published

@@ -110,11 +110,13 @@ exports.updateSurvey = async (req, res) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userProfileId = decoded.profileId;
+        const userRole = decoded.role;  // Assuming the role is stored in the token
 
         const survey = await Survey.findById(req.params.id);
         if (!survey) return res.status(404).json({ message: "Survey not found" });
 
-        if (survey.userId.toString() !== userProfileId) {
+        // Allow access if the user is the owner or an admin
+        if (survey.userId.toString() !== userProfileId && userRole !== 'admin') {
             return res.status(403).json({ message: "Unauthorized to update this survey" });
         }
 
@@ -149,6 +151,7 @@ exports.updateSurvey = async (req, res) => {
 };
 
 // Delete a survey
+// Delete a survey
 exports.deleteSurvey = async (req, res) => {
     try {
         const token = req.cookies.token;
@@ -158,19 +161,15 @@ exports.deleteSurvey = async (req, res) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userProfileId = decoded.profileId;
+        const userRole = decoded.role;  // Assuming role is stored in the token
 
         const survey = await Survey.findById(req.params.id);
         if (!survey) {
             return res.status(404).json({ message: "Survey not found." });
         }
 
-        // Check if the `userId` exists before trying to access it
-        if (!survey.userId) {
-            return res.status(500).json({ message: "Survey is missing user profile information." });
-        }
-
-        // Ensure the user is authorized to delete the survey
-        if (survey.userId.toString() !== userProfileId) {
+        // Allow deletion if the user is the owner or an admin
+        if (survey.userId.toString() !== userProfileId && userRole !== 'admin') {
             return res.status(403).json({ message: "Unauthorized to delete this survey." });
         }
 
@@ -184,17 +183,31 @@ exports.deleteSurvey = async (req, res) => {
 
 // Toggle publish and unpublish
 exports.publishSurvey = async (req, res) => {
-    const surveyId = req.params.id;
-    const survey = await Survey.findById(surveyId);
-
-    if (!survey) {
-        return res.status(404).json({ msg: "Survey not found" });
-    }
-
-    // Toggle the published status
-    survey.published = !survey.published;
-
     try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized, token missing." });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userProfileId = decoded.profileId;
+        const userRole = decoded.role;  // Assuming role is stored in the token
+
+        const surveyId = req.params.id;
+        const survey = await Survey.findById(surveyId);
+
+        if (!survey) {
+            return res.status(404).json({ msg: "Survey not found" });
+        }
+
+        // Allow publish/unpublish if the user is the owner or an admin
+        if (survey.userId.toString() !== userProfileId && userRole !== 'admin') {
+            return res.status(403).json({ message: "Unauthorized to modify this survey." });
+        }
+
+        // Toggle the published status
+        survey.published = !survey.published;
+
         await survey.save();
         res.status(200).json(survey); // Return the updated survey
     } catch (error) {
@@ -202,6 +215,7 @@ exports.publishSurvey = async (req, res) => {
         res.status(500).json({ msg: "Server Error", error: error.message });
     }
 };
+
 
 
 // USER-SIDE

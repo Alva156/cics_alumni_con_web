@@ -78,6 +78,7 @@ function Survey() {
   }, [isModalOpen]);
 
   const renderInputField = (question) => {
+    const userAnswer = userResponses[question._id]; // Get the user's answer for the question
     switch (question.questionType) {
         case "radio":
             return question.choices.map((choice, idx) => (
@@ -86,6 +87,7 @@ function Survey() {
                         type="radio"
                         name={question._id}
                         value={choice}
+                        checked={userAnswer === choice} // Check if the answer matches
                         onChange={() => handleResponseChange(question._id, choice, "radio")}
                         className="mr-2"
                     />
@@ -99,6 +101,7 @@ function Survey() {
                         type="checkbox"
                         name={question._id}
                         value={choice}
+                        checked={userAnswer && userAnswer.includes(choice)} // Check if choice is selected
                         onChange={() => handleResponseChange(question._id, choice, "checkbox")}
                         className="mr-2"
                     />
@@ -110,6 +113,7 @@ function Survey() {
                 <input
                     type="text"
                     name={question._id}
+                    value={userAnswer || ''} // Pre-fill with existing answer
                     onChange={(e) => handleResponseChange(question._id, e.target.value, "textInput")}
                     className="w-full px-2 py-1 border rounded mb-2"
                 />
@@ -118,6 +122,7 @@ function Survey() {
             return (
                 <textarea
                     name={question._id}
+                    value={userAnswer || ''} // Pre-fill with existing answer
                     onChange={(e) => handleResponseChange(question._id, e.target.value, "textArea")}
                     className="w-full px-2 py-1 border rounded mb-2"
                     rows="4"
@@ -206,9 +211,8 @@ const fetchSurveyById = async (surveyId) => {
 
       // Set existing user responses or initialize as empty
       const existingResponses = response.data.questions.reduce((acc, question) => {
-          const existingAnswer = userResponses[question._id] || '';
-          acc[question._id] = existingAnswer; // Initialize with existing answer or empty
-          return acc;
+        acc[question._id] = userResponses[question._id] || ''; // Keep previous responses or set as empty
+        return acc;
       }, {});
       setUserResponses(existingResponses);
 

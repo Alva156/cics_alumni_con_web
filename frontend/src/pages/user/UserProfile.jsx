@@ -26,6 +26,8 @@ function UserProfile() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthday, setBirthday] = useState("");
+  const [gender, setGender] = useState("");
+  const [region, setRegion] = useState("");
   const [profession, setProfession] = useState("");
   const [college, setCollege] = useState("");
   const [collegeProgram, setCollegeProgram] = useState("");
@@ -694,6 +696,8 @@ function UserProfile() {
       firstName,
       lastName,
       birthday,
+      gender,
+      region,
       profession,
       college,
       collegeProgram,
@@ -846,6 +850,8 @@ function UserProfile() {
           // Populate form fields with fetched profile data
           setFirstName(profileData.firstName || "");
           setLastName(profileData.lastName || "");
+          setGender(profileData.gender || "");
+          setRegion(profileData.region || "");
           setProfession(profileData.profession || "");
           setCollege(profileData.college || "");
           setCollegeProgram(profileData.collegeProgram || "");
@@ -1443,6 +1449,55 @@ function UserProfile() {
                       onChange={(e) => setBirthday(e.target.value)}
                     />
                   </div>
+
+                  <div className="py-1">
+                  <label className="pt-4 pb-2 text-sm">Gender</label>
+                  <select
+                    name="gender"
+                    className="select select-bordered select-sm  w-full h-10"
+                    onChange={(e) => setGender(e.target.value)}
+                    value={gender}
+                  >
+                    <option value="" disabled>
+                      Choose
+                    </option>
+                    <option>Male</option>
+                    <option>Female</option>
+                  </select>
+                </div>
+
+                <div className="py-1">
+                  <label className="pt-4 pb-2 text-sm">Region</label>
+                  <select
+                    name="region"
+                    className="select select-bordered select-sm  w-full h-10"
+                    onChange={(e) => setRegion(e.target.value)}
+                    value={region}
+                  >
+                    <option value="" disabled>
+                      Choose
+                    </option>
+                    <option>NCR</option>
+                    <option>CAR</option>
+                    <option>Region I</option>
+                    <option>Region II</option>
+                    <option>Region III</option>
+                    <option>Region IV-A </option>
+                    <option>Region IV-B </option>
+                    <option>Region V</option>
+                    <option>Region VI</option>
+                    <option>NIR</option>
+                    <option>Region VII</option>
+                    <option>Region VIII</option>
+                    <option>Region IX</option>
+                    <option>Region X</option>
+                    <option>Region XI</option>
+                    <option>Region XII</option>
+                    <option>Region XIII</option>
+                    <option>BARMM</option>
+                    <option>N/A</option>
+                  </select>
+                </div>
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">Profession</label>

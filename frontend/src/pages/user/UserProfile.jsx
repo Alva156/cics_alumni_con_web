@@ -19,12 +19,15 @@ function UserProfile() {
   const [showErrorMessage2, setShowErrorMessage2] = useState(false);
   const [errorMessage2, setErrorMessage2] = useState("");
   const [isPassModalOpen, setIsPassModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthday, setBirthday] = useState("");
+  const [gender, setGender] = useState("");
+  const [region, setRegion] = useState("");
   const [profession, setProfession] = useState("");
   const [college, setCollege] = useState("");
   const [collegeProgram, setCollegeProgram] = useState("");
@@ -51,6 +54,139 @@ function UserProfile() {
   const [modalVisible, setModalVisible] = useState(false);
   const [initialAccountEmail, setInitialAccountEmail] = useState("");
   const [profileId, setProfileId] = useState(null);
+  const [newEmail, setNewEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [otpSent, setOtpSent] = useState(false);
+  const [isDeleteModalPicOpen, setIsDeleteModalPicOpen] = useState(false);
+  const handleDeleteProfileImage = async () => {
+    try {
+      await axios.delete(`${backendUrl}/profile/deleteProfileImage`, {
+        withCredentials: true,
+      });
+      // Reset to the blank profile image and clear the preview
+      setProfileImage(blankprofilepic);
+      setValidationMessage("Profile image deleted successfully!");
+      setShowValidationMessage(true);
+      setImagePreview(null);
+      setIsDeleteModalPicOpen(false); // Close the modal
+      setTimeout(() => {
+        setShowValidationMessage(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error deleting profile image:", error);
+      setErrorMessage("Failed to delete profile image. Please try again.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
+    }
+  };
+
+  useEffect(() => {
+    if (timer > 0 && otpSent) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [timer, otpSent]);
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+  };
+
+  const sendOTP = async () => {
+    if (!newEmail.trim()) {
+      setErrorMessage2("Please fill up the required fields.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+      return;
+    }
+
+    if (newEmail.endsWith("@ust.edu.ph")) {
+      setErrorMessage2("UST email is not allowed.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/profile/send-otp`,
+        { newEmail },
+        { withCredentials: true }
+      );
+
+      if (
+        response.status === 200 &&
+        response.data.msg === "OTP sent successfully"
+      ) {
+        setValidationMessage2("OTP sent successfully.");
+        setShowValidationMessage2(true);
+        setOtpSent(true);
+        setTimer(300); // 5 minutes in seconds (300 seconds)
+        setTimeout(() => setShowValidationMessage2(false), 3000);
+      } else {
+        setErrorMessage2("Failed to send OTP. Please try again.");
+        setShowErrorMessage2(true);
+        setTimeout(() => setShowErrorMessage2(false), 3000);
+      }
+    } catch (error) {
+      console.error(
+        "Error sending OTP:",
+        error.response?.data || error.message
+      );
+      setErrorMessage2("Error sending OTP. Please try again.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+    }
+  };
+
+  const verifyOTPAndUpdateEmail = async () => {
+    if (!newEmail.trim() || !otp.trim()) {
+      setErrorMessage2("Please fill up the required fields.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/profile/verify-otp`,
+        { newEmail, otp },
+        { withCredentials: true }
+      );
+
+      // Check if the response status is 200
+      if (response.status === 200 && response.data.success) {
+        setNewEmail(""); // Clear new email input
+        setOtp(""); // Clear OTP input
+        setValidationMessage(
+          "Email changed successfully! Please log in using your new email."
+        );
+        setModalVisible(true);
+
+        setIsEmailModalOpen(false);
+        setAccountEmail(newEmail); // Update the account email
+        setOtpSent(false);
+        setTimer(0);
+      } else {
+        setErrorMessage2("Invalid OTP. Please try again.");
+        setShowErrorMessage2(true);
+        setTimeout(() => setShowErrorMessage2(false), 3000);
+      }
+    } catch (error) {
+      console.error(
+        "Error verifying OTP:",
+        error.response?.data || error.message
+      );
+      setErrorMessage2("Invalid OTP. Please try again.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+    }
+  };
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDeleteAttachmentModalOpen, setIsDeleteAttachmentModalOpen] =
     useState(false);
@@ -560,8 +696,9 @@ function UserProfile() {
       firstName,
       lastName,
       birthday,
+      gender,
+      region,
       profession,
-      accountEmail,
       college,
       collegeProgram,
       specialization,
@@ -713,6 +850,8 @@ function UserProfile() {
           // Populate form fields with fetched profile data
           setFirstName(profileData.firstName || "");
           setLastName(profileData.lastName || "");
+          setGender(profileData.gender || "");
+          setRegion(profileData.region || "");
           setProfession(profileData.profession || "");
           setCollege(profileData.college || "");
           setCollegeProgram(profileData.collegeProgram || "");
@@ -798,10 +937,11 @@ function UserProfile() {
       );
 
       if (response.status === 200) {
-        setValidationMessage2(
+        setValidationMessage(
           "Password changed successfully! Please log in using your new password."
         );
         setModalVisible(true);
+        setIsPassModalOpen(false);
       } else {
         setErrorMessage2(response.data.error || "Failed to reset password.");
         setShowErrorMessage2(true);
@@ -845,6 +985,19 @@ function UserProfile() {
   // Function to close the password modal
   const closePassModal = () => {
     setIsPassModalOpen(false);
+  };
+
+  const openEmailModal = () => {
+    setIsEmailModalOpen(true);
+  };
+
+  // Function to close the password modal
+  const closeEmailModal = () => {
+    setIsEmailModalOpen(false);
+    setOtpSent(false);
+    setTimer(0);
+    setNewEmail("");
+    setOtp("");
   };
 
   return (
@@ -959,6 +1112,140 @@ function UserProfile() {
           </div>
         </div>
       )}
+      {isDeleteModalPicOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Profile Image</h2>
+            <p>Are you sure you want to delete your Profile Image?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={handleDeleteProfileImage} // Trigger the delete function
+              >
+                Delete
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteModalPicOpen(false)} // Close the modal on cancel
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Email Modal */}
+      {isEmailModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          {/* Error and Validation Messages */}
+          {showErrorMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{errorMessage2}</p>
+            </div>
+          )}
+          {showValidationMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{validationMessage2}</p>
+            </div>
+          )}
+
+          {/* Modal Content */}
+          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
+            {/* Modal Body */}
+            <div className="mb-4">
+              <div className="block mb-2 text-sm font-medium">
+                Updating Email Address
+              </div>
+              <div className="block mb-2 text-sm font-light">
+                Update your account email address using the email OTP option.
+              </div>
+            </div>
+
+            {/* Current Email Display */}
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">
+                Current Account Email
+              </label>
+              <input
+                type="email"
+                className="input input-sm input-bordered w-full h-10"
+                required
+                name="accountEmail"
+                value={accountEmail}
+                readOnly
+              />
+            </div>
+
+            {/* New Email Input and Send OTP Button */}
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">
+                New Email *
+              </label>
+              <input
+                type="email"
+                placeholder="Type new email"
+                className="input input-sm input-bordered w-full h-10"
+                required
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)} // This captures user input
+              />
+              <button
+                onClick={sendOTP}
+                className="btn btn-sm mt-2 w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Send OTP
+              </button>
+            </div>
+
+            {otpSent && timer > 0 && (
+              <div className="mb-4">
+                <p className="text-left text-sm md:text-base">
+                  OTP valid for: {formatTime(timer)}
+                </p>
+              </div>
+            )}
+
+            {/* OTP Input and Verify Button */}
+            <div className="mb-2 mt-2">
+              <label className="block mt-2 mb-2 text-sm font-medium">
+                Enter OTP *
+              </label>
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                className="input input-sm input-bordered w-full h-10"
+                required
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+              <button
+                onClick={sendOTP}
+                className="btn btn-sm mt-1 w-28 md:btn-md md:w-52 lg:w-60 bg-[#BE142E] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Resend OTP
+              </button>
+            </div>
+
+            {/* Save and Cancel Buttons */}
+            <div className="flex justify-center gap-2 mt-8">
+              <button
+                onClick={verifyOTPAndUpdateEmail}
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Save
+              </button>
+              <button
+                onClick={closeEmailModal}
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal */}
       {modalVisible && (
         <dialog id="my_modal_5" className="modal modal-middle " open>
@@ -1089,29 +1376,36 @@ function UserProfile() {
                   {/* PRIMARY INFORMATION */}
                   <div className="text-xl py-4">Primary Information</div>
 
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="Image Preview"
-                      className="h-40 w-40 border-2 mb-4"
-                    />
-                  ) : (
-                    <img
-                      src={
-                        profileImage === blankprofilepic
-                          ? blankprofilepic
-                          : `${backendUrl}${profileImage}`
-                      }
-                      alt="Profile"
-                      className="h-40 w-40 border-2 mb-4"
-                    />
-                  )}
+                  <div className="py-1">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Image Preview"
+                        className="h-40 w-40 border-2 mb-4"
+                      />
+                    ) : (
+                      <img
+                        src={
+                          profileImage === blankprofilepic
+                            ? blankprofilepic
+                            : `${backendUrl}${profileImage}`
+                        }
+                        alt="Profile"
+                        className="h-40 w-40 border-2 mb-4"
+                      />
+                    )}
+                    <div className="flex justify-between items-center pt-4">
+                      <label className="text-sm">Profile Picture</label>
+                      <button
+                        type="button"
+                        onClick={() => setIsDeleteModalPicOpen(true)}
+                        className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer"
+                      ></button>
+                    </div>
 
-                  <div className="mt-4">
-                    <label className="pt-4 pb-2 text-sm">Profile Picture</label>
                     <input
                       type="file"
-                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10"
+                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mt-2"
                       onChange={handleImageChange}
                       accept="image/*"
                     />
@@ -1155,6 +1449,55 @@ function UserProfile() {
                       onChange={(e) => setBirthday(e.target.value)}
                     />
                   </div>
+
+                  <div className="py-1">
+                  <label className="pt-4 pb-2 text-sm">Gender</label>
+                  <select
+                    name="gender"
+                    className="select select-bordered select-sm  w-full h-10"
+                    onChange={(e) => setGender(e.target.value)}
+                    value={gender}
+                  >
+                    <option value="" disabled>
+                      Choose
+                    </option>
+                    <option>Male</option>
+                    <option>Female</option>
+                  </select>
+                </div>
+
+                <div className="py-1">
+                  <label className="pt-4 pb-2 text-sm">Region</label>
+                  <select
+                    name="region"
+                    className="select select-bordered select-sm  w-full h-10"
+                    onChange={(e) => setRegion(e.target.value)}
+                    value={region}
+                  >
+                    <option value="" disabled>
+                      Choose
+                    </option>
+                    <option>NCR</option>
+                    <option>CAR</option>
+                    <option>Region I</option>
+                    <option>Region II</option>
+                    <option>Region III</option>
+                    <option>Region IV-A </option>
+                    <option>Region IV-B </option>
+                    <option>Region V</option>
+                    <option>Region VI</option>
+                    <option>NIR</option>
+                    <option>Region VII</option>
+                    <option>Region VIII</option>
+                    <option>Region IX</option>
+                    <option>Region X</option>
+                    <option>Region XI</option>
+                    <option>Region XII</option>
+                    <option>Region XIII</option>
+                    <option>BARMM</option>
+                    <option>N/A</option>
+                  </select>
+                </div>
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">Profession</label>
@@ -1452,7 +1795,9 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Alternative Email Address</label>
+                  <label className="pt-4 pb-2 text-sm">
+                    Alternative Email Address
+                  </label>
                   <input
                     type="email"
                     placeholder="Type here"
@@ -1893,15 +2238,26 @@ function UserProfile() {
                 <div className="text-xl py-4 mt-4">Settings</div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Account Email *</label>
+                  <label className="pt-4 pb-2 text-sm">Account Email </label>
                   <input
-                    type="email" // Changed type to email for better validation
+                    type="email"
+                    className="input input-sm input-bordered w-full h-10"
+                    required
                     name="accountEmail"
                     value={accountEmail}
-                    onChange={(e) => setAccountEmail(e.target.value)}
-                    placeholder="Type here"
-                    className="input input-sm input-bordered w-full h-10"
+                    readOnly
                   />
+                </div>
+
+                <div className="py-1">
+                  <button
+                    type="button"
+                    className="btn md:w-64 w-52 bg-orange text-white" // Add a function to handle saving
+                    onClick={openEmailModal}
+                    aria-label="Save" // Added aria-label for accessibility
+                  >
+                    Change Account Email
+                  </button>
                 </div>
               </div>
               {/* END OF SETTINGS */}

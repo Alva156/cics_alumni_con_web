@@ -227,6 +227,48 @@ const AdminDashboard = () => {
       },
     ],
   };
+  const data9 = {
+    labels: ["Male", "Female"],
+    datasets: [
+      {
+        label: "Number of Alumni",
+        data: dashboardData.usersPerGender,
+        backgroundColor: "#BE142E",
+        borderRadius: 4,
+      },
+    ],
+  };
+  const data10 = {
+    labels: [
+      "NCR",
+      "CAR",
+      "Region I",
+      "Region II",
+      "Region III",
+      "Region IV-A",
+      "Region IV-B",
+      "Region V",
+      "Region VI",
+      "NIR",
+      "Region VII",
+      "Region VIII",
+      "Region IX",
+      "Region X",
+      "Region XI",
+      "Region XII",
+      "Region XIII",
+      "BARMM",
+      "N/A",
+    ],
+    datasets: [
+      {
+        label: "Number of Alumni",
+        data: dashboardData.usersPerRegion,
+        backgroundColor: "#BE142E",
+        borderRadius: 4,
+      },
+    ],
+  };
   // Function to trigger the browser's print dialog
   const exportToPDF = () => {
     if (dashboardRef.current) {
@@ -281,6 +323,26 @@ const AdminDashboard = () => {
       <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
         <div>
           <div className="text-sm text-black-600">
+            Number of Alumni per Gender
+          </div>
+          <div className="h-48 mt-8">
+            <Bar data={data9} options={options1} />
+          </div>
+        </div>
+      </div>
+      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
+        <div>
+          <div className="text-sm text-black-600">
+            Number of Alumni per Region
+          </div>
+          <div className="h-48 mt-8">
+            <Bar data={data10} options={options1} />
+          </div>
+        </div>
+      </div>
+      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
+        <div>
+          <div className="text-sm text-black-600">
             Number of Alumni per College Program
           </div>
           <div className="h-48 mt-8">
@@ -322,7 +384,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
         <div>
           <div className="text-sm text-black-600">Work Industry</div>
           <div className="h-48 mt-8">

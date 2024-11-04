@@ -149,6 +149,8 @@ exports.createProfile = async (req, res) => {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         birthday: req.body.birthday,
+        gender: req.body.gender,
+        region: req.body.region,
         careerBackground: req.body.careerBackground,
         college: req.body.college,
         collegeProgram: req.body.collegeProgram,
@@ -271,6 +273,8 @@ exports.updateProfile = async (req, res) => {
         firstName,
         lastName,
         birthday,
+        gender,
+        region,
         careerBackground,
         accountEmail,
         college,
@@ -395,6 +399,8 @@ exports.updateProfile = async (req, res) => {
         firstName,
         lastName,
         birthday,
+        gender,
+        region,
         careerBackground,
         accountEmail,
         college,
@@ -953,6 +959,39 @@ exports.getDashboardStats = async (req, res) => {
         profile.employmentStatus === "Freelancing"
     ).length;
 
+    // Alumni per Gender
+    const gender = ["Male", "Female"];
+    const usersPerGender = gender.map(
+      (kind) =>
+        filteredAlumni.filter((profile) => profile.gender === kind).length
+    );
+    // Alumni per Region
+    const region = [
+      "NCR",
+      "CAR",
+      "Region I",
+      "Region II",
+      "Region III",
+      "Region IV-A",
+      "Region IV-B",
+      "Region V",
+      "Region VI",
+      "NIR",
+      "Region VII",
+      "Region VIII",
+      "Region IX",
+      "Region X",
+      "Region XI",
+      "Region XII",
+      "Region XIII",
+      "BARMM",
+      "N/A",
+    ];
+    const usersPerRegion = region.map(
+      (place) =>
+        filteredAlumni.filter((profile) => profile.region === place).length
+    );
+
     //users per college
     const usersPerCollege = {};
     filteredAlumni.forEach((profile) => {
@@ -1036,6 +1075,8 @@ exports.getDashboardStats = async (req, res) => {
     res.status(200).json({
       numberOfUsers,
       employedUsers,
+      usersPerGender,
+      usersPerRegion,
       usersPerCollege,
       usersPerCollegeProgram,
       usersPerSpecialization,

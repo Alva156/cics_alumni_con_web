@@ -254,6 +254,8 @@ function AdminReports() {
   }, [selectedColleges]);
 
   const fieldToKeyMap = {
+    Gender: "gender",
+    Region: "region",
     Profession: "profession",
     College: "college",
     "College Program": "collegeProgram",

@@ -12,6 +12,14 @@ function Alumni() {
   const [selectedProgram, setSelectedProgram] = useState("");
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedBatch, setSelectedBatch] = useState("");
+  const formatDate = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString).getTime())) {
+      return "";
+    }
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
+
   const uniqueYears = [
     ...new Set(
       alumni.map((alum) => alum.yearGraduatedCollege).filter((year) => year)
@@ -582,6 +590,18 @@ function Alumni() {
                 <p className="text-xs mb-1/2">Name</p>
                 <p className="text-s mb-2 font-bold">
                   {`${selectedAlumni.firstName} ${selectedAlumni.lastName}`}
+                </p>
+                <p className="text-xs mb-1/2">Birthday</p>
+                <p className="text-s mb-2 font-bold">
+                  {formatDate(selectedAlumni.birthday)}
+                </p>
+                <p className="text-xs mb-1/2">Gender</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.gender || "-"}
+                </p>
+                <p className="text-xs mb-1/2">Region</p>
+                <p className="text-s mb-2 font-bold">
+                  {selectedAlumni.region || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Profession</p>
                 <p className="text-s mb-2 font-bold">

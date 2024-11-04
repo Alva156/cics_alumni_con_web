@@ -19,6 +19,12 @@ const userProfileSchema = new Schema({
         type: Date,
         required: true,
     },
+    gender: {
+        type: String,
+    },
+    region: {
+        type: String,
+    },
     accountEmail: {
         type: String,
     },

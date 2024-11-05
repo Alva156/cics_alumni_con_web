@@ -34,6 +34,12 @@ function Threads() {
   const [selectedReply, setSelectedReply] = useState(null);
   const [isDeleteReplyModalOpen, setIsDeleteReplyModalOpen] = useState(false);
   const [replyToDelete, setReplyToDelete] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
+    </div>
+  );
   const filter = new Filter();
   const customBadWords = [
     "putang ina",
@@ -359,15 +365,19 @@ function Threads() {
   }, [selectedThread]);
 
   const handleCreateReply = async () => {
+    // Check if the reply content is empty
     if (!newReply.trim()) {
-      showError("Reply content cannot be empty.");
+      showError("Reply content cannot be empty."); // Show error message immediately
       return;
     }
+
     // Check for bad words in the reply content
     if (filter.isProfane(newReply)) {
-      showError("Your reply contains prohibited words and cannot be posted.");
+      showError("Your reply contains prohibited words and cannot be posted."); // Show error message immediately
       return;
     }
+
+    setLoading(true); // Start loading immediately
 
     try {
       const response = await axios.post(
@@ -398,11 +408,21 @@ function Threads() {
 
       // Clear the reply input
       setNewReply("");
-      showValidation("Reply created successfully!");
+
+      // Show success message after loading
+      setTimeout(() => {
+        setLoading(false); // Stop loading after 1 second
+        showValidation("Reply created successfully!"); // Show success message
+      }, 1000);
     } catch (error) {
       console.error("Error creating reply:", error);
+
+      // Stop loading immediately on error
+      setLoading(false);
+      showError("Failed to create reply. Please try again."); // Show error message immediately
     }
   };
+
   const handleEditReply = (reply) => {
     setSelectedReply({
       ...reply,
@@ -850,6 +870,7 @@ function Threads() {
 
       {isViewModalOpen && selectedThread && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          {loading && <LoadingSpinner />} {/* Show loading spinner */}
           <div className="bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] relative mx-4">
             {/* Header section */}
             <div className="flex justify-between items-center mb-4">

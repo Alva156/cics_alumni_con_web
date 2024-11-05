@@ -6,6 +6,8 @@ import { uniqueId } from "lodash"; // Make sure you import uniqueId
 function AdminSurveyTool() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [selectedSurveyId, setSelectedSurveyId] = useState(null); 
   const [showMessage, setshowMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
@@ -279,10 +281,22 @@ function AdminSurveyTool() {
     }
   };
 
+  const handleTogglePublishStatus = (surveyId) => {
+    const surveyToToggle = surveys.find((survey) => survey._id === surveyId);
+
+    // Check if the survey is being republished (was unpublished, now will be published)
+    if (surveyToToggle && !surveyToToggle.published) {
+      setSelectedSurveyId(surveyId);
+      setIsPublishModalOpen(true); // Open the confirmation modal
+    } else {
+      // If just unpublishing, proceed directly
+      handlePublishSurvey(surveyId);
+    }
+  };
+
   const handlePublishSurvey = async (surveyId) => {
     console.log("Toggling publish status for survey with ID:", surveyId);
 
-    // Find the survey to publish
     const surveyToToggle = surveys.find((survey) => survey._id === surveyId);
     if (!surveyToToggle) {
       console.error("Survey not found in local state");
@@ -302,20 +316,22 @@ function AdminSurveyTool() {
         throw new Error("Failed to toggle publish status for the survey");
       }
 
-      // Update the surveys array to reflect the new published status
-      setSurveys((prevSurveys) =>
-        prevSurveys.map((survey) =>
-          survey._id === surveyId
-            ? { ...survey, published: !survey.published }
-            : survey
-        )
-      );
-
       console.log("Survey publish status toggled successfully");
+
+      // Refresh surveys to reflect changes
+      await fetchSurveys();
     } catch (error) {
       console.error("Error toggling publish status for survey:", error);
     }
   };
+
+  const handleConfirmPublish = () => {
+    if (selectedSurveyId) {
+      handlePublishSurvey(selectedSurveyId);
+    }
+    setIsPublishModalOpen(false); // Close the modal after confirming
+  };
+  
 
   const handleSaveSurvey = async () => {
     const surveyData = {
@@ -452,8 +468,8 @@ function AdminSurveyTool() {
   // USE EFFECTS
   const fetchSurveys = async () => {
     try {
-      const response = await fetch(`${backendUrl}/survey/view`);
-      const data = await response.json();
+      const response = await axios.get(`${backendUrl}/survey/view`);
+      const data = response.data;
       console.log("Fetched Surveys:", data); // Check the structure of data
       setSurveys(data);
     } catch (error) {
@@ -564,7 +580,9 @@ function AdminSurveyTool() {
             <div>
               <div className="text-md font-medium mb-1">{survey.name}</div>
               <div className="text-sm text-black-600">
-                {survey.response || "No responses yet."}
+              {survey.responseCount
+                  ? `${survey.responseCount} responses`
+                  : "No responses recorded."}
               </div>
             </div>
             <div className="flex items-center">
@@ -594,25 +612,38 @@ function AdminSurveyTool() {
               </div>
               {/* Publish Button */}
               <div
-                className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handlePublishSurvey(survey._id); // Call the function to handle publishing
-                }}
-                role="button" // Make it clear it's a button
-                tabIndex={0} // Make it focusable
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    // Allow activation via keyboard
-                    e.stopPropagation();
-                    handlePublishSurvey(survey._id);
-                  }
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Publish
-                </span>
-              </div>
+  className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+  onClick={(e) => {
+    e.stopPropagation();
+    const surveyToToggle = surveys.find((s) => s._id === survey._id); // Find the survey
+    if (surveyToToggle && !surveyToToggle.published) {
+      setSelectedSurveyId(survey._id); // Set the ID for confirmation
+      setIsPublishModalOpen(true); // Open the confirmation modal
+    } else {
+      handlePublishSurvey(survey._id); // Call the function to handle publishing
+    }
+  }}
+  role="button" // Make it clear it's a button
+  tabIndex={0} // Make it focusable
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      // Allow activation via keyboard
+      e.stopPropagation();
+      const surveyToToggle = surveys.find((s) => s._id === survey._id); // Find the survey
+      if (surveyToToggle && !surveyToToggle.published) {
+        setSelectedSurveyId(survey._id); // Set the ID for confirmation
+        setIsPublishModalOpen(true); // Open the confirmation modal
+      } else {
+        handlePublishSurvey(survey._id); // Call the function to handle publishing
+      }
+    }
+  }}
+>
+  <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+    Publish
+  </span>
+</div>
+
             </div>
           </div>
         ))
@@ -986,7 +1017,36 @@ function AdminSurveyTool() {
           </div>
         </div>
       )}
+
+
+      {/* Publish Confirmation Modal */}
+      {isPublishModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Confirm Publish Action</h2>
+            <p>Republishing will reset all survey responses. Are you sure you want to continue?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={handleConfirmPublish}
+              >
+                Confirm
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsPublishModalOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
     </div>
+
+    
   );
 }
 

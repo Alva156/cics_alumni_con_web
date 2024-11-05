@@ -113,7 +113,7 @@ exports.createSurvey = async (req, res) => {
   }
 };
 
-// Update a survey
+
 // Update a survey
 exports.updateSurvey = async (req, res) => {
   try {
@@ -166,7 +166,7 @@ exports.updateSurvey = async (req, res) => {
   }
 };
 
-// Delete a survey
+
 // Delete a survey
 exports.deleteSurvey = async (req, res) => {
   try {
@@ -199,26 +199,38 @@ exports.deleteSurvey = async (req, res) => {
   }
 };
 
-// Toggle publish and unpublish
+
+// Toggle publish and unpublish with response reset logic
 exports.publishSurvey = async (req, res) => {
   const surveyId = req.params.id;
-  const survey = await Survey.findById(surveyId);
-
-  if (!survey) {
-    return res.status(404).json({ msg: "Survey not found" });
-  }
-
-  // Toggle the published status
-  survey.published = !survey.published;
 
   try {
+    const survey = await Survey.findById(surveyId);
+
+    if (!survey) {
+      return res.status(404).json({ message: "Survey not found" });
+    }
+
+    // Toggle the published status
+    const wasPublished = survey.published;
+    survey.published = !survey.published;
+
+    // Reset responses and answered fields if publishing again after unpublishing
+    if (!wasPublished && survey.published) {
+      survey.responses = [];
+      survey.answered = [];
+      survey.responseCount = 0;
+      console.log("Survey responses and answers reset upon republishing.");
+    }
+
     await survey.save();
     res.status(200).json(survey); // Return the updated survey
   } catch (error) {
     console.error("Error updating survey:", error);
-    res.status(500).json({ msg: "Server Error", error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 
 // USER-SIDE
 

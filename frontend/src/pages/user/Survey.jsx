@@ -4,6 +4,8 @@ import axios from "axios";
 function Survey() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [surveys, setSurveys] = useState([]);
+  const [answeredSurveys, setAnsweredSurveys] = useState([]);
+  const [unansweredSurveys, setUnansweredSurveys] = useState([]);
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userResponses, setUserResponses] = useState({});
@@ -97,8 +99,7 @@ function Survey() {
   };
 
   // Filter surveys based on whether they are answered or not
-  const unansweredSurveys = surveys.filter((survey) => !survey.answered);
-  const answeredSurveys = surveys.filter((survey) => survey.answered);
+  
 
   const handleResponseChange = (questionId, answer, type) => {
     setUserResponses((prev) => ({
@@ -120,13 +121,13 @@ function Survey() {
           answer,
         })
       );
-
+  
       // Log the data being sent to the backend
       console.log("Sending response to backend:", {
         surveyId: selectedSurvey._id,
         answers,
       });
-
+  
       // Make sure the token is included in the request cookies
       const response = await axios.post(
         `${backendUrl}/survey/respond`,
@@ -136,8 +137,13 @@ function Survey() {
         },
         { withCredentials: true }
       ); // Enable withCredentials to send cookies
-
+  
       console.log("Response saved successfully:", response.data);
+  
+      // Refresh the surveys to update answered and unanswered sections
+      await fetchSurveys();
+  
+      // Close the modal after the data is refreshed
       closeModal();
     } catch (error) {
       if (error.response) {
@@ -150,23 +156,39 @@ function Survey() {
       }
     }
   };
+  
 
   const fetchSurveys = async () => {
     try {
-      const response = await fetch(`${backendUrl}/survey/viewpublish`); // Updated to view all surveys
-      const data = await response.json();
-
-      // Check if data is an array and set surveys accordingly
-      if (Array.isArray(data)) {
-        console.log("Fetched all surveys:", data);
-        setSurveys(data);
+      // Use axios to make a GET request with credentials
+      const response = await axios.get(`${backendUrl}/survey/viewpublish`, { withCredentials: true });
+      
+      // Extract data from response
+      const data = response.data;
+      
+      // Check if the response contains the expected structure with answeredSurveys and unansweredSurveys
+      if (data.answeredSurveys && data.unansweredSurveys) {
+        console.log("Fetched answered and unanswered surveys:", data);
+  
+        // Set the surveys for both answered and unanswered sections
+        setAnsweredSurveys(data.answeredSurveys);
+        setUnansweredSurveys(data.unansweredSurveys);
       } else {
+        // Handle unexpected response structure
         console.error("Unexpected response format:", data);
       }
     } catch (error) {
-      console.error("Error fetching surveys:", error.message);
+      if (error.response) {
+        console.error("Error fetching surveys:", error.response.data);
+        console.error("HTTP status code:", error.response.status);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
     }
   };
+  
 
   // Use effect to fetch on component mount
   useEffect(() => {
@@ -224,43 +246,43 @@ function Survey() {
 
       <hr className="mb-6 border-black" />
 
-      {surveys.map((survey) => (
-        <div
-          key={survey._id} // Use survey ID for unique keys
-          className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openModal(survey)}
-          aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
-        >
-          <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
-          <p className="text-sm text-gray-600">
-            <span className="font-bold">{survey.responseCount}</span> responses
-          </p>
-        </div>
-      ))}
+      {unansweredSurveys.map((survey) => (
+      <div
+        key={survey._id}
+        className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+        onClick={() => openModal(survey)}
+        aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
+      >
+        <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
+        <p className="text-sm text-gray-600">
+          <span className="font-bold">{survey.responseCount}</span> responses
+        </p>
+      </div>
+    ))}
 
       <div className="text-lg mb-4">Answered</div>
 
       <hr className="mb-6 border-black" />
 
-      {/* {surveys.map((survey) => (
-  <div
-    key={survey._id} // Use survey ID for unique keys
-    className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-    onClick={() => openModal(survey)}
-    aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
-    role="button"
-    tabIndex={0}
-    onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
-  >
-    <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
-    <p className="text-sm text-gray-600">
-      <span className="font-bold">{survey.responseCount}</span> responses
-    </p>
-  </div>
-))} */}
+      {answeredSurveys.map((survey) => (
+      <div
+        key={survey._id}
+        className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+        onClick={() => openModal(survey)}
+        aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
+      >
+        <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
+        <p className="text-sm text-gray-600">
+          <span className="font-bold">{survey.responseCount}</span> responses
+        </p>
+      </div>
+    ))}
 
       {/* Modal */}
       {isModalOpen && selectedSurvey && (

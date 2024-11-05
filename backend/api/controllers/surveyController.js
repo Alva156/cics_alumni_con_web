@@ -232,36 +232,65 @@ exports.getPublished = async (req, res) => {
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       userProfileId = decoded.profileId;
+      console.log("Decoded token, userProfileId:", userProfileId); // Log the decoded profileId
     }
 
-    // Find all surveys and populate userId and questions
+    // Find all published surveys
     const surveys = await Survey.find({ published: true })
       .populate("userId", "firstName lastName profileImage profession") // Populating userId
       .populate("questions") // Populating questions
       .lean();
 
-    // Enhance each survey with response count and ownership status
-    const surveysWithResponseCount = surveys.map((survey) => {
-      // Count responses related to this survey
-      const responseCount = survey.responses.length; // Since responses is an array
-      return {
+    console.log("Fetched surveys:", surveys.length); // Log the number of surveys found
+
+    // Separate surveys into answered and unanswered sections
+    const answeredSurveys = [];
+    const unansweredSurveys = [];
+
+    surveys.forEach((survey) => {
+      const responseCount = survey.responses.length;
+      console.log("Survey ID:", survey._id, "Response Count:", responseCount); // Log survey details
+
+      // Log the answered array and current user's profile ID for debugging
+      console.log("Survey answered array:", survey.answered);
+      console.log("Current user profile ID:", userProfileId);
+
+      // Ensure userProfileId is a string and check if the user has answered the survey
+      const isAnswered = survey.answered.some(id => id.toString() === userProfileId?.toString());
+
+      console.log("Is answered:", isAnswered); // Log if the survey is answered by the user
+
+      const surveyWithInfo = {
         ...survey,
         responseCount,
-        isOwner:
-          userProfileId &&
-          survey.userId._id.toString() === userProfileId.toString(), // Check ownership
+        answered: isAnswered, // Add this field to the response
       };
+
+      // Push the survey into the appropriate array
+      if (isAnswered) {
+        answeredSurveys.push(surveyWithInfo);
+        console.log("Survey added to answeredSurveys:", survey._id); // Log if added to answeredSurveys
+      } else {
+        unansweredSurveys.push(surveyWithInfo);
+        console.log("Survey added to unansweredSurveys:", survey._id); // Log if added to unansweredSurveys
+      }
     });
 
-    // Return enhanced surveys
-    res.status(200).json(surveysWithResponseCount);
+    // Log the final counts for both answered and unanswered surveys
+    console.log("Total answered surveys:", answeredSurveys.length);
+    console.log("Total unanswered surveys:", unansweredSurveys.length);
+
+    // Return separated surveys in two sections
+    res.status(200).json({
+      answeredSurveys,
+      unansweredSurveys,
+    });
   } catch (error) {
     console.error("Error fetching surveys:", error); // Log the error for debugging
-    res
-      .status(500)
-      .json({ message: "Error fetching surveys", error: error.message });
+    res.status(500).json({ message: "Error fetching surveys", error: error.message });
   }
 };
+
 
 // Get a single published survey by ID
 exports.getPublishedById = async (req, res) => {
@@ -300,12 +329,8 @@ exports.getPublishedById = async (req, res) => {
   }
 };
 
-// Get a single survey by ID
-
-// Toggle Answered and Unanswered
 
 // Submit survey response (user-side)
-
 exports.saveSurveyResponse = async (req, res) => {
   try {
     const token = req.cookies.token; // Adjust this if you're using headers instead
@@ -370,7 +395,41 @@ exports.saveSurveyResponse = async (req, res) => {
 
     await survey.save();
     console.log("Survey response saved successfully:", survey);
-    res.status(200).json({ message: "Response saved successfully", survey });
+
+    // Fetch all published surveys and categorize them as answered or unanswered
+    const surveys = await Survey.find({ published: true })
+      .populate("userId", "firstName lastName profileImage profession") // Populating userId
+      .populate("questions") // Populating questions
+      .lean();
+
+    const answeredSurveys = [];
+    const unansweredSurveys = [];
+
+    surveys.forEach((s) => {
+      const isAnswered = s.answered.includes(userProfileId);
+      const surveyWithInfo = {
+        ...s,
+        answered: isAnswered,
+      };
+
+      if (isAnswered) {
+        answeredSurveys.push(surveyWithInfo);
+      } else {
+        unansweredSurveys.push(surveyWithInfo);
+      }
+    });
+
+    // Log the final counts for both answered and unanswered surveys
+    console.log("Total answered surveys:", answeredSurveys.length);
+    console.log("Total unanswered surveys:", unansweredSurveys.length);
+
+    // Return separated surveys in two sections
+    res.status(200).json({
+      message: "Response saved successfully",
+      survey,
+      answeredSurveys,
+      unansweredSurveys,
+    });
   } catch (error) {
     console.error("Error saving survey response:", error.message);
     res
@@ -378,3 +437,4 @@ exports.saveSurveyResponse = async (req, res) => {
       .json({ message: "Error saving response", error: error.message });
   }
 };
+

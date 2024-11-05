@@ -8,6 +8,9 @@ function Survey() {
   const [unansweredSurveys, setUnansweredSurveys] = useState([]);
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showSuccessMessage, setSuccessMessage] = useState(false);
+  const [showErrorMessage, setErrorMessage] = useState(false);
+  const [showMessage, setshowMessage] = useState("");
   const [userResponses, setUserResponses] = useState({});
   const modalRef = useRef(null);
 
@@ -137,6 +140,12 @@ function Survey() {
         },
         { withCredentials: true }
       ); // Enable withCredentials to send cookies
+      
+      setshowMessage("Response saved successfully!");
+      setSuccessMessage(true);
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
   
       console.log("Response saved successfully:", response.data);
   
@@ -221,6 +230,18 @@ function Survey() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+      {showSuccessMessage && (
+  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+    <p>{showMessage}</p>
+  </div>
+)}
+
+{showErrorMessage && (
+  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+    <p>{showMessage}</p>
+  </div>
+)}
+
       <h1 className="text-2xl font-medium text-gray-700 mb-6">Survey</h1>
 
       <div className="mb-4 relative">

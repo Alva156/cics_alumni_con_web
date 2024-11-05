@@ -8,9 +8,9 @@ function AdminSurveyTool() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [selectedSurveyId, setSelectedSurveyId] = useState(null); 
+  const [showSuccessMessage, setSuccessMessage] = useState(false);
+  const [showErrorMessage, setErrorMessage] = useState(false);
   const [showMessage, setshowMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(false);
-  const [successMessage, setSuccessMessage] = useState(false);
   const [surveys, setSurveys] = useState([]);
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -269,6 +269,11 @@ function AdminSurveyTool() {
           withCredentials: true, // Important if the token is in cookies
         }
       );
+      setshowMessage("Survey created successfully!");
+      setSuccessMessage(true);
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
 
       console.log("Survey created successfully, response:", response);
       return response;
@@ -311,6 +316,17 @@ function AdminSurveyTool() {
         },
         body: JSON.stringify({ published: !surveyToToggle.published }), // Toggle the published status
       });
+
+      if (surveyToToggle.published) {
+      setshowMessage("Survey unpublished!"); // Message when unpublishing
+    } else {
+      setshowMessage("Survey published!"); // Message when publishing
+    }
+
+    setSuccessMessage(true);
+    setTimeout(() => {
+      setSuccessMessage(false);
+    }, 3000);
 
       if (!response.ok) {
         throw new Error("Failed to toggle publish status for the survey");
@@ -505,6 +521,19 @@ function AdminSurveyTool() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+
+{showSuccessMessage && (
+  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+    <p>{showMessage}</p>
+  </div>
+)}
+
+{showErrorMessage && (
+  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+    <p>{showMessage}</p>
+  </div>
+)}
+
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
@@ -744,41 +773,9 @@ function AdminSurveyTool() {
               </div>
             </div>
 
-            <div className="mt-6">Results Summary</div>
 
-            {selectedSurvey.questions.map((question, index) => (
-              <div
-                key={index}
-                className="w-full rounded px-4 py-2 border border-black my-2"
-              >
-                <div className="font-medium ">
-                  {index + 1}
-                  <span className="mr-2">.</span>
-                  {question.questionText}
-                </div>
-                <div className="flex justify-between mt-2">
-                  <div>{renderInputField(question)}</div>
-                  <div className="text-center">
-                    {renderInputField(question)}
-                  </div>
-                  <div className="text-center">hello worlds</div>
-                </div>
-              </div>
-            ))}
 
-            {/* BOTTOM BUTTONS */}
-            <div className="flex justify-center mt-16 space-x-3">
-              <div>
-                <button className="btn md:w-64 w-44 bg-fgray text-white">
-                  Cancel
-                </button>
-              </div>
-              <div>
-                <button className="btn md:w-64 w-44 bg-green text-white">
-                  Save
-                </button>
-              </div>
-            </div>
+            
           </div>
         </div>
       )}

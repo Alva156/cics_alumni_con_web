@@ -1226,7 +1226,7 @@ function UserProfile() {
       )}
 
       {isConfirmationModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">Confirm Action</h2>
             <p>{confirmationMessage}</p>
@@ -1252,7 +1252,7 @@ function UserProfile() {
       )}
 
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">Delete Section</h2>
             <p>Are you sure you want to delete this section?</p>
@@ -1275,7 +1275,7 @@ function UserProfile() {
       )}
 
       {isDeleteAttachmentModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">Delete Attachment</h2>
             <p>Are you sure you want to delete this attachment?</p>
@@ -2162,19 +2162,19 @@ function UserProfile() {
       <div>
         {/* BOTTOM BUTTONS */}
         <div className="flex justify-center mt-16 space-x-3 mb-12">
-          <div>
+          <div className="w-full sm:w-64">
             <button
-              className="btn md:w-64 w-52 bg-green text-white"
+              className="btn w-full bg-green text-white"
               onClick={handleSave} // Add a function to handle saving
               aria-label="Save" // Added aria-label for accessibility
             >
               Save
             </button>
           </div>
-          <div className="">
+          <div className="w-full sm:w-64">
             <button
               onClick={openPassModal}
-              className="btn md:w-64 w-full bg-fgray text-white"
+              className="btn w-full bg-fgray text-white"
             >
               Reset Password
             </button>

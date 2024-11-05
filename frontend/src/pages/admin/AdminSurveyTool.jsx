@@ -7,7 +7,7 @@ function AdminSurveyTool() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [selectedSurveyId, setSelectedSurveyId] = useState(null); 
+  const [selectedSurveyId, setSelectedSurveyId] = useState(null);
   const [showSuccessMessage, setSuccessMessage] = useState(false);
   const [showErrorMessage, setErrorMessage] = useState(false);
   const [showMessage, setshowMessage] = useState("");
@@ -15,14 +15,251 @@ function AdminSurveyTool() {
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSurveyReportModalOpen, setIsSurveyReportModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const [openGenderDropdown, setOpenGenderDropdown] = useState(false);
+  const [openRegionDropdown, setOpenRegionDropdown] = useState(false);
+  const [openCollegeDropdown, setOpenCollegeDropdown] = useState(false);
+  const [openProgramDropdown, setOpenProgramDropdown] = useState(false);
+  const [openBatchYearDropdown, setOpenBatchYearDropdown] = useState(false);
+  const [selectedCollege, setSelectedCollege] = useState(null);
+  const [selectedProgram, setSelectedProgram] = useState(null);
+  const [selectedBatchYears, setSelectedBatchYears] = useState([]); // State for selected batch years
+
+  const batchYears = [2020, 2021, 2022, 2023, 2024]; // Example batch years
+  const collegeDropdownRef = useRef(null);
+  const programDropdownRef = useRef(null);
+  const batchYearDropdownRef = useRef(null);
+  const genderDropdownRef = useRef(null);
+  const regionDropdownRef = useRef(null);
+  const dropdownRef = useRef(null);
   const [questions, setQuestions] = useState([
     { questionText: "", questionType: "", choices: [""] },
   ]);
 
   // MODALS LOGIC
   const modalRef = useRef(null);
+
+  const toggleGenderDropdown = () => {
+    setOpenGenderDropdown((prev) => !prev);
+  };
+
+  const toggleRegionDropdown = () => {
+    setOpenRegionDropdown((prev) => !prev);
+  };
+
+  const toggleCollegeDropdown = () => setOpenCollegeDropdown(!openCollegeDropdown);
+  const toggleProgramDropdown = () => setOpenProgramDropdown(!openProgramDropdown);
+  const toggleBatchYearDropdown = () => setOpenBatchYearDropdown(!openBatchYearDropdown);
+
+  const handleCollegeSelect = (college) => {
+    setSelectedCollege((prev) =>
+      prev === college ? null : college // Toggle selection
+    );
+  };
+
+  const handleBatchYearSelect = (year) => {
+    setSelectedBatchYears((prev) => {
+      if (prev.includes(year)) {
+        // If the year is already selected, remove it
+        return prev.filter((y) => y !== year);
+      } else {
+        // Otherwise, add it to the selected years
+        return [...prev, year];
+      }
+    });
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (genderDropdownRef.current && !genderDropdownRef.current.contains(event.target)) {
+        setOpenGenderDropdown(false);
+      }
+      if (regionDropdownRef.current && !regionDropdownRef.current.contains(event.target)) {
+        setOpenRegionDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const regions = [
+    "Region I",
+    "Region II",
+    "Region III",
+    "Region IV-A",
+    "Region IV-B",
+    "Region V",
+    "Region VI",
+    "Region VII",
+    "Region VIII",
+    "Region IX",
+    "Region X",
+    "Region XI",
+    "Region XII",
+    "Region XIII",
+    "NCR",
+    "ARMM",
+    "BARMM",
+    "CAR",
+  ];
+
+  const collegePrograms = {
+    "UST-AMV College of Accountancy": [
+      "Accountancy",
+      "Accounting Information System",
+      "Management Accounting",
+    ],
+    "College of Architecture": ["Architecture"],
+    "Faculty of Arts and Letters": [
+      "Asian Studies",
+      "Behavioral Science",
+      "Communication",
+      "Creative Writing",
+      "Economics",
+      "English Language Studies",
+      "History",
+      "Journalism",
+      "Legal Management",
+      "Literature",
+      "Philosophy",
+      "Political Science",
+      "Sociology",
+    ],
+    "Faculty of Civil Law": ["Juris Doctor"],
+    "College of Commerce and Business Administration": [
+      "Business Administration, major in Business Economics",
+      "Business Administration, major in Financial Management",
+      "Business Administration, major in Human Resource Management",
+      "Business Administration, major in Marketing Management",
+      "Entrepreneurship",
+    ],
+    "College of Education": [
+      "Secondary Education Major in English",
+      "Secondary Education Major in Filipino",
+      "Secondary Education Major in Mathematics",
+      "Secondary Education Major in Religious and Values Education",
+      "Secondary Education Major in Science",
+      "Secondary Education Major in Social Studies",
+      "Early Childhood Education",
+      "Elementary Education",
+      "Special Needs Education, major in Early Childhood Education",
+      "Food Technology",
+      "Nutrition and Dietetics",
+      "Bachelor of Library and Information Science",
+    ],
+    "Faculty of Engineering": [
+      "Chemical Engineering",
+      "Civil Engineering",
+      "Electrical Engineering",
+      "Electronics Engineering",
+      "Industrial Engineering",
+      "Mechanical Engineering",
+    ],
+    "College of Fine Arts and Design": [
+      "Fine Arts, major in Advertising Arts",
+      "Fine Arts, major in Industrial Design",
+      "Interior Design",
+      "Fine Arts, major in Painting",
+    ],
+    "College of Information and Computing Sciences": [
+      "Computer Science",
+      "Information Systems",
+      "Information Technology",
+    ],
+    "Faculty of Medicine and Surgery": [
+      "Basic Human Studies",
+      "Doctor of Medicine",
+      "Master in Clinical Audiology",
+      "Master in Pain Management",
+    ],
+    "Conservatory of Music": [
+      "Performance, major in Bassoon",
+      "Performance, major in Choral Conducting",
+      "Performance, major in Clarinet",
+      "Composition",
+      "Performance, major in Double Bass",
+      "Performance, major in Flute",
+      "Performance, major in French Horn",
+      "Performance, major in Guitar",
+      "Jazz",
+      "Musicology",
+      "Music Education",
+      "Music Theatre",
+      "Music Technology",
+      "Performance, major in Oboe",
+      "Performance, major in Orchestral Conducting",
+      "Performance, major in Percussion",
+      "Performance, major in Piano",
+      "Performance, major in Saxophone",
+      "Performance, major in Trombone",
+      "Performance, major in Trumpet",
+      "Performance, major in Tuba",
+      "Performance, major in Viola",
+      "Performance, major in Violin",
+      "Performance, major in Violoncello",
+      "Performance, major in Voice",
+    ],
+    "College of Nursing": ["Nursing"],
+    "Faculty of Pharmacy": [
+      "Biochemistry",
+      "Medical Technology",
+      "Pharmacy",
+      "Pharmacy, major in Clinical Pharmacy",
+      "Doctor of Pharmacy",
+    ],
+    "Institute of Physical Education and Athletics": [
+      "Fitness and Sports Management",
+    ],
+    "College of Rehabilitation Sciences": [
+      "Occupational Therapy",
+      "Physical Therapy",
+      "Speech-Language Pathology",
+      "Sports Science",
+    ],
+    "College of Science": [
+      "Applied Mathematics, major in Actuarial Science",
+      "Applied Physics, major in Instrumentation",
+      "Biology, major in Environmental Biology",
+      "Biology, major in Medical Biology",
+      "Bachelor of Science major in Molecular Biology and Biotechnology",
+      "Chemistry",
+      "Data Science and Analytics",
+      "Microbiology",
+      "Psychology",
+    ],
+    "College of Tourism and Hospitality Management": [
+      "Hospitality Management, major in Culinary Entrepreneurship",
+      "Hospitality Management, major in Hospitality Leadership",
+      "Tourism Management, major in Recreation and Leisure Management",
+      "Tourism Management, major in Travel Operation and Service Management",
+    ],
+    "Faculty of Canon Law": [
+      "Doctor of Canon Law",
+      "Licentiate in Canon Law",
+      "Bachelor of Canon Law",
+    ],
+    "Faculty of Philosophy": [
+      "Doctor of Philosophy",
+      "Licentiate in Philosophy",
+      "Bachelor of Philosophy (Classical)",
+    ],
+    "Faculty of Sacred Theology": [
+      "Doctor of Sacred Theology",
+      "Licentiate in Sacred Theology",
+      "Bachelor of Sacred Theology",
+    ],
+  };
+
+  const openSurveyReportModal = (survey) => {
+    setSelectedSurvey(survey);
+    setIsSurveyReportModalOpen(true);
+  };
 
   const openViewModal = (survey) => {
     setSelectedSurvey(survey);
@@ -37,7 +274,7 @@ function AdminSurveyTool() {
         choices:
           question.choices ||
           (question.questionType === "radio" ||
-          question.questionType === "checkbox"
+            question.questionType === "checkbox"
             ? [""]
             : []),
       }))
@@ -70,6 +307,10 @@ function AdminSurveyTool() {
     setIsEditModalOpen(false);
     setIsAddModalOpen(false);
     setSelectedSurvey(null);
+  };
+
+  const closeSurveyReportModal = () => {
+    setIsSurveyReportModalOpen(false);
   };
 
   const openDeleteModal = (survey) => {
@@ -318,15 +559,15 @@ function AdminSurveyTool() {
       });
 
       if (surveyToToggle.published) {
-      setshowMessage("Survey unpublished!"); // Message when unpublishing
-    } else {
-      setshowMessage("Survey published!"); // Message when publishing
-    }
+        setshowMessage("Survey unpublished!"); // Message when unpublishing
+      } else {
+        setshowMessage("Survey published!"); // Message when publishing
+      }
 
-    setSuccessMessage(true);
-    setTimeout(() => {
-      setSuccessMessage(false);
-    }, 3000);
+      setSuccessMessage(true);
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
 
       if (!response.ok) {
         throw new Error("Failed to toggle publish status for the survey");
@@ -347,7 +588,7 @@ function AdminSurveyTool() {
     }
     setIsPublishModalOpen(false); // Close the modal after confirming
   };
-  
+
 
   const handleSaveSurvey = async () => {
     const surveyData = {
@@ -522,17 +763,17 @@ function AdminSurveyTool() {
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
 
-{showSuccessMessage && (
-  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
-    <p>{showMessage}</p>
-  </div>
-)}
+      {showSuccessMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+          <p>{showMessage}</p>
+        </div>
+      )}
 
-{showErrorMessage && (
-  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
-    <p>{showMessage}</p>
-  </div>
-)}
+      {showErrorMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+          <p>{showMessage}</p>
+        </div>
+      )}
 
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -609,7 +850,7 @@ function AdminSurveyTool() {
             <div>
               <div className="text-md font-medium mb-1">{survey.name}</div>
               <div className="text-sm text-black-600">
-              {survey.responseCount
+                {survey.responseCount
                   ? `${survey.responseCount} responses`
                   : "No responses recorded."}
               </div>
@@ -641,37 +882,37 @@ function AdminSurveyTool() {
               </div>
               {/* Publish Button */}
               <div
-  className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-  onClick={(e) => {
-    e.stopPropagation();
-    const surveyToToggle = surveys.find((s) => s._id === survey._id); // Find the survey
-    if (surveyToToggle && !surveyToToggle.published) {
-      setSelectedSurveyId(survey._id); // Set the ID for confirmation
-      setIsPublishModalOpen(true); // Open the confirmation modal
-    } else {
-      handlePublishSurvey(survey._id); // Call the function to handle publishing
-    }
-  }}
-  role="button" // Make it clear it's a button
-  tabIndex={0} // Make it focusable
-  onKeyDown={(e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      // Allow activation via keyboard
-      e.stopPropagation();
-      const surveyToToggle = surveys.find((s) => s._id === survey._id); // Find the survey
-      if (surveyToToggle && !surveyToToggle.published) {
-        setSelectedSurveyId(survey._id); // Set the ID for confirmation
-        setIsPublishModalOpen(true); // Open the confirmation modal
-      } else {
-        handlePublishSurvey(survey._id); // Call the function to handle publishing
-      }
-    }
-  }}
->
-  <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-    Publish
-  </span>
-</div>
+                className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const surveyToToggle = surveys.find((s) => s._id === survey._id); // Find the survey
+                  if (surveyToToggle && !surveyToToggle.published) {
+                    setSelectedSurveyId(survey._id); // Set the ID for confirmation
+                    setIsPublishModalOpen(true); // Open the confirmation modal
+                  } else {
+                    handlePublishSurvey(survey._id); // Call the function to handle publishing
+                  }
+                }}
+                role="button" // Make it clear it's a button
+                tabIndex={0} // Make it focusable
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    // Allow activation via keyboard
+                    e.stopPropagation();
+                    const surveyToToggle = surveys.find((s) => s._id === survey._id); // Find the survey
+                    if (surveyToToggle && !surveyToToggle.published) {
+                      setSelectedSurveyId(survey._id); // Set the ID for confirmation
+                      setIsPublishModalOpen(true); // Open the confirmation modal
+                    } else {
+                      handlePublishSurvey(survey._id); // Call the function to handle publishing
+                    }
+                  }
+                }}
+              >
+                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                  Publish
+                </span>
+              </div>
 
             </div>
           </div>
@@ -750,35 +991,370 @@ function AdminSurveyTool() {
             <div className="text-2xl font-medium mb-2">
               {selectedSurvey.name}
             </div>
-            <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 border border-fgray">
-              <div className="text-xs font-light">Responses</div>
-              <div className="text-xl font-normal">999</div>
-            </div>
 
-            <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 mt-2 border border-fgray">
-              <div className="text-xs font-light">Date Created</div>
-              <div className="text-xl font-normal">August 20, 2024</div>
-            </div>
-
-            <div className="flex mt-4 space-x-3">
-              <div>
-                <button className="btn md:w-64 w-32 bg-blue text-white ">
-                  Export to PDF
-                </button>
+            <div className="w-full rounded px-3 py-2 space-y-2 border border-fgray">
+              <div className="text-md font-medium">Survey Dashboard</div>
+              <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 border border-fgray">
+                <div className="text-xs font-light">Responses</div>
+                <div className="text-xl font-normal">999</div>
               </div>
-              <div>
-                <button className="btn md:w-64 w-32 bg-green text-white">
-                  Export to Excel
-                </button>
+
+              <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 mt-2 border border-fgray">
+                <div className="text-xs font-light">Date Created</div>
+                <div className="text-xl font-normal">August 20, 2024</div>
+              </div>
+
+              <div className="flex mt-4 space-x-3">
+                <div>
+                  <button className="btn md:w-64 w-32 bg-blue text-white ">
+                    Export to PDF
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full mt-4 rounded px-3 py-2 space-y-2 border border-fgray">
+              <div className="text-md font-medium">Survey Reports</div>
+              <div className="text-sm font-light">View individual responses by clicking the button below.</div>
+              <div className="flex mt-4 space-x-3">
+                <div>
+                  <button className="btn md:w-64 w-32 bg-green text-white" onClick={() => openSurveyReportModal(selectedSurvey)}>
+                    View Reports
+                  </button>
+                </div>
               </div>
             </div>
 
 
-
-            
           </div>
+
+          {/* SURVEY REPORT MODAL */}
+          {isSurveyReportModalOpen && selectedSurvey && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div
+                ref={modalRef}
+                className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-8xl lg:max-w-10xl w-full h-auto overflow-y-auto max-h-full relative" // Increased max width
+              >
+                <button
+                  className="absolute top-4 right-4 text-black text-2xl"
+                  onClick={closeSurveyReportModal}
+                >
+                  &times;
+                </button>
+                <div className="text-2xl font-medium mb-4">
+                  {selectedSurvey.name} Survey Report
+                </div>
+                <div className="text-md mb-2 font-normal mt-2">Filters:</div>
+
+                {/* Filter Dropdown */}
+                <div className="sm:flex block sm:space-x-4">
+                  {/* Gender Dropdown */}
+                  <div className="relative mb-6" ref={genderDropdownRef}>
+                    <button
+                      onClick={toggleGenderDropdown}
+                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                    >
+                      <span>Gender</span>
+                      <svg
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openGenderDropdown ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 6"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="m1 1 4 4 4-4"
+                        />
+                      </svg>
+                    </button>
+
+                    {openGenderDropdown && (
+                      <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg">
+                        <ul className="p-3 text-sm text-gray-700">
+                          {["All", "Male", "Female"].map((gender, idx) => (
+                            <li key={idx} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                value={gender}
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                              />
+                              <label className="ms-2 font-medium">{gender}</label>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Region Dropdown */}
+                  <div className="relative mb-6" ref={regionDropdownRef}>
+                    <button
+                      onClick={toggleRegionDropdown}
+                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                    >
+                      <span>Region</span>
+                      <svg
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openRegionDropdown ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 6"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="m1 1 4 4 4-4"
+                        />
+                      </svg>
+                    </button>
+
+                    {openRegionDropdown && (
+                      <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <ul className="p-3 text-sm text-gray-700">
+                          {["All", ...regions].map((region, idx) => (
+                            <li key={idx} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                value={region}
+                                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                              />
+                              <label className="ms-2 font-medium">{region}</label>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* College Dropdown */}
+                  <div className="relative mb-6" ref={collegeDropdownRef}>
+                    <button
+                      onClick={toggleCollegeDropdown}
+                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                    >
+                      <span>{selectedCollege || "Select College"}</span>
+                      <svg
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openCollegeDropdown ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 6"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="m1 1 4 4 4-4"
+                        />
+                      </svg>
+                    </button>
+
+                    {openCollegeDropdown && (
+                      <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <ul className="p-3 text-sm text-gray-700">
+                          <li className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={selectedCollege === 'All'} // Check if "All" is selected
+                              onChange={() => {
+                                const allSelected = selectedCollege === 'All';
+                                setSelectedCollege(allSelected ? '' : 'All'); // Toggle "All" selection
+                                if (!allSelected) {
+                                  setOpenProgramDropdown(true); // Automatically open program dropdown
+                                }
+                              }}
+                              className="mr-2"
+                            />
+                            <span>All Colleges</span> {/* Display the "All Colleges" option */}
+                          </li>
+                          {Object.keys(collegePrograms).map((college, idx) => (
+                            <li key={idx} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedCollege === college} // Check if this college is selected
+                                onChange={() => {
+                                  if (selectedCollege === 'All') {
+                                    setSelectedCollege(college); // Select individual college if "All" was selected
+                                  } else {
+                                    handleCollegeSelect(college);
+                                  }
+                                  setOpenProgramDropdown(true); // Automatically open program dropdown
+                                }}
+                                className="mr-2"
+                              />
+                              <span>{college}</span> {/* Display the college name */}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+
+                  {/* College Programs Dropdown */}
+                  <div className="relative mb-6" ref={programDropdownRef}>
+                    <button
+                      onClick={toggleProgramDropdown}
+                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      disabled={!selectedCollege} // Disable if no college is selected
+                    >
+                      <span>{selectedProgram || "Select Program"}</span>
+                      <svg
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openProgramDropdown ? 'rotate-180' : ''}`}
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 6"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="m1 1 4 4 4-4"
+                        />
+                      </svg>
+                    </button>
+
+                    {openProgramDropdown && selectedCollege && (
+                      <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <ul className="p-3 text-sm text-gray-700">
+                          <li className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={selectedProgram === 'All'} // Check if "All" is selected
+                              onChange={() => {
+                                const allSelected = selectedProgram === 'All';
+                                setSelectedProgram(allSelected ? '' : 'All'); // Toggle "All" selection
+                              }}
+                              className="mr-2"
+                            />
+                            <span>All Programs</span> {/* Display the "All Programs" option */}
+                          </li>
+                          {(selectedCollege === 'All' ? // Show all programs if "All Colleges" is selected
+                            Object.values(collegePrograms).flat() :
+                            collegePrograms[selectedCollege]).map((program, idx) => (
+                              <li key={idx} className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedProgram === program} // Check if this program is selected
+                                  onChange={() => setSelectedProgram(program)} // Use onChange for checkboxes
+                                  className="mr-2" // Add margin for spacing
+                                />
+                                <span>{program}</span> {/* Display the program name */}
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+
+
+                  {/* Batch Year Dropdown */}
+                  <div className="relative mb-6" ref={batchYearDropdownRef}>
+  <button
+    onClick={toggleBatchYearDropdown}
+    className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+  >
+    <span>
+      {selectedBatchYears.length > 0
+        ? (selectedBatchYears.length === batchYears.length ? "All Batch Years" : selectedBatchYears.join(', '))
+        : "Select Batch Year"}
+    </span>
+    <svg
+      className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openBatchYearDropdown ? 'rotate-180' : ''}`}
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 10 6"
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="m1 1 4 4 4-4"
+      />
+    </svg>
+  </button>
+
+  {openBatchYearDropdown && (
+    <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+      <ul className="p-3 text-sm text-gray-700">
+        <li className="flex items-center">
+          <input
+            type="checkbox"
+            checked={selectedBatchYears.length === batchYears.length} // Check if all years are selected
+            onChange={() => {
+              if (selectedBatchYears.length === batchYears.length) {
+                setSelectedBatchYears([]); // Deselect all if currently all are selected
+              } else {
+                setSelectedBatchYears(batchYears); // Select all if not all are currently selected
+              }
+            }}
+            className="mr-2"
+          />
+          <span>All Batch Years</span> {/* Display the "All Batch Years" option */}
+        </li>
+        {batchYears.map((year, idx) => (
+          <li key={idx} className="flex items-center">
+            <input
+              type="checkbox"
+              value={year}
+              checked={selectedBatchYears.includes(year) && selectedBatchYears.length !== batchYears.length} // Check if this year is selected, only if not all are selected
+              onChange={() => {
+                if (selectedBatchYears.includes(year)) {
+                  setSelectedBatchYears(selectedBatchYears.filter(y => y !== year)); // Deselect the year if it was selected
+                } else {
+                  setSelectedBatchYears([...selectedBatchYears, year]); // Select the year if it was not selected
+                }
+              }} // Use onChange for checkboxes
+              className="mr-2" // Add margin for spacing
+            />
+            <span>{year}</span> {/* Display the batch year */}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
+
+
+
+
+
+
+                </div>
+
+                {/* Full-Width Table Section with Padding */}
+                <div className="w-full mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                  <div className="text-xl font-semibold mb-2 h-40">Table</div>
+                  {/* Add table content here */}
+                </div>
+
+                {/* Export Buttons */}
+                <div className="flex mt-4 justify-center space-x-3">
+                  <button className="btn md:w-64 w-32 bg-blue text-white rounded-lg py-2 px-4">
+                    Export to PDF
+                  </button>
+                  <button className="btn md:w-64 w-32 bg-green text-white rounded-lg py-2 px-4">
+                    Export to Excel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
+
+
 
       {/* EDIT MODAL */}
       {isEditModalOpen && selectedSurvey && (
@@ -861,13 +1437,13 @@ function AdminSurveyTool() {
                 {/* Add Option button for radio/checkbox types */}
                 {(question.questionType === "radio" ||
                   question.questionType === "checkbox") && (
-                  <button
-                    className="btn btn-sm bg-blue text-white mt-2"
-                    onClick={() => handleAddOption(questionIndex)}
-                  >
-                    Add Option
-                  </button>
-                )}
+                    <button
+                      className="btn btn-sm bg-blue text-white mt-2"
+                      onClick={() => handleAddOption(questionIndex)}
+                    >
+                      Add Option
+                    </button>
+                  )}
 
                 <hr className="my-4 border-black" />
               </div>
@@ -976,13 +1552,13 @@ function AdminSurveyTool() {
                 {renderOptionInputs(question, questionIndex)}
                 {(question.questionType === "radio" ||
                   question.questionType === "checkbox") && (
-                  <button
-                    className="btn btn-sm bg-blue text-white mt-2"
-                    onClick={() => handleAddOption(questionIndex)}
-                  >
-                    Add Option
-                  </button>
-                )}
+                    <button
+                      className="btn btn-sm bg-blue text-white mt-2"
+                      onClick={() => handleAddOption(questionIndex)}
+                    >
+                      Add Option
+                    </button>
+                  )}
                 <hr className="my-4 border-black" />
               </div>
             ))}
@@ -1015,7 +1591,6 @@ function AdminSurveyTool() {
         </div>
       )}
 
-
       {/* Publish Confirmation Modal */}
       {isPublishModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
@@ -1040,10 +1615,7 @@ function AdminSurveyTool() {
         </div>
       )}
 
-
     </div>
-
-    
   );
 }
 

@@ -286,62 +286,63 @@ function Survey() {
 
       {/* Modal */}
       {isModalOpen && selectedSurvey && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div
-            ref={modalRef}
-            className="bg-white p-6 rounded-lg w-full h-auto overflow-y-auto relative"
-          >
-            <button
-              className="absolute top-4 right-4 text-black text-2xl"
-              onClick={closeModal}
-            >
-              &times;
-            </button>
-            <div className="text-2xl font-medium mb-2">
-              {selectedSurvey.name}
-            </div>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div
+      ref={modalRef}
+      className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto relative"
+    >
+      <button
+        className="absolute top-4 right-4 text-black text-2xl"
+        onClick={closeModal}
+      >
+        &times;
+      </button>
+      <div className="text-2xl font-medium mb-2">
+        {selectedSurvey.name}
+      </div>
 
-            {selectedSurvey.questions.map((question, index) => (
-              <div
-                key={index}
-                className="w-full rounded px-4 py-2 border border-black my-2"
-              >
-                <div className="font-medium ">
-                  {index + 1}
-                  <span className="mr-2">.</span>
-                  {question.questionText}
-                </div>
-                <div>
-                  {renderInputField({
-                    ...question,
-                    answer: userResponses[question._id],
-                  })}
-                </div>
-              </div>
-            ))}
-
-            {/* BOTTOM BUTTONS */}
-            <div className="flex justify-center mt-16 space-x-3">
-              <div className="">
-                <button
-                  className="btn md:w-64 w-52 bg-fgray text-white"
-                  onClick={closeModal}
-                >
-                  Cancel
-                </button>
-              </div>
-              <div className="">
-                <button
-                  className="btn md:w-64 w-52 bg-green text-white"
-                  onClick={handleSaveResponse}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
+      {selectedSurvey.questions.map((question, index) => (
+        <div
+          key={index}
+          className="w-full rounded px-4 py-2 border border-black my-2"
+        >
+          <div className="font-medium">
+            {index + 1}
+            <span className="mr-2">.</span>
+            {question.questionText}
+          </div>
+          <div>
+            {renderInputField({
+              ...question,
+              answer: userResponses[question._id],
+            })}
           </div>
         </div>
-      )}
+      ))}
+
+      {/* BOTTOM BUTTONS */}
+      <div className="flex justify-center mt-16 space-x-3">
+        <div>
+          <button
+            className="btn md:w-64 w-52 bg-fgray text-white"
+            onClick={closeModal}
+          >
+            Cancel
+          </button>
+        </div>
+        <div>
+          <button
+            className="btn md:w-64 w-52 bg-green text-white"
+            onClick={handleSaveResponse}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

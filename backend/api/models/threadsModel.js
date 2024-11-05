@@ -9,6 +9,7 @@ const threadSchema = new mongoose.Schema(
     },
     title: { type: String, required: true },
     content: { type: String, required: true },
+    notifEnabled: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

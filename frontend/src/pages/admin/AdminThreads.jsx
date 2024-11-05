@@ -10,6 +10,7 @@ function AdminThreads() {
   const [allThreads, setAllThreads] = useState([]);
   const [newThread, setNewThread] = useState({ title: "", content: "" });
   const [selectedThread, setSelectedThread] = useState(null);
+  const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -293,6 +294,48 @@ function AdminThreads() {
       console.error("Error deleting thread:", error);
     }
   };
+  const handleNotif = async () => {
+    if (!selectedThread) return;
+
+    try {
+      // Toggle the notifEnabled status based on the current state
+      const newNotifStatus = !selectedThread.notifEnabled;
+
+      await axios.put(
+        `${backendUrl}/threads/silence/${selectedThread._id}`,
+        { notifEnabled: newNotifStatus }, // Send new notifEnabled status
+        {
+          withCredentials: true,
+        }
+      );
+
+      // Update the notifEnabled status for the selected thread in both `myThreads` and `allThreads`
+      const updatedMyThreads = myThreads.map((thread) =>
+        thread._id === selectedThread._id
+          ? { ...thread, notifEnabled: newNotifStatus }
+          : thread
+      );
+      const updatedAllThreads = allThreads.map((thread) =>
+        thread._id === selectedThread._id
+          ? { ...thread, notifEnabled: newNotifStatus }
+          : thread
+      );
+
+      setMyThreads(updatedMyThreads);
+      setAllThreads(updatedAllThreads);
+
+      // Optionally update state or show a message
+      showValidation(
+        `Thread notifications ${
+          newNotifStatus ? "enabled" : "disabled"
+        } successfully!`
+      );
+      setIsNotifModalOpen(false);
+    } catch (error) {
+      console.error("Error toggling notifications:", error);
+    }
+  };
+
   const fetchReplies = async (threadId) => {
     try {
       const response = await axios.get(
@@ -444,6 +487,10 @@ function AdminThreads() {
     fetchReplies(thread._id);
   };
 
+  const openNotifModal = (thread) => {
+    setSelectedThread(thread);
+    setIsNotifModalOpen(true);
+  };
   const openEditModal = (thread) => {
     setSelectedThread(thread);
     setIsEditModalOpen(true);
@@ -464,6 +511,7 @@ function AdminThreads() {
     setIsEditModalOpen(false);
     setIsAddModalOpen(false);
     setIsDeleteModalOpen(false);
+    setIsNotifModalOpen(false);
     setSelectedThread(null);
     setThreadToDelete(null);
   };
@@ -593,6 +641,18 @@ function AdminThreads() {
                     </span>
                   </div>
                   <div
+                    className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openNotifModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Notifications
+                    </span>
+                  </div>
+
+                  <div
                     className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -636,6 +696,17 @@ function AdminThreads() {
                   >
                     <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
                       Delete
+                    </span>
+                  </div>
+                  <div
+                    className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openNotifModal(thread);
+                    }}
+                  >
+                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                      Notifications
                     </span>
                   </div>
                   <div
@@ -687,6 +758,17 @@ function AdminThreads() {
                     >
                       <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
                         Delete
+                      </span>
+                    </div>
+                    <div
+                      className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openNotifModal(thread);
+                      }}
+                    >
+                      <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                        Notifications
                       </span>
                     </div>
                     <div
@@ -996,6 +1078,36 @@ function AdminThreads() {
                 onClick={() => setIsDeleteModalOpen(false)}
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isNotifModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">
+              {selectedThread?.notifEnabled
+                ? "Turn Off Notifications"
+                : "Turn On Notifications"}
+            </h2>
+            <p>
+              {selectedThread?.notifEnabled
+                ? "Do you want to disable notifications for this thread?"
+                : "Do you want to enable notifications for this thread?"}
+            </p>
+            <div className="flex justify-end mt-4">
+              <button
+                className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={handleNotif}
+              >
+                Yes
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsNotifModalOpen(false)}
+              >
+                No
               </button>
             </div>
           </div>

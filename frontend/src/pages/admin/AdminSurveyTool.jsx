@@ -517,7 +517,7 @@ function AdminSurveyTool() {
         choices:
           question.choices ||
           (question.questionType === "radio" ||
-          question.questionType === "checkbox"
+            question.questionType === "checkbox"
             ? [""]
             : []),
       }))
@@ -773,13 +773,15 @@ function AdminSurveyTool() {
   const handleTogglePublishStatus = (surveyId) => {
     const surveyToToggle = surveys.find((survey) => survey._id === surveyId);
 
-    // Check if the survey is being republished (was unpublished, now will be published)
-    if (surveyToToggle && !surveyToToggle.published) {
-      setSelectedSurveyId(surveyId);
-      setIsPublishModalOpen(true); // Open the confirmation modal
-    } else {
-      // If just unpublishing, proceed directly
-      handlePublishSurvey(surveyId);
+    if (surveyToToggle) {
+      // Show the modal when unpublishing (currently published) or republishing (currently unpublished)
+      if (surveyToToggle.published || (!surveyToToggle.published && surveyToToggle.hasBeenPublished)) {
+        setSelectedSurveyId(surveyId);
+        setIsPublishModalOpen(true); // Open the modal for unpublishing or republishing
+      } else {
+        // Proceed directly if publishing for the first time (never been published before)
+        handlePublishSurvey(surveyId);
+      }
     }
   };
 
@@ -827,10 +829,11 @@ function AdminSurveyTool() {
 
   const handleConfirmPublish = () => {
     if (selectedSurveyId) {
-      handlePublishSurvey(selectedSurveyId);
+      handlePublishSurvey(selectedSurveyId); // Publish or unpublish
     }
     setIsPublishModalOpen(false); // Close the modal after confirming
   };
+
 
   const handleSaveSurvey = async () => {
     const surveyData = {
@@ -1421,18 +1424,15 @@ function AdminSurveyTool() {
                 className="w-4 h-4 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log(
-                    "Attempting to unpublish survey with ID:",
-                    survey._id
-                  ); // Log ID
-                  handlePublishSurvey(survey._id); // Call to handle publishing/unpublishing
+                  console.log("Attempting to unpublish survey with ID:", survey._id); // Log ID
+                  handleTogglePublishStatus(survey._id); // Call to handle unpublishing and show modal if needed
                 }}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.stopPropagation();
-                    handlePublishSurvey(survey._id);
+                    handleTogglePublishStatus(survey._id); // Call to handle unpublishing via keyboard
                   }
                 }}
               >
@@ -1480,13 +1480,13 @@ function AdminSurveyTool() {
                 <div className="text-xl font-normal">
                   {selectedSurvey?.createdAt
                     ? new Date(selectedSurvey.createdAt).toLocaleDateString(
-                        "en-US",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
-                      )
+                      "en-US",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )
                     : "Date not available"}
                 </div>
               </div>
@@ -1550,9 +1550,8 @@ function AdminSurveyTool() {
                     >
                       <span>Gender</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-                          openGenderDropdown ? "rotate-180" : ""
-                        }`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openGenderDropdown ? "rotate-180" : ""
+                          }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1598,9 +1597,8 @@ function AdminSurveyTool() {
                     >
                       <span>Region</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-                          openRegionDropdown ? "rotate-180" : ""
-                        }`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openRegionDropdown ? "rotate-180" : ""
+                          }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1639,72 +1637,71 @@ function AdminSurveyTool() {
                   </div>
 
                   {/* College Dropdown */}
-<div className="relative mb-6" ref={collegeDropdownRef}>
-  <button
-    onClick={() => {
-      toggleCollegeDropdown(); // Toggle only the college dropdown
-      setOpenProgramDropdown(false); // Close the program dropdown whenever the college dropdown is toggled
-    }}
-    className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
-  >
-    <span>Select College</span>
-    <svg
-      className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-        openCollegeDropdown ? "rotate-180" : ""
-      }`}
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 10 6"
-    >
-      <path
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="m1 1 4 4 4-4"
-      />
-    </svg>
-  </button>
+                  <div className="relative mb-6" ref={collegeDropdownRef}>
+                    <button
+                      onClick={() => {
+                        toggleCollegeDropdown(); // Toggle only the college dropdown
+                        setOpenProgramDropdown(false); // Close the program dropdown whenever the college dropdown is toggled
+                      }}
+                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                    >
+                      <span>Select College</span>
+                      <svg
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openCollegeDropdown ? "rotate-180" : ""
+                          }`}
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 6"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="m1 1 4 4 4-4"
+                        />
+                      </svg>
+                    </button>
 
-  {openCollegeDropdown && (
-    <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-      <ul className="p-3 text-sm text-gray-700">
-        <li className="flex items-center">
-          <input
-            type="checkbox"
-            checked={selectedCollege === "All"} // Check if "All" is selected
-            onChange={() => {
-              const allSelected = selectedCollege === "All";
-              setSelectedCollege(allSelected ? "" : "All"); // Toggle "All" selection
-            }}
-            className="mr-2"
-          />
-          <span>All Colleges</span>{" "}
-          {/* Display the "All Colleges" option */}
-        </li>
-        {Object.keys(collegePrograms).map((college, idx) => (
-          <li key={idx} className="flex items-center">
-            <input
-              type="checkbox"
-              checked={selectedCollege === college} // Check if this college is selected
-              onChange={() => {
-                if (selectedCollege === "All") {
-                  setSelectedCollege(college); // Select individual college if "All" was selected
-                } else {
-                  handleCollegeSelect(college);
-                }
-              }}
-              className="mr-2"
-            />
-            <span>{college}</span>{" "}
-            {/* Display the college name */}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )}
-</div>
+                    {openCollegeDropdown && (
+                      <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <ul className="p-3 text-sm text-gray-700">
+                          <li className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={selectedCollege === "All"} // Check if "All" is selected
+                              onChange={() => {
+                                const allSelected = selectedCollege === "All";
+                                setSelectedCollege(allSelected ? "" : "All"); // Toggle "All" selection
+                              }}
+                              className="mr-2"
+                            />
+                            <span>All Colleges</span>{" "}
+                            {/* Display the "All Colleges" option */}
+                          </li>
+                          {Object.keys(collegePrograms).map((college, idx) => (
+                            <li key={idx} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedCollege === college} // Check if this college is selected
+                                onChange={() => {
+                                  if (selectedCollege === "All") {
+                                    setSelectedCollege(college); // Select individual college if "All" was selected
+                                  } else {
+                                    handleCollegeSelect(college);
+                                  }
+                                }}
+                                className="mr-2"
+                              />
+                              <span>{college}</span>{" "}
+                              {/* Display the college name */}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
 
                   {/* College Programs Dropdown */}
                   <div className="relative mb-6" ref={programDropdownRef}>
@@ -1715,9 +1712,8 @@ function AdminSurveyTool() {
                     >
                       <span>Select Program</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-                          openProgramDropdown ? "rotate-180" : ""
-                        }`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openProgramDropdown ? "rotate-180" : ""
+                          }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1783,9 +1779,8 @@ function AdminSurveyTool() {
                           : "Select Batch Year"}
                       </span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-                          openBatchYearDropdown ? "rotate-180" : ""
-                        }`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openBatchYearDropdown ? "rotate-180" : ""
+                          }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1833,7 +1828,7 @@ function AdminSurveyTool() {
                                 checked={
                                   selectedBatchYears.includes(year) &&
                                   selectedBatchYears.length !==
-                                    batchYears.length
+                                  batchYears.length
                                 } // Check if this year is selected, only if not all are selected
                                 onChange={() => {
                                   if (selectedBatchYears.includes(year)) {
@@ -2084,13 +2079,13 @@ function AdminSurveyTool() {
                 {/* Add Option button for radio/checkbox types */}
                 {(question.questionType === "radio" ||
                   question.questionType === "checkbox") && (
-                  <button
-                    className="btn btn-sm bg-blue text-white mt-2"
-                    onClick={() => handleAddOption(questionIndex)}
-                  >
-                    Add Option
-                  </button>
-                )}
+                    <button
+                      className="btn btn-sm bg-blue text-white mt-2"
+                      onClick={() => handleAddOption(questionIndex)}
+                    >
+                      Add Option
+                    </button>
+                  )}
 
                 <hr className="my-4 border-black" />
               </div>
@@ -2199,13 +2194,13 @@ function AdminSurveyTool() {
                 {renderOptionInputs(question, questionIndex)}
                 {(question.questionType === "radio" ||
                   question.questionType === "checkbox") && (
-                  <button
-                    className="btn btn-sm bg-blue text-white mt-2"
-                    onClick={() => handleAddOption(questionIndex)}
-                  >
-                    Add Option
-                  </button>
-                )}
+                    <button
+                      className="btn btn-sm bg-blue text-white mt-2"
+                      onClick={() => handleAddOption(questionIndex)}
+                    >
+                      Add Option
+                    </button>
+                  )}
                 <hr className="my-4 border-black" />
               </div>
             ))}
@@ -2238,14 +2233,19 @@ function AdminSurveyTool() {
         </div>
       )}
 
-      {/* Publish Confirmation Modal */}
+      {/* Publish/Unpublish Confirmation Modal */}
       {isPublishModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-            <h2 className="text-2xl mb-4">Confirm Publish Action</h2>
+            <h2 className="text-2xl mb-4">
+              {surveys.find((survey) => survey._id === selectedSurveyId)?.published
+                ? "Confirm Unpublish Action"
+                : "Confirm Publish Action"}
+            </h2>
             <p>
-              Republishing will reset all survey responses. Are you sure you
-              want to continue?
+              {surveys.find((survey) => survey._id === selectedSurveyId)?.published
+                ? "Unpublishing will make the survey invisible to users and could reset responses when republished. Are you sure you want to continue?"
+                : "Republishing will reset all survey responses. Are you sure you want to continue?"}
             </p>
             <div className="flex justify-end mt-4">
               <button
@@ -2264,6 +2264,7 @@ function AdminSurveyTool() {
           </div>
         </div>
       )}
+
     </div>
   );
 }

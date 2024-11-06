@@ -2244,8 +2244,8 @@ function AdminSurveyTool() {
             </h2>
             <p>
               {surveys.find((survey) => survey._id === selectedSurveyId)?.published
-                ? "Unpublishing will make the survey invisible to users and could reset responses when republished. Are you sure you want to continue?"
-                : "Republishing will reset all survey responses. Are you sure you want to continue?"}
+                ? "Unpublishing will make the survey inaccessible to users and could reset responses when republished. Are you sure you want to continue?"
+                : "Publishing will let the survey accessible to all users."}
             </p>
             <div className="flex justify-end mt-4">
               <button

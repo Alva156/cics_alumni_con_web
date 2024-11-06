@@ -1580,7 +1580,7 @@ function AdminSurveyTool() {
                   <div className="relative mb-6" ref={genderDropdownRef}>
                     <button
                       onClick={toggleGenderDropdown}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                     >
                       <span>Gender</span>
                       <svg
@@ -1628,7 +1628,7 @@ function AdminSurveyTool() {
                   <div className="relative mb-6" ref={regionDropdownRef}>
                     <button
                       onClick={toggleRegionDropdown}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                     >
                       <span>Region</span>
                       <svg
@@ -1679,7 +1679,7 @@ function AdminSurveyTool() {
                         toggleCollegeDropdown(); // Toggle only the college dropdown
                         setOpenProgramDropdown(false); // Close the program dropdown whenever the college dropdown is toggled
                       }}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                     >
                       <span>Select College</span>
                       <svg
@@ -1744,7 +1744,7 @@ function AdminSurveyTool() {
                   <div className="relative mb-6" ref={programDropdownRef}>
                     <button
                       onClick={toggleProgramDropdown}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                       disabled={!selectedCollege} // Disable if no college is selected
                     >
                       <span>Select Program</span>
@@ -1807,7 +1807,7 @@ function AdminSurveyTool() {
                   <div className="relative mb-6" ref={batchYearDropdownRef}>
                     <button
                       onClick={toggleBatchYearDropdown}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                     >
                       <span>
                         {selectedBatchYears.length > 0
@@ -1885,29 +1885,29 @@ function AdminSurveyTool() {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-8">
-                  <span className="text-xl font-bold mr-8">
+                <div className="sm:flex block sm:space-x-4 items-center">
+                  <div className="text-xl font-bold mr-8">
                     Number of Alumni: {filteredAlumniCount}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Employed: {countByStatus("Employed")}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Self-Employed: {countByStatus("Self-Employed")}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Underemployed: {countByStatus("Underemployed")}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Freelancing: {countByStatus("Freelancing")}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Unemployed: {countByStatus("Unemployed")}
-                  </span>
+                  </div>
                 </div>
 
                 {/* Full-Width Table Section with Padding */}
-                <div className="overflow-x-auto mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                <div className="overflow-x-auto mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50 max-h-96 min-h-96 overflow-y-auto">
                   <table className="min-w-full bg-white border border-gray-300">
                     <thead>
                       <tr className="text-xs font-normal text-center">

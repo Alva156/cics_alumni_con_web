@@ -4,54 +4,55 @@ const jwt = require("jsonwebtoken");
 
 // ADMIN-SIDE
 
-// Display all surveys
+// Display all surveys with responder details
 exports.getAllSurveys = async (req, res) => {
   try {
     const token = req.cookies.token;
     let userProfileId = null;
 
-    // Decode the token if it exists
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       userProfileId = decoded.profileId;
     }
 
-    // Find all surveys and populate userId and questions
+    // Fetch all surveys and populate responder profile fields
     const surveys = await Survey.find()
-      .populate("userId", "firstName lastName profileImage profession") // Populating userId
-      .populate("questions") // Populating questions
+      .populate(
+        "responses.userId",
+        "firstName lastName college collegeProgram yearGraduatedCollege gender region"
+      ) // Populate responder details
+      .populate("questions") // Populate questions
       .lean();
 
-    // Enhance each survey with response count and ownership status
     const surveysWithResponseCount = surveys.map((survey) => {
-      // Count responses related to this survey
-      const responseCount = survey.responses.length; // Since responses is an array
+      const responseCount = survey.responses.length;
       return {
         ...survey,
         responseCount,
         isOwner:
           userProfileId &&
-          survey.userId._id.toString() === userProfileId.toString(), // Check ownership
+          survey.userId._id.toString() === userProfileId.toString(),
       };
     });
 
-    // Return enhanced surveys
     res.status(200).json(surveysWithResponseCount);
   } catch (error) {
-    console.error("Error fetching surveys:", error); // Log the error for debugging
+    console.error("Error fetching surveys:", error);
     res
       .status(500)
       .json({ message: "Error fetching surveys", error: error.message });
   }
 };
 
-// Get a single survey by ID
+// Get a single survey by ID with responder details
 exports.getSurveyById = async (req, res) => {
   try {
-    // Fetch the survey and populate userId and questions
     const survey = await Survey.findById(req.params.id)
-      .populate("userId", "firstName lastName profileImage profession") // Populating userId
-      .populate("questions") // Populating questions
+      .populate(
+        "responses.userId",
+        "firstName lastName college collegeProgram yearGraduatedCollege gender region"
+      ) // Populate responder details
+      .populate("questions") // Populate questions
       .lean();
 
     if (!survey) {
@@ -60,7 +61,7 @@ exports.getSurveyById = async (req, res) => {
 
     res.status(200).json(survey);
   } catch (error) {
-    console.error("Error fetching survey:", error); // Added logging for better debugging
+    console.error("Error fetching survey:", error);
     res.status(500).json({ message: "Error fetching survey", error });
   }
 };
@@ -112,7 +113,6 @@ exports.createSurvey = async (req, res) => {
     res.status(500).json({ error: "Failed to create survey" });
   }
 };
-
 
 // Update a survey
 exports.updateSurvey = async (req, res) => {
@@ -166,7 +166,6 @@ exports.updateSurvey = async (req, res) => {
   }
 };
 
-
 // Delete a survey
 exports.deleteSurvey = async (req, res) => {
   try {
@@ -199,7 +198,6 @@ exports.deleteSurvey = async (req, res) => {
   }
 };
 
-
 // Toggle publish and unpublish with response reset logic
 exports.publishSurvey = async (req, res) => {
   const surveyId = req.params.id;
@@ -230,7 +228,6 @@ exports.publishSurvey = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
 
 // USER-SIDE
 
@@ -268,7 +265,9 @@ exports.getPublished = async (req, res) => {
       console.log("Current user profile ID:", userProfileId);
 
       // Ensure userProfileId is a string and check if the user has answered the survey
-      const isAnswered = survey.answered.some(id => id.toString() === userProfileId?.toString());
+      const isAnswered = survey.answered.some(
+        (id) => id.toString() === userProfileId?.toString()
+      );
 
       console.log("Is answered:", isAnswered); // Log if the survey is answered by the user
 
@@ -299,10 +298,11 @@ exports.getPublished = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching surveys:", error); // Log the error for debugging
-    res.status(500).json({ message: "Error fetching surveys", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching surveys", error: error.message });
   }
 };
-
 
 // Get a single published survey by ID
 exports.getPublishedById = async (req, res) => {
@@ -340,7 +340,6 @@ exports.getPublishedById = async (req, res) => {
     res.status(500).json({ message: "Error fetching survey", error });
   }
 };
-
 
 // Submit survey response (user-side)
 exports.saveSurveyResponse = async (req, res) => {
@@ -449,4 +448,3 @@ exports.saveSurveyResponse = async (req, res) => {
       .json({ message: "Error saving response", error: error.message });
   }
 };
-

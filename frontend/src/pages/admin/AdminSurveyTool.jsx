@@ -1113,7 +1113,7 @@ function AdminSurveyTool() {
           </div>
         ))
       ) : (
-        <div className="mb-4 text-center text-gray-500">
+        <div className="mb-4 text-center text-gray-500 no-print">
           No unanswered surveys available.
         </div>
       )}
@@ -1165,7 +1165,7 @@ function AdminSurveyTool() {
           </div>
         ))
       ) : (
-        <div className="mb-4 text-center text-gray-500">
+        <div className="mb-4 text-center text-gray-500 no-print">
           No answered surveys available.
         </div>
       )}
@@ -1257,7 +1257,7 @@ function AdminSurveyTool() {
                   &times;
                 </button>
                 <div className="text-2xl font-medium mb-4">
-                  {selectedSurvey.name} Survey Report
+                  {selectedSurvey.name} Individual Survey Report
                 </div>
                 <div className="text-md mb-2 font-normal mt-2">Filters:</div>
 
@@ -1579,9 +1579,91 @@ function AdminSurveyTool() {
                 </div>
 
                 {/* Full-Width Table Section with Padding */}
-                <div className="w-full mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
-                  <div className="text-xl font-semibold mb-2 h-40">Table</div>
-                  {/* Add table content here */}
+                <div className="overflow-x-auto mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                  <table className="min-w-full bg-white border border-gray-300">
+                    <thead>
+                      <tr className="text-xs font-normal text-center">
+                        <td className="px-4 py-2 border"></td>
+                        <td className="px-4 py-2 border">First Name</td>
+                        <td className="px-4 py-2 border">Last Name</td>
+                        <td className="px-4 py-2 border">College</td>
+                        <td className="px-4 py-2 border">College Program</td>
+                        <td className="px-4 py-2 border">Year Graduated</td>
+                        <td className="px-4 py-2 border">Gender</td>
+                        <td className="px-4 py-2 border">Region</td>
+
+                        {/* Dynamically rendering question columns */}
+                        {selectedSurvey?.questions?.map((question) => (
+                          <td key={question._id} className="px-4 py-2 border">
+                            {question.questionText}
+                          </td>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="text-xs">
+                      {selectedSurvey?.responses?.length > 0 ? (
+                        selectedSurvey.responses.map((response, index) => (
+                          <tr key={response._id} className="text-center">
+                            <td className="px-4 py-2 border">{index + 1}</td>
+                            <td className="px-4 py-2 border">
+                              {response.userId?.firstName || "N/A"}
+                            </td>
+                            <td className="px-4 py-2 border">
+                              {response.userId?.lastName || "N/A"}
+                            </td>
+                            <td className="px-4 py-2 border">
+                              {response.userId?.college || "N/A"}
+                            </td>
+                            <td className="px-4 py-2 border">
+                              {response.userId?.collegeProgram || "N/A"}
+                            </td>
+                            <td className="px-4 py-2 border">
+                              {response.userId?.yearGraduatedCollege || "N/A"}
+                            </td>
+                            <td className="px-4 py-2 border">
+                              {response.userId?.gender || "N/A"}
+                            </td>
+                            <td className="px-4 py-2 border">
+                              {response.userId?.region || "N/A"}
+                            </td>
+
+                            {/* Display answers for each question */}
+                            {selectedSurvey?.questions?.map((question) => {
+                              const userAnswer = response.answers.find(
+                                (ans) =>
+                                  ans.questionId.toString() ===
+                                  question._id.toString()
+                              );
+
+                              return (
+                                <td
+                                  key={question._id}
+                                  className="px-4 py-2 border"
+                                >
+                                  {userAnswer
+                                    ? Array.isArray(userAnswer.answer)
+                                      ? // For checkbox type questions, display each selected choice
+                                        userAnswer.answer.join(", ")
+                                      : // For other question types, display the answer directly
+                                        userAnswer.answer
+                                    : "N/A"}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={selectedSurvey?.questions.length + 8}
+                            className="px-4 py-2 text-center"
+                          >
+                            No responder data found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
 
                 {/* Export Buttons */}

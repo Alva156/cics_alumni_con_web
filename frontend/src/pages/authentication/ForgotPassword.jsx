@@ -158,29 +158,36 @@ function ForgotPassword() {
             <label className="block mb-4 text-sm font-medium">
               Mobile Number
             </label>
-            <input
-              type="tel"
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "40px" }}
-            />
-            <button className="btn md:w-64 w-52 bg-black text-white hover:bg-black hover:text-white">
-              Send OTP (SMS)
-            </button>
+            <div className="flex items-center mb-4">
+              <input
+                type="tel"
+                className="p-2 border border-black bg-[#D9D9D9] w-full"
+                style={{ height: "40px" }}
+              />
+              <button className="btn w-auto ml-2 bg-black text-white hover:bg-black hover:text-white">
+                Send OTP (SMS)
+              </button>
+            </div>
 
             <label className="block mb-2 mt-6 text-sm font-medium">Email</label>
-            <input
-              type="email"
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              onChange={(e) => setEmail(e.target.value)}
-              style={{ height: "40px" }}
-            />
-            <button
-              onClick={handleSendEmailOTP}
-              className="btn md:w-64 w-52 bg-black text-white mt-2 hover:bg-black hover:text-white"
-              disabled={loading}
-            >
-              {otpSent && timer > 0 ? "Resend OTP (Email)" : "Send OTP (Email)"}
-            </button>
+            <div className="flex items-center mb-4">
+              <input
+                type="email"
+                className="p-2 border border-black bg-[#D9D9D9] w-full"
+                onChange={(e) => setEmail(e.target.value)}
+                style={{ height: "40px" }}
+              />
+              <button
+                onClick={handleSendEmailOTP}
+                className="btn w-auto ml-2 bg-black text-white hover:bg-black hover:text-white"
+                disabled={loading}
+              >
+                {otpSent && timer > 0
+                  ? "Resend OTP (Email)"
+                  : "Send OTP (Email)"}
+              </button>
+            </div>
+
             {showOTPForm && (
               <>
                 <label className="block mb-2 mt-6 text-sm font-medium">
@@ -229,6 +236,8 @@ function ForgotPassword() {
             className="object-cover w-full h-full"
           />
         </div>
+
+        {/* Modal 2 */}
         {modal2Visible && (
           <dialog id="my_modal_5" className="modal modal-middle " open>
             <div className="modal-box">
@@ -255,6 +264,8 @@ function ForgotPassword() {
             </div>
           </dialog>
         )}
+
+        {/* Modal 3 */}
         {modal3Visible && (
           <dialog id="my_modal_5" className="modal modal-middle " open>
             <div className="modal-box">

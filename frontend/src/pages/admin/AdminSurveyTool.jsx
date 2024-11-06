@@ -44,9 +44,56 @@ function AdminSurveyTool() {
   const [openCollegeDropdown, setOpenCollegeDropdown] = useState(false);
   const [openProgramDropdown, setOpenProgramDropdown] = useState(false);
   const [openBatchYearDropdown, setOpenBatchYearDropdown] = useState(false);
-  const [selectedCollege, setSelectedCollege] = useState(null);
-  const [selectedProgram, setSelectedProgram] = useState(null);
-  const [selectedBatchYears, setSelectedBatchYears] = useState([]); // State for selected batch years
+  const [selectedGender, setSelectedGender] = useState("All"); // Default "All"
+  const [selectedRegion, setSelectedRegion] = useState("All"); // Default "All"
+  const [selectedCollege, setSelectedCollege] = useState("All"); // Default "All"
+  const [selectedProgram, setSelectedProgram] = useState("All"); // Default "All"
+  const [selectedBatchYears, setSelectedBatchYears] = useState([]); // Empty array means "All batch years"
+  const filterResponses = () => {
+    return selectedSurvey.responses.filter((response) => {
+      // Filter by Gender (skip if "All")
+      if (
+        selectedGender !== "All" &&
+        response.userId?.gender !== selectedGender
+      ) {
+        return false;
+      }
+
+      // Filter by Region (skip if "All")
+      if (
+        selectedRegion !== "All" &&
+        response.userId?.region !== selectedRegion
+      ) {
+        return false;
+      }
+
+      // Filter by College (skip if "All")
+      if (
+        selectedCollege !== "All" &&
+        response.userId?.college !== selectedCollege
+      ) {
+        return false;
+      }
+
+      // Filter by College Program (skip if "All")
+      if (
+        selectedProgram !== "All" &&
+        response.userId?.collegeProgram !== selectedProgram
+      ) {
+        return false;
+      }
+
+      // Filter by Batch Year (skip if no years selected, i.e., "All" batch years)
+      if (
+        selectedBatchYears.length > 0 &&
+        !selectedBatchYears.includes(response.userId?.yearGraduatedCollege)
+      ) {
+        return false;
+      }
+
+      return true; // Include this response if it matches all criteria
+    });
+  };
 
   const batchYears = [2020, 2021, 2022, 2023, 2024]; // Example batch years
   const collegeDropdownRef = useRef(null);
@@ -1297,6 +1344,8 @@ function AdminSurveyTool() {
                               <input
                                 type="checkbox"
                                 value={gender}
+                                checked={selectedGender === gender}
+                                onChange={() => setSelectedGender(gender)} // Update the selected gender
                                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
                               />
                               <label className="ms-2 font-medium">
@@ -1343,6 +1392,8 @@ function AdminSurveyTool() {
                               <input
                                 type="checkbox"
                                 value={region}
+                                checked={selectedRegion === region} // Check if this region is selected
+                                onChange={() => setSelectedRegion(region)} // Update the selected region
                                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
                               />
                               <label className="ms-2 font-medium">
@@ -1358,10 +1409,13 @@ function AdminSurveyTool() {
                   {/* College Dropdown */}
                   <div className="relative mb-6" ref={collegeDropdownRef}>
                     <button
-                      onClick={toggleCollegeDropdown}
+                      onClick={() => {
+                        toggleCollegeDropdown(); // Toggle only the college dropdown
+                        setOpenProgramDropdown(false); // Close the program dropdown whenever the college dropdown is toggled
+                      }}
                       className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                     >
-                      <span>{selectedCollege || "Select College"}</span>
+                      <span>Select College</span>
                       <svg
                         className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
                           openCollegeDropdown ? "rotate-180" : ""
@@ -1431,7 +1485,7 @@ function AdminSurveyTool() {
                       className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                       disabled={!selectedCollege} // Disable if no college is selected
                     >
-                      <span>{selectedProgram || "Select Program"}</span>
+                      <span>Select Program</span>
                       <svg
                         className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
                           openProgramDropdown ? "rotate-180" : ""
@@ -1601,30 +1655,39 @@ function AdminSurveyTool() {
                       </tr>
                     </thead>
                     <tbody className="text-xs">
-                      {selectedSurvey?.responses?.length > 0 ? (
-                        selectedSurvey.responses.map((response, index) => (
+                      {filterResponses().length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={selectedSurvey?.questions.length + 8}
+                            className="text-center px-4 py-2 border"
+                          >
+                            No Respondents
+                          </td>
+                        </tr>
+                      ) : (
+                        filterResponses().map((response, index) => (
                           <tr key={response._id} className="text-center">
                             <td className="px-4 py-2 border">{index + 1}</td>
                             <td className="px-4 py-2 border">
-                              {response.userId?.firstName || "N/A"}
+                              {response.userId?.firstName || ""}
                             </td>
                             <td className="px-4 py-2 border">
-                              {response.userId?.lastName || "N/A"}
+                              {response.userId?.lastName || ""}
                             </td>
                             <td className="px-4 py-2 border">
-                              {response.userId?.college || "N/A"}
+                              {response.userId?.college || ""}
                             </td>
                             <td className="px-4 py-2 border">
-                              {response.userId?.collegeProgram || "N/A"}
+                              {response.userId?.collegeProgram || ""}
                             </td>
                             <td className="px-4 py-2 border">
-                              {response.userId?.yearGraduatedCollege || "N/A"}
+                              {response.userId?.yearGraduatedCollege || ""}
                             </td>
                             <td className="px-4 py-2 border">
-                              {response.userId?.gender || "N/A"}
+                              {response.userId?.gender || ""}
                             </td>
                             <td className="px-4 py-2 border">
-                              {response.userId?.region || "N/A"}
+                              {response.userId?.region || ""}
                             </td>
 
                             {/* Display answers for each question */}
@@ -1642,25 +1705,14 @@ function AdminSurveyTool() {
                                 >
                                   {userAnswer
                                     ? Array.isArray(userAnswer.answer)
-                                      ? // For checkbox type questions, display each selected choice
-                                        userAnswer.answer.join(", ")
-                                      : // For other question types, display the answer directly
-                                        userAnswer.answer
-                                    : "N/A"}
+                                      ? userAnswer.answer.join(", ") // For checkbox type questions
+                                      : userAnswer.answer // For other question types
+                                    : ""}
                                 </td>
                               );
                             })}
                           </tr>
                         ))
-                      ) : (
-                        <tr>
-                          <td
-                            colSpan={selectedSurvey?.questions.length + 8}
-                            className="px-4 py-2 text-center"
-                          >
-                            No responder data found.
-                          </td>
-                        </tr>
                       )}
                     </tbody>
                   </table>

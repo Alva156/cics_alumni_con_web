@@ -2,6 +2,26 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { uniqueId } from "lodash"; // Make sure you import uniqueId
+import { Pie } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+} from "chart.js";
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement
+);
 
 function AdminSurveyTool() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -38,6 +58,144 @@ function AdminSurveyTool() {
   const [questions, setQuestions] = useState([
     { questionText: "", questionType: "", choices: [""] },
   ]);
+  const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  // Create an array of random colors for each choice
+  const generateColorsForChoices = (choices) => {
+    return choices.map(() => generateRandomColor());
+  };
+
+  const renderPieChartsContainer = (survey) => (
+    <div>
+      {survey.questions.map((question, questionIndex) => {
+        // Check the question type and render accordingly
+        if (
+          question.questionType === "radio" ||
+          question.questionType === "checkbox"
+        ) {
+          const answerCounts = {};
+
+          // Calculate answer frequencies for multiple-choice questions
+          survey.responses.forEach((response) => {
+            const answer = response.answers.find(
+              (a) => a.questionId === question._id
+            );
+            if (answer) {
+              const answerValue = answer.answer;
+              if (Array.isArray(answerValue)) {
+                answerValue.forEach((val) => {
+                  answerCounts[val] = (answerCounts[val] || 0) + 1;
+                });
+              } else {
+                answerCounts[answerValue] =
+                  (answerCounts[answerValue] || 0) + 1;
+              }
+            }
+          });
+
+          const pieData = {
+            labels: question.choices,
+            datasets: [
+              {
+                data: question.choices.map(
+                  (choice) => answerCounts[choice] || 0
+                ),
+                backgroundColor: generateColorsForChoices(question.choices),
+              },
+            ],
+          };
+
+          // Customize the tooltip to show "X Alumni"
+          const pieOptions = {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: true,
+                position: "bottom",
+              },
+              tooltip: {
+                callbacks: {
+                  label: (tooltipItem) => {
+                    const count = tooltipItem.raw || 0; // Get the raw value (count)
+                    return `${count} Alumni`; // Display only the count with "Alumni"
+                  },
+                },
+              },
+            },
+          };
+
+          return (
+            <div
+              className="w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2"
+              key={questionIndex}
+            >
+              <h3 className="text-lg font-semibold mb-2">
+                {question.questionText}
+              </h3>
+              {Object.keys(answerCounts).length === 0 ? (
+                <div className="text-center text-gray-500 py-4">
+                  <p>No responses</p>
+                </div>
+              ) : (
+                <Pie data={pieData} options={pieOptions} />
+              )}
+            </div>
+          );
+        } else if (
+          question.questionType === "textInput" ||
+          question.questionType === "textArea"
+        ) {
+          // For text-based responses
+          const textResponses = survey.responses
+            .map((response) => {
+              const answer = response.answers.find(
+                (a) => a.questionId === question._id
+              );
+              return answer ? answer.answer : null;
+            })
+            .filter(Boolean); // Filter out null responses
+
+          return (
+            <div
+              className="w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2"
+              key={questionIndex}
+            >
+              <h3 className="text-lg font-semibold mb-2">
+                {question.questionText}
+              </h3>
+              <div className="text-sm text-gray-600">
+                {textResponses.length > 0 ? (
+                  <p className="mb-2">
+                    {textResponses.length} Alumni Responses
+                  </p>
+                ) : (
+                  <p>No responses yet.</p>
+                )}
+                <ul className="list-disc pl-5 space-y-1">
+                  {textResponses.map((response, responseIndex) => (
+                    <li
+                      key={responseIndex}
+                      className="text-gray-800 break-words max-w-full overflow-hidden"
+                    >
+                      -- {response}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })}
+    </div>
+  );
 
   // MODALS LOGIC
   const modalRef = useRef(null);
@@ -50,13 +208,16 @@ function AdminSurveyTool() {
     setOpenRegionDropdown((prev) => !prev);
   };
 
-  const toggleCollegeDropdown = () => setOpenCollegeDropdown(!openCollegeDropdown);
-  const toggleProgramDropdown = () => setOpenProgramDropdown(!openProgramDropdown);
-  const toggleBatchYearDropdown = () => setOpenBatchYearDropdown(!openBatchYearDropdown);
+  const toggleCollegeDropdown = () =>
+    setOpenCollegeDropdown(!openCollegeDropdown);
+  const toggleProgramDropdown = () =>
+    setOpenProgramDropdown(!openProgramDropdown);
+  const toggleBatchYearDropdown = () =>
+    setOpenBatchYearDropdown(!openBatchYearDropdown);
 
   const handleCollegeSelect = (college) => {
-    setSelectedCollege((prev) =>
-      prev === college ? null : college // Toggle selection
+    setSelectedCollege(
+      (prev) => (prev === college ? null : college) // Toggle selection
     );
   };
 
@@ -74,17 +235,23 @@ function AdminSurveyTool() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (genderDropdownRef.current && !genderDropdownRef.current.contains(event.target)) {
+      if (
+        genderDropdownRef.current &&
+        !genderDropdownRef.current.contains(event.target)
+      ) {
         setOpenGenderDropdown(false);
       }
-      if (regionDropdownRef.current && !regionDropdownRef.current.contains(event.target)) {
+      if (
+        regionDropdownRef.current &&
+        !regionDropdownRef.current.contains(event.target)
+      ) {
         setOpenRegionDropdown(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -274,7 +441,7 @@ function AdminSurveyTool() {
         choices:
           question.choices ||
           (question.questionType === "radio" ||
-            question.questionType === "checkbox"
+          question.questionType === "checkbox"
             ? [""]
             : []),
       }))
@@ -589,7 +756,6 @@ function AdminSurveyTool() {
     setIsPublishModalOpen(false); // Close the modal after confirming
   };
 
-
   const handleSaveSurvey = async () => {
     const surveyData = {
       title: selectedSurvey?.name || "New Survey", // Ensure this is 'title'
@@ -762,7 +928,6 @@ function AdminSurveyTool() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-
       {showSuccessMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
           <p>{showMessage}</p>
@@ -885,7 +1050,9 @@ function AdminSurveyTool() {
                 className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
                 onClick={(e) => {
                   e.stopPropagation();
-                  const surveyToToggle = surveys.find((s) => s._id === survey._id); // Find the survey
+                  const surveyToToggle = surveys.find(
+                    (s) => s._id === survey._id
+                  ); // Find the survey
                   if (surveyToToggle && !surveyToToggle.published) {
                     setSelectedSurveyId(survey._id); // Set the ID for confirmation
                     setIsPublishModalOpen(true); // Open the confirmation modal
@@ -899,7 +1066,9 @@ function AdminSurveyTool() {
                   if (e.key === "Enter" || e.key === " ") {
                     // Allow activation via keyboard
                     e.stopPropagation();
-                    const surveyToToggle = surveys.find((s) => s._id === survey._id); // Find the survey
+                    const surveyToToggle = surveys.find(
+                      (s) => s._id === survey._id
+                    ); // Find the survey
                     if (surveyToToggle && !surveyToToggle.published) {
                       setSelectedSurveyId(survey._id); // Set the ID for confirmation
                       setIsPublishModalOpen(true); // Open the confirmation modal
@@ -913,7 +1082,6 @@ function AdminSurveyTool() {
                   Publish
                 </span>
               </div>
-
             </div>
           </div>
         ))
@@ -996,12 +1164,25 @@ function AdminSurveyTool() {
               <div className="text-md font-medium">Survey Dashboard</div>
               <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 border border-fgray">
                 <div className="text-xs font-light">Responses</div>
-                <div className="text-xl font-normal">999</div>
+                <div className="text-xl font-normal">
+                  {selectedSurvey?.responseCount || 0}
+                </div>
               </div>
 
               <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 mt-2 border border-fgray">
                 <div className="text-xs font-light">Date Created</div>
-                <div className="text-xl font-normal">August 20, 2024</div>
+                <div className="text-xl font-normal">
+                  {selectedSurvey?.createdAt
+                    ? new Date(selectedSurvey.createdAt).toLocaleDateString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        }
+                      )
+                    : "Date not available"}
+                </div>
               </div>
 
               <div className="flex mt-4 space-x-3">
@@ -1012,20 +1193,24 @@ function AdminSurveyTool() {
                 </div>
               </div>
             </div>
+            <div>{renderPieChartsContainer(selectedSurvey)}</div>
 
             <div className="w-full mt-4 rounded px-3 py-2 space-y-2 border border-fgray">
               <div className="text-md font-medium">Survey Reports</div>
-              <div className="text-sm font-light">View individual responses by clicking the button below.</div>
+              <div className="text-sm font-light">
+                View individual responses by clicking the button below.
+              </div>
               <div className="flex mt-4 space-x-3">
                 <div>
-                  <button className="btn md:w-64 w-32 bg-green text-white" onClick={() => openSurveyReportModal(selectedSurvey)}>
+                  <button
+                    className="btn md:w-64 w-32 bg-green text-white"
+                    onClick={() => openSurveyReportModal(selectedSurvey)}
+                  >
                     View Reports
                   </button>
                 </div>
               </div>
             </div>
-
-
           </div>
 
           {/* SURVEY REPORT MODAL */}
@@ -1056,7 +1241,9 @@ function AdminSurveyTool() {
                     >
                       <span>Gender</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openGenderDropdown ? 'rotate-180' : ''}`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openGenderDropdown ? "rotate-180" : ""
+                        }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1082,7 +1269,9 @@ function AdminSurveyTool() {
                                 value={gender}
                                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
                               />
-                              <label className="ms-2 font-medium">{gender}</label>
+                              <label className="ms-2 font-medium">
+                                {gender}
+                              </label>
                             </li>
                           ))}
                         </ul>
@@ -1098,7 +1287,9 @@ function AdminSurveyTool() {
                     >
                       <span>Region</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openRegionDropdown ? 'rotate-180' : ''}`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openRegionDropdown ? "rotate-180" : ""
+                        }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1124,7 +1315,9 @@ function AdminSurveyTool() {
                                 value={region}
                                 className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
                               />
-                              <label className="ms-2 font-medium">{region}</label>
+                              <label className="ms-2 font-medium">
+                                {region}
+                              </label>
                             </li>
                           ))}
                         </ul>
@@ -1140,7 +1333,9 @@ function AdminSurveyTool() {
                     >
                       <span>{selectedCollege || "Select College"}</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openCollegeDropdown ? 'rotate-180' : ''}`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openCollegeDropdown ? "rotate-180" : ""
+                        }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1162,17 +1357,18 @@ function AdminSurveyTool() {
                           <li className="flex items-center">
                             <input
                               type="checkbox"
-                              checked={selectedCollege === 'All'} // Check if "All" is selected
+                              checked={selectedCollege === "All"} // Check if "All" is selected
                               onChange={() => {
-                                const allSelected = selectedCollege === 'All';
-                                setSelectedCollege(allSelected ? '' : 'All'); // Toggle "All" selection
+                                const allSelected = selectedCollege === "All";
+                                setSelectedCollege(allSelected ? "" : "All"); // Toggle "All" selection
                                 if (!allSelected) {
                                   setOpenProgramDropdown(true); // Automatically open program dropdown
                                 }
                               }}
                               className="mr-2"
                             />
-                            <span>All Colleges</span> {/* Display the "All Colleges" option */}
+                            <span>All Colleges</span>{" "}
+                            {/* Display the "All Colleges" option */}
                           </li>
                           {Object.keys(collegePrograms).map((college, idx) => (
                             <li key={idx} className="flex items-center">
@@ -1180,7 +1376,7 @@ function AdminSurveyTool() {
                                 type="checkbox"
                                 checked={selectedCollege === college} // Check if this college is selected
                                 onChange={() => {
-                                  if (selectedCollege === 'All') {
+                                  if (selectedCollege === "All") {
                                     setSelectedCollege(college); // Select individual college if "All" was selected
                                   } else {
                                     handleCollegeSelect(college);
@@ -1189,14 +1385,14 @@ function AdminSurveyTool() {
                                 }}
                                 className="mr-2"
                               />
-                              <span>{college}</span> {/* Display the college name */}
+                              <span>{college}</span>{" "}
+                              {/* Display the college name */}
                             </li>
                           ))}
                         </ul>
                       </div>
                     )}
                   </div>
-
 
                   {/* College Programs Dropdown */}
                   <div className="relative mb-6" ref={programDropdownRef}>
@@ -1207,7 +1403,9 @@ function AdminSurveyTool() {
                     >
                       <span>{selectedProgram || "Select Program"}</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openProgramDropdown ? 'rotate-180' : ''}`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openProgramDropdown ? "rotate-180" : ""
+                        }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1229,108 +1427,125 @@ function AdminSurveyTool() {
                           <li className="flex items-center">
                             <input
                               type="checkbox"
-                              checked={selectedProgram === 'All'} // Check if "All" is selected
+                              checked={selectedProgram === "All"} // Check if "All" is selected
                               onChange={() => {
-                                const allSelected = selectedProgram === 'All';
-                                setSelectedProgram(allSelected ? '' : 'All'); // Toggle "All" selection
+                                const allSelected = selectedProgram === "All";
+                                setSelectedProgram(allSelected ? "" : "All"); // Toggle "All" selection
                               }}
                               className="mr-2"
                             />
-                            <span>All Programs</span> {/* Display the "All Programs" option */}
+                            <span>All Programs</span>{" "}
+                            {/* Display the "All Programs" option */}
                           </li>
-                          {(selectedCollege === 'All' ? // Show all programs if "All Colleges" is selected
-                            Object.values(collegePrograms).flat() :
-                            collegePrograms[selectedCollege]).map((program, idx) => (
-                              <li key={idx} className="flex items-center">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedProgram === program} // Check if this program is selected
-                                  onChange={() => setSelectedProgram(program)} // Use onChange for checkboxes
-                                  className="mr-2" // Add margin for spacing
-                                />
-                                <span>{program}</span> {/* Display the program name */}
-                              </li>
-                            ))}
+                          {(selectedCollege === "All" // Show all programs if "All Colleges" is selected
+                            ? Object.values(collegePrograms).flat()
+                            : collegePrograms[selectedCollege]
+                          ).map((program, idx) => (
+                            <li key={idx} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedProgram === program} // Check if this program is selected
+                                onChange={() => setSelectedProgram(program)} // Use onChange for checkboxes
+                                className="mr-2" // Add margin for spacing
+                              />
+                              <span>{program}</span>{" "}
+                              {/* Display the program name */}
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     )}
                   </div>
 
-
                   {/* Batch Year Dropdown */}
                   <div className="relative mb-6" ref={batchYearDropdownRef}>
-  <button
-    onClick={toggleBatchYearDropdown}
-    className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
-  >
-    <span>
-      {selectedBatchYears.length > 0
-        ? (selectedBatchYears.length === batchYears.length ? "All Batch Years" : selectedBatchYears.join(', '))
-        : "Select Batch Year"}
-    </span>
-    <svg
-      className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openBatchYearDropdown ? 'rotate-180' : ''}`}
-      aria-hidden="true"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 10 6"
-    >
-      <path
-        stroke="currentColor"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="2"
-        d="m1 1 4 4 4-4"
-      />
-    </svg>
-  </button>
+                    <button
+                      onClick={toggleBatchYearDropdown}
+                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                    >
+                      <span>
+                        {selectedBatchYears.length > 0
+                          ? selectedBatchYears.length === batchYears.length
+                            ? "All Batch Years"
+                            : selectedBatchYears.join(", ")
+                          : "Select Batch Year"}
+                      </span>
+                      <svg
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openBatchYearDropdown ? "rotate-180" : ""
+                        }`}
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 10 6"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="m1 1 4 4 4-4"
+                        />
+                      </svg>
+                    </button>
 
-  {openBatchYearDropdown && (
-    <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-      <ul className="p-3 text-sm text-gray-700">
-        <li className="flex items-center">
-          <input
-            type="checkbox"
-            checked={selectedBatchYears.length === batchYears.length} // Check if all years are selected
-            onChange={() => {
-              if (selectedBatchYears.length === batchYears.length) {
-                setSelectedBatchYears([]); // Deselect all if currently all are selected
-              } else {
-                setSelectedBatchYears(batchYears); // Select all if not all are currently selected
-              }
-            }}
-            className="mr-2"
-          />
-          <span>All Batch Years</span> {/* Display the "All Batch Years" option */}
-        </li>
-        {batchYears.map((year, idx) => (
-          <li key={idx} className="flex items-center">
-            <input
-              type="checkbox"
-              value={year}
-              checked={selectedBatchYears.includes(year) && selectedBatchYears.length !== batchYears.length} // Check if this year is selected, only if not all are selected
-              onChange={() => {
-                if (selectedBatchYears.includes(year)) {
-                  setSelectedBatchYears(selectedBatchYears.filter(y => y !== year)); // Deselect the year if it was selected
-                } else {
-                  setSelectedBatchYears([...selectedBatchYears, year]); // Select the year if it was not selected
-                }
-              }} // Use onChange for checkboxes
-              className="mr-2" // Add margin for spacing
-            />
-            <span>{year}</span> {/* Display the batch year */}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )}
-</div>
-
-
-
-
-
-
+                    {openBatchYearDropdown && (
+                      <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <ul className="p-3 text-sm text-gray-700">
+                          <li className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={
+                                selectedBatchYears.length === batchYears.length
+                              } // Check if all years are selected
+                              onChange={() => {
+                                if (
+                                  selectedBatchYears.length ===
+                                  batchYears.length
+                                ) {
+                                  setSelectedBatchYears([]); // Deselect all if currently all are selected
+                                } else {
+                                  setSelectedBatchYears(batchYears); // Select all if not all are currently selected
+                                }
+                              }}
+                              className="mr-2"
+                            />
+                            <span>All Batch Years</span>{" "}
+                            {/* Display the "All Batch Years" option */}
+                          </li>
+                          {batchYears.map((year, idx) => (
+                            <li key={idx} className="flex items-center">
+                              <input
+                                type="checkbox"
+                                value={year}
+                                checked={
+                                  selectedBatchYears.includes(year) &&
+                                  selectedBatchYears.length !==
+                                    batchYears.length
+                                } // Check if this year is selected, only if not all are selected
+                                onChange={() => {
+                                  if (selectedBatchYears.includes(year)) {
+                                    setSelectedBatchYears(
+                                      selectedBatchYears.filter(
+                                        (y) => y !== year
+                                      )
+                                    ); // Deselect the year if it was selected
+                                  } else {
+                                    setSelectedBatchYears([
+                                      ...selectedBatchYears,
+                                      year,
+                                    ]); // Select the year if it was not selected
+                                  }
+                                }} // Use onChange for checkboxes
+                                className="mr-2" // Add margin for spacing
+                              />
+                              <span>{year}</span> {/* Display the batch year */}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Full-Width Table Section with Padding */}
@@ -1353,8 +1568,6 @@ function AdminSurveyTool() {
           )}
         </div>
       )}
-
-
 
       {/* EDIT MODAL */}
       {isEditModalOpen && selectedSurvey && (
@@ -1437,13 +1650,13 @@ function AdminSurveyTool() {
                 {/* Add Option button for radio/checkbox types */}
                 {(question.questionType === "radio" ||
                   question.questionType === "checkbox") && (
-                    <button
-                      className="btn btn-sm bg-blue text-white mt-2"
-                      onClick={() => handleAddOption(questionIndex)}
-                    >
-                      Add Option
-                    </button>
-                  )}
+                  <button
+                    className="btn btn-sm bg-blue text-white mt-2"
+                    onClick={() => handleAddOption(questionIndex)}
+                  >
+                    Add Option
+                  </button>
+                )}
 
                 <hr className="my-4 border-black" />
               </div>
@@ -1552,13 +1765,13 @@ function AdminSurveyTool() {
                 {renderOptionInputs(question, questionIndex)}
                 {(question.questionType === "radio" ||
                   question.questionType === "checkbox") && (
-                    <button
-                      className="btn btn-sm bg-blue text-white mt-2"
-                      onClick={() => handleAddOption(questionIndex)}
-                    >
-                      Add Option
-                    </button>
-                  )}
+                  <button
+                    className="btn btn-sm bg-blue text-white mt-2"
+                    onClick={() => handleAddOption(questionIndex)}
+                  >
+                    Add Option
+                  </button>
+                )}
                 <hr className="my-4 border-black" />
               </div>
             ))}
@@ -1596,7 +1809,10 @@ function AdminSurveyTool() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">Confirm Publish Action</h2>
-            <p>Republishing will reset all survey responses. Are you sure you want to continue?</p>
+            <p>
+              Republishing will reset all survey responses. Are you sure you
+              want to continue?
+            </p>
             <div className="flex justify-end mt-4">
               <button
                 className="btn btn-sm w-24 bg-red text-white mr-2"
@@ -1614,7 +1830,6 @@ function AdminSurveyTool() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

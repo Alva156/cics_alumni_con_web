@@ -568,11 +568,15 @@ function Threads() {
         return a.title.localeCompare(b.title);
       } else if (sortOption === "Title (Z-A)") {
         return b.title.localeCompare(a.title);
+      } else if (sortOption === "Most Recent") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      } else if (sortOption === "Oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
       }
       return 0;
     });
   };
-
+  
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-0 mb-12">
       <div className="carousel relative bg-white m-3 max-w-full overflow-hidden">
@@ -612,8 +616,11 @@ function Threads() {
         >
           <option>Title (A-Z)</option>
           <option>Title (Z-A)</option>
+          <option>Most Recent</option>
+          <option>Oldest</option>
         </select>
       </div>
+
 
       <div className="flex justify-between items-center mb-4 mt-12">
         {searchTerm.trim() ? (

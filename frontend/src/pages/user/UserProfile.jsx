@@ -377,90 +377,85 @@ function UserProfile() {
     setCollegeProgram(""); // Ensure college program resets
   };
 
-
   // Initialize state for attachments, assuming that attachments are fetched with correct _id values
-const [attachments, setAttachments] = useState([
-  { _id: 1, file: null, filename: "", filepath: "" }, // This should be replaced with data from the backend
-]);
+  const [attachments, setAttachments] = useState([
+    { _id: 1, file: null, filename: "", filepath: "" }, // This should be replaced with data from the backend
+  ]);
 
-// Set maxId based on the maximum _id from the fetched attachments, or use 1 if no attachments exist
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const response = await axios.get(`${backendUrl}/profile/userprofile`, {
-        withCredentials: true,
-      });
-      const profileData = response.data;
+  // Set maxId based on the maximum _id from the fetched attachments, or use 1 if no attachments exist
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/profile/userprofile`, {
+          withCredentials: true,
+        });
+        const profileData = response.data;
 
-      if (profileData) {
-        // Fetch attachments from backend data and update the attachments state
-        const fetchedAttachments = profileData.attachments || [];
-        setAttachments(fetchedAttachments);
+        if (profileData) {
+          // Fetch attachments from backend data and update the attachments state
+          const fetchedAttachments = profileData.attachments || [];
+          setAttachments(fetchedAttachments);
 
-        // Update maxId based on the highest _id from the fetched attachments
-        const highestId = fetchedAttachments.reduce(
-          (max, attachment) => Math.max(max, attachment._id),
-          1
-        );
-        setMaxId(highestId); // Set the maxId to the highest _id found
+          // Update maxId based on the highest _id from the fetched attachments
+          const highestId = fetchedAttachments.reduce(
+            (max, attachment) => Math.max(max, attachment._id),
+            1
+          );
+          setMaxId(highestId); // Set the maxId to the highest _id found
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching profile data:", error);
-    }
+    };
+
+    fetchProfile();
+  }, [backendUrl]);
+
+  // Function to add a new attachment with a unique ID
+  const addAttachment = () => {
+    const newId = maxId + 1; // Calculate new ID based on the current max ID
+    setAttachments((prev) => [
+      ...prev,
+      { _id: newId, file: null, filename: "", filepath: "" }, // New attachment with unique _id
+    ]);
+    setMaxId(newId); // Update the maxId state
   };
 
-  fetchProfile();
-}, [backendUrl]);
+  // Function to handle file changes and replace an attachment while retaining its _id
+  const handleFileChange = (e, index) => {
+    const file = e.target.files[0]; // Get the selected file from input
+    if (file) {
+      console.log(`Selected input field: ${index + 1}`);
 
-// Function to add a new attachment with a unique ID
-const addAttachment = () => {
-  const newId = maxId + 1; // Calculate new ID based on the current max ID
-  setAttachments((prev) => [
-    ...prev,
-    { _id: newId, file: null, filename: "", filepath: "" }, // New attachment with unique _id
-  ]);
-  setMaxId(newId); // Update the maxId state
-};
+      setAttachments((prevAttachments) => {
+        const updatedAttachments = [...prevAttachments];
+        const existingAttachment = updatedAttachments[index];
 
-// Function to handle file changes and replace an attachment while retaining its _id
-const handleFileChange = (e, index) => {
-  const file = e.target.files[0]; // Get the selected file from input
-  if (file) {
-    console.log(`Selected input field: ${index + 1}`);
+        console.log("Existing attachment:", existingAttachment);
 
-    setAttachments((prevAttachments) => {
-      const updatedAttachments = [...prevAttachments];
-      const existingAttachment = updatedAttachments[index];
+        // Only update if the file is different
+        if (existingAttachment.file !== file) {
+          console.log(`Replacing file: ${existingAttachment.filename}`);
 
-      console.log("Existing attachment:", existingAttachment);
+          // Ensure the _id is retained from the existing attachment
+          updatedAttachments[index] = {
+            ...existingAttachment, // Keep the existing data, including _id
+            file, // Set the new file object
+            filename: file.name, // Update the filename
+          };
 
-      // Only update if the file is different
-      if (existingAttachment.file !== file) {
-        console.log(`Replacing file: ${existingAttachment.filename}`);
+          console.log(`Retained ID: ${existingAttachment._id}`);
+          console.log(`New file: ${file.name}`);
+        } else {
+          console.log(`No change in file for input field: ${index + 1}`);
+        }
 
-        // Ensure the _id is retained from the existing attachment
-        updatedAttachments[index] = {
-          ...existingAttachment, // Keep the existing data, including _id
-          file, // Set the new file object
-          filename: file.name, // Update the filename
-        };
-
-        console.log(`Retained ID: ${existingAttachment._id}`);
-        console.log(`New file: ${file.name}`);
-      } else {
-        console.log(`No change in file for input field: ${index + 1}`);
-      }
-
-      return updatedAttachments; // Return the updated attachments array with retained IDs
-    });
-  } else {
-    console.log(`No file selected for input field: ${index + 1}`);
-  }
-};
-
-
-
-  
+        return updatedAttachments; // Return the updated attachments array with retained IDs
+      });
+    } else {
+      console.log(`No file selected for input field: ${index + 1}`);
+    }
+  };
 
   const openConfirmationModal = (message, onConfirm) => {
     setConfirmationMessage(message);
@@ -1486,53 +1481,53 @@ const handleFileChange = (e, index) => {
                   </div>
 
                   <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Gender</label>
-                  <select
-                    name="gender"
-                    className="select select-bordered select-sm  w-full h-10"
-                    onChange={(e) => setGender(e.target.value)}
-                    value={gender}
-                  >
-                    <option value="" disabled>
-                      Choose
-                    </option>
-                    <option>Male</option>
-                    <option>Female</option>
-                  </select>
-                </div>
+                    <label className="pt-4 pb-2 text-sm">Gender</label>
+                    <select
+                      name="gender"
+                      className="select select-bordered select-sm  w-full h-10"
+                      onChange={(e) => setGender(e.target.value)}
+                      value={gender}
+                    >
+                      <option value="" disabled>
+                        Choose
+                      </option>
+                      <option>Male</option>
+                      <option>Female</option>
+                    </select>
+                  </div>
 
-                <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Region</label>
-                  <select
-                    name="region"
-                    className="select select-bordered select-sm  w-full h-10"
-                    onChange={(e) => setRegion(e.target.value)}
-                    value={region}
-                  >
-                    <option value="" disabled>
-                      Choose
-                    </option>
-                    <option>NCR</option>
-                    <option>CAR</option>
-                    <option>Region I</option>
-                    <option>Region II</option>
-                    <option>Region III</option>
-                    <option>Region IV-A </option>
-                    <option>Region IV-B </option>
-                    <option>Region V</option>
-                    <option>Region VI</option>
-                    <option>NIR</option>
-                    <option>Region VII</option>
-                    <option>Region VIII</option>
-                    <option>Region IX</option>
-                    <option>Region X</option>
-                    <option>Region XI</option>
-                    <option>Region XII</option>
-                    <option>Region XIII</option>
-                    <option>BARMM</option>
-                    <option>N/A</option>
-                  </select>
-                </div>
+                  <div className="py-1">
+                    <label className="pt-4 pb-2 text-sm">Region</label>
+                    <select
+                      name="region"
+                      className="select select-bordered select-sm  w-full h-10"
+                      onChange={(e) => setRegion(e.target.value)}
+                      value={region}
+                    >
+                      <option value="" disabled>
+                        Choose
+                      </option>
+                      <option>NCR</option>
+                      <option>CAR</option>
+                      <option>Region I</option>
+                      <option>Region II</option>
+                      <option>Region III</option>
+                      <option>Region IV-A </option>
+                      <option>Region IV-B </option>
+                      <option>Region V</option>
+                      <option>Region VI</option>
+                      <option>NIR</option>
+                      <option>Region VII</option>
+                      <option>Region VIII</option>
+                      <option>Region IX</option>
+                      <option>Region X</option>
+                      <option>Region XI</option>
+                      <option>Region XII</option>
+                      <option>Region XIII</option>
+                      <option>BARMM</option>
+                      <option>N/A</option>
+                    </select>
+                  </div>
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">Profession</label>
@@ -1909,6 +1904,7 @@ const handleFileChange = (e, index) => {
                       </div>
                       <div className="right">
                         <button
+                          type="button"
                           className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2"
                           onClick={() =>
                             initiateDeleteAttachment(attachment._id)

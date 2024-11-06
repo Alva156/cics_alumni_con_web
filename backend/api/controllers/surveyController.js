@@ -19,7 +19,7 @@ exports.getAllSurveys = async (req, res) => {
     const surveys = await Survey.find()
       .populate(
         "responses.userId",
-        "firstName lastName college collegeProgram yearGraduatedCollege gender region"
+        "firstName lastName college collegeProgram yearGraduatedCollege gender region employmentStatus"
       ) // Populate responder details
       .populate("questions") // Populate questions
       .lean();
@@ -50,7 +50,7 @@ exports.getSurveyById = async (req, res) => {
     const survey = await Survey.findById(req.params.id)
       .populate(
         "responses.userId",
-        "firstName lastName college collegeProgram yearGraduatedCollege gender region"
+        "firstName lastName college collegeProgram yearGraduatedCollege gender region employmentStatus"
       ) // Populate responder details
       .populate("questions") // Populate questions
       .lean();

@@ -54,6 +54,13 @@ function AdminSurveyTool() {
   const [selectedCollege, setSelectedCollege] = useState("All"); // Default "All"
   const [selectedProgram, setSelectedProgram] = useState("All"); // Default "All"
   const [selectedBatchYears, setSelectedBatchYears] = useState([]); // Empty array means "All batch years"
+  const getBatchYears = () => {
+    const years = selectedSurvey?.responses
+      .map((response) => response.userId?.yearGraduatedCollege)
+      .filter((year) => year !== null && year !== undefined && year !== ""); // Filter out null, undefined, and empty strings
+
+    return [...new Set(years)]; // Removes duplicates and returns unique years
+  };
   const filterResponses = () => {
     return selectedSurvey.responses.filter((response) => {
       // Filter by Gender (skip if "All")
@@ -103,7 +110,20 @@ function AdminSurveyTool() {
   const filteredAlumniCount = selectedSurvey?.responses
     ? filterResponses().length
     : 0;
-  const batchYears = [2020, 2021, 2022, 2023, 2024]; // Example batch years
+
+  const filteredResponses = selectedSurvey?.responses ? filterResponses() : [];
+
+  // Function to count filtered alumni based on their employment status
+  const countByStatus = (status) => {
+    return filteredResponses.filter(
+      (response) =>
+        response.userId?.employmentStatus &&
+        response.userId.employmentStatus.trim().toLowerCase() ===
+          status.toLowerCase()
+    ).length;
+  };
+
+  const batchYears = getBatchYears();
   const collegeDropdownRef = useRef(null);
   const programDropdownRef = useRef(null);
   const batchYearDropdownRef = useRef(null);
@@ -517,7 +537,7 @@ function AdminSurveyTool() {
         choices:
           question.choices ||
           (question.questionType === "radio" ||
-            question.questionType === "checkbox"
+          question.questionType === "checkbox"
             ? [""]
             : []),
       }))
@@ -775,7 +795,10 @@ function AdminSurveyTool() {
 
     if (surveyToToggle) {
       // Show the modal when unpublishing (currently published) or republishing (currently unpublished)
-      if (surveyToToggle.published || (!surveyToToggle.published && surveyToToggle.hasBeenPublished)) {
+      if (
+        surveyToToggle.published ||
+        (!surveyToToggle.published && surveyToToggle.hasBeenPublished)
+      ) {
         setSelectedSurveyId(surveyId);
         setIsPublishModalOpen(true); // Open the modal for unpublishing or republishing
       } else {
@@ -833,7 +856,6 @@ function AdminSurveyTool() {
     }
     setIsPublishModalOpen(false); // Close the modal after confirming
   };
-
 
   const handleSaveSurvey = async () => {
     const surveyData = {
@@ -1177,6 +1199,7 @@ function AdminSurveyTool() {
         ],
         ["Gender", response.userId?.gender || "---------"],
         ["Region", response.userId?.region || "---------"],
+        ["Employment Status", response.userId?.employmentStatus || "---------"],
       ];
 
       // Dynamic fields for each question in the survey, with numbering
@@ -1224,7 +1247,7 @@ function AdminSurveyTool() {
       doc.text(
         `Page ${i} of ${pageCount}`,
         doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 30,
+        doc.internal.pageSize.height - 20,
         {
           align: "center",
         }
@@ -1424,7 +1447,10 @@ function AdminSurveyTool() {
                 className="w-4 h-4 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log("Attempting to unpublish survey with ID:", survey._id); // Log ID
+                  console.log(
+                    "Attempting to unpublish survey with ID:",
+                    survey._id
+                  ); // Log ID
                   handleTogglePublishStatus(survey._id); // Call to handle unpublishing and show modal if needed
                 }}
                 role="button"
@@ -1480,13 +1506,13 @@ function AdminSurveyTool() {
                 <div className="text-xl font-normal">
                   {selectedSurvey?.createdAt
                     ? new Date(selectedSurvey.createdAt).toLocaleDateString(
-                      "en-US",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        }
+                      )
                     : "Date not available"}
                 </div>
               </div>
@@ -1550,8 +1576,9 @@ function AdminSurveyTool() {
                     >
                       <span>Gender</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openGenderDropdown ? "rotate-180" : ""
-                          }`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openGenderDropdown ? "rotate-180" : ""
+                        }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1597,8 +1624,9 @@ function AdminSurveyTool() {
                     >
                       <span>Region</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openRegionDropdown ? "rotate-180" : ""
-                          }`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openRegionDropdown ? "rotate-180" : ""
+                        }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1647,8 +1675,9 @@ function AdminSurveyTool() {
                     >
                       <span>Select College</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openCollegeDropdown ? "rotate-180" : ""
-                          }`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openCollegeDropdown ? "rotate-180" : ""
+                        }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1712,8 +1741,9 @@ function AdminSurveyTool() {
                     >
                       <span>Select Program</span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openProgramDropdown ? "rotate-180" : ""
-                          }`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openProgramDropdown ? "rotate-180" : ""
+                        }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1779,8 +1809,9 @@ function AdminSurveyTool() {
                           : "Select Batch Year"}
                       </span>
                       <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${openBatchYearDropdown ? "rotate-180" : ""
-                          }`}
+                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                          openBatchYearDropdown ? "rotate-180" : ""
+                        }`}
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -1802,17 +1833,12 @@ function AdminSurveyTool() {
                           <li className="flex items-center">
                             <input
                               type="checkbox"
-                              checked={
-                                selectedBatchYears.length === batchYears.length
-                              } // Check if all years are selected
+                              checked={selectedBatchYears.length === 0} // All Batch Years checked only if none selected
                               onChange={() => {
-                                if (
-                                  selectedBatchYears.length ===
-                                  batchYears.length
-                                ) {
-                                  setSelectedBatchYears([]); // Deselect all if currently all are selected
+                                if (selectedBatchYears.length === 0) {
+                                  setSelectedBatchYears(batchYears); // Select all batch years if none selected
                                 } else {
-                                  setSelectedBatchYears(batchYears); // Select all if not all are currently selected
+                                  setSelectedBatchYears([]); // Deselect all if any batch year is selected
                                 }
                               }}
                               className="mr-2"
@@ -1825,11 +1851,7 @@ function AdminSurveyTool() {
                               <input
                                 type="checkbox"
                                 value={year}
-                                checked={
-                                  selectedBatchYears.includes(year) &&
-                                  selectedBatchYears.length !==
-                                  batchYears.length
-                                } // Check if this year is selected, only if not all are selected
+                                checked={selectedBatchYears.includes(year)} // Directly check if the year is selected
                                 onChange={() => {
                                   if (selectedBatchYears.includes(year)) {
                                     setSelectedBatchYears(
@@ -1843,8 +1865,8 @@ function AdminSurveyTool() {
                                       year,
                                     ]); // Select the year if it was not selected
                                   }
-                                }} // Use onChange for checkboxes
-                                className="mr-2" // Add margin for spacing
+                                }}
+                                className="mr-2"
                               />
                               <span>{year}</span> {/* Display the batch year */}
                             </li>
@@ -1854,8 +1876,26 @@ function AdminSurveyTool() {
                     )}
                   </div>
                 </div>
-                <div className="text-lg">
-                  Number of Alumni:{filteredAlumniCount}
+
+                <div className="flex items-center space-x-8">
+                  <span className="text-xl font-bold mr-8">
+                    Number of Alumni: {filteredAlumniCount}
+                  </span>
+                  <span className="text-sm">
+                    Employed: {countByStatus("Employed")}
+                  </span>
+                  <span className="text-sm">
+                    Self-Employed: {countByStatus("Self-Employed")}
+                  </span>
+                  <span className="text-sm">
+                    Underemployed: {countByStatus("Underemployed")}
+                  </span>
+                  <span className="text-sm">
+                    Freelancing: {countByStatus("Freelancing")}
+                  </span>
+                  <span className="text-sm">
+                    Unemployed: {countByStatus("Unemployed")}
+                  </span>
                 </div>
 
                 {/* Full-Width Table Section with Padding */}
@@ -1868,9 +1908,10 @@ function AdminSurveyTool() {
                         <td className="px-4 py-2 border">Last Name</td>
                         <td className="px-4 py-2 border">College</td>
                         <td className="px-4 py-2 border">College Program</td>
-                        <td className="px-4 py-2 border">Year Graduated</td>
+                        <td className="px-4 py-2 border">Batch</td>
                         <td className="px-4 py-2 border">Gender</td>
                         <td className="px-4 py-2 border">Region</td>
+                        <td className="px-4 py-2 border">Employment Status</td>
 
                         {/* Dynamically rendering question columns */}
                         {selectedSurvey?.questions?.map((question) => (
@@ -1914,6 +1955,9 @@ function AdminSurveyTool() {
                             </td>
                             <td className="px-4 py-2 border">
                               {response.userId?.region || ""}
+                            </td>
+                            <td className="px-4 py-2 border">
+                              {response.userId?.employmentStatus || ""}
                             </td>
 
                             {/* Display answers for each question */}
@@ -1960,10 +2004,12 @@ function AdminSurveyTool() {
                         College: response.userId?.college || "---------",
                         CollegeProgram:
                           response.userId?.collegeProgram || "---------",
-                        YearGraduated:
+                        Batch:
                           response.userId?.yearGraduatedCollege || "---------",
                         Gender: response.userId?.gender || "---------",
                         Region: response.userId?.region || "---------",
+                        EmploymentStatus:
+                          response.userId?.employmentStatus || "---------",
                       };
 
                       const dynamicFields =
@@ -2079,13 +2125,13 @@ function AdminSurveyTool() {
                 {/* Add Option button for radio/checkbox types */}
                 {(question.questionType === "radio" ||
                   question.questionType === "checkbox") && (
-                    <button
-                      className="btn btn-sm bg-blue text-white mt-2"
-                      onClick={() => handleAddOption(questionIndex)}
-                    >
-                      Add Option
-                    </button>
-                  )}
+                  <button
+                    className="btn btn-sm bg-blue text-white mt-2"
+                    onClick={() => handleAddOption(questionIndex)}
+                  >
+                    Add Option
+                  </button>
+                )}
 
                 <hr className="my-4 border-black" />
               </div>
@@ -2194,13 +2240,13 @@ function AdminSurveyTool() {
                 {renderOptionInputs(question, questionIndex)}
                 {(question.questionType === "radio" ||
                   question.questionType === "checkbox") && (
-                    <button
-                      className="btn btn-sm bg-blue text-white mt-2"
-                      onClick={() => handleAddOption(questionIndex)}
-                    >
-                      Add Option
-                    </button>
-                  )}
+                  <button
+                    className="btn btn-sm bg-blue text-white mt-2"
+                    onClick={() => handleAddOption(questionIndex)}
+                  >
+                    Add Option
+                  </button>
+                )}
                 <hr className="my-4 border-black" />
               </div>
             ))}
@@ -2238,12 +2284,14 @@ function AdminSurveyTool() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">
-              {surveys.find((survey) => survey._id === selectedSurveyId)?.published
+              {surveys.find((survey) => survey._id === selectedSurveyId)
+                ?.published
                 ? "Confirm Unpublish Action"
                 : "Confirm Publish Action"}
             </h2>
             <p>
-              {surveys.find((survey) => survey._id === selectedSurveyId)?.published
+              {surveys.find((survey) => survey._id === selectedSurveyId)
+                ?.published
                 ? "Unpublishing will make the survey inaccessible to users and could reset responses when republished. Are you sure you want to continue?"
                 : "Publishing will let the survey accessible to all users."}
             </p>
@@ -2264,7 +2312,6 @@ function AdminSurveyTool() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

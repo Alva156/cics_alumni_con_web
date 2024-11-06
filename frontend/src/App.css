@@ -26,6 +26,11 @@ body {
   border-radius: 10px; /* Rounded corners for the video */
 }
 
+/* Prevent video from going fullscreen */
+video::-webkit-media-controls-fullscreen-button {
+  display: none;
+}
+
 .homepage-wrapper {
   padding: 12px 45px;
 }

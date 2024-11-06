@@ -1407,76 +1407,72 @@ function AdminSurveyTool() {
                   </div>
 
                   {/* College Dropdown */}
-                  <div className="relative mb-6" ref={collegeDropdownRef}>
-                    <button
-                      onClick={() => {
-                        toggleCollegeDropdown(); // Toggle only the college dropdown
-                        setOpenProgramDropdown(false); // Close the program dropdown whenever the college dropdown is toggled
-                      }}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
-                    >
-                      <span>Select College</span>
-                      <svg
-                        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-                          openCollegeDropdown ? "rotate-180" : ""
-                        }`}
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 10 6"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="m1 1 4 4 4-4"
-                        />
-                      </svg>
-                    </button>
+<div className="relative mb-6" ref={collegeDropdownRef}>
+  <button
+    onClick={() => {
+      toggleCollegeDropdown(); // Toggle only the college dropdown
+      setOpenProgramDropdown(false); // Close the program dropdown whenever the college dropdown is toggled
+    }}
+    className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+  >
+    <span>Select College</span>
+    <svg
+      className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+        openCollegeDropdown ? "rotate-180" : ""
+      }`}
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 10 6"
+    >
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="m1 1 4 4 4-4"
+      />
+    </svg>
+  </button>
 
-                    {openCollegeDropdown && (
-                      <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                        <ul className="p-3 text-sm text-gray-700">
-                          <li className="flex items-center">
-                            <input
-                              type="checkbox"
-                              checked={selectedCollege === "All"} // Check if "All" is selected
-                              onChange={() => {
-                                const allSelected = selectedCollege === "All";
-                                setSelectedCollege(allSelected ? "" : "All"); // Toggle "All" selection
-                                if (!allSelected) {
-                                  setOpenProgramDropdown(true); // Automatically open program dropdown
-                                }
-                              }}
-                              className="mr-2"
-                            />
-                            <span>All Colleges</span>{" "}
-                            {/* Display the "All Colleges" option */}
-                          </li>
-                          {Object.keys(collegePrograms).map((college, idx) => (
-                            <li key={idx} className="flex items-center">
-                              <input
-                                type="checkbox"
-                                checked={selectedCollege === college} // Check if this college is selected
-                                onChange={() => {
-                                  if (selectedCollege === "All") {
-                                    setSelectedCollege(college); // Select individual college if "All" was selected
-                                  } else {
-                                    handleCollegeSelect(college);
-                                  }
-                                  setOpenProgramDropdown(true); // Automatically open program dropdown
-                                }}
-                                className="mr-2"
-                              />
-                              <span>{college}</span>{" "}
-                              {/* Display the college name */}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
+  {openCollegeDropdown && (
+    <div className="z-10 absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+      <ul className="p-3 text-sm text-gray-700">
+        <li className="flex items-center">
+          <input
+            type="checkbox"
+            checked={selectedCollege === "All"} // Check if "All" is selected
+            onChange={() => {
+              const allSelected = selectedCollege === "All";
+              setSelectedCollege(allSelected ? "" : "All"); // Toggle "All" selection
+            }}
+            className="mr-2"
+          />
+          <span>All Colleges</span>{" "}
+          {/* Display the "All Colleges" option */}
+        </li>
+        {Object.keys(collegePrograms).map((college, idx) => (
+          <li key={idx} className="flex items-center">
+            <input
+              type="checkbox"
+              checked={selectedCollege === college} // Check if this college is selected
+              onChange={() => {
+                if (selectedCollege === "All") {
+                  setSelectedCollege(college); // Select individual college if "All" was selected
+                } else {
+                  handleCollegeSelect(college);
+                }
+              }}
+              className="mr-2"
+            />
+            <span>{college}</span>{" "}
+            {/* Display the college name */}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</div>
 
                   {/* College Programs Dropdown */}
                   <div className="relative mb-6" ref={programDropdownRef}>

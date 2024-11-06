@@ -42,48 +42,53 @@ function Documents() {
   );
 
   // Sort documents based on selected criteria
-  const sortedDocuments = filteredDocuments.sort((a, b) => {
-    if (sortCriteria === "Name (A-Z)") {
-      return a.name.localeCompare(b.name);
-    } else if (sortCriteria === "Name (Z-A)") {
-      return b.name.localeCompare(a.name);
-    }
-    return 0;
-  });
+const sortedDocuments = filteredDocuments.sort((a, b) => {
+  if (sortCriteria === "Name (A-Z)") {
+    return a.name.localeCompare(b.name);
+  } else if (sortCriteria === "Name (Z-A)") {
+    return b.name.localeCompare(a.name);
+  } else if (sortCriteria === "Most Recent") {
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  } else if (sortCriteria === "Oldest") {
+    return new Date(a.createdAt) - new Date(b.createdAt);
+  }
+  return 0;
+});
 
-  return (
-    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-2xl font-medium text-gray-700 mb-6">
-        Document Request Steps
-      </h1>
+return (
+  <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+    <h1 className="text-2xl font-medium text-gray-700 mb-6">Documents</h1>
 
-      <div className="mb-4 relative">
-        <input
-          type="text"
-          placeholder="Search Documents"
-          className="w-full border border-black rounded-lg px-4 py-2"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <span
-          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-          onClick={() => setSearchTerm("")}
-        >
-          X
-        </span>
-      </div>
+    <div className="mb-4 relative">
+      <input
+        type="text"
+        placeholder="Search Documents"
+        className="w-full border border-black rounded-lg px-4 py-2"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <span
+        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+        onClick={() => setSearchTerm("")}
+      >
+        X
+      </span>
+    </div>
 
-      <div className="mb-6">
-        <span className="text-sm">Sort by:</span>
-        <select
-          className="ml-2 border border-black rounded px-3 py-1 text-sm"
-          value={sortCriteria}
-          onChange={(e) => setSortCriteria(e.target.value)}
-        >
-          <option>Name (A-Z)</option>
-          <option>Name (Z-A)</option>
-        </select>
-      </div>
+    <div className="mb-6">
+      <span className="text-sm">Sort by:</span>
+      <select
+        className="ml-2 border border-black rounded px-3 py-1 text-sm"
+        value={sortCriteria}
+        onChange={(e) => setSortCriteria(e.target.value)}
+      >
+        <option>Name (A-Z)</option>
+        <option>Name (Z-A)</option>
+        <option>Most Recent</option>
+        <option>Oldest</option>
+      </select>
+    </div>
+
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {sortedDocuments.map((document) => (

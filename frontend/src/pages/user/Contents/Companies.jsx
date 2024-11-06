@@ -47,6 +47,10 @@ function Companies() {
       return a.name.localeCompare(b.name);
     } else if (sortCriteria === "Name (Z-A)") {
       return b.name.localeCompare(a.name);
+    } else if (sortCriteria === "Most Recent") {
+      return new Date(b.createdAt) - new Date(a.createdAt); // Assuming createdAt holds the creation date
+    } else if (sortCriteria === "Oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
     }
     return 0;
   });
@@ -80,8 +84,11 @@ function Companies() {
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
+          <option>Most Recent</option>
+          <option>Oldest</option>
         </select>
       </div>
+
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {sortedCompanies.map((company) => (

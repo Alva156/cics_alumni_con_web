@@ -112,13 +112,27 @@ function AdminSurveyTool() {
             ],
           };
 
-          // Customize the tooltip to show "X Alumni"
           const pieOptions = {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
               legend: {
                 display: true,
                 position: "bottom",
+                labels: {
+                  generateLabels: (chart) => {
+                    const data = chart.data;
+                    return data.labels.map((label, i) => {
+                      const count = data.datasets[0].data[i] || 0;
+                      return {
+                        text: `${label} - ${count}`,
+                        fillStyle: data.datasets[0].backgroundColor[i],
+                        hidden: false, // Ensure that the label is never hidden, even if the count is zero
+                        index: i,
+                      };
+                    });
+                  },
+                },
               },
               tooltip: {
                 callbacks: {
@@ -144,7 +158,14 @@ function AdminSurveyTool() {
                   <p>No responses</p>
                 </div>
               ) : (
-                <Pie data={pieData} options={pieOptions} />
+                <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto">
+                  <Pie
+                    data={pieData}
+                    options={pieOptions}
+                    width={300} // Width in pixels
+                    height={300}
+                  />
+                </div>
               )}
             </div>
           );

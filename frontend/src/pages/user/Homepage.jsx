@@ -69,6 +69,26 @@ const Homepage = () => {
     return () => clearInterval(autoSlideInterval); // Cleanup on unmount
   }, [autoSlideEvents, events]);
 
+  useEffect(() => {
+    const handleVideoFullScreen = () => {
+      const videoElement = videoRef.current;
+      if (videoElement) {
+        // Prevent full-screen on mobile devices
+        if (window.innerWidth <= 768) {
+          videoElement.removeAttribute("controlsList"); // Remove fullscreen control
+        }
+      }
+    };
+  
+    window.addEventListener("resize", handleVideoFullScreen);
+    handleVideoFullScreen(); // Call it initially
+  
+    return () => {
+      window.removeEventListener("resize", handleVideoFullScreen);
+    };
+  }, []);
+  
+
   const fetchNews = async () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;
     try {

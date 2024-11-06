@@ -681,6 +681,19 @@ screens */
   .chart-container {
     page-break-inside: avoid; /* Avoid page breaks within charts */
   }
+  /* Expand modal to fill page */
+  .print-modal {
+    position: static;
+    background: white;
+    overflow: visible;
+  }
+  /* Ensure modal content takes full page width for print */
+  .print-content {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
 }
 .background-news-container {
   display: flex; /* Aligns children (video and news carousel) in a row */

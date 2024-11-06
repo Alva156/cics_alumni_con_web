@@ -1211,36 +1211,35 @@ function AdminSurveyTool() {
                     : "Date not available"}
                 </div>
               </div>
+              <div className="w-full mt-4 rounded px-3 py-2 space-y-2 border border-fgray no-print">
+                <div className="text-md font-medium">Survey Reports</div>
+                <div className="text-sm font-light">
+                  View individual responses by clicking the button below.
+                </div>
+                <div className="flex mt-4 space-x-3">
+                  <div>
+                    <button
+                      className="btn md:w-64 w-32 bg-green text-white"
+                      onClick={() => openSurveyReportModal(selectedSurvey)}
+                    >
+                      View Reports
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-              <div className="flex mt-4 space-x-3">
+              <div className="flex mt-6 space-x-3">
                 <div>
                   <button
                     onClick={exportToPDF}
                     className="btn md:w-64 w-32 bg-blue text-white no-print "
                   >
-                    Export to PDF
+                    Export Dashboard to PDF
                   </button>
                 </div>
               </div>
 
               <div>{renderPieChartsContainer(selectedSurvey)}</div>
-            </div>
-
-            <div className="w-full mt-4 rounded px-3 py-2 space-y-2 border border-fgray no-print">
-              <div className="text-md font-medium">Survey Reports</div>
-              <div className="text-sm font-light">
-                View individual responses by clicking the button below.
-              </div>
-              <div className="flex mt-4 space-x-3">
-                <div>
-                  <button
-                    className="btn md:w-64 w-32 bg-green text-white"
-                    onClick={() => openSurveyReportModal(selectedSurvey)}
-                  >
-                    View Reports
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 

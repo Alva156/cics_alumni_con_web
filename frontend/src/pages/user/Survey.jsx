@@ -102,7 +102,6 @@ function Survey() {
   };
 
   // Filter surveys based on whether they are answered or not
-  
 
   const handleResponseChange = (questionId, answer, type) => {
     setUserResponses((prev) => ({
@@ -124,13 +123,13 @@ function Survey() {
           answer,
         })
       );
-  
+
       // Log the data being sent to the backend
       console.log("Sending response to backend:", {
         surveyId: selectedSurvey._id,
         answers,
       });
-  
+
       // Make sure the token is included in the request cookies
       const response = await axios.post(
         `${backendUrl}/survey/respond`,
@@ -140,18 +139,18 @@ function Survey() {
         },
         { withCredentials: true }
       ); // Enable withCredentials to send cookies
-      
+
       setshowMessage("Response saved successfully!");
       setSuccessMessage(true);
       setTimeout(() => {
         setSuccessMessage(false);
       }, 3000);
-  
+
       console.log("Response saved successfully:", response.data);
-  
+
       // Refresh the surveys to update answered and unanswered sections
       await fetchSurveys();
-  
+
       // Close the modal after the data is refreshed
       closeModal();
     } catch (error) {
@@ -165,20 +164,21 @@ function Survey() {
       }
     }
   };
-  
 
   const fetchSurveys = async () => {
     try {
       // Use axios to make a GET request with credentials
-      const response = await axios.get(`${backendUrl}/survey/viewpublish`, { withCredentials: true });
-      
+      const response = await axios.get(`${backendUrl}/survey/viewpublish`, {
+        withCredentials: true,
+      });
+
       // Extract data from response
       const data = response.data;
-      
+
       // Check if the response contains the expected structure with answeredSurveys and unansweredSurveys
       if (data.answeredSurveys && data.unansweredSurveys) {
         console.log("Fetched answered and unanswered surveys:", data);
-  
+
         // Set the surveys for both answered and unanswered sections
         setAnsweredSurveys(data.answeredSurveys);
         setUnansweredSurveys(data.unansweredSurveys);
@@ -197,7 +197,6 @@ function Survey() {
       }
     }
   };
-  
 
   // Use effect to fetch on component mount
   useEffect(() => {
@@ -231,16 +230,16 @@ function Survey() {
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       {showSuccessMessage && (
-  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
-    <p>{showMessage}</p>
-  </div>
-)}
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+          <p>{showMessage}</p>
+        </div>
+      )}
 
-{showErrorMessage && (
-  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
-    <p>{showMessage}</p>
-  </div>
-)}
+      {showErrorMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+          <p>{showMessage}</p>
+        </div>
+      )}
 
       <h1 className="text-2xl font-medium text-gray-700 mb-6">Survey</h1>
 
@@ -268,102 +267,101 @@ function Survey() {
       <hr className="mb-6 border-black" />
 
       {unansweredSurveys.map((survey) => (
-      <div
-        key={survey._id}
-        className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-        onClick={() => openModal(survey)}
-        aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
-      >
-        <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
-        <p className="text-sm text-gray-600">
-          <span className="font-bold">{survey.responseCount}</span> responses
-        </p>
-      </div>
-    ))}
+        <div
+          key={survey._id}
+          className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+          onClick={() => openModal(survey)}
+          aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
+        >
+          <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
+          <p className="text-sm text-gray-600">
+            <span className="font-bold">{survey.responseCount}</span> responses
+          </p>
+        </div>
+      ))}
 
       <div className="text-lg mb-4">Answered</div>
 
       <hr className="mb-6 border-black" />
 
       {answeredSurveys.map((survey) => (
-      <div
-        key={survey._id}
-        className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-        onClick={() => openModal(survey)}
-        aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
-      >
-        <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
-        <p className="text-sm text-gray-600">
-          <span className="font-bold">{survey.responseCount}</span> responses
-        </p>
-      </div>
-    ))}
-
-      {/* Modal */}
-      {isModalOpen && selectedSurvey && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-    <div
-      ref={modalRef}
-      className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto relative"
-    >
-      <button
-        className="absolute top-4 right-4 text-black text-2xl"
-        onClick={closeModal}
-      >
-        &times;
-      </button>
-      <div className="text-2xl font-medium mb-2">
-        {selectedSurvey.name}
-      </div>
-
-      {selectedSurvey.questions.map((question, index) => (
         <div
-          key={index}
-          className="w-full rounded px-4 py-2 border border-black my-2"
+          key={survey._id}
+          className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+          onClick={() => openModal(survey)}
+          aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
         >
-          <div className="font-medium">
-            {index + 1}
-            <span className="mr-2">.</span>
-            {question.questionText}
-          </div>
-          <div>
-            {renderInputField({
-              ...question,
-              answer: userResponses[question._id],
-            })}
-          </div>
+          <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
+          <p className="text-sm text-gray-600">
+            <span className="font-bold">{survey.responseCount}</span> responses
+          </p>
         </div>
       ))}
 
-      {/* BOTTOM BUTTONS */}
-      <div className="flex justify-center mt-16 space-x-3">
-        <div>
-          <button
-            className="btn md:w-64 w-52 bg-fgray text-white"
-            onClick={closeModal}
+      {/* Modal */}
+      {isModalOpen && selectedSurvey && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div
+            ref={modalRef}
+            className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
           >
-            Cancel
-          </button>
-        </div>
-        <div>
-          <button
-            className="btn md:w-64 w-52 bg-green text-white"
-            onClick={handleSaveResponse}
-          >
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+            <button
+              className="absolute top-4 right-4 text-black text-2xl"
+              onClick={closeModal}
+            >
+              &times;
+            </button>
+            <div className="text-2xl font-medium mb-2">
+              {selectedSurvey.name}
+            </div>
 
+            {selectedSurvey.questions.map((question, index) => (
+              <div
+                key={index}
+                className="w-full rounded px-4 py-2 border border-black my-2"
+              >
+                <div className="font-medium">
+                  {index + 1}
+                  <span className="mr-2">.</span>
+                  {question.questionText}
+                </div>
+                <div>
+                  {renderInputField({
+                    ...question,
+                    answer: userResponses[question._id],
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* BOTTOM BUTTONS */}
+            <div className="flex justify-center mt-16 space-x-3">
+              <div>
+                <button
+                  className="btn md:w-64 w-52 bg-fgray text-white"
+                  onClick={closeModal}
+                >
+                  Cancel
+                </button>
+              </div>
+              <div>
+                <button
+                  className="btn md:w-64 w-52 bg-green text-white"
+                  onClick={handleSaveResponse}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

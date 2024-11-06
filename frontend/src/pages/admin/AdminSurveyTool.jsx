@@ -147,7 +147,7 @@ function AdminSurveyTool() {
 
           return (
             <div
-              className="w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2"
+              className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2 "
               key={questionIndex}
             >
               <h3 className="text-lg font-semibold mb-2">
@@ -158,7 +158,7 @@ function AdminSurveyTool() {
                   <p>No responses</p>
                 </div>
               ) : (
-                <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto">
+                <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container ">
                   <Pie
                     data={pieData}
                     options={pieOptions}
@@ -185,13 +185,13 @@ function AdminSurveyTool() {
 
           return (
             <div
-              className="w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2"
+              className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2"
               key={questionIndex}
             >
               <h3 className="text-lg font-semibold mb-2">
                 {question.questionText}
               </h3>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 ">
                 {textResponses.length > 0 ? (
                   <p className="mb-2">
                     {textResponses.length} Alumni Responses
@@ -946,9 +946,15 @@ function AdminSurveyTool() {
       });
     }
   }, [isEditModalOpen]);
+  const dashboardRef = useRef(null);
+  const exportToPDF = () => {
+    if (dashboardRef.current) {
+      window.print(); // Triggers the print dialog
+    }
+  };
 
   return (
-    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12 ">
       {showSuccessMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
           <p>{showMessage}</p>
@@ -987,11 +993,11 @@ function AdminSurveyTool() {
         </div>
       )}
 
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 no-print">
         <h1 className="text-2xl font-medium text-gray-700">Survey Tool</h1>
       </div>
 
-      <div className="mb-4 relative">
+      <div className="mb-4 relative no-print">
         <input
           type="text"
           placeholder="Search Company"
@@ -1007,7 +1013,7 @@ function AdminSurveyTool() {
         </span>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 no-print">
         <span className="text-sm">Sort by:</span>
         <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
           <option>Name (A-Z)</option>
@@ -1015,7 +1021,7 @@ function AdminSurveyTool() {
         </select>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 no-print">
         <div className="text-lg">Drafts</div>
         <button
           className="btn btn-sm w-36 bg-green text-white"
@@ -1025,15 +1031,15 @@ function AdminSurveyTool() {
         </button>
       </div>
 
-      <hr className="mb-6 border-black" />
+      <hr className="mb-6 border-black no-print" />
       {unansweredSurveys.length > 0 ? (
         unansweredSurveys.map((survey, index) => (
           <div
             key={index}
-            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
             onClick={() => openViewModal(survey)}
           >
-            <div>
+            <div className="no-print">
               <div className="text-md font-medium mb-1">{survey.name}</div>
               <div className="text-sm text-black-600">
                 {survey.responseCount
@@ -1112,17 +1118,17 @@ function AdminSurveyTool() {
         </div>
       )}
 
-      <div className="text-lg mb-4">Published Surveys</div>
-      <hr className="mb-6 border-black" />
+      <div className="text-lg mb-4 no-print">Published Surveys</div>
+      <hr className="mb-6 border-black no-print " />
 
       {answeredSurveys.length > 0 ? (
         answeredSurveys.map((survey, index) => (
           <div
             key={index}
-            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
+            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
             onClick={() => openViewModal(survey)} // Update to open ViewModal
           >
-            <div>
+            <div className="no-print">
               <div className="text-md font-medium mb-1">{survey.name}</div>
               <div className="text-sm text-black-600">
                 {survey.responseCount
@@ -1166,13 +1172,13 @@ function AdminSurveyTool() {
 
       {/* VIEW MODAL */}
       {isViewModalOpen && selectedSurvey && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 print-modal ">
           <div
-            ref={modalRef}
-            className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative"
+            ref={(modalRef, dashboardRef)}
+            className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative print-content"
           >
             <button
-              className="absolute top-4 right-4 text-black text-2xl"
+              className="absolute top-4 right-4 text-black text-2xl no-print"
               onClick={closeModal}
             >
               &times;
@@ -1181,7 +1187,7 @@ function AdminSurveyTool() {
               {selectedSurvey.name}
             </div>
 
-            <div className="w-full rounded px-3 py-2 space-y-2 border border-fgray">
+            <div>
               <div className="text-md font-medium">Survey Dashboard</div>
               <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 border border-fgray">
                 <div className="text-xs font-light">Responses</div>
@@ -1208,15 +1214,19 @@ function AdminSurveyTool() {
 
               <div className="flex mt-4 space-x-3">
                 <div>
-                  <button className="btn md:w-64 w-32 bg-blue text-white ">
+                  <button
+                    onClick={exportToPDF}
+                    className="btn md:w-64 w-32 bg-blue text-white no-print "
+                  >
                     Export to PDF
                   </button>
                 </div>
               </div>
-            </div>
-            <div>{renderPieChartsContainer(selectedSurvey)}</div>
 
-            <div className="w-full mt-4 rounded px-3 py-2 space-y-2 border border-fgray">
+              <div>{renderPieChartsContainer(selectedSurvey)}</div>
+            </div>
+
+            <div className="w-full mt-4 rounded px-3 py-2 space-y-2 border border-fgray no-print">
               <div className="text-md font-medium">Survey Reports</div>
               <div className="text-sm font-light">
                 View individual responses by clicking the button below.

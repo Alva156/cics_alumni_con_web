@@ -47,6 +47,10 @@ function News() {
       return a.name.localeCompare(b.name);
     } else if (sortCriteria === "Name (Z-A)") {
       return b.name.localeCompare(a.name);
+    } else if (sortCriteria === "Most Recent") {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    } else if (sortCriteria === "Oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
     }
     return 0;
   });
@@ -80,6 +84,8 @@ function News() {
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
+          <option>Most Recent</option>
+          <option>Oldest</option>
         </select>
       </div>
 

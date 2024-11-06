@@ -54,8 +54,18 @@ function AdminSurveyTool() {
   const [selectedCollege, setSelectedCollege] = useState("All"); // Default "All"
   const [selectedProgram, setSelectedProgram] = useState("All"); // Default "All"
   const [selectedBatchYears, setSelectedBatchYears] = useState([]); // Empty array means "All batch years"
+  const [loading, setLoading] = useState(false);
+  const LoadingSpinner = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
+    </div>
+  );
   const getBatchYears = () => {
-    const years = selectedSurvey?.responses
+    if (!selectedSurvey?.responses) {
+      return []; // Return an empty array if responses are not available
+    }
+
+    const years = selectedSurvey.responses
       .map((response) => response.userId?.yearGraduatedCollege)
       .filter((year) => year !== null && year !== undefined && year !== ""); // Filter out null, undefined, and empty strings
 
@@ -809,6 +819,7 @@ function AdminSurveyTool() {
   };
 
   const handlePublishSurvey = async (surveyId) => {
+    setLoading(false);
     console.log("Toggling publish status for survey with ID:", surveyId);
 
     const surveyToToggle = surveys.find((survey) => survey._id === surveyId);
@@ -816,7 +827,10 @@ function AdminSurveyTool() {
       console.error("Survey not found in local state");
       return;
     }
-
+    // Only set loading to true if we are publishing the survey (i.e., survey is currently unpublished)
+    if (!surveyToToggle.published) {
+      setLoading(true); // Show loading when publishing
+    }
     try {
       const response = await fetch(`${backendUrl}/survey/publish/${surveyId}`, {
         method: "PUT",
@@ -847,6 +861,9 @@ function AdminSurveyTool() {
       await fetchSurveys();
     } catch (error) {
       console.error("Error toggling publish status for survey:", error);
+    } finally {
+      // Set loading to false after the operation (publish or unpublish) is complete
+      setLoading(false);
     }
   };
 
@@ -1260,18 +1277,17 @@ function AdminSurveyTool() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12 ">
+      {loading && <LoadingSpinner />} {/* Show loading spinner */}
       {showSuccessMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
           <p>{showMessage}</p>
         </div>
       )}
-
       {showErrorMessage && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
           <p>{showMessage}</p>
         </div>
       )}
-
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
@@ -1297,11 +1313,9 @@ function AdminSurveyTool() {
           </div>
         </div>
       )}
-
       <div className="flex items-center mb-4 no-print">
         <h1 className="text-2xl font-medium text-gray-700">Survey Tool</h1>
       </div>
-
       <div className="mb-4 relative no-print">
         <input
           type="text"
@@ -1317,7 +1331,6 @@ function AdminSurveyTool() {
           X
         </span>
       </div>
-
       <div className="mb-6 no-print">
         <span className="text-sm">Sort by:</span>
         <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
@@ -1325,7 +1338,6 @@ function AdminSurveyTool() {
           <option>Name (Z-A)</option>
         </select>
       </div>
-
       <div className="flex justify-between items-center mb-4 no-print">
         <div className="text-lg">Drafts</div>
         <button
@@ -1335,7 +1347,6 @@ function AdminSurveyTool() {
           +
         </button>
       </div>
-
       <hr className="mb-6 border-black no-print" />
       {unansweredSurveys.length > 0 ? (
         unansweredSurveys.map((survey, index) => (
@@ -1422,10 +1433,8 @@ function AdminSurveyTool() {
           No unanswered surveys available.
         </div>
       )}
-
       <div className="text-lg mb-4 no-print">Published Surveys</div>
       <hr className="mb-6 border-black no-print " />
-
       {answeredSurveys.length > 0 ? (
         answeredSurveys.map((survey, index) => (
           <div
@@ -1474,7 +1483,6 @@ function AdminSurveyTool() {
           No answered surveys available.
         </div>
       )}
-
       {/* VIEW MODAL */}
       {isViewModalOpen && selectedSurvey && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 print-modal ">
@@ -2043,7 +2051,6 @@ function AdminSurveyTool() {
           )}
         </div>
       )}
-
       {/* EDIT MODAL */}
       {isEditModalOpen && selectedSurvey && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -2169,7 +2176,6 @@ function AdminSurveyTool() {
           </div>
         </div>
       )}
-
       {/* ADD MODAL */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-1000">
@@ -2278,7 +2284,6 @@ function AdminSurveyTool() {
           </div>
         </div>
       )}
-
       {/* Publish/Unpublish Confirmation Modal */}
       {isPublishModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

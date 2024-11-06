@@ -1,6 +1,7 @@
 const Survey = require("../models/surveyModel");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 
 // ADMIN-SIDE
 
@@ -219,6 +220,68 @@ exports.publishSurvey = async (req, res) => {
       survey.answered = [];
       survey.responseCount = 0;
       console.log("Survey responses and answers reset upon republishing.");
+
+      // Fetch all users with the role 'user'
+      const users = await User.find({ role: "user" });
+
+      if (users.length > 0) {
+        // Send email notification to all users with role 'user'
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
+
+        // Email content
+        const htmlContent = `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f8f8; border-radius: 8px;">
+            <div style="background-color: #ff4b4b; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            </div>
+            <div style="background-color: #fff; padding: 40px; border-radius: 0 0 8px 8px;">
+              <h2 style="color: #ff4b4b; text-align: center;">New Survey Published</h2>
+              <p style="text-align: center; font-size: 16px; color: #333;">
+                Hello,
+              </p>
+              <p style="text-align: center; font-size: 16px; color: #333;">
+                A new survey titled "<strong>${survey.name}</strong>" has just been published by the CICS Alumni Connect.
+              </p>
+              <p style="text-align: center; font-size: 16px; color: #333;">
+                We would really appreciate your time and input in answering the questions provided in this survey. Your responses will help improve our services and provide better support for our alumni community.
+              </p>
+              <p style="text-align: center; font-size: 16px; color: #333;">
+                If you have some time to spare, we would be grateful for your participation.
+              </p>
+              <p style="text-align: center; font-size: 16px; color: #333;">
+                Thank you for your continued support!
+              </p>
+            </div>
+          </div>
+          <div style="text-align: center; margin-top: 20px;">
+            <p style="font-size: 12px; color: #999;">
+              © 2024 CICS Alumni Connect. All rights reserved.
+            </p>
+          </div>
+        </div>
+      `;
+
+        // Send email to all users
+        for (let user of users) {
+          const mailOptions = {
+            from: '"CICS Alumni Connect" <' + process.env.EMAIL_USER + ">",
+            to: user.email, // Assuming user schema has 'email' field
+            subject: `New Survey Alert "${survey.name}" `,
+            html: htmlContent,
+          };
+
+          await transporter.sendMail(mailOptions);
+          console.log(`Email sent to ${user.email} for survey publication.`);
+        }
+      } else {
+        console.log("No users with role 'user' found.");
+      }
     }
 
     await survey.save();

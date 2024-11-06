@@ -58,6 +58,7 @@ function UserProfile() {
   const [otp, setOtp] = useState("");
   const [timer, setTimer] = useState(0);
   const [otpSent, setOtpSent] = useState(false);
+  const [maxId, setMaxId] = useState(1);
   const [isDeleteModalPicOpen, setIsDeleteModalPicOpen] = useState(false);
   const handleDeleteProfileImage = async () => {
     try {
@@ -376,56 +377,90 @@ function UserProfile() {
     setCollegeProgram(""); // Ensure college program resets
   };
 
-  // Initialize attachments state
-  const [attachments, setAttachments] = useState([
-    { _id: 1, file: null, filename: "", filepath: "" }, // Start with ID 1
-  ]);
-  const [maxId, setMaxId] = useState(1); // Track the maximum ID
 
-  const addAttachment = () => {
-    const newId = maxId + 1; // Calculate the new ID based on the current max ID
-    setAttachments((prev) => [
-      ...prev,
-      { _id: newId, file: null, filename: "", filepath: "" }, // Add new attachment with empty fields
-    ]);
-    setMaxId(newId); // Update the max ID
-  };
+  // Initialize state for attachments, assuming that attachments are fetched with correct _id values
+const [attachments, setAttachments] = useState([
+  { _id: 1, file: null, filename: "", filepath: "" }, // This should be replaced with data from the backend
+]);
 
-  const handleFileChange = (e, index) => {
-    const file = e.target.files[0]; // Get the new file from the input
-    if (file) {
-      console.log(`Selected input field: ${index + 1}`);
-
-      setAttachments((prevAttachments) => {
-        const updatedAttachments = [...prevAttachments];
-        const existingAttachment = updatedAttachments[index];
-
-        // Log the entire existing attachment for debugging
-        console.log("Existing attachment:", existingAttachment);
-
-        // Only update if the file is different
-        if (existingAttachment.file !== file) {
-          console.log(`Replacing file: ${existingAttachment.filename}`);
-
-          // Ensure the ID is retained from the existing attachment
-          updatedAttachments[index] = {
-            ...existingAttachment, // Keep all existing data
-            file, // Set the new file object
-            filename: file.name, // Update the filename
-          };
-
-          console.log(`Old ID: ${existingAttachment._id}`); // Log the old ID
-          console.log(`New file: ${file.name}`); // Log the new file name
-        } else {
-          console.log(`No change in file for input field: ${index + 1}`);
-        }
-
-        return updatedAttachments; // Return the updated attachments array
+// Set maxId based on the maximum _id from the fetched attachments, or use 1 if no attachments exist
+useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/profile/userprofile`, {
+        withCredentials: true,
       });
-    } else {
-      console.log(`No file selected for input field: ${index + 1}`);
+      const profileData = response.data;
+
+      if (profileData) {
+        // Fetch attachments from backend data and update the attachments state
+        const fetchedAttachments = profileData.attachments || [];
+        setAttachments(fetchedAttachments);
+
+        // Update maxId based on the highest _id from the fetched attachments
+        const highestId = fetchedAttachments.reduce(
+          (max, attachment) => Math.max(max, attachment._id),
+          1
+        );
+        setMaxId(highestId); // Set the maxId to the highest _id found
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
     }
   };
+
+  fetchProfile();
+}, [backendUrl]);
+
+// Function to add a new attachment with a unique ID
+const addAttachment = () => {
+  const newId = maxId + 1; // Calculate new ID based on the current max ID
+  setAttachments((prev) => [
+    ...prev,
+    { _id: newId, file: null, filename: "", filepath: "" }, // New attachment with unique _id
+  ]);
+  setMaxId(newId); // Update the maxId state
+};
+
+// Function to handle file changes and replace an attachment while retaining its _id
+const handleFileChange = (e, index) => {
+  const file = e.target.files[0]; // Get the selected file from input
+  if (file) {
+    console.log(`Selected input field: ${index + 1}`);
+
+    setAttachments((prevAttachments) => {
+      const updatedAttachments = [...prevAttachments];
+      const existingAttachment = updatedAttachments[index];
+
+      console.log("Existing attachment:", existingAttachment);
+
+      // Only update if the file is different
+      if (existingAttachment.file !== file) {
+        console.log(`Replacing file: ${existingAttachment.filename}`);
+
+        // Ensure the _id is retained from the existing attachment
+        updatedAttachments[index] = {
+          ...existingAttachment, // Keep the existing data, including _id
+          file, // Set the new file object
+          filename: file.name, // Update the filename
+        };
+
+        console.log(`Retained ID: ${existingAttachment._id}`);
+        console.log(`New file: ${file.name}`);
+      } else {
+        console.log(`No change in file for input field: ${index + 1}`);
+      }
+
+      return updatedAttachments; // Return the updated attachments array with retained IDs
+    });
+  } else {
+    console.log(`No file selected for input field: ${index + 1}`);
+  }
+};
+
+
+
+  
 
   const openConfirmationModal = (message, onConfirm) => {
     setConfirmationMessage(message);

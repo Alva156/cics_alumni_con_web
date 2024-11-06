@@ -568,7 +568,7 @@ function AdminReports() {
       <div className="text-sm mb-4">Filters:</div>
       <div className="sm:flex block sm:space-x-4">
         {/* College Dropdown */}
-        <div className="relative mb-6">
+        <div className="relative mb-6" ref={dropdownRef}>
           <button
             onClick={() => toggleDropdown("colleges")}
             className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
@@ -594,7 +594,7 @@ function AdminReports() {
           </button>
           {openDropdown === "colleges" && (
             <div
-              ref={dropdownRef}
+              
               className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
             >
               <ul className="p-3 space-y-3 text-sm text-gray-700">
@@ -618,7 +618,7 @@ function AdminReports() {
         </div>
 
         {/* College Program Dropdown */}
-        <div className="relative mb-6">
+        <div className="relative mb-6" ref={dropdownRef}>
           <button
             onClick={() => toggleDropdown("programs")}
             className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
@@ -644,7 +644,7 @@ function AdminReports() {
           </button>
           {openDropdown === "programs" && (
             <div
-              ref={dropdownRef}
+              
               className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
             >
               <ul className="p-3 space-y-3 text-sm text-gray-700">
@@ -668,7 +668,7 @@ function AdminReports() {
         </div>
 
         {/* Batch Dropdown */}
-        <div className="relative mb-6">
+        <div className="relative mb-6" ref={dropdownRef}>
           <button
             onClick={() => toggleDropdown("batches")}
             className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
@@ -694,7 +694,7 @@ function AdminReports() {
           </button>
           {openDropdown === "batches" && (
             <div
-              ref={dropdownRef}
+  
               className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
             >
               <ul className="p-3 space-y-3 text-sm text-gray-700">
@@ -717,7 +717,7 @@ function AdminReports() {
           )}
         </div>
 
-        <div className="relative mb-6">
+        <div className="relative mb-6" ref={dropdownRef}>
           <button
             onClick={() => toggleDropdown("fields")}
             className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-80 w-full relative bg-transparent"
@@ -743,7 +743,6 @@ function AdminReports() {
           </button>
           {openDropdown === "fields" && (
             <div
-              ref={dropdownRef}
               className="z-10 h-64 overflow-y-scroll absolute sm:w-80 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2"
             >
               <ul className="p-3 space-y-3 text-sm text-gray-700">

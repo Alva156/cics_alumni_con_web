@@ -1,59 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 
 function Survey() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [surveys, setSurveys] = useState([]);
+  const [answeredSurveys, setAnsweredSurveys] = useState([]);
+  const [unansweredSurveys, setUnansweredSurveys] = useState([]);
   const [selectedSurvey, setSelectedSurvey] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [showSuccessMessage, setSuccessMessage] = useState(false);
+  const [showErrorMessage, setErrorMessage] = useState(false);
+  const [showMessage, setshowMessage] = useState("");
+  const [userResponses, setUserResponses] = useState({});
   const modalRef = useRef(null);
 
-  const surveys = [
-    {
-      name: "Survey Name 1",
-      response: "999 responses",
-      answered: false,
-      questions: [
-        {
-          question: "Question 1",
-          questionContent: "hello world",
-          questionType: "radio",
-          choices: ["choice 1", "choice 2", "choice 3"],
-        },
-        {
-          question: "Question 2",
-          questionContent: "hello world",
-          questionType: "checkbox",
-          choices: ["choice 1", "choice 2", "choice 3"],
-        },
-        {
-          question: "Question 3",
-          questionContent: "hello world",
-          questionType: "textInput",
-        },
-        {
-          question: "Question 4",
-          questionContent: "hello world",
-          questionType: "textArea",
-        },
-      ],
-    },
-    {
-      name: "Survey Name 2",
-      response: "500 responses",
-      answered: true,
-      questions: [
-        {
-          question: "Question 1",
-          questionContent: "another question content",
-          questionType: "radio",
-          choices: ["option 1", "option 2"],
-        },
-      ],
-    },
-  ];
-
-  const openModal = (survey) => {
-    setSelectedSurvey(survey);
-    setIsModalOpen(true);
+  const openModal = async (survey) => {
+    await fetchSurveyById(survey._id);
   };
 
   const closeModal = () => {
@@ -76,14 +38,19 @@ function Survey() {
   }, [isModalOpen]);
 
   const renderInputField = (question) => {
+    const userAnswer = userResponses[question._id]; // Get the user's answer for the question
     switch (question.questionType) {
       case "radio":
         return question.choices.map((choice, idx) => (
           <div key={idx} className="flex items-center mb-2">
             <input
               type="radio"
-              name={question.question}
+              name={question._id}
               value={choice}
+              checked={userAnswer === choice} // Check if the answer matches
+              onChange={() =>
+                handleResponseChange(question._id, choice, "radio")
+              }
               className="mr-2"
             />
             <label>{choice}</label>
@@ -94,8 +61,12 @@ function Survey() {
           <div key={idx} className="flex items-center mb-2">
             <input
               type="checkbox"
-              name={question.question}
+              name={question._id}
               value={choice}
+              checked={userAnswer && userAnswer.includes(choice)} // Check if choice is selected
+              onChange={() =>
+                handleResponseChange(question._id, choice, "checkbox")
+              }
               className="mr-2"
             />
             <label>{choice}</label>
@@ -105,14 +76,22 @@ function Survey() {
         return (
           <input
             type="text"
-            name={question.question}
+            name={question._id}
+            value={userAnswer || ""} // Pre-fill with existing answer
+            onChange={(e) =>
+              handleResponseChange(question._id, e.target.value, "textInput")
+            }
             className="w-full px-2 py-1 border rounded mb-2"
           />
         );
       case "textArea":
         return (
           <textarea
-            name={question.question}
+            name={question._id}
+            value={userAnswer || ""} // Pre-fill with existing answer
+            onChange={(e) =>
+              handleResponseChange(question._id, e.target.value, "textArea")
+            }
             className="w-full px-2 py-1 border rounded mb-2"
             rows="4"
           ></textarea>
@@ -123,11 +102,145 @@ function Survey() {
   };
 
   // Filter surveys based on whether they are answered or not
-  const unansweredSurveys = surveys.filter((survey) => !survey.answered);
-  const answeredSurveys = surveys.filter((survey) => survey.answered);
+
+  const handleResponseChange = (questionId, answer, type) => {
+    setUserResponses((prev) => ({
+      ...prev,
+      [questionId]:
+        type === "checkbox"
+          ? (prev[questionId] || []).includes(answer)
+            ? prev[questionId].filter((item) => item !== answer)
+            : [...(prev[questionId] || []), answer]
+          : answer,
+    }));
+  };
+
+  const handleSaveResponse = async () => {
+    try {
+      const answers = Object.entries(userResponses).map(
+        ([questionId, answer]) => ({
+          questionId,
+          answer,
+        })
+      );
+
+      // Log the data being sent to the backend
+      console.log("Sending response to backend:", {
+        surveyId: selectedSurvey._id,
+        answers,
+      });
+
+      // Make sure the token is included in the request cookies
+      const response = await axios.post(
+        `${backendUrl}/survey/respond`,
+        {
+          surveyId: selectedSurvey._id,
+          answers,
+        },
+        { withCredentials: true }
+      ); // Enable withCredentials to send cookies
+
+      setshowMessage("Response saved successfully!");
+      setSuccessMessage(true);
+      setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
+
+      console.log("Response saved successfully:", response.data);
+
+      // Refresh the surveys to update answered and unanswered sections
+      await fetchSurveys();
+
+      // Close the modal after the data is refreshed
+      closeModal();
+    } catch (error) {
+      if (error.response) {
+        console.error("Error saving response:", error.response.data);
+        console.error("HTTP status code:", error.response.status);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+    }
+  };
+
+  const fetchSurveys = async () => {
+    try {
+      // Use axios to make a GET request with credentials
+      const response = await axios.get(`${backendUrl}/survey/viewpublish`, {
+        withCredentials: true,
+      });
+
+      // Extract data from response
+      const data = response.data;
+
+      // Check if the response contains the expected structure with answeredSurveys and unansweredSurveys
+      if (data.answeredSurveys && data.unansweredSurveys) {
+        console.log("Fetched answered and unanswered surveys:", data);
+
+        // Set the surveys for both answered and unanswered sections
+        setAnsweredSurveys(data.answeredSurveys);
+        setUnansweredSurveys(data.unansweredSurveys);
+      } else {
+        // Handle unexpected response structure
+        console.error("Unexpected response format:", data);
+      }
+    } catch (error) {
+      if (error.response) {
+        console.error("Error fetching surveys:", error.response.data);
+        console.error("HTTP status code:", error.response.status);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+    }
+  };
+
+  // Use effect to fetch on component mount
+  useEffect(() => {
+    fetchSurveys();
+  }, []);
+
+  const fetchSurveyById = async (surveyId) => {
+    try {
+      const response = await axios.get(
+        `${backendUrl}/survey/viewpublish/${surveyId}`,
+        { withCredentials: true } // Ensures cookies are sent with the request
+      );
+      const surveyData = response.data;
+      setSelectedSurvey(surveyData);
+
+      const existingResponses = surveyData.questions.reduce((acc, question) => {
+        const previousAnswer = surveyData.previousAnswers.find(
+          (answer) => answer.questionId === question._id
+        );
+        acc[question._id] = previousAnswer ? previousAnswer.answer : "";
+        return acc;
+      }, {});
+      setUserResponses(existingResponses);
+
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching survey by ID:", error.message);
+    }
+  };
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+      {showSuccessMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+          <p>{showMessage}</p>
+        </div>
+      )}
+
+      {showErrorMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+          <p>{showMessage}</p>
+        </div>
+      )}
+
       <h1 className="text-2xl font-medium text-gray-700 mb-6">Survey</h1>
 
       <div className="mb-4 relative">
@@ -153,14 +266,20 @@ function Survey() {
 
       <hr className="mb-6 border-black" />
 
-      {unansweredSurveys.map((survey, index) => (
+      {unansweredSurveys.map((survey) => (
         <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+          key={survey._id}
+          className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
           onClick={() => openModal(survey)}
+          aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
         >
-          <div className="text-md font-medium mb-1">{survey.name}</div>
-          <div className="text-sm text-black-600">{survey.response}</div>
+          <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
+          <p className="text-sm text-gray-600">
+            <span className="font-bold">{survey.responseCount}</span> responses
+          </p>
         </div>
       ))}
 
@@ -168,14 +287,20 @@ function Survey() {
 
       <hr className="mb-6 border-black" />
 
-      {answeredSurveys.map((survey, index) => (
+      {answeredSurveys.map((survey) => (
         <div
-          key={index}
-          className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+          key={survey._id}
+          className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
           onClick={() => openModal(survey)}
+          aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
         >
-          <div className="text-md font-medium mb-1">{survey.name}</div>
-          <div className="text-sm text-black-600">{survey.response}</div>
+          <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
+          <p className="text-sm text-gray-600">
+            <span className="font-bold">{survey.responseCount}</span> responses
+          </p>
         </div>
       ))}
 
@@ -201,21 +326,35 @@ function Survey() {
                 key={index}
                 className="w-full rounded px-4 py-2 border border-black my-2"
               >
-                <div className="font-medium">{question.question}</div>
-                <div className="mb-2">{question.questionContent}</div>
-                <div>{renderInputField(question)}</div>
+                <div className="font-medium">
+                  {index + 1}
+                  <span className="mr-2">.</span>
+                  {question.questionText}
+                </div>
+                <div>
+                  {renderInputField({
+                    ...question,
+                    answer: userResponses[question._id],
+                  })}
+                </div>
               </div>
             ))}
 
             {/* BOTTOM BUTTONS */}
             <div className="flex justify-center mt-16 space-x-3">
-              <div className="">
-                <button className="btn md:w-64 w-52 bg-fgray text-white">
+              <div>
+                <button
+                  className="btn md:w-64 w-52 bg-fgray text-white"
+                  onClick={closeModal}
+                >
                   Cancel
                 </button>
               </div>
-              <div className="">
-                <button className="btn md:w-64 w-52 bg-green text-white">
+              <div>
+                <button
+                  className="btn md:w-64 w-52 bg-green text-white"
+                  onClick={handleSaveResponse}
+                >
                   Save
                 </button>
               </div>

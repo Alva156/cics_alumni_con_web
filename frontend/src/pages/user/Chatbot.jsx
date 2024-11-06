@@ -733,6 +733,15 @@ function Chatbot() {
       "Licentiate in Sacred Theology",
       "Bachelor of Sacred Theology",
     ],
+
+    /// About Alumni Connect
+    "What is Alumni Connect?": [
+      "Alumni Connect is a web-based platform designed for the alumni of the University of Santo Tomas College of Information and Computing Sciences (UST CICS). The project aims to create a dedicated online space to address the challenges of collecting comprehensive alumni data and fostering networking opportunities. Ultimately, this initiative seeks to strengthen the UST CICS community while enhancing career development and improving curriculum pathways for its members.",
+    ],
+
+    "Who are the proponents of Alumni Connect?": [
+      "The proponents of Alumni Connect are Andrei Cimoune Alvarico, Alessandra Claire Cruz, James Lorenz Santos, and Denise Anne Valdivieso. They are 4th-year Information Technology students specializing in Web Development at the University of Santo Tomas.",
+    ],
   };
 
   const addChatMessage = (from, message) => {
@@ -762,6 +771,7 @@ function Chatbot() {
           "Colleges",
           "Jobs",
           "College Office Information",
+          "About Alumni Connect",
         ]);
       } else if (previousStep === 3) {
         addChatMessage("chatbot", "You chose:");
@@ -778,6 +788,7 @@ function Chatbot() {
       "Colleges",
       "Jobs",
       "College Office Information",
+      "About Alumni Connect",
     ]);
     setStepHistory([1]);
     setStep(2);
@@ -863,6 +874,12 @@ function Chatbot() {
           "Faculty of Canon Law",
           "Faculty of Philosophy",
           "Faculty of Sacred Theology",
+          "Go back",
+        ];
+      } else if (option === "About Alumni Connect") {
+        options = [
+          "What is Alumni Connect?",
+          "Who are the proponents of Alumni Connect?",
           "Go back",
         ];
       }

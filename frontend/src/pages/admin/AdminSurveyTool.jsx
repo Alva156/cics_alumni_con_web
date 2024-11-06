@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { CSVLink } from "react-csv";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
+import cicslogo from "../../assets/cicslogo.png";
 import { uniqueId } from "lodash"; // Make sure you import uniqueId
 import { Pie } from "react-chartjs-2";
 import {
@@ -95,6 +100,9 @@ function AdminSurveyTool() {
     });
   };
 
+  const filteredAlumniCount = selectedSurvey?.responses
+    ? filterResponses().length
+    : 0;
   const batchYears = [2020, 2021, 2022, 2023, 2024]; // Example batch years
   const collegeDropdownRef = useRef(null);
   const programDropdownRef = useRef(null);
@@ -999,6 +1007,230 @@ function AdminSurveyTool() {
       window.print(); // Triggers the print dialog
     }
   };
+  const getBase64 = async (url) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+  const generatePDF = async () => {
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "pt",
+      format: "a3",
+    });
+
+    // Convert images to base64
+    const alumniconnectlogo2Base64 = await getBase64(alumniconnectlogo2);
+    const cicsLogoBase64 = await getBase64(cicslogo);
+
+    // Add CICS logo (left side)
+    doc.addImage(cicsLogoBase64, "PNG", 40, 30, 48, 48); // Left-side logo
+    doc.setFontSize(10);
+    doc.setTextColor("#000000");
+    doc.text("University of Santo Tomas", 100, 52); // Align beside the logo
+    doc.setFontSize(8);
+    doc.text("College of Information and Computing Sciences", 100, 62); // Align beside the logo
+
+    // Add AlumniConnect logo (right side)
+    doc.addImage(
+      alumniconnectlogo2Base64,
+      "PNG",
+      doc.internal.pageSize.width - 90,
+      30,
+      50,
+      50
+    ); // Right-side logo
+
+    // Add "Alumni Connect" text beside AlumniConnect logo
+    const textY = 60;
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor("#2d2b2b");
+    const alumniTextWidth = doc.getTextWidth("Alumni");
+    const alumniTextX = doc.internal.pageSize.width - 250; // Position text beside logo
+    doc.text("Alumni", alumniTextX, textY);
+    doc.setTextColor("#be142e");
+    const connectTextX = alumniTextX + alumniTextWidth + 5; // Slight gap after "Alumni"
+    doc.text("Connect", connectTextX, textY);
+
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor("#000000");
+    doc.text(
+      "CICS Alumni Connect Survey Report",
+      doc.internal.pageSize.width / 2,
+      100,
+      {
+        align: "center",
+      }
+    );
+
+    // Calculate summary counts
+    const filteredResponses = filterResponses();
+    const summaryCounts = {
+      totalAlumni: filteredResponses.length,
+      batches: {},
+      colleges: {},
+      programs: {},
+      genders: {},
+      regions: {},
+    };
+
+    filteredResponses.forEach((response) => {
+      const { yearGraduatedCollege, college, collegeProgram, gender, region } =
+        response.userId || {};
+
+      if (yearGraduatedCollege) {
+        summaryCounts.batches[yearGraduatedCollege] =
+          (summaryCounts.batches[yearGraduatedCollege] || 0) + 1;
+      }
+      if (college) {
+        summaryCounts.colleges[college] =
+          (summaryCounts.colleges[college] || 0) + 1;
+      }
+      if (collegeProgram) {
+        summaryCounts.programs[collegeProgram] =
+          (summaryCounts.programs[collegeProgram] || 0) + 1;
+      }
+      if (gender) {
+        summaryCounts.genders[gender] =
+          (summaryCounts.genders[gender] || 0) + 1;
+      }
+      if (region) {
+        summaryCounts.regions[region] =
+          (summaryCounts.regions[region] || 0) + 1;
+      }
+    });
+
+    // Display Alumni Summary table
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor("#be142e");
+    doc.text("Alumni Summary", 40, 160); // Section title with red color
+
+    // Prepare the summary data for the table
+    const summaryData = [
+      ["Total Alumni", "", summaryCounts.totalAlumni],
+      ...Object.entries(summaryCounts.batches).map(([year, count]) => [
+        "Batch",
+        year,
+        count,
+      ]),
+      ...Object.entries(summaryCounts.colleges).map(([college, count]) => [
+        "College",
+        college,
+        count,
+      ]),
+      ...Object.entries(summaryCounts.programs).map(([program, count]) => [
+        "Program",
+        program,
+        count,
+      ]),
+      ...Object.entries(summaryCounts.genders).map(([gender, count]) => [
+        "Gender",
+        gender,
+        count,
+      ]),
+      ...Object.entries(summaryCounts.regions).map(([region, count]) => [
+        "Region",
+        region,
+        count,
+      ]),
+    ];
+
+    // Render the summary data table
+    autoTable(doc, {
+      head: [["Category", "Item", "Count"]],
+      body: summaryData,
+      startY: 180, // Adjust as needed based on previous sections
+      styles: { fontSize: 10, textColor: "#333" },
+      headStyles: { fillColor: "#be142e", textColor: "#fff" },
+      columnStyles: {
+        0: { cellWidth: 100 },
+        1: { cellWidth: 200 },
+        2: { cellWidth: 100 },
+      },
+      margin: { top: 5, bottom: 10, left: 40, right: 40 },
+    });
+
+    // Start adding individual responses as tables
+    let startY = doc.autoTable.previous.finalY + 20;
+
+    filteredResponses.forEach((response, index) => {
+      // Default fields for each respondent
+      const defaultFields = [
+        ["First Name", response.userId?.firstName || "---------"],
+        ["Last Name", response.userId?.lastName || "---------"],
+        ["College", response.userId?.college || "---------"],
+        ["College Program", response.userId?.collegeProgram || "---------"],
+        [
+          "Year Graduated",
+          response.userId?.yearGraduatedCollege || "---------",
+        ],
+        ["Gender", response.userId?.gender || "---------"],
+        ["Region", response.userId?.region || "---------"],
+      ];
+
+      // Dynamic fields for each question in the survey, with numbering
+      const questionFields =
+        selectedSurvey?.questions.map((question, qIndex) => {
+          const userAnswer = response.answers.find(
+            (ans) => ans.questionId.toString() === question._id.toString()
+          );
+          return [
+            `Question ${qIndex + 1} (${question.questionText})`,
+            userAnswer
+              ? Array.isArray(userAnswer.answer)
+                ? userAnswer.answer.join(", ") // For checkbox type questions
+                : userAnswer.answer // For other question types
+              : "---------",
+          ];
+        }) || [];
+
+      // Combine default fields and question answers into one table
+      autoTable(doc, {
+        head: [[`Alumni ${index + 1}`, "Field", "Value"]],
+        body: [
+          ...defaultFields.map((field) => ["", field[0], field[1]]),
+          ...questionFields.map((field) => ["", field[0], field[1]]),
+        ],
+        startY,
+        styles: { fontSize: 10, textColor: "#333" },
+        headStyles: { fillColor: "#be142e", textColor: "#fff" },
+        columnStyles: {
+          0: { cellWidth: 100 },
+          1: { cellWidth: 200 },
+          2: { cellWidth: 200 },
+        },
+        margin: { top: 5, bottom: 10, left: 40, right: 40 },
+      });
+
+      startY = doc.autoTable.previous.finalY + 20; // Adds space after each response
+    });
+
+    // Add page numbers at the bottom of each page
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.width / 2,
+        doc.internal.pageSize.height - 30,
+        {
+          align: "center",
+        }
+      );
+    }
+
+    // Save the generated PDF
+    doc.save("cicsalumniconnect_survey_report.pdf");
+  };
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12 ">
@@ -1627,6 +1859,9 @@ function AdminSurveyTool() {
                     )}
                   </div>
                 </div>
+                <div className="text-lg">
+                  Number of Alumni:{filteredAlumniCount}
+                </div>
 
                 {/* Full-Width Table Section with Padding */}
                 <div className="overflow-x-auto mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
@@ -1716,12 +1951,51 @@ function AdminSurveyTool() {
 
                 {/* Export Buttons */}
                 <div className="flex mt-4 justify-center space-x-3">
-                  <button className="btn md:w-64 w-32 bg-blue text-white rounded-lg py-2 px-4">
+                  <button
+                    onClick={generatePDF}
+                    className="btn md:w-64 w-32 bg-blue text-white rounded-lg py-2 px-4"
+                  >
                     Export to PDF
                   </button>
-                  <button className="btn md:w-64 w-32 bg-green text-white rounded-lg py-2 px-4">
+                  <CSVLink
+                    data={filterResponses().map((response) => {
+                      const defaultFields = {
+                        FirstName: response.userId?.firstName || "---------",
+                        LastName: response.userId?.lastName || "---------",
+                        College: response.userId?.college || "---------",
+                        CollegeProgram:
+                          response.userId?.collegeProgram || "---------",
+                        YearGraduated:
+                          response.userId?.yearGraduatedCollege || "---------",
+                        Gender: response.userId?.gender || "---------",
+                        Region: response.userId?.region || "---------",
+                      };
+
+                      const dynamicFields =
+                        selectedSurvey?.questions.reduce((acc, question) => {
+                          const answer = response.answers.find(
+                            (ans) =>
+                              ans.questionId.toString() ===
+                              question._id.toString()
+                          );
+                          acc[question.questionText] = answer
+                            ? Array.isArray(answer.answer)
+                              ? answer.answer.join(", ")
+                              : answer.answer
+                            : "---------";
+                          return acc;
+                        }, {}) || {};
+
+                      return {
+                        ...defaultFields,
+                        ...dynamicFields,
+                      };
+                    })}
+                    filename="cicsalumniconnect_surveyreport.csv"
+                    className="btn md:w-64 w-32 bg-green text-white rounded-lg py-2 px-4"
+                  >
                     Export to Excel
-                  </button>
+                  </CSVLink>
                 </div>
               </div>
             </div>

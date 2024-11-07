@@ -312,9 +312,20 @@ function AdminReports() {
 
   const dropdownRef = useRef(null);
 
+  const fieldsRef = useRef(null);
+  const batchesRef = useRef(null);
+  const collegesRef = useRef(null);
+  const programsRef = useRef(null);
+
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      // Check each dropdown's ref
+      if (
+        fieldsRef.current && !fieldsRef.current.contains(event.target) &&
+        batchesRef.current && !batchesRef.current.contains(event.target) &&
+        collegesRef.current && !collegesRef.current.contains(event.target) &&
+        programsRef.current && !programsRef.current.contains(event.target)
+      ) {
         setOpenDropdown("");
       }
     }
@@ -568,7 +579,7 @@ function AdminReports() {
       <div className="text-sm mb-1">Filters:</div>
       <div className="sm:flex block sm:space-x-4">
         {/* College Dropdown */}
-        <div className="relative sm:mb-1 mb-2" ref={dropdownRef}>
+        <div className="relative sm:mb-1 mb-2" ref={collegesRef}>
           <button
             onClick={() => toggleDropdown("colleges")}
             className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
@@ -618,7 +629,7 @@ function AdminReports() {
         </div>
 
         {/* College Program Dropdown */}
-        <div className="relative sm:mb-1 mb-2" ref={dropdownRef}>
+        <div className="relative sm:mb-1 mb-2" ref={programsRef}>
           <button
             onClick={() => toggleDropdown("programs")}
             className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
@@ -668,7 +679,7 @@ function AdminReports() {
         </div>
 
         {/* Batch Dropdown */}
-        <div className="relative sm:mb-1 mb-2" ref={dropdownRef}>
+        <div className="relative sm:mb-1 mb-2" ref={batchesRef}>
           <button
             onClick={() => toggleDropdown("batches")}
             className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
@@ -717,7 +728,8 @@ function AdminReports() {
           )}
         </div>
 
-        <div className="relative sm:mb-1 mb-2" ref={dropdownRef}>
+        {/* Fields Dropdown */}
+        <div className="relative sm:mb-1 mb-2" ref={fieldsRef}>
           <button
             onClick={() => toggleDropdown("fields")}
             className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-80 w-full relative bg-transparent"

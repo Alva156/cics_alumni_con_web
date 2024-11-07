@@ -8,6 +8,7 @@ import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
 import cicslogo from "../../assets/cicslogo.png";
 import { uniqueId } from "lodash"; // Make sure you import uniqueId
 import { Pie } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -164,7 +165,334 @@ function AdminSurveyTool() {
   const generateColorsForChoices = (choices) => {
     return choices.map(() => generateRandomColor());
   };
+  const getCountByField = (responses, field) => {
+    return responses.reduce((count, response) => {
+      const value = response.userId?.[field];
+      if (value) {
+        count[value] = (count[value] || 0) + 1;
+      }
+      return count;
+    }, {});
+  };
 
+  const renderBarChartData = (data, label) => ({
+    labels: Object.keys(data),
+    datasets: [
+      {
+        label: label, // General label for the dataset
+        data: Object.values(data), // Data values for each category
+        backgroundColor: generateColorsForChoices(Object.keys(data)),
+      },
+    ],
+  });
+
+  const renderPieChartData = (data, label) => ({
+    labels: Object.keys(data),
+    datasets: [
+      {
+        label: label,
+        data: Object.values(data),
+        backgroundColor: generateColorsForChoices(Object.keys(data)),
+      },
+    ],
+  });
+
+  const renderChartsContainer = (survey) => (
+    <div>
+      {/* Bar Chart for Academic Unit */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per College
+        </h3>
+        <div className="chart-container w-full">
+          <Bar
+            data={renderBarChartData(
+              getCountByField(survey.responses, "college"),
+              "Academic Units"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: true,
+              aspectRatio: 2,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Display label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false,
+                          index: i,
+                        };
+                      });
+                    },
+                    font: {
+                      size: (context) => {
+                        const width = context.chart.width;
+                        return width > 800 ? 14 : width > 500 ? 12 : 8;
+                      },
+                    },
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    display: false,
+                  },
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                  },
+                },
+              },
+              onResize: (chart) => {
+                const width = chart.width;
+                const fontSize = width > 800 ? 14 : width > 500 ? 12 : 8;
+                chart.options.plugins.legend.labels.font.size = fontSize;
+                chart.update();
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Bar Chart for Program */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per College Program
+        </h3>
+        <div className="chart-container w-full">
+          <Bar
+            data={renderBarChartData(
+              getCountByField(survey.responses, "collegeProgram"),
+              "Programs"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: true,
+              aspectRatio: 2,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Display label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false,
+                          index: i,
+                        };
+                      });
+                    },
+                    font: {
+                      size: (context) => {
+                        const width = context.chart.width;
+                        return width > 800 ? 14 : width > 500 ? 12 : 8;
+                      },
+                    },
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    display: false,
+                  },
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                  },
+                },
+              },
+              onResize: (chart) => {
+                const width = chart.width;
+                const fontSize = width > 800 ? 14 : width > 500 ? 12 : 8;
+                chart.options.plugins.legend.labels.font.size = fontSize;
+                chart.update();
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Bar Chart for Batch */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per Batch
+        </h3>
+        <div className="chart-container w-full">
+          <Bar
+            data={renderBarChartData(
+              getCountByField(survey.responses, "yearGraduatedCollege"),
+              "Batches"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: true,
+              aspectRatio: 2,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Display label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false,
+                          index: i,
+                        };
+                      });
+                    },
+                    font: {
+                      size: (context) => {
+                        const width = context.chart.width;
+                        return width > 800 ? 14 : width > 500 ? 12 : 8;
+                      },
+                    },
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    display: false,
+                  },
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                  },
+                },
+              },
+              onResize: (chart) => {
+                const width = chart.width;
+                const fontSize = width > 800 ? 14 : width > 500 ? 12 : 8;
+                chart.options.plugins.legend.labels.font.size = fontSize;
+                chart.update();
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Pie Chart for Region */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per Region
+        </h3>
+        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container">
+          <Pie
+            data={renderPieChartData(
+              getCountByField(survey.responses, "region"),
+              "Region"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Show label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false, // Ensure that the label is never hidden, even if the count is zero
+                          index: i,
+                        };
+                      });
+                    },
+                  },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (tooltipItem) => {
+                      const count = tooltipItem.raw || 0; // Get the raw value (count)
+                      return `${count} Alumni`; // Display only the count with "Alumni"
+                    },
+                  },
+                },
+              },
+            }}
+            width={300}
+            height={300}
+          />
+        </div>
+      </div>
+
+      {/* Pie Chart for Gender */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per Gender
+        </h3>
+        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container">
+          <Pie
+            data={renderPieChartData(
+              getCountByField(survey.responses, "gender"),
+              "Gender"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Show label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false, // Ensure that the label is never hidden, even if the count is zero
+                          index: i,
+                        };
+                      });
+                    },
+                  },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (tooltipItem) => {
+                      const count = tooltipItem.raw || 0; // Get the raw value (count)
+                      return `${count} Alumni`; // Display only the count with "Alumni"
+                    },
+                  },
+                },
+              },
+            }}
+            width={300}
+            height={300}
+          />
+        </div>
+      </div>
+    </div>
+  );
   const renderPieChartsContainer = (survey) => (
     <div>
       {survey.questions.map((question, questionIndex) => {
@@ -1562,7 +1890,6 @@ function AdminSurveyTool() {
                   {selectedSurvey?.responseCount || 0}
                 </div>
               </div>
-
               <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 mt-2 border border-fgray">
                 <div className="text-xs font-light">Date Created</div>
                 <div className="text-xl font-normal">
@@ -1594,7 +1921,6 @@ function AdminSurveyTool() {
                   </div>
                 </div>
               </div>
-
               <div className="flex mt-6 space-x-3">
                 <div>
                   <button
@@ -1605,8 +1931,13 @@ function AdminSurveyTool() {
                   </button>
                 </div>
               </div>
-
-              <div>{renderPieChartsContainer(selectedSurvey)}</div>
+              <div className="mb-8">
+                {renderChartsContainer(selectedSurvey)}
+              </div>
+              <div className="chart-container">
+                <div className="text-lg font-light">Questions Summary</div>
+                <div>{renderPieChartsContainer(selectedSurvey)}</div>
+              </div>
             </div>
           </div>
 

@@ -43,6 +43,7 @@ function AdminSurveyTool() {
   const [isSurveyReportModalOpen, setIsSurveyReportModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("Name (A-Z)");
   const [openDropdown, setOpenDropdown] = useState(false);
   const [openGenderDropdown, setOpenGenderDropdown] = useState(false);
   const [openRegionDropdown, setOpenRegionDropdown] = useState(false);
@@ -116,6 +117,7 @@ function AdminSurveyTool() {
       return true; // Include this response if it matches all criteria
     });
   };
+  
 
   const filteredAlumniCount = selectedSurvey?.responses
     ? filterResponses().length
@@ -1275,6 +1277,40 @@ function AdminSurveyTool() {
     doc.save("cicsalumniconnect_survey_report.pdf");
   };
 
+  const filteredAndSortedSurveys = unansweredSurveys
+  .filter((survey) => {
+    return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
+  })
+  .sort((a, b) => {
+    if (sortOption === "Name (A-Z)") {
+      return a.name.localeCompare(b.name);
+    } else if (sortOption === "Name (Z-A)") {
+      return b.name.localeCompare(a.name);
+    } else if (sortOption === "Responses (Lowest-Highest)") {
+      return (a.responseCount || 0) - (b.responseCount || 0);
+    } else if (sortOption === "Responses (Highest-Lowest)") {
+      return (b.responseCount || 0) - (a.responseCount || 0);
+    }
+    return 0;
+  });
+
+  const filteredAndSortedAnsweredSurveys = answeredSurveys
+  .filter((survey) => {
+    return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
+  })
+  .sort((a, b) => {
+    if (sortOption === "Name (A-Z)") {
+      return a.name.localeCompare(b.name);
+    } else if (sortOption === "Name (Z-A)") {
+      return b.name.localeCompare(a.name);
+    } else if (sortOption === "Responses (Lowest-Highest)") {
+      return (a.responseCount || 0) - (b.responseCount || 0);
+    } else if (sortOption === "Responses (Highest-Lowest)") {
+      return (b.responseCount || 0) - (a.responseCount || 0);
+    }
+    return 0;
+  });
+
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12 ">
       {loading && <LoadingSpinner />} {/* Show loading spinner */}
@@ -1317,27 +1353,38 @@ function AdminSurveyTool() {
         <h1 className="text-2xl font-medium text-gray-700">Survey Tool</h1>
       </div>
       <div className="mb-4 relative no-print">
-        <input
-          type="text"
-          placeholder="Search Company"
-          className="w-full border border-black rounded-lg px-4 py-2"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <span
-          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-          onClick={() => setSearchTerm("")}
-        >
-          X
-        </span>
-      </div>
-      <div className="mb-6 no-print">
-        <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
-          <option>Name (A-Z)</option>
-          <option>Name (Z-A)</option>
-        </select>
-      </div>
+      <input
+        type="text"
+        placeholder="Search Company"
+        className="w-full border border-black rounded-lg px-4 py-2"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <span
+        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+        onClick={() => setSearchTerm("")}
+      >
+        X
+      </span>
+    </div>
+      {/* Sort Dropdown */}
+    <div className="mb-6 no-print">
+      <span className="text-sm">Sort by:</span>
+      <select
+        className="ml-2 border border-black rounded px-3 py-1 text-sm"
+        value={sortOption}
+        onChange={(e) => setSortOption(e.target.value)}
+      >
+        <option value="Name (A-Z)">Name (A-Z)</option>
+        <option value="Name (Z-A)">Name (Z-A)</option>
+        <option value="Responses (Lowest-Highest)">
+          Responses (Lowest-Highest)
+        </option>
+        <option value="Responses (Highest-Lowest)">
+          Responses (Highest-Lowest)
+        </option>
+      </select>
+    </div>
       <div className="flex justify-between items-center mb-4 no-print">
         <div className="text-lg">Drafts</div>
         <button
@@ -1348,8 +1395,8 @@ function AdminSurveyTool() {
         </button>
       </div>
       <hr className="mb-6 border-black no-print" />
-      {unansweredSurveys.length > 0 ? (
-        unansweredSurveys.map((survey, index) => (
+      {filteredAndSortedSurveys.length > 0 ? (
+        filteredAndSortedSurveys.map((survey, index) => (
           <div
             key={index}
             className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
@@ -1435,8 +1482,8 @@ function AdminSurveyTool() {
       )}
       <div className="text-lg mb-4 no-print">Published Surveys</div>
       <hr className="mb-6 border-black no-print " />
-      {answeredSurveys.length > 0 ? (
-        answeredSurveys.map((survey, index) => (
+      {filteredAndSortedAnsweredSurveys.length > 0 ? (
+        filteredAndSortedAnsweredSurveys.map((survey, index) => (
           <div
             key={index}
             className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"

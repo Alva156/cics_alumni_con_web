@@ -61,6 +61,13 @@ function AdminSurveyTool() {
       <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
     </div>
   );
+  const formatDate = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString).getTime())) {
+      return "";
+    }
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
   const getBatchYears = () => {
     if (!selectedSurvey?.responses) {
       return []; // Return an empty array if responses are not available
@@ -117,7 +124,6 @@ function AdminSurveyTool() {
       return true; // Include this response if it matches all criteria
     });
   };
-  
 
   const filteredAlumniCount = selectedSurvey?.responses
     ? filterResponses().length
@@ -1210,6 +1216,7 @@ function AdminSurveyTool() {
       const defaultFields = [
         ["First Name", response.userId?.firstName || "---------"],
         ["Last Name", response.userId?.lastName || "---------"],
+        ["Birthday", formatDate(response.userId?.birthday) || "---------"],
         ["College", response.userId?.college || "---------"],
         ["College Program", response.userId?.collegeProgram || "---------"],
         [
@@ -1278,38 +1285,38 @@ function AdminSurveyTool() {
   };
 
   const filteredAndSortedSurveys = unansweredSurveys
-  .filter((survey) => {
-    return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
-  })
-  .sort((a, b) => {
-    if (sortOption === "Name (A-Z)") {
-      return a.name.localeCompare(b.name);
-    } else if (sortOption === "Name (Z-A)") {
-      return b.name.localeCompare(a.name);
-    } else if (sortOption === "Responses (Lowest-Highest)") {
-      return (a.responseCount || 0) - (b.responseCount || 0);
-    } else if (sortOption === "Responses (Highest-Lowest)") {
-      return (b.responseCount || 0) - (a.responseCount || 0);
-    }
-    return 0;
-  });
+    .filter((survey) => {
+      return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
+    })
+    .sort((a, b) => {
+      if (sortOption === "Name (A-Z)") {
+        return a.name.localeCompare(b.name);
+      } else if (sortOption === "Name (Z-A)") {
+        return b.name.localeCompare(a.name);
+      } else if (sortOption === "Responses (Lowest-Highest)") {
+        return (a.responseCount || 0) - (b.responseCount || 0);
+      } else if (sortOption === "Responses (Highest-Lowest)") {
+        return (b.responseCount || 0) - (a.responseCount || 0);
+      }
+      return 0;
+    });
 
   const filteredAndSortedAnsweredSurveys = answeredSurveys
-  .filter((survey) => {
-    return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
-  })
-  .sort((a, b) => {
-    if (sortOption === "Name (A-Z)") {
-      return a.name.localeCompare(b.name);
-    } else if (sortOption === "Name (Z-A)") {
-      return b.name.localeCompare(a.name);
-    } else if (sortOption === "Responses (Lowest-Highest)") {
-      return (a.responseCount || 0) - (b.responseCount || 0);
-    } else if (sortOption === "Responses (Highest-Lowest)") {
-      return (b.responseCount || 0) - (a.responseCount || 0);
-    }
-    return 0;
-  });
+    .filter((survey) => {
+      return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
+    })
+    .sort((a, b) => {
+      if (sortOption === "Name (A-Z)") {
+        return a.name.localeCompare(b.name);
+      } else if (sortOption === "Name (Z-A)") {
+        return b.name.localeCompare(a.name);
+      } else if (sortOption === "Responses (Lowest-Highest)") {
+        return (a.responseCount || 0) - (b.responseCount || 0);
+      } else if (sortOption === "Responses (Highest-Lowest)") {
+        return (b.responseCount || 0) - (a.responseCount || 0);
+      }
+      return 0;
+    });
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12 ">
@@ -1353,38 +1360,38 @@ function AdminSurveyTool() {
         <h1 className="text-2xl font-medium text-gray-700">Survey Tool</h1>
       </div>
       <div className="mb-4 relative no-print">
-      <input
-        type="text"
-        placeholder="Search Company"
-        className="w-full border border-black rounded-lg px-4 py-2"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <span
-        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-        onClick={() => setSearchTerm("")}
-      >
-        X
-      </span>
-    </div>
+        <input
+          type="text"
+          placeholder="Search Company"
+          className="w-full border border-black rounded-lg px-4 py-2"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <span
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+          onClick={() => setSearchTerm("")}
+        >
+          X
+        </span>
+      </div>
       {/* Sort Dropdown */}
-    <div className="mb-6 no-print">
-      <span className="text-sm">Sort by:</span>
-      <select
-        className="ml-2 border border-black rounded px-3 py-1 text-sm"
-        value={sortOption}
-        onChange={(e) => setSortOption(e.target.value)}
-      >
-        <option value="Name (A-Z)">Name (A-Z)</option>
-        <option value="Name (Z-A)">Name (Z-A)</option>
-        <option value="Responses (Lowest-Highest)">
-          Responses (Lowest-Highest)
-        </option>
-        <option value="Responses (Highest-Lowest)">
-          Responses (Highest-Lowest)
-        </option>
-      </select>
-    </div>
+      <div className="mb-6 no-print">
+        <span className="text-sm">Sort by:</span>
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
+          <option value="Name (A-Z)">Name (A-Z)</option>
+          <option value="Name (Z-A)">Name (Z-A)</option>
+          <option value="Responses (Lowest-Highest)">
+            Responses (Lowest-Highest)
+          </option>
+          <option value="Responses (Highest-Lowest)">
+            Responses (Highest-Lowest)
+          </option>
+        </select>
+      </div>
       <div className="flex justify-between items-center mb-4 no-print">
         <div className="text-lg">Drafts</div>
         <button
@@ -1961,6 +1968,7 @@ function AdminSurveyTool() {
                         <td className="px-4 py-2 border"></td>
                         <td className="px-4 py-2 border">First Name</td>
                         <td className="px-4 py-2 border">Last Name</td>
+                        <td className="px-4 py-2 border">Birthday</td>
                         <td className="px-4 py-2 border">College</td>
                         <td className="px-4 py-2 border">College Program</td>
                         <td className="px-4 py-2 border">Batch</td>
@@ -1995,6 +2003,9 @@ function AdminSurveyTool() {
                             </td>
                             <td className="px-4 py-2 border">
                               {response.userId?.lastName || ""}
+                            </td>
+                            <td className="px-4 py-2 border">
+                              {formatDate(response.userId?.birthday) || ""}
                             </td>
                             <td className="px-4 py-2 border">
                               {response.userId?.college || ""}
@@ -2056,6 +2067,8 @@ function AdminSurveyTool() {
                       const defaultFields = {
                         FirstName: response.userId?.firstName || "---------",
                         LastName: response.userId?.lastName || "---------",
+                        Birthday:
+                          formatDate(response.userId?.birthday) || "---------",
                         College: response.userId?.college || "---------",
                         CollegeProgram:
                           response.userId?.collegeProgram || "---------",

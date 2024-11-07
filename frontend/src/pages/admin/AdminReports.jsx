@@ -312,9 +312,20 @@ function AdminReports() {
 
   const dropdownRef = useRef(null);
 
+  const fieldsRef = useRef(null);
+  const batchesRef = useRef(null);
+  const collegesRef = useRef(null);
+  const programsRef = useRef(null);
+
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      // Check each dropdown's ref
+      if (
+        fieldsRef.current && !fieldsRef.current.contains(event.target) &&
+        batchesRef.current && !batchesRef.current.contains(event.target) &&
+        collegesRef.current && !collegesRef.current.contains(event.target) &&
+        programsRef.current && !programsRef.current.contains(event.target)
+      ) {
         setOpenDropdown("");
       }
     }
@@ -561,17 +572,17 @@ function AdminReports() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-2">
         <h1 className="text-2xl font-medium text-gray-700">Reports</h1>
       </div>
 
-      <div className="text-sm mb-4">Filters:</div>
+      <div className="text-sm mb-1">Filters:</div>
       <div className="sm:flex block sm:space-x-4">
         {/* College Dropdown */}
-        <div className="relative mb-6" ref={dropdownRef}>
+        <div className="relative sm:mb-1 mb-2" ref={collegesRef}>
           <button
             onClick={() => toggleDropdown("colleges")}
-            className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+            className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
           >
             <span>College</span>
             <svg
@@ -618,10 +629,10 @@ function AdminReports() {
         </div>
 
         {/* College Program Dropdown */}
-        <div className="relative mb-6" ref={dropdownRef}>
+        <div className="relative sm:mb-1 mb-2" ref={programsRef}>
           <button
             onClick={() => toggleDropdown("programs")}
-            className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+            className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
           >
             <span>College Program</span>
             <svg
@@ -668,10 +679,10 @@ function AdminReports() {
         </div>
 
         {/* Batch Dropdown */}
-        <div className="relative mb-6" ref={dropdownRef}>
+        <div className="relative sm:mb-1 mb-2" ref={batchesRef}>
           <button
             onClick={() => toggleDropdown("batches")}
-            className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+            className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
           >
             <span>Batch (Year Graduated)</span>
             <svg
@@ -717,10 +728,11 @@ function AdminReports() {
           )}
         </div>
 
-        <div className="relative mb-6" ref={dropdownRef}>
+        {/* Fields Dropdown */}
+        <div className="relative sm:mb-1 mb-2" ref={fieldsRef}>
           <button
             onClick={() => toggleDropdown("fields")}
-            className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-80 w-full relative bg-transparent"
+            className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-80 w-full relative bg-transparent"
           >
             <span>Fields</span>
             <svg
@@ -765,11 +777,11 @@ function AdminReports() {
           )}
         </div>
       </div>
-      <div className="text-sm mt-4 mb-4">
+      <div className="text-sm mt-4">
         Number of Alumni: {filteredAlumniCount}
       </div>
 
-      <div className="overflow-x-auto mt-6">
+      <div className="overflow-x-auto mt-2 overflow-y-auto max-h-96">
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
             <tr className="text-xs font-normal text-center">
@@ -826,7 +838,7 @@ function AdminReports() {
         </table>
       </div>
 
-      <div className="flex justify-center mt-16 space-x-3">
+      <div className="flex justify-center mt-3 space-x-3">
         <div className="">
           <button
             onClick={generatePDF}

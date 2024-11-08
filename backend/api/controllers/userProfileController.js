@@ -296,6 +296,8 @@ exports.updateProfile = async (req, res) => {
         attachmentIds = [],
       } = req.body;
 
+      const mobileNumber = contactInformation?.mobileNumber;
+
       // Find the existing profile
       const userProfile = await UserProfile.findOne({ userId });
       if (!userProfile) {
@@ -431,16 +433,20 @@ exports.updateProfile = async (req, res) => {
       );
 
       // If accountEmail is provided, update the email in the User model
-      if (accountEmail) {
+      const updateUserFields = {};
+      if (accountEmail) updateUserFields.email = accountEmail;
+      if (mobileNumber) updateUserFields.mobileNumber = mobileNumber;
+
+      if (Object.keys(updateUserFields).length > 0) {
         const updatedUser = await User.findByIdAndUpdate(
           userId,
-          { email: accountEmail },
+          updateUserFields,
           { new: true, upsert: false }
         );
         if (!updatedUser) {
           return res
             .status(404)
-            .json({ error: "User not found while updating email." });
+            .json({ error: "User not found while updating email or mobile number." });
         }
       }
 

@@ -1397,6 +1397,7 @@ function UserProfile() {
               aria-label="Primary"
               defaultChecked
             />
+
             <div
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 tab-active"
@@ -1839,7 +1840,7 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Mobile Number</label>
+                  <label className="pt-4 pb-2 text-sm">Mobile Number <span className="text-xs font-light italic"> ( include country code before 10-digit number, e.g., <span className="font-medium">63</span> 9125559207 for PH )</span></label>
                   <input
                     type="tel"
                     placeholder="Type here"
@@ -2321,8 +2322,11 @@ function UserProfile() {
 
         {/* END OF BOTTOM BUTTONS */}
       </div>
+
     </>
   );
+
 }
+
 
 export default UserProfile;

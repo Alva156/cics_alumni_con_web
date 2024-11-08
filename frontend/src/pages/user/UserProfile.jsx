@@ -1126,44 +1126,47 @@ function UserProfile() {
               ^, &, *)
             </p>
             <div className="flex justify-center gap-2 mt-8">
-              <button
-                onClick={handlePasswordSub}
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
-              >
-                Save
-              </button>
-              <button
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
-                onClick={closePassModal}
-              >
-                Cancel
-              </button>
-            </div>
+  <button
+    onClick={closePassModal}
+    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+  >
+    Cancel
+  </button>
+  <button
+    onClick={handlePasswordSub}
+    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+  >
+    Save
+  </button>
+</div>
+
+
           </div>
         </div>
       )}
-      {isDeleteModalPicOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-            <h2 className="text-2xl mb-4">Delete Profile Image</h2>
-            <p>Are you sure you want to delete your Profile Image?</p>
-            <div className="flex justify-end mt-4">
-              <button
-                className="btn btn-sm w-24 bg-red text-white mr-2"
-                onClick={handleDeleteProfileImage} // Trigger the delete function
-              >
-                Delete
-              </button>
-              <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={() => setIsDeleteModalPicOpen(false)} // Close the modal on cancel
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+     {isDeleteModalPicOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+      <h2 className="text-2xl mb-4">Delete Profile Image</h2>
+      <p>Are you sure you want to delete your Profile Image?</p>
+      <div className="flex justify-center gap-4 mt-4">
+        <button
+          className="btn btn-sm w-24 bg-[#3D3C3C] text-white px-4 py-2"
+          onClick={() => setIsDeleteModalPicOpen(false)} // Close the modal on cancel
+        >
+          Cancel
+        </button>
+        <button
+          className="btn btn-sm w-24 bg-red text-white px-4 py-2"
+          onClick={handleDeleteProfileImage} // Trigger the delete function
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {/* Email Modal */}
       {isEmailModalOpen && (
@@ -1258,20 +1261,21 @@ function UserProfile() {
             </div>
 
             {/* Save and Cancel Buttons */}
-            <div className="flex justify-center gap-2 mt-8">
-              <button
-                onClick={verifyOTPAndUpdateEmail}
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
-              >
-                Save
-              </button>
-              <button
-                onClick={closeEmailModal}
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
-              >
-                Cancel
-              </button>
-            </div>
+<div className="flex justify-center gap-2 mt-8">
+  <button
+    onClick={closeEmailModal}
+    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+  >
+    Cancel
+  </button>
+  <button
+    onClick={verifyOTPAndUpdateEmail}
+    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+  >
+    Save
+  </button>
+</div>
+
           </div>
         </div>
       )}
@@ -1331,51 +1335,52 @@ function UserProfile() {
         </div>
       )}
 
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-            <h2 className="text-2xl mb-4">Delete Section</h2>
-            <p>Are you sure you want to delete this section?</p>
-            <div className="flex justify-end mt-4">
-              <button
-                className="btn btn-sm w-24 bg-red text-white mr-2"
-                onClick={handleDeleteSection} // Call the actual delete function on confirm
-              >
-                Delete
-              </button>
-              <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={() => setIsDeleteModalOpen(false)} // Close the modal on cancel
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+{isDeleteModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+      <h2 className="text-2xl mb-4">Delete Section</h2>
+      <p>Are you sure you want to delete this section?</p>
+      <div className="flex justify-center gap-4 mt-4">
+        <button
+          className="btn btn-sm w-24 bg-[#3D3C3C] text-white px-4 py-2"
+          onClick={() => setIsDeleteModalOpen(false)} // Close the modal on cancel
+        >
+          Cancel
+        </button>
+        <button
+          className="btn btn-sm w-24 bg-red text-white px-4 py-2"
+          onClick={handleDeleteSection} // Call the actual delete function on confirm
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
-      {isDeleteAttachmentModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-            <h2 className="text-2xl mb-4">Delete Attachment</h2>
-            <p>Are you sure you want to delete this attachment?</p>
-            <div className="flex justify-end mt-4">
-              <button
-                className="btn btn-sm w-24 bg-red text-white mr-2"
-                onClick={handleDeleteAttachment} // Call the delete function for attachments on confirm
-              >
-                Delete
-              </button>
-              <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={() => setIsDeleteAttachmentModalOpen(false)} // Close the modal on cancel
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+{isDeleteAttachmentModalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+      <h2 className="text-2xl mb-4">Delete Attachment</h2>
+      <p>Are you sure you want to delete this attachment?</p>
+      <div className="flex justify-center gap-4 mt-4">
+        <button
+          className="btn btn-sm w-24 bg-[#3D3C3C] text-white px-4 py-2"
+          onClick={() => setIsDeleteAttachmentModalOpen(false)} // Close the modal on cancel
+        >
+          Cancel
+        </button>
+        <button
+          className="btn btn-sm w-24 bg-red text-white px-4 py-2"
+          onClick={handleDeleteAttachment} // Call the delete function for attachments on confirm
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       <form onSubmit={handleSubmit}>
         <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">

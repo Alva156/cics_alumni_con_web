@@ -1340,18 +1340,19 @@ function UserProfile() {
             <h2 className="text-2xl mb-4">Delete Section</h2>
             <p>Are you sure you want to delete this section?</p>
             <div className="flex justify-end mt-4">
+            <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteModalOpen(false)} // Close the modal on cancel
+              >
+                Cancel
+              </button>
               <button
                 className="btn btn-sm w-24 bg-red text-white mr-2"
                 onClick={handleDeleteSection} // Call the actual delete function on confirm
               >
                 Delete
               </button>
-              <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={() => setIsDeleteModalOpen(false)} // Close the modal on cancel
-              >
-                Cancel
-              </button>
+
             </div>
           </div>
         </div>

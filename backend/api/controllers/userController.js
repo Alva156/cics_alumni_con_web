@@ -107,6 +107,7 @@ exports.registerUser = async (req, res) => {
 
     // Generate JWT token with user details
     const tokenPayload = {
+      studentNum,
       firstName,
       lastName,
       birthday,
@@ -261,8 +262,15 @@ exports.verifyOTP = async (req, res) => {
 
     // Decode the token to get user details
     const userDetails = jwt.verify(token, process.env.JWT_SECRET);
-    const { firstName, lastName, birthday, email, mobileNumber, password } =
-      userDetails;
+    const {
+      studentNum,
+      firstName,
+      lastName,
+      birthday,
+      email,
+      mobileNumber,
+      password,
+    } = userDetails;
 
     // Check for OTP associated with either email or mobile number
     let otpRecord;
@@ -291,7 +299,7 @@ exports.verifyOTP = async (req, res) => {
 
     // Create a new user record with isVerified set to true
     const newUser = new User({
-      studentNum: "N/A", // Adjust as necessary based on your logic
+      studentNum: studentNum || "N/A", // Adjust as necessary based on your logic
       firstName,
       lastName,
       birthday,
@@ -306,7 +314,7 @@ exports.verifyOTP = async (req, res) => {
 
     // Send success response along with user details
     return res.status(200).json({
-      user: { firstName, lastName, email, mobileNumber, birthday },
+      user: { studentNum, firstName, lastName, email, mobileNumber, birthday },
     });
   } catch (err) {
     console.error("Error verifying OTP:", err);

@@ -1840,7 +1840,7 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Mobile Number <span className="text-xs font-light italic"> ( include country code before 10-digit number, e.g., 63 for PH )</span></label>
+                  <label className="pt-4 pb-2 text-sm">Mobile Number <span className="text-xs font-light italic"> ( include country code before 10-digit number, e.g., <span className="font-medium">63</span> 9125559207 for PH )</span></label>
                   <input
                     type="tel"
                     placeholder="Type here"

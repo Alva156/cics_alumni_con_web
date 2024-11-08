@@ -1258,20 +1258,21 @@ function UserProfile() {
             </div>
 
             {/* Save and Cancel Buttons */}
-            <div className="flex justify-center gap-2 mt-8">
-              <button
-                onClick={verifyOTPAndUpdateEmail}
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
-              >
-                Save
-              </button>
-              <button
-                onClick={closeEmailModal}
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
-              >
-                Cancel
-              </button>
-            </div>
+<div className="flex justify-center gap-2 mt-8">
+  <button
+    onClick={closeEmailModal}
+    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+  >
+    Cancel
+  </button>
+  <button
+    onClick={verifyOTPAndUpdateEmail}
+    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+  >
+    Save
+  </button>
+</div>
+
           </div>
         </div>
       )}

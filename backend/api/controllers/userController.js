@@ -135,7 +135,9 @@ exports.registerUser = async (req, res) => {
     return res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
-// Send OTP
+// Import axios for sending HTTP requests
+const axios = require("axios");
+
 exports.sendOTP = async (req, res) => {
   try {
     // Get the token from the cookies
@@ -146,69 +148,97 @@ exports.sendOTP = async (req, res) => {
       return res.status(401).json({ msg: "Unauthorized, token missing" });
     }
 
-    // Decode the token to get the user details (specifically email)
-    const { email } = jwt.verify(token, process.env.JWT_SECRET);
+    // Decode the token to get the user's details (email and mobile number)
+    const { email, mobileNumber } = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (!email) {
-      return res.status(400).json({ msg: "Email is required for OTP" });
-    }
+    // Check if an otpType is specified and get the appropriate contact information
+    const { otpType } = req.body;
+    if (otpType === "Email" && email) {
+      // Generate OTP and save it with the email
+      const otp = generateOTP();
+      const newOTP = new OTP({ email, otp });
+      await newOTP.save();
 
-    // Generate OTP and save it associated with the user's email
-    const otp = generateOTP();
-    const newOTP = new OTP({ email, otp });
-    await newOTP.save();
-
-    console.log(`Sending OTP ${otp} to email: ${email}`);
-
-    // Send OTP via email
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-    const htmlContent = `
-    <div style="font-family: Arial, sans-serif; color: #333;">
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f8f8; border-radius: 8px;">
-        <div style="background-color: #ff4b4b; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-         
-        </div>
-        <div style="background-color: #fff; padding: 40px; border-radius: 0 0 8px 8px;">
-          <h2 style="color: #ff4b4b; text-align: center;">Your OTP Code</h2>
-          <p style="text-align: center; font-size: 16px; color: #333;">
-            Hello,
-          </p>
-          <p style="text-align: center; font-size: 16px; color: #333;">
-            To continue with your registration, please use the following One-Time Password (OTP):
-          </p>
-          <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px;">
-            <h1 style="color: #ff4b4b; font-size: 32px; letter-spacing: 2px;">${otp}</h1>
+      // Send OTP via email
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+      const htmlContent = `
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f8f8; border-radius: 8px;">
+          <div style="background-color: #ff4b4b; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+           
           </div>
-          <p style="text-align: center; font-size: 14px; color: #777;">
-            This OTP will expire in 5 minutes.
-          </p>
-          <p style="text-align: center; font-size: 14px; color: #777;">
-            If you didn’t request this, please ignore this email.
+          <div style="background-color: #fff; padding: 40px; border-radius: 0 0 8px 8px;">
+            <h2 style="color: #ff4b4b; text-align: center;">Your OTP Code</h2>
+            <p style="text-align: center; font-size: 16px; color: #333;">
+              Hello,
+            </p>
+            <p style="text-align: center; font-size: 16px; color: #333;">
+              To continue with your registration, please use the following One-Time Password (OTP):
+            </p>
+            <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px;">
+              <h1 style="color: #ff4b4b; font-size: 32px; letter-spacing: 2px;">${otp}</h1>
+            </div>
+            <p style="text-align: center; font-size: 14px; color: #777;">
+              This OTP will expire in 5 minutes.
+            </p>
+            <p style="text-align: center; font-size: 14px; color: #777;">
+              If you didn’t request this, please ignore this email.
+            </p>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+          <p style="font-size: 12px; color: #999;">
+            © 2024 CICS Alumni Connect. All rights reserved.
           </p>
         </div>
       </div>
-      <div style="text-align: center; margin-top: 20px;">
-        <p style="font-size: 12px; color: #999;">
-          © 2024 CICS Alumni Connect. All rights reserved.
-        </p>
-      </div>
-    </div>
-  `;
-    const mailOptions = {
-      from: '"CICS Alumni Connect" <' + process.env.EMAIL_USER + ">",
-      to: email,
-      subject: "Your OTP Code",
-      text: `Your OTP code is ${otp}`,
-      html: htmlContent,
-    };
+    `;
 
-    await transporter.sendMail(mailOptions);
+      const mailOptions = {
+        from: '"CICS Alumni Connect" <' + process.env.EMAIL_USER + ">",
+        to: email,
+        subject: "Your OTP Code",
+        text: `Your OTP code is ${otp}`,
+        html: htmlContent,
+      };
+
+      await transporter.sendMail(mailOptions);
+      console.log(`OTP ${otp} sent to email: ${email}`);
+    } else if (otpType === "SMS" && mobileNumber) {
+      // Generate OTP and save it with the mobile number
+      const otp = generateOTP();
+      const newOTP = new OTP({ mobileNumber, otp });
+      await newOTP.save();
+
+      // Send OTP via SMS using PhilSMS
+      const response = await axios.post(
+        "https://app.philsms.com/api/v3/sms/send",
+        {
+          recipient: mobileNumber, // Use "recipient" instead of "to" to match PhilSMS syntax
+          sender_id: "PhilSMS", // Replace "YourName" with your actual sender ID if needed
+          type: "plain",
+          message: `Your OTP code is ${otp}. It will expire in 5 minutes.`,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.PHILSMS_API_TOKEN}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+      console.log(`OTP ${otp} sent to mobile number: ${mobileNumber}`);
+    } else {
+      return res
+        .status(400)
+        .json({ msg: "Valid email or mobile number required for OTP" });
+    }
 
     // Respond with success message
     res.status(200).json({ msg: "OTP sent successfully" });
@@ -221,7 +251,7 @@ exports.sendOTP = async (req, res) => {
 // Verify OTP
 exports.verifyOTP = async (req, res) => {
   try {
-    const { otp } = req.body; // OTP coming in the body
+    const { otp } = req.body; // OTP received from the request body
 
     // Get the token from the cookies
     const token = req.cookies.userToken;
@@ -232,26 +262,36 @@ exports.verifyOTP = async (req, res) => {
     // Decode the token to get user details
     const userDetails = jwt.verify(token, process.env.JWT_SECRET);
     const { firstName, lastName, birthday, email, mobileNumber, password } =
-      userDetails; // Extract password
+      userDetails;
 
-    // Validate OTP
-    const otpRecord = await OTP.findOne({ email, otp });
+    // Check for OTP associated with either email or mobile number
+    let otpRecord;
+    if (email) {
+      otpRecord = await OTP.findOne({ email, otp });
+    }
+    if (!otpRecord && mobileNumber) {
+      otpRecord = await OTP.findOne({ mobileNumber, otp });
+    }
+
+    // If OTP does not match, return an error
     if (!otpRecord) {
       return res.status(400).json({ msg: "Invalid OTP" });
     }
 
-    // Hash the password from the cookie
+    // Hash the password from the token
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Check if the user already exists to avoid duplicate records
-    const existingUser = await User.findOne({ email });
+    // Check if the user already exists to prevent duplicate records
+    const existingUser = await User.findOne(
+      email ? { email } : { mobileNumber }
+    );
     if (existingUser) {
       return res.status(400).json({ msg: "User already registered" });
     }
 
-    // Create a new user record
+    // Create a new user record with isVerified set to true
     const newUser = new User({
-      studentNum: "N/A", // If applicable, change based on real logic
+      studentNum: "N/A", // Adjust as necessary based on your logic
       firstName,
       lastName,
       birthday,
@@ -262,7 +302,7 @@ exports.verifyOTP = async (req, res) => {
     });
 
     await newUser.save();
-    await OTP.deleteOne({ email, otp }); // Clean up OTP records
+    await OTP.deleteOne({ _id: otpRecord._id }); // Clean up OTP record after successful verification
 
     // Send success response along with user details
     return res.status(200).json({

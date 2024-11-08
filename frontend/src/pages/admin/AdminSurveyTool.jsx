@@ -2538,7 +2538,7 @@ function AdminSurveyTool() {
             {/* Button to add a new question */}
             <div className="mb-6">
               <button
-                className="btn md:w-64 w-44 bg-green text-white"
+                className="btn btn-sm w-29 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={() => {
                   setQuestions([
                     ...questions,
@@ -2552,13 +2552,13 @@ function AdminSurveyTool() {
 
             <div className="flex justify-center mt-16 space-x-3">
               <button
-                className="btn md:w-64 w-44 bg-fgray text-white"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
-                className="btn md:w-64 w-44 bg-green text-white"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={handleUpdateSurvey}
               >
                 Save
@@ -2651,22 +2651,22 @@ function AdminSurveyTool() {
             {/* Button to add a new question */}
             <div className="mb-6">
               <button
-                className="btn md:w-64 w-44 bg-green text-white"
+                className="btn btn-sm w-29 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={addQuestion}
               >
                 Add Question
               </button>
             </div>
 
-            <div className="flex justify-center mt-16 space-x-3">
+            <div className="flex justify-center gap-2 mt-4">
               <button
-                className="btn md:w-64 w-44 bg-fgray text-white"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
-                className="btn md:w-64 w-44 bg-green text-white"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={handleSaveSurvey}
               >
                 Save

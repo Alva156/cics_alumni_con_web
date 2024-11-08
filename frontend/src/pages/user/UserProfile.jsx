@@ -1363,18 +1363,19 @@ function UserProfile() {
             <h2 className="text-2xl mb-4">Delete Attachment</h2>
             <p>Are you sure you want to delete this attachment?</p>
             <div className="flex justify-end mt-4">
+            <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteAttachmentModalOpen(false)} // Close the modal on cancel
+              >
+                Cancel
+              </button>
               <button
                 className="btn btn-sm w-24 bg-red text-white mr-2"
                 onClick={handleDeleteAttachment} // Call the delete function for attachments on confirm
               >
                 Delete
               </button>
-              <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={() => setIsDeleteAttachmentModalOpen(false)} // Close the modal on cancel
-              >
-                Cancel
-              </button>
+       
             </div>
           </div>
         </div>

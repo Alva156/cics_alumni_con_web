@@ -1149,18 +1149,19 @@ function UserProfile() {
             <h2 className="text-2xl mb-4">Delete Profile Image</h2>
             <p>Are you sure you want to delete your Profile Image?</p>
             <div className="flex justify-end mt-4">
+            <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsDeleteModalPicOpen(false)} // Close the modal on cancel
+              >
+                Cancel
+              </button>
               <button
                 className="btn btn-sm w-24 bg-red text-white mr-2"
                 onClick={handleDeleteProfileImage} // Trigger the delete function
               >
                 Delete
               </button>
-              <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={() => setIsDeleteModalPicOpen(false)} // Close the modal on cancel
-              >
-                Cancel
-              </button>
+           
             </div>
           </div>
         </div>

@@ -321,10 +321,14 @@ function AdminReports() {
     function handleClickOutside(event) {
       // Check each dropdown's ref
       if (
-        fieldsRef.current && !fieldsRef.current.contains(event.target) &&
-        batchesRef.current && !batchesRef.current.contains(event.target) &&
-        collegesRef.current && !collegesRef.current.contains(event.target) &&
-        programsRef.current && !programsRef.current.contains(event.target)
+        fieldsRef.current &&
+        !fieldsRef.current.contains(event.target) &&
+        batchesRef.current &&
+        !batchesRef.current.contains(event.target) &&
+        collegesRef.current &&
+        !collegesRef.current.contains(event.target) &&
+        programsRef.current &&
+        !programsRef.current.contains(event.target)
       ) {
         setOpenDropdown("");
       }
@@ -577,187 +581,195 @@ function AdminReports() {
       </div>
 
       <div className="text-sm mb-1">Filters:</div>
-<div className="flex flex-wrap gap-4">
-  {/* College Dropdown */}
-  <div className="relative mb-2 w-full sm:w-auto" ref={collegesRef}>
-    <button
-      onClick={() => toggleDropdown("colleges")}
-      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center w-full sm:w-64 bg-transparent"
-    >
-      <span>College</span>
-      <svg
-        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-          openDropdown === "colleges" ? "rotate-180" : ""
-        }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 10 6"
-      >
-        <path
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="m1 1 4 4 4-4"
-        />
-      </svg>
-    </button>
-    {openDropdown === "colleges" && (
-      <div className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2">
-        <ul className="p-3 space-y-3 text-sm text-gray-700">
-          {["All Colleges", ...availableColleges].map((college, idx) => (
-            <li key={idx} className="flex items-center">
-              <input
-                type="checkbox"
-                value={college}
-                checked={selectedColleges.includes(college)}
-                onChange={handleCollegeSelection}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+      <div className="flex flex-wrap gap-4">
+        {/* College Dropdown */}
+        <div className="relative mb-2 w-full sm:w-auto" ref={collegesRef}>
+          <button
+            onClick={() => toggleDropdown("colleges")}
+            className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center w-full sm:w-64 bg-transparent"
+          >
+            <span>College</span>
+            <svg
+              className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                openDropdown === "colleges" ? "rotate-180" : ""
+              }`}
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
               />
-              <label className="ms-2 sm:text-xs font-medium">{college}</label>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </div>
+            </svg>
+          </button>
+          {openDropdown === "colleges" && (
+            <div className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2">
+              <ul className="p-3 space-y-3 text-sm text-gray-700">
+                {["All Colleges", ...availableColleges].map((college, idx) => (
+                  <li key={idx} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      value={college}
+                      checked={selectedColleges.includes(college)}
+                      onChange={handleCollegeSelection}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                    />
+                    <label className="ms-2 sm:text-xs font-medium">
+                      {college}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
 
-  {/* College Program Dropdown */}
-  <div className="relative mb-2 w-full sm:w-auto" ref={programsRef}>
-    <button
-      onClick={() => toggleDropdown("programs")}
-      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center w-full sm:w-64 bg-transparent"
-    >
-      <span>College Program</span>
-      <svg
-        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-          openDropdown === "programs" ? "rotate-180" : ""
-        }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 10 6"
-      >
-        <path
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="m1 1 4 4 4-4"
-        />
-      </svg>
-    </button>
-    {openDropdown === "programs" && (
-      <div className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2">
-        <ul className="p-3 space-y-3 text-sm text-gray-700">
-          {["All Programs", ...availablePrograms].map((program, idx) => (
-            <li key={idx} className="flex items-center">
-              <input
-                type="checkbox"
-                value={program}
-                checked={selectedPrograms.includes(program)}
-                onChange={handleProgramSelection}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+        {/* College Program Dropdown */}
+        <div className="relative mb-2 w-full sm:w-auto" ref={programsRef}>
+          <button
+            onClick={() => toggleDropdown("programs")}
+            className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center w-full sm:w-64 bg-transparent"
+          >
+            <span>College Program</span>
+            <svg
+              className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                openDropdown === "programs" ? "rotate-180" : ""
+              }`}
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
               />
-              <label className="ms-2 sm:text-xs font-medium">{program}</label>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </div>
+            </svg>
+          </button>
+          {openDropdown === "programs" && (
+            <div className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2">
+              <ul className="p-3 space-y-3 text-sm text-gray-700">
+                {["All Programs", ...availablePrograms].map((program, idx) => (
+                  <li key={idx} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      value={program}
+                      checked={selectedPrograms.includes(program)}
+                      onChange={handleProgramSelection}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                    />
+                    <label className="ms-2 sm:text-xs font-medium">
+                      {program}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
 
-  {/* Batch Dropdown */}
-  <div className="relative mb-2 w-full sm:w-auto" ref={batchesRef}>
-    <button
-      onClick={() => toggleDropdown("batches")}
-      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center w-full sm:w-64 bg-transparent"
-    >
-      <span>Batch (Year Graduated)</span>
-      <svg
-        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-          openDropdown === "batches" ? "rotate-180" : ""
-        }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 10 6"
-      >
-        <path
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="m1 1 4 4 4-4"
-        />
-      </svg>
-    </button>
-    {openDropdown === "batches" && (
-      <div className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2">
-        <ul className="p-3 space-y-3 text-sm text-gray-700">
-          {["All Batches", ...availableBatches].map((batch, idx) => (
-            <li key={idx} className="flex items-center">
-              <input
-                type="checkbox"
-                value={batch}
-                checked={selectedBatches.includes(batch)}
-                onChange={handleBatchSelection}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+        {/* Batch Dropdown */}
+        <div className="relative mb-2 w-full sm:w-auto" ref={batchesRef}>
+          <button
+            onClick={() => toggleDropdown("batches")}
+            className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center w-full sm:w-64 bg-transparent"
+          >
+            <span>Batch (Year Graduated)</span>
+            <svg
+              className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                openDropdown === "batches" ? "rotate-180" : ""
+              }`}
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
               />
-              <label className="ms-2 sm:text-xs font-medium">{batch}</label>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </div>
+            </svg>
+          </button>
+          {openDropdown === "batches" && (
+            <div className="z-10 absolute h-64 overflow-y-scroll sm:w-64 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2">
+              <ul className="p-3 space-y-3 text-sm text-gray-700">
+                {["All Batches", ...availableBatches].map((batch, idx) => (
+                  <li key={idx} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      value={batch}
+                      checked={selectedBatches.includes(batch)}
+                      onChange={handleBatchSelection}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                    />
+                    <label className="ms-2 sm:text-xs font-medium">
+                      {batch}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
 
-  {/* Fields Dropdown */}
-  <div className="relative mb-2 w-full sm:w-auto" ref={fieldsRef}>
-    <button
-      onClick={() => toggleDropdown("fields")}
-      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center w-full sm:w-80 bg-transparent"
-    >
-      <span>Fields</span>
-      <svg
-        className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
-          openDropdown === "fields" ? "rotate-180" : ""
-        }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 10 6"
-      >
-        <path
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="m1 1 4 4 4-4"
-        />
-      </svg>
-    </button>
-    {openDropdown === "fields" && (
-      <div className="z-10 absolute h-64 overflow-y-scroll sm:w-80 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2">
-        <ul className="p-3 space-y-3 text-sm text-gray-700">
-          {["All Fields", ...availableFields].map((field, idx) => (
-            <li key={idx} className="flex items-center">
-              <input
-                type="checkbox"
-                value={field}
-                checked={selectedFields.includes(field)}
-                onChange={handleFieldSelection}
-                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+        {/* Fields Dropdown */}
+        <div className="relative mb-2 w-full sm:w-auto" ref={fieldsRef}>
+          <button
+            onClick={() => toggleDropdown("fields")}
+            className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center w-full sm:w-80 bg-transparent"
+          >
+            <span>Fields</span>
+            <svg
+              className={`w-2.5 h-2.5 ms-3 absolute right-4 transition-transform duration-300 ease-in-out ${
+                openDropdown === "fields" ? "rotate-180" : ""
+              }`}
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 10 6"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="m1 1 4 4 4-4"
               />
-              <label className="ms-2 sm:text-xs font-medium">{field}</label>
-            </li>
-          ))}
-        </ul>
+            </svg>
+          </button>
+          {openDropdown === "fields" && (
+            <div className="z-10 absolute h-64 overflow-y-scroll sm:w-80 w-full bg-white divide-y divide-gray-100 rounded-lg shadow mt-2">
+              <ul className="p-3 space-y-3 text-sm text-gray-700">
+                {["All Fields", ...availableFields].map((field, idx) => (
+                  <li key={idx} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      value={field}
+                      checked={selectedFields.includes(field)}
+                      onChange={handleFieldSelection}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded"
+                    />
+                    <label className="ms-2 sm:text-xs font-medium">
+                      {field}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
-    )}
-  </div>
-</div>
 
       <div className="text-sm mt-4">
         Number of Alumni: {filteredAlumniCount}
@@ -820,11 +832,11 @@ function AdminReports() {
         </table>
       </div>
 
-      <div className="flex justify-center mt-3 space-x-3">
+      <div className="flex justify-center gap-2 mt-4">
         <div className="">
           <button
             onClick={generatePDF}
-            className="btn md:w-64 w-52 bg-blue text-white"
+            className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-blue text-white px-4 py-2 md:px-6 md:py-3"
           >
             Export to PDF
           </button>
@@ -863,7 +875,7 @@ function AdminReports() {
               };
             })}
             filename="cicsalumniconnect_report.csv"
-            className="btn md:w-64 w-52 bg-green text-white"
+            className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
           >
             Export to Excel
           </CSVLink>

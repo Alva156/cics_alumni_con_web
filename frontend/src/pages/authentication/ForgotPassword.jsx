@@ -189,7 +189,12 @@ function ForgotPassword() {
             </div>
 
             <label className="block mb-4 text-sm font-medium">
-              Mobile Number
+              Mobile Number{" "}
+              <span className="text-xs font-light italic">
+                {" "}
+                ( include country code before your number, e.g.,{" "}
+                <span className="font-medium">63</span> 9125559207 for PH )
+              </span>
             </label>
             <div className="flex items-center mb-4">
               <input

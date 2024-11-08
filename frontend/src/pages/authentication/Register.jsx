@@ -79,11 +79,6 @@ function Register() {
       setTimeout(() => setError(""), 5000);
       return;
     }
-    // if (mobileNumber.length !== 11) {
-    //   setError("Mobile number must be exactly 11 digits");
-    //   setTimeout(() => setError(""), 5000);
-    //   return;
-    // }
 
     if (
       !firstName ||
@@ -233,7 +228,12 @@ function Register() {
               style={{ height: "30px" }}
             />
             <label className="block mb-1 text-xs font-medium">
-              Mobile Number *
+              Mobile Number *{" "}
+              <span className="text-xs font-light italic">
+                {" "}
+                ( include country code before your number, e.g.,{" "}
+                <span className="font-medium">63</span> 9125559207 for PH )
+              </span>
             </label>
             <input
               type="number"

@@ -8,6 +8,7 @@ import alumniconnectlogo2 from "../../assets/alumniconnectlogo2.png";
 import cicslogo from "../../assets/cicslogo.png";
 import { uniqueId } from "lodash"; // Make sure you import uniqueId
 import { Pie } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -43,6 +44,7 @@ function AdminSurveyTool() {
   const [isSurveyReportModalOpen, setIsSurveyReportModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("Name (A-Z)");
   const [openDropdown, setOpenDropdown] = useState(false);
   const [openGenderDropdown, setOpenGenderDropdown] = useState(false);
   const [openRegionDropdown, setOpenRegionDropdown] = useState(false);
@@ -60,6 +62,13 @@ function AdminSurveyTool() {
       <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
     </div>
   );
+  const formatDate = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString).getTime())) {
+      return "";
+    }
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString("en-US", options);
+  };
   const getBatchYears = () => {
     if (!selectedSurvey?.responses) {
       return []; // Return an empty array if responses are not available
@@ -156,7 +165,334 @@ function AdminSurveyTool() {
   const generateColorsForChoices = (choices) => {
     return choices.map(() => generateRandomColor());
   };
+  const getCountByField = (responses, field) => {
+    return responses.reduce((count, response) => {
+      const value = response.userId?.[field];
+      if (value) {
+        count[value] = (count[value] || 0) + 1;
+      }
+      return count;
+    }, {});
+  };
 
+  const renderBarChartData = (data, label) => ({
+    labels: Object.keys(data),
+    datasets: [
+      {
+        label: label, // General label for the dataset
+        data: Object.values(data), // Data values for each category
+        backgroundColor: generateColorsForChoices(Object.keys(data)),
+      },
+    ],
+  });
+
+  const renderPieChartData = (data, label) => ({
+    labels: Object.keys(data),
+    datasets: [
+      {
+        label: label,
+        data: Object.values(data),
+        backgroundColor: generateColorsForChoices(Object.keys(data)),
+      },
+    ],
+  });
+
+  const renderChartsContainer = (survey) => (
+    <div>
+      {/* Bar Chart for Academic Unit */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per College
+        </h3>
+        <div className="chart-container w-full">
+          <Bar
+            data={renderBarChartData(
+              getCountByField(survey.responses, "college"),
+              "Academic Units"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: true,
+              aspectRatio: 2,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Display label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false,
+                          index: i,
+                        };
+                      });
+                    },
+                    font: {
+                      size: (context) => {
+                        const width = context.chart.width;
+                        return width > 800 ? 14 : width > 500 ? 12 : 8;
+                      },
+                    },
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    display: false,
+                  },
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                  },
+                },
+              },
+              onResize: (chart) => {
+                const width = chart.width;
+                const fontSize = width > 800 ? 14 : width > 500 ? 12 : 8;
+                chart.options.plugins.legend.labels.font.size = fontSize;
+                chart.update();
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Bar Chart for Program */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per College Program
+        </h3>
+        <div className="chart-container w-full">
+          <Bar
+            data={renderBarChartData(
+              getCountByField(survey.responses, "collegeProgram"),
+              "Programs"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: true,
+              aspectRatio: 2,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Display label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false,
+                          index: i,
+                        };
+                      });
+                    },
+                    font: {
+                      size: (context) => {
+                        const width = context.chart.width;
+                        return width > 800 ? 14 : width > 500 ? 12 : 8;
+                      },
+                    },
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    display: false,
+                  },
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                  },
+                },
+              },
+              onResize: (chart) => {
+                const width = chart.width;
+                const fontSize = width > 800 ? 14 : width > 500 ? 12 : 8;
+                chart.options.plugins.legend.labels.font.size = fontSize;
+                chart.update();
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Bar Chart for Batch */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per Batch
+        </h3>
+        <div className="chart-container w-full">
+          <Bar
+            data={renderBarChartData(
+              getCountByField(survey.responses, "yearGraduatedCollege"),
+              "Batches"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: true,
+              aspectRatio: 2,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Display label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false,
+                          index: i,
+                        };
+                      });
+                    },
+                    font: {
+                      size: (context) => {
+                        const width = context.chart.width;
+                        return width > 800 ? 14 : width > 500 ? 12 : 8;
+                      },
+                    },
+                  },
+                },
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    display: false,
+                  },
+                },
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    stepSize: 1,
+                  },
+                },
+              },
+              onResize: (chart) => {
+                const width = chart.width;
+                const fontSize = width > 800 ? 14 : width > 500 ? 12 : 8;
+                chart.options.plugins.legend.labels.font.size = fontSize;
+                chart.update();
+              },
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Pie Chart for Region */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per Region
+        </h3>
+        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container">
+          <Pie
+            data={renderPieChartData(
+              getCountByField(survey.responses, "region"),
+              "Region"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Show label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false, // Ensure that the label is never hidden, even if the count is zero
+                          index: i,
+                        };
+                      });
+                    },
+                  },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (tooltipItem) => {
+                      const count = tooltipItem.raw || 0; // Get the raw value (count)
+                      return `${count} Alumni`; // Display only the count with "Alumni"
+                    },
+                  },
+                },
+              },
+            }}
+            width={300}
+            height={300}
+          />
+        </div>
+      </div>
+
+      {/* Pie Chart for Gender */}
+      <div className="chart-container w-full rounded px-3 py-2 space-y-2 border border-fgray mt-2">
+        <h3 className="text-lg font-semibold mb-2">
+          Number of Alumni per Gender
+        </h3>
+        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container">
+          <Pie
+            data={renderPieChartData(
+              getCountByField(survey.responses, "gender"),
+              "Gender"
+            )}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  position: "bottom",
+                  labels: {
+                    generateLabels: (chart) => {
+                      const data = chart.data;
+                      return data.labels.map((label, i) => {
+                        const count = data.datasets[0].data[i] || 0;
+                        return {
+                          text: `${label} - ${count}`, // Show label with the count
+                          fillStyle: data.datasets[0].backgroundColor[i],
+                          hidden: false, // Ensure that the label is never hidden, even if the count is zero
+                          index: i,
+                        };
+                      });
+                    },
+                  },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (tooltipItem) => {
+                      const count = tooltipItem.raw || 0; // Get the raw value (count)
+                      return `${count} Alumni`; // Display only the count with "Alumni"
+                    },
+                  },
+                },
+              },
+            }}
+            width={300}
+            height={300}
+          />
+        </div>
+      </div>
+    </div>
+  );
   const renderPieChartsContainer = (survey) => (
     <div>
       {survey.questions.map((question, questionIndex) => {
@@ -1208,6 +1544,7 @@ function AdminSurveyTool() {
       const defaultFields = [
         ["First Name", response.userId?.firstName || "---------"],
         ["Last Name", response.userId?.lastName || "---------"],
+        ["Birthday", formatDate(response.userId?.birthday) || "---------"],
         ["College", response.userId?.college || "---------"],
         ["College Program", response.userId?.collegeProgram || "---------"],
         [
@@ -1275,6 +1612,40 @@ function AdminSurveyTool() {
     doc.save("cicsalumniconnect_survey_report.pdf");
   };
 
+  const filteredAndSortedSurveys = unansweredSurveys
+    .filter((survey) => {
+      return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
+    })
+    .sort((a, b) => {
+      if (sortOption === "Name (A-Z)") {
+        return a.name.localeCompare(b.name);
+      } else if (sortOption === "Name (Z-A)") {
+        return b.name.localeCompare(a.name);
+      } else if (sortOption === "Responses (Lowest-Highest)") {
+        return (a.responseCount || 0) - (b.responseCount || 0);
+      } else if (sortOption === "Responses (Highest-Lowest)") {
+        return (b.responseCount || 0) - (a.responseCount || 0);
+      }
+      return 0;
+    });
+
+  const filteredAndSortedAnsweredSurveys = answeredSurveys
+    .filter((survey) => {
+      return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
+    })
+    .sort((a, b) => {
+      if (sortOption === "Name (A-Z)") {
+        return a.name.localeCompare(b.name);
+      } else if (sortOption === "Name (Z-A)") {
+        return b.name.localeCompare(a.name);
+      } else if (sortOption === "Responses (Lowest-Highest)") {
+        return (a.responseCount || 0) - (b.responseCount || 0);
+      } else if (sortOption === "Responses (Highest-Lowest)") {
+        return (b.responseCount || 0) - (a.responseCount || 0);
+      }
+      return 0;
+    });
+
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12 ">
       {loading && <LoadingSpinner />} {/* Show loading spinner */}
@@ -1331,11 +1702,22 @@ function AdminSurveyTool() {
           X
         </span>
       </div>
+      {/* Sort Dropdown */}
       <div className="mb-6 no-print">
         <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm">
-          <option>Name (A-Z)</option>
-          <option>Name (Z-A)</option>
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
+          <option value="Name (A-Z)">Name (A-Z)</option>
+          <option value="Name (Z-A)">Name (Z-A)</option>
+          <option value="Responses (Lowest-Highest)">
+            Responses (Lowest-Highest)
+          </option>
+          <option value="Responses (Highest-Lowest)">
+            Responses (Highest-Lowest)
+          </option>
         </select>
       </div>
       <div className="flex justify-between items-center mb-4 no-print">
@@ -1348,8 +1730,8 @@ function AdminSurveyTool() {
         </button>
       </div>
       <hr className="mb-6 border-black no-print" />
-      {unansweredSurveys.length > 0 ? (
-        unansweredSurveys.map((survey, index) => (
+      {filteredAndSortedSurveys.length > 0 ? (
+        filteredAndSortedSurveys.map((survey, index) => (
           <div
             key={index}
             className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
@@ -1435,8 +1817,8 @@ function AdminSurveyTool() {
       )}
       <div className="text-lg mb-4 no-print">Published Surveys</div>
       <hr className="mb-6 border-black no-print " />
-      {answeredSurveys.length > 0 ? (
-        answeredSurveys.map((survey, index) => (
+      {filteredAndSortedAnsweredSurveys.length > 0 ? (
+        filteredAndSortedAnsweredSurveys.map((survey, index) => (
           <div
             key={index}
             className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
@@ -1508,7 +1890,6 @@ function AdminSurveyTool() {
                   {selectedSurvey?.responseCount || 0}
                 </div>
               </div>
-
               <div className="w-full rounded bg-hgray px-3 py-2 space-y-2 mt-2 border border-fgray">
                 <div className="text-xs font-light">Date Created</div>
                 <div className="text-xl font-normal">
@@ -1540,7 +1921,6 @@ function AdminSurveyTool() {
                   </div>
                 </div>
               </div>
-
               <div className="flex mt-6 space-x-3">
                 <div>
                   <button
@@ -1551,8 +1931,13 @@ function AdminSurveyTool() {
                   </button>
                 </div>
               </div>
-
-              <div>{renderPieChartsContainer(selectedSurvey)}</div>
+              <div className="mb-8">
+                {renderChartsContainer(selectedSurvey)}
+              </div>
+              <div className="chart-container">
+                <div className="text-lg font-light">Questions Summary</div>
+                <div>{renderPieChartsContainer(selectedSurvey)}</div>
+              </div>
             </div>
           </div>
 
@@ -1580,7 +1965,7 @@ function AdminSurveyTool() {
                   <div className="relative mb-6" ref={genderDropdownRef}>
                     <button
                       onClick={toggleGenderDropdown}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                     >
                       <span>Gender</span>
                       <svg
@@ -1628,7 +2013,7 @@ function AdminSurveyTool() {
                   <div className="relative mb-6" ref={regionDropdownRef}>
                     <button
                       onClick={toggleRegionDropdown}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                     >
                       <span>Region</span>
                       <svg
@@ -1679,7 +2064,7 @@ function AdminSurveyTool() {
                         toggleCollegeDropdown(); // Toggle only the college dropdown
                         setOpenProgramDropdown(false); // Close the program dropdown whenever the college dropdown is toggled
                       }}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                     >
                       <span>Select College</span>
                       <svg
@@ -1744,7 +2129,7 @@ function AdminSurveyTool() {
                   <div className="relative mb-6" ref={programDropdownRef}>
                     <button
                       onClick={toggleProgramDropdown}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                       disabled={!selectedCollege} // Disable if no college is selected
                     >
                       <span>Select Program</span>
@@ -1807,7 +2192,7 @@ function AdminSurveyTool() {
                   <div className="relative mb-6" ref={batchYearDropdownRef}>
                     <button
                       onClick={toggleBatchYearDropdown}
-                      className="border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
+                      className="btn-sm border border-black focus:ring-4 focus:outline-none focus:ring-blue-300 font-light rounded-lg text-sm px-5 py-2.5 flex justify-between items-center sm:w-64 w-full relative bg-transparent"
                     >
                       <span>
                         {selectedBatchYears.length > 0
@@ -1885,35 +2270,36 @@ function AdminSurveyTool() {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-8">
-                  <span className="text-xl font-bold mr-8">
+                <div className="sm:flex block sm:space-x-4 items-center">
+                  <div className="text-xl font-bold mr-8">
                     Number of Alumni: {filteredAlumniCount}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Employed: {countByStatus("Employed")}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Self-Employed: {countByStatus("Self-Employed")}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Underemployed: {countByStatus("Underemployed")}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Freelancing: {countByStatus("Freelancing")}
-                  </span>
-                  <span className="text-sm">
+                  </div>
+                  <div className="text-sm">
                     Unemployed: {countByStatus("Unemployed")}
-                  </span>
+                  </div>
                 </div>
 
                 {/* Full-Width Table Section with Padding */}
-                <div className="overflow-x-auto mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
+                <div className="overflow-x-auto mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50 max-h-96 min-h-96 overflow-y-auto">
                   <table className="min-w-full bg-white border border-gray-300">
                     <thead>
                       <tr className="text-xs font-normal text-center">
                         <td className="px-4 py-2 border"></td>
                         <td className="px-4 py-2 border">First Name</td>
                         <td className="px-4 py-2 border">Last Name</td>
+                        <td className="px-4 py-2 border">Birthday</td>
                         <td className="px-4 py-2 border">College</td>
                         <td className="px-4 py-2 border">College Program</td>
                         <td className="px-4 py-2 border">Batch</td>
@@ -1948,6 +2334,9 @@ function AdminSurveyTool() {
                             </td>
                             <td className="px-4 py-2 border">
                               {response.userId?.lastName || ""}
+                            </td>
+                            <td className="px-4 py-2 border">
+                              {formatDate(response.userId?.birthday) || ""}
                             </td>
                             <td className="px-4 py-2 border">
                               {response.userId?.college || ""}
@@ -2009,6 +2398,8 @@ function AdminSurveyTool() {
                       const defaultFields = {
                         FirstName: response.userId?.firstName || "---------",
                         LastName: response.userId?.lastName || "---------",
+                        Birthday:
+                          formatDate(response.userId?.birthday) || "---------",
                         College: response.userId?.college || "---------",
                         CollegeProgram:
                           response.userId?.collegeProgram || "---------",

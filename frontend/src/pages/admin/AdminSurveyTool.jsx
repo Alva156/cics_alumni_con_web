@@ -1931,7 +1931,10 @@ function AdminSurveyTool() {
                   </button>
                 </div>
               </div>
-              <div className="mb-8">
+              <div className="mb-8 mt-4">
+                <div className="text-lg font-light">
+                  Respondents Information Summary
+                </div>
                 {renderChartsContainer(selectedSurvey)}
               </div>
               <div className="chart-container">

@@ -1840,22 +1840,22 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Mobile Number</label>
+                  <label className="pt-4 pb-2 text-sm">
+                    Mobile Number{" "}
+                    <span className="text-xs font-light italic">
+                      {" "}
+                      ( include country code before your number, e.g.,{" "}
+                      <span className="font-medium">63</span> 9125559207 for PH
+                      )
+                    </span>
+                  </label>
                   <input
                     type="tel"
                     placeholder="Type here"
                     className="input input-sm input-bordered w-full h-10"
                     name="mobileNumber"
                     value={mobileNumber}
-                    onChange={(e) => {
-                      // Remove all non-digit characters, but retain the + symbol
-                      const input = e.target.value.replace(/\D/g, '');
-
-                      // Ensure the value starts with the Philippines country code +63
-                      const formattedNumber = '+63' + input.slice(2, 12); // Slicing ensures a max of 10 digits after +63
-
-                      setMobileNumber(formattedNumber);
-                    }}
+                    onChange={(e) => setMobileNumber(e.target.value)}
                   />
                 </div>
 
@@ -2330,11 +2330,8 @@ function UserProfile() {
 
         {/* END OF BOTTOM BUTTONS */}
       </div>
-
     </>
   );
-
 }
-
 
 export default UserProfile;

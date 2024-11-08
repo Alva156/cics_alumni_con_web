@@ -7,6 +7,7 @@ import forgotpasswordImage from "../../assets/forgotpassword_image.jpg";
 function ForgotPassword() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [email, setEmail] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [otpType, setOtpType] = useState(null);
   const [showOTPForm, setShowOTPForm] = useState(false);
@@ -75,6 +76,35 @@ function ForgotPassword() {
     }
     setLoading(false);
   };
+  const handleSendSMSOTP = async () => {
+    setLoading(true);
+    if (!mobileNumber) {
+      setError("Please enter your mobile number");
+      clearErrorAfterDelay();
+      setLoading(false);
+      return;
+    }
+    try {
+      const response = await axios.post(`${backendUrl}/users/forget`, {
+        mobileNumber,
+      });
+      if (response.data.msg) {
+        setOtpType("sms");
+        setOtpSent(true);
+        setShowOTPForm(true);
+        setTimer(300);
+        setSuccess("OTP sent to mobile number successfully");
+        clearSuccessAfterDelay();
+      } else {
+        setError("Failed to send OTP");
+        clearErrorAfterDelay();
+      }
+    } catch (err) {
+      setError("An error occurred while sending OTP");
+      clearErrorAfterDelay();
+    }
+    setLoading(false);
+  };
 
   const handleVerifyOTP = async () => {
     setLoading(true);
@@ -84,25 +114,28 @@ function ForgotPassword() {
       setLoading(false);
       return;
     }
-
-    const dataToSend = { email, otp };
+    const dataToSend =
+      otpType === "email" ? { email, otp } : { mobileNumber, otp };
     try {
       const response = await axios.post(
         `${backendUrl}/users/verifypassword`,
         dataToSend,
         { withCredentials: true }
       );
-      if (response.data.msg) {
+      if (response.data.msg === "OTP verified successfully") {
         setSuccess("OTP verified successfully");
         clearSuccessAfterDelay();
-        setTimeout(() => navigate("/resetpassword"), 3000); // 3 seconds pause before navigating
+        setTimeout(() => navigate("/resetpassword"), 3000);
       } else {
-        setError("Invalid OTP");
+        setError("An unexpected error occurred");
         clearErrorAfterDelay();
       }
     } catch (err) {
-      console.error(err);
-      setError("An error occurred while verifying OTP");
+      if (err.response && err.response.status === 400) {
+        setError("Invalid OTP");
+      } else {
+        setError("An error occurred while verifying OTP");
+      }
       clearErrorAfterDelay();
     }
     setLoading(false);
@@ -156,16 +189,26 @@ function ForgotPassword() {
             </div>
 
             <label className="block mb-4 text-sm font-medium">
-              Mobile Number
+              Mobile Number{" "}
+              <span className="text-xs font-light italic">
+                {" "}
+                ( include country code before your number, e.g.,{" "}
+                <span className="font-medium">63</span> 9125559207 for PH )
+              </span>
             </label>
             <div className="flex items-center mb-4">
               <input
                 type="tel"
                 className="p-2 border border-black bg-[#D9D9D9] w-full"
+                onChange={(e) => setMobileNumber(e.target.value)}
                 style={{ height: "40px" }}
               />
-              <button className="btn w-auto ml-2 bg-black text-white hover:bg-black hover:text-white">
-                Send OTP (SMS)
+              <button
+                onClick={handleSendSMSOTP}
+                className="btn w-auto ml-2 bg-black text-white hover:bg-black hover:text-white"
+                disabled={loading}
+              >
+                {otpSent && timer > 0 ? "Resend OTP (SMS)" : "Send OTP (SMS)"}
               </button>
             </div>
 

@@ -238,8 +238,14 @@ function VerifyAccount() {
               </p>
             </div>
 
-            <button className="btn md:w-64 w-52 bg-black text-white hover:bg-black hover:text-white">
-              Send OTP (SMS)
+            <button
+              onClick={() => handleOtpTypeSelection("SMS")}
+              className="btn md:w-64 w-52 bg-black text-white mt-2 hover:bg-black hover:text-white"
+              disabled={loading}
+            >
+              {otpSent && otpType === "SMS" && timer > 0
+                ? "Resend OTP (SMS)"
+                : "Send OTP (SMS)"}
             </button>
 
             <button

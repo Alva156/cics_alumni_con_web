@@ -1397,6 +1397,7 @@ function UserProfile() {
               aria-label="Primary"
               defaultChecked
             />
+
             <div
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 tab-active"
@@ -1846,7 +1847,15 @@ function UserProfile() {
                     className="input input-sm input-bordered w-full h-10"
                     name="mobileNumber"
                     value={mobileNumber}
-                    onChange={(e) => setMobileNumber(e.target.value)}
+                    onChange={(e) => {
+                      // Remove all non-digit characters, but retain the + symbol
+                      const input = e.target.value.replace(/\D/g, '');
+
+                      // Ensure the value starts with the Philippines country code +63
+                      const formattedNumber = '+63' + input.slice(2, 12); // Slicing ensures a max of 10 digits after +63
+
+                      setMobileNumber(formattedNumber);
+                    }}
                   />
                 </div>
 
@@ -2321,8 +2330,11 @@ function UserProfile() {
 
         {/* END OF BOTTOM BUTTONS */}
       </div>
+
     </>
   );
+
 }
+
 
 export default UserProfile;

@@ -63,8 +63,10 @@ function VerifyAccount() {
       if (response.data.msg === "OTP sent successfully") {
         setOtpSent(true);
         setSuccess(
-          `OTP sent successfully to your ${
-            type === "Email" ? "email address" : "mobile number by PhilSMS"
+          `OTP sent successfully to the ${
+            type === "Email"
+              ? "email address you provided during registration"
+              : "mobile number you provided during registration via PhilSMS"
           }`
         );
         setTimer(300); // Set timer for 5 minutes (300 seconds)

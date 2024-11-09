@@ -224,7 +224,7 @@ exports.sendOTP = async (req, res) => {
           recipient: mobileNumber, // Use "recipient" instead of "to" to match PhilSMS syntax
           sender_id: "PhilSMS", // Replace "YourName" with your actual sender ID if needed
           type: "plain",
-          message: `Your CICS Alumni Connect registration OTP is ${otp}. Expires in 5 mins.`,
+          message: `Your registration OTP is ${otp}. Expires in 5 mins.`,
         },
         {
           headers: {
@@ -552,7 +552,7 @@ exports.forgotPassword = async (req, res) => {
           recipient: mobileNumber,
           sender_id: "PhilSMS",
           type: "plain",
-          message: `Your CICS Alumni Connect OTP to reset your password is ${otp}. Expires in 5 mins.`,
+          message: `Your OTP to reset your password is ${otp}. Expires in 5 mins.`,
         },
         {
           headers: {

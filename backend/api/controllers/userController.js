@@ -180,7 +180,7 @@ exports.sendOTP = async (req, res) => {
               Hello,
             </p>
             <p style="text-align: center; font-size: 16px; color: #333;">
-              To continue with your registration to CICS Alumni Connect, please use the following One-Time Password (OTP):
+              To continue with your registration, please use the following One-Time Password (OTP):
             </p>
             <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px;">
               <h1 style="color: #ff4b4b; font-size: 32px; letter-spacing: 2px;">${otp}</h1>

@@ -12,12 +12,14 @@ function ForgotPassword() {
   const [otpType, setOtpType] = useState(null);
   const [showOTPForm, setShowOTPForm] = useState(false);
   const [timer, setTimer] = useState(0);
-  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [modal2Visible, setModal2Visible] = useState(false);
   const [modal3Visible, setModal3Visible] = useState(false);
+  const [otpSentForEmail, setOtpSentForEmail] = useState(false);
+  const [otpSentForSMS, setOtpSentForSMS] = useState(false);
+
   const navigate = useNavigate();
 
   const clearErrorAfterDelay = () => {
@@ -29,16 +31,17 @@ function ForgotPassword() {
   };
 
   useEffect(() => {
-    if (timer > 0 && otpSent) {
+    if (timer > 0 && (otpSentForEmail || otpSentForSMS)) {
       const interval = setInterval(() => {
         setTimer((prev) => prev - 1);
       }, 1000);
 
       return () => clearInterval(interval);
     } else if (timer === 0) {
-      setOtpSent(false);
+      setOtpSentForEmail(false);
+      setOtpSentForSMS(false);
     }
-  }, [timer, otpSent]);
+  }, [timer, otpSentForEmail, otpSentForSMS]);
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
@@ -60,10 +63,11 @@ function ForgotPassword() {
       });
       if (response.data.msg) {
         setOtpType("email");
-        setOtpSent(true);
+        setOtpSentForEmail(true);
+        setOtpSentForSMS(false); // Ensure SMS state remains unchanged
         setShowOTPForm(true);
         setTimer(300); // 5 minutes timer
-        setSuccess("OTP sent to email successfully");
+        setSuccess("OTP sent to your email successfully");
         clearSuccessAfterDelay();
       } else {
         setError("Failed to send OTP");
@@ -90,10 +94,13 @@ function ForgotPassword() {
       });
       if (response.data.msg) {
         setOtpType("sms");
-        setOtpSent(true);
+        setOtpSentForSMS(true);
+        setOtpSentForEmail(false); // Ensure email state remains unchanged
         setShowOTPForm(true);
         setTimer(300);
-        setSuccess("OTP sent to mobile number successfully");
+        setSuccess(
+          "OTP sent to your mobile number successfully. Expect the OTP to be sent by 'PhilSMS'"
+        );
         clearSuccessAfterDelay();
       } else {
         setError("Failed to send OTP");
@@ -208,7 +215,9 @@ function ForgotPassword() {
                 className="btn w-auto ml-2 bg-black text-white hover:bg-black hover:text-white"
                 disabled={loading}
               >
-                {otpSent && timer > 0 ? "Resend OTP (SMS)" : "Send OTP (SMS)"}
+                {otpSentForSMS && timer > 0
+                  ? "Resend OTP (SMS)"
+                  : "Send OTP (SMS)"}
               </button>
             </div>
 
@@ -225,7 +234,7 @@ function ForgotPassword() {
                 className="btn w-auto ml-2 bg-black text-white hover:bg-black hover:text-white"
                 disabled={loading}
               >
-                {otpSent && timer > 0
+                {otpSentForEmail && timer > 0
                   ? "Resend OTP (Email)"
                   : "Send OTP (Email)"}
               </button>
@@ -243,14 +252,13 @@ function ForgotPassword() {
                   className="mb-3 p-2 border border-black bg-[#D9D9D9] w-full"
                   style={{ height: "40px" }}
                 />
-                {otpSent && (
+                {timer > 0 && (
                   <div className="mb-4 mt-4">
                     <p className="text-left text-sm md:text-base">
                       OTP valid for: {formatTime(timer)}
                     </p>
                   </div>
                 )}
-
                 <button
                   onClick={handleVerifyOTP}
                   className="btn md:w-64 w-52 bg-green text-white mt-2 hover:bg-green hover:text-white"
@@ -258,7 +266,6 @@ function ForgotPassword() {
                 >
                   Confirm
                 </button>
-
                 <button
                   onClick={() => setModal2Visible(true)}
                   className="btn md:w-64 w-52 bg-[#C5C5C5] text-black hover:bg-[#C5C5C5] hover:text-black mt-2"

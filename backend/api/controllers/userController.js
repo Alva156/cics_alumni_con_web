@@ -180,7 +180,7 @@ exports.sendOTP = async (req, res) => {
               Hello,
             </p>
             <p style="text-align: center; font-size: 16px; color: #333;">
-              To continue with your registration, please use the following One-Time Password (OTP):
+              To continue with your registration to CICS Alumni Connect, please use the following One-Time Password (OTP):
             </p>
             <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px;">
               <h1 style="color: #ff4b4b; font-size: 32px; letter-spacing: 2px;">${otp}</h1>
@@ -224,7 +224,7 @@ exports.sendOTP = async (req, res) => {
           recipient: mobileNumber, // Use "recipient" instead of "to" to match PhilSMS syntax
           sender_id: "PhilSMS", // Replace "YourName" with your actual sender ID if needed
           type: "plain",
-          message: `Your OTP code is ${otp}. It will expire in 5 minutes.`,
+          message: `Your CICS Alumni Connect registration OTP is ${otp}. Expires in 5 mins.`,
         },
         {
           headers: {
@@ -552,7 +552,7 @@ exports.forgotPassword = async (req, res) => {
           recipient: mobileNumber,
           sender_id: "PhilSMS",
           type: "plain",
-          message: `Your OTP code for password reset is ${otp}. It will expire in 5 minutes.`,
+          message: `Your CICS Alumni Connect OTP to reset your password is ${otp}. Expires in 5 mins.`,
         },
         {
           headers: {

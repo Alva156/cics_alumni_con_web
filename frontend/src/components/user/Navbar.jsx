@@ -162,7 +162,7 @@ const Navbar = () => {
                 </li>
                 <li className="p-2.5 ">
                   <button onClick={() => navigate("/user-chatbot")}>
-                    Chatbot
+                    FAQs
                   </button>
                 </li>
               </ul>

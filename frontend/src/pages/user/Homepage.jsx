@@ -79,15 +79,14 @@ const Homepage = () => {
         }
       }
     };
-  
+
     window.addEventListener("resize", handleVideoFullScreen);
     handleVideoFullScreen(); // Call it initially
-  
+
     return () => {
       window.removeEventListener("resize", handleVideoFullScreen);
     };
   }, []);
-  
 
   const fetchNews = async () => {
     const backendUrl = import.meta.env.VITE_BACKEND_URL;

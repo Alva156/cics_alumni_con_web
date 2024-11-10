@@ -158,11 +158,11 @@ function AdminAlumni() {
         </span>
       </div>
 
-      <div className="flex md:flex-row mb-6">
-        <div className="mb-6">
+      <div className="flex flex-col md:flex-row mb-6 space-y-4 md:space-y-0 md:space-x-4">
+        <div className="flex flex-col md:flex-row md:items-center">
           <span className="text-sm">Sort by:</span>
           <select
-            className="ml-2 border border-black rounded px-3 py-1 text-sm mr-10"
+            className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-auto"
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
@@ -170,317 +170,333 @@ function AdminAlumni() {
             <option value="desc">Name (Z-A)</option>
           </select>
         </div>
-        <div>
-          <span className="text-sm">Filter by:</span>
 
-          <select
-            className="ml-2 border border-black rounded px-3 py-1 text-sm w-44"
-            value={selectedCollege}
-            onChange={(e) => setSelectedCollege(e.target.value)}
-          >
-            <option value="">All Colleges</option>
-            <option value="UST-AMV College of Accountancy">
-              UST-AMV College of Accountancy
-            </option>
-            <option value="College of Architecture">
-              College of Architecture
-            </option>
-            <option value="Faculty of Arts and Letters">
-              Faculty of Arts and Letters
-            </option>
-            <option value="Faculty of Civil Law">Faculty of Civil Law</option>
-            <option value="College of Commerce and Business Administration">
-              College of Commerce and Business Administration
-            </option>
-            <option value="College of Education">College of Education</option>
-            <option value="Faculty of Engineering">
-              Faculty of Engineering
-            </option>
-            <option value="College of Fine Arts and Design">
-              College of Fine Arts and Design
-            </option>
-            <option value="College of Information and Computing Sciences">
-              College of Information and Computing Sciences
-            </option>
-            <option value="Faculty of Medicine and Surgery">
-              Faculty of Medicine and Surgery
-            </option>
-            <option value="Conservatory of Music">Conservatory of Music</option>
-            <option value="College of Nursing">College of Nursing</option>
-            <option value="Faculty of Pharmacy">Faculty of Pharmacy</option>
-            <option value="Institute of Physical Education and Athletics">
-              Institute of Physical Education and Athletics
-            </option>
-            <option value="College of Rehabilitation Sciences">
-              College of Rehabilitation Sciences
-            </option>
-            <option value="College of Science">College of Science</option>
-            <option value="College of Tourism and Hospitality Management">
-              College of Tourism and Hospitality Management
-            </option>
-            <option value="Faculty of Canon Law">Faculty of Canon Law</option>
-            <option value="Faculty of Philosophy">Faculty of Philosophy</option>
-            <option value="Faculty of Sacred Theology">
-              Faculty of Sacred Theology
-            </option>
-          </select>
-          <select
-            className="ml-2 border border-black rounded px-3 py-1 text-sm w-52"
-            value={selectedProgram}
-            onChange={(e) => setSelectedProgram(e.target.value)}
-          >
-            <option value="">All Programs</option>
-            <option value="Accountancy">Accountancy</option>
-            <option value="Accounting Information System">
-              Accounting Information System
-            </option>
-            <option value="Management Accounting">Management Accounting</option>
-            <option value="Architecture">Architecture</option>
-            <option value="Asian Studies">Asian Studies</option>
-            <option value="Behavioral Science">Behavioral Science</option>
-            <option value="Communication">Communication</option>
-            <option value="Creative Writing">Creative Writing</option>
-            <option value="Economics">Economics</option>
-            <option value="English Language Studies">
-              English Language Studies
-            </option>
-            <option value="History">History</option>
-            <option value="Journalism">Journalism</option>
-            <option value="Legal Management">Legal Management</option>
-            <option value="Literature">Literature</option>
-            <option value="Philosophy">Philosophy</option>
-            <option value="Political Science">Political Science</option>
-            <option value="Sociology">Sociology</option>
-            <option value="Business Administration, major in Business Economics">
-              Business Administration, major in Business Economics
-            </option>
-            <option value="Business Administration, major in Financial Management">
-              Business Administration, major in Financial Management
-            </option>
-            <option value="Business Administration, major in Human Resource Management">
-              Business Administration, major in Human Resource Management
-            </option>
-            <option value="Business Administration, major in Marketing Management">
-              Business Administration, major in Marketing Management
-            </option>
-            <option value="Entrepreneurship">Entrepreneurship</option>
-            <option value="Secondary Education Major in English">
-              Secondary Education Major in English
-            </option>
-            <option value="Secondary Education Major in Filipino">
-              Secondary Education Major in Filipino
-            </option>
-            <option value="Secondary Education Major in Mathematics">
-              Secondary Education Major in Mathematics
-            </option>
-            <option value="Secondary Education Major in Religious and Values Education">
-              Secondary Education Major in Religious and Values Education
-            </option>
-            <option value="Secondary Education Major in Science">
-              Secondary Education Major in Science
-            </option>
-            <option value="Secondary Education Major in Social Studies">
-              Secondary Education Major in Social Studies
-            </option>
-            <option value="Early Childhood Education">
-              Early Childhood Education
-            </option>
-            <option value="Elementary Education">Elementary Education</option>
-            <option value="Special Needs Education, major in Early Childhood Education">
-              Special Needs Education, major in Early Childhood Education
-            </option>
-            <option value="Food Technology">Food Technology</option>
-            <option value="Nutrition and Dietetics">
-              Nutrition and Dietetics
-            </option>
-            <option value="Bachelor of Library and Information Science">
-              Bachelor of Library and Information Science
-            </option>
-            <option value="Chemical Engineering">Chemical Engineering</option>
-            <option value="Civil Engineering">Civil Engineering</option>
-            <option value="Electrical Engineering">
-              Electrical Engineering
-            </option>
-            <option value="Electronics Engineering">
-              Electronics Engineering
-            </option>
-            <option value="Industrial Engineering">
-              Industrial Engineering
-            </option>
-            <option value="Mechanical Engineering">
-              Mechanical Engineering
-            </option>
-            <option value="Fine Arts, major in Advertising Arts">
-              Fine Arts, major in Advertising Arts
-            </option>
-            <option value="Fine Arts, major in Industrial Design">
-              Fine Arts, major in Industrial Design
-            </option>
-            <option value="Interior Design">Interior Design</option>
-            <option value="Fine Arts, major in Painting">
-              Fine Arts, major in Painting
-            </option>
-            <option value="Computer Science">Computer Science</option>
-            <option value="Information Systems">Information Systems</option>
-            <option value="Information Technology">
-              Information Technology
-            </option>
-            <option value="Basic Human Studies">Basic Human Studies</option>
-            <option value="Doctor of Medicine">Doctor of Medicine</option>
-            <option value="Master in Clinical Audiology">
-              Master in Clinical Audiology
-            </option>
-            <option value="Master in Pain Management">
-              Master in Pain Management
-            </option>
-            <option value="Performance, major in Bassoon">
-              Performance, major in Bassoon
-            </option>
-            <option value="Performance, major in Choral Conducting">
-              Performance, major in Choral Conducting
-            </option>
-            <option value="Performance, major in Clarinet">
-              Performance, major in Clarinet
-            </option>
-            <option value="Composition">Composition</option>
-            <option value="Performance, major in Double Bass">
-              Performance, major in Double Bass
-            </option>
-            <option value="Performance, major in Flute">
-              Performance, major in Flute
-            </option>
-            <option value="Performance, major in French Horn">
-              Performance, major in French Horn
-            </option>
-            <option value="Performance, major in Guitar">
-              Performance, major in Guitar
-            </option>
-            <option value="Jazz">Jazz</option>
-            <option value="Musicology">Musicology</option>
-            <option value="Music Education">Music Education</option>
-            <option value="Music Theatre">Music Theatre</option>
-            <option value="Music Technology">Music Technology</option>
-            <option value="Performance, major in Oboe">
-              Performance, major in Oboe
-            </option>
-            <option value="Performance, major in Orchestral Conducting">
-              Performance, major in Orchestral Conducting
-            </option>
-            <option value="Performance, major in Percussion">
-              Performance, major in Percussion
-            </option>
-            <option value="Performance, major in Piano">
-              Performance, major in Piano
-            </option>
-            <option value="Performance, major in Saxophone">
-              Performance, major in Saxophone
-            </option>
-            <option value="Performance, major in Trombone">
-              Performance, major in Trombone
-            </option>
-            <option value="Performance, major in Trumpet">
-              Performance, major in Trumpet
-            </option>
-            <option value="Performance, major in Tuba">
-              Performance, major in Tuba
-            </option>
-            <option value="Performance, major in Viola">
-              Performance, major in Viola
-            </option>
-            <option value="Performance, major in Violin">
-              Performance, major in Violin
-            </option>
-            <option value="Performance, major in Violoncello">
-              Performance, major in Violoncello
-            </option>
-            <option value="Performance, major in Voice">
-              Performance, major in Voice
-            </option>
-            <option value="Nursing">Nursing</option>
-            <option value="Biochemistry">Biochemistry</option>
-            <option value="Medical Technology">Medical Technology</option>
-            <option value="Pharmacy">Pharmacy</option>
-            <option value="Pharmacy, major in Clinical Pharmacy">
-              Pharmacy, major in Clinical Pharmacy
-            </option>
-            <option value="Doctor of Pharmacy">Doctor of Pharmacy</option>
-            <option value="Fitness and Sports Management">
-              Fitness and Sports Management
-            </option>
-            <option value="Occupational Therapy">Occupational Therapy</option>
-            <option value="Physical Therapy">Physical Therapy</option>
-            <option value="Speech-Language Pathology">
-              Speech-Language Pathology
-            </option>
-            <option value="Sports Science">Sports Science</option>
-            <option value="Applied Mathematics, major in Actuarial Science">
-              Applied Mathematics, major in Actuarial Science
-            </option>
-            <option value="Applied Physics, major in Instrumentation">
-              Applied Physics, major in Instrumentation
-            </option>
-            <option value="Biology, major in Environmental Biology">
-              Biology, major in Environmental Biology
-            </option>
-            <option value="Biology, major in Medical Biology">
-              Biology, major in Medical Biology
-            </option>
-            <option value="Bachelor of Science major in Molecular Biology and Biotechnology">
-              Bachelor of Science major in Molecular Biology and Biotechnology
-            </option>
-            <option value="Chemistry">Chemistry</option>
-            <option value="Data Science and Analytics">
-              Data Science and Analytics
-            </option>
-            <option value="Microbiology">Microbiology</option>
-            <option value="Psychology">Psychology</option>
-            <option value="Hospitality Management, major in Culinary Entrepreneurship">
-              Hospitality Management, major in Culinary Entrepreneurship
-            </option>
-            <option value="Hospitality Management, major in Hospitality Leadership">
-              Hospitality Management, major in Hospitality Leadership
-            </option>
-            <option value="Tourism Management, major in Recreation and Leisure Management">
-              Tourism Management, major in Recreation and Leisure Management
-            </option>
-            <option value="Tourism Management, major in Travel Operation and Service Management">
-              Tourism Management, major in Travel Operation and Service
-              Management
-            </option>
-            <option value="Doctor of Canon Law">Doctor of Canon Law</option>
-            <option value="Licentiate in Canon Law">
-              Licentiate in Canon Law
-            </option>
-            <option value="Bachelor of Canon Law">Bachelor of Canon Law</option>
-            <option value="Doctor of Philosophy">Doctor of Philosophy</option>
-            <option value="Licentiate in Philosophy">
-              Licentiate in Philosophy
-            </option>
-            <option value="Bachelor of Philosophy (Classical)">
-              Bachelor of Philosophy (Classical)
-            </option>
-            <option value="Doctor of Sacred Theology">
-              Doctor of Sacred Theology
-            </option>
-            <option value="Licentiate in Sacred Theology">
-              Licentiate in Sacred Theology
-            </option>
-            <option value="Bachelor of Sacred Theology">
-              Bachelor of Sacred Theology
-            </option>
-          </select>
-          <select
-            className="ml-2 border border-black rounded px-3 py-1 text-sm w-44"
-            value={selectedBatch}
-            onChange={(e) => setSelectedBatch(e.target.value)}
-          >
-            <option value="">All Batches</option>
-            {uniqueYears.map((year) => (
-              <option key={year} value={year}>
-                {year}
+        <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+          <div className="flex flex-col md:flex-row md:items-center">
+            <span className="text-sm">Filter by:</span>
+
+            <select
+              className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-44"
+              value={selectedCollege}
+              onChange={(e) => setSelectedCollege(e.target.value)}
+            >
+              <option value="">All Colleges</option>
+              <option value="UST-AMV College of Accountancy">
+                UST-AMV College of Accountancy
               </option>
-            ))}
-          </select>
+              <option value="College of Architecture">
+                College of Architecture
+              </option>
+              <option value="Faculty of Arts and Letters">
+                Faculty of Arts and Letters
+              </option>
+              <option value="Faculty of Civil Law">Faculty of Civil Law</option>
+              <option value="College of Commerce and Business Administration">
+                College of Commerce and Business Administration
+              </option>
+              <option value="College of Education">College of Education</option>
+              <option value="Faculty of Engineering">
+                Faculty of Engineering
+              </option>
+              <option value="College of Fine Arts and Design">
+                College of Fine Arts and Design
+              </option>
+              <option value="College of Information and Computing Sciences">
+                College of Information and Computing Sciences
+              </option>
+              <option value="Faculty of Medicine and Surgery">
+                Faculty of Medicine and Surgery
+              </option>
+              <option value="Conservatory of Music">
+                Conservatory of Music
+              </option>
+              <option value="College of Nursing">College of Nursing</option>
+              <option value="Faculty of Pharmacy">Faculty of Pharmacy</option>
+              <option value="Institute of Physical Education and Athletics">
+                Institute of Physical Education and Athletics
+              </option>
+              <option value="College of Rehabilitation Sciences">
+                College of Rehabilitation Sciences
+              </option>
+              <option value="College of Science">College of Science</option>
+              <option value="College of Tourism and Hospitality Management">
+                College of Tourism and Hospitality Management
+              </option>
+              <option value="Faculty of Canon Law">Faculty of Canon Law</option>
+              <option value="Faculty of Philosophy">
+                Faculty of Philosophy
+              </option>
+              <option value="Faculty of Sacred Theology">
+                Faculty of Sacred Theology
+              </option>
+            </select>
+          </div>
+
+          <div className="flex flex-col md:flex-row md:items-center">
+            <select
+              className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-52"
+              value={selectedProgram}
+              onChange={(e) => setSelectedProgram(e.target.value)}
+            >
+              <option value="">All Programs</option>
+              <option value="Accountancy">Accountancy</option>
+              <option value="Accounting Information System">
+                Accounting Information System
+              </option>
+              <option value="Management Accounting">
+                Management Accounting
+              </option>
+              <option value="Architecture">Architecture</option>
+              <option value="Asian Studies">Asian Studies</option>
+              <option value="Behavioral Science">Behavioral Science</option>
+              <option value="Communication">Communication</option>
+              <option value="Creative Writing">Creative Writing</option>
+              <option value="Economics">Economics</option>
+              <option value="English Language Studies">
+                English Language Studies
+              </option>
+              <option value="History">History</option>
+              <option value="Journalism">Journalism</option>
+              <option value="Legal Management">Legal Management</option>
+              <option value="Literature">Literature</option>
+              <option value="Philosophy">Philosophy</option>
+              <option value="Political Science">Political Science</option>
+              <option value="Sociology">Sociology</option>
+              <option value="Business Administration, major in Business Economics">
+                Business Administration, major in Business Economics
+              </option>
+              <option value="Business Administration, major in Financial Management">
+                Business Administration, major in Financial Management
+              </option>
+              <option value="Business Administration, major in Human Resource Management">
+                Business Administration, major in Human Resource Management
+              </option>
+              <option value="Business Administration, major in Marketing Management">
+                Business Administration, major in Marketing Management
+              </option>
+              <option value="Entrepreneurship">Entrepreneurship</option>
+              <option value="Secondary Education Major in English">
+                Secondary Education Major in English
+              </option>
+              <option value="Secondary Education Major in Filipino">
+                Secondary Education Major in Filipino
+              </option>
+              <option value="Secondary Education Major in Mathematics">
+                Secondary Education Major in Mathematics
+              </option>
+              <option value="Secondary Education Major in Religious and Values Education">
+                Secondary Education Major in Religious and Values Education
+              </option>
+              <option value="Secondary Education Major in Science">
+                Secondary Education Major in Science
+              </option>
+              <option value="Secondary Education Major in Social Studies">
+                Secondary Education Major in Social Studies
+              </option>
+              <option value="Early Childhood Education">
+                Early Childhood Education
+              </option>
+              <option value="Elementary Education">Elementary Education</option>
+              <option value="Special Needs Education, major in Early Childhood Education">
+                Special Needs Education, major in Early Childhood Education
+              </option>
+              <option value="Food Technology">Food Technology</option>
+              <option value="Nutrition and Dietetics">
+                Nutrition and Dietetics
+              </option>
+              <option value="Bachelor of Library and Information Science">
+                Bachelor of Library and Information Science
+              </option>
+              <option value="Chemical Engineering">Chemical Engineering</option>
+              <option value="Civil Engineering">Civil Engineering</option>
+              <option value="Electrical Engineering">
+                Electrical Engineering
+              </option>
+              <option value="Electronics Engineering">
+                Electronics Engineering
+              </option>
+              <option value="Industrial Engineering">
+                Industrial Engineering
+              </option>
+              <option value="Mechanical Engineering">
+                Mechanical Engineering
+              </option>
+              <option value="Fine Arts, major in Advertising Arts">
+                Fine Arts, major in Advertising Arts
+              </option>
+              <option value="Fine Arts, major in Industrial Design">
+                Fine Arts, major in Industrial Design
+              </option>
+              <option value="Interior Design">Interior Design</option>
+              <option value="Fine Arts, major in Painting">
+                Fine Arts, major in Painting
+              </option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Systems">Information Systems</option>
+              <option value="Information Technology">
+                Information Technology
+              </option>
+              <option value="Basic Human Studies">Basic Human Studies</option>
+              <option value="Doctor of Medicine">Doctor of Medicine</option>
+              <option value="Master in Clinical Audiology">
+                Master in Clinical Audiology
+              </option>
+              <option value="Master in Pain Management">
+                Master in Pain Management
+              </option>
+              <option value="Performance, major in Bassoon">
+                Performance, major in Bassoon
+              </option>
+              <option value="Performance, major in Choral Conducting">
+                Performance, major in Choral Conducting
+              </option>
+              <option value="Performance, major in Clarinet">
+                Performance, major in Clarinet
+              </option>
+              <option value="Composition">Composition</option>
+              <option value="Performance, major in Double Bass">
+                Performance, major in Double Bass
+              </option>
+              <option value="Performance, major in Flute">
+                Performance, major in Flute
+              </option>
+              <option value="Performance, major in French Horn">
+                Performance, major in French Horn
+              </option>
+              <option value="Performance, major in Guitar">
+                Performance, major in Guitar
+              </option>
+              <option value="Jazz">Jazz</option>
+              <option value="Musicology">Musicology</option>
+              <option value="Music Education">Music Education</option>
+              <option value="Music Theatre">Music Theatre</option>
+              <option value="Music Technology">Music Technology</option>
+              <option value="Performance, major in Oboe">
+                Performance, major in Oboe
+              </option>
+              <option value="Performance, major in Orchestral Conducting">
+                Performance, major in Orchestral Conducting
+              </option>
+              <option value="Performance, major in Percussion">
+                Performance, major in Percussion
+              </option>
+              <option value="Performance, major in Piano">
+                Performance, major in Piano
+              </option>
+              <option value="Performance, major in Saxophone">
+                Performance, major in Saxophone
+              </option>
+              <option value="Performance, major in Trombone">
+                Performance, major in Trombone
+              </option>
+              <option value="Performance, major in Trumpet">
+                Performance, major in Trumpet
+              </option>
+              <option value="Performance, major in Tuba">
+                Performance, major in Tuba
+              </option>
+              <option value="Performance, major in Viola">
+                Performance, major in Viola
+              </option>
+              <option value="Performance, major in Violin">
+                Performance, major in Violin
+              </option>
+              <option value="Performance, major in Violoncello">
+                Performance, major in Violoncello
+              </option>
+              <option value="Performance, major in Voice">
+                Performance, major in Voice
+              </option>
+              <option value="Nursing">Nursing</option>
+              <option value="Biochemistry">Biochemistry</option>
+              <option value="Medical Technology">Medical Technology</option>
+              <option value="Pharmacy">Pharmacy</option>
+              <option value="Pharmacy, major in Clinical Pharmacy">
+                Pharmacy, major in Clinical Pharmacy
+              </option>
+              <option value="Doctor of Pharmacy">Doctor of Pharmacy</option>
+              <option value="Fitness and Sports Management">
+                Fitness and Sports Management
+              </option>
+              <option value="Occupational Therapy">Occupational Therapy</option>
+              <option value="Physical Therapy">Physical Therapy</option>
+              <option value="Speech-Language Pathology">
+                Speech-Language Pathology
+              </option>
+              <option value="Sports Science">Sports Science</option>
+              <option value="Applied Mathematics, major in Actuarial Science">
+                Applied Mathematics, major in Actuarial Science
+              </option>
+              <option value="Applied Physics, major in Instrumentation">
+                Applied Physics, major in Instrumentation
+              </option>
+              <option value="Biology, major in Environmental Biology">
+                Biology, major in Environmental Biology
+              </option>
+              <option value="Biology, major in Medical Biology">
+                Biology, major in Medical Biology
+              </option>
+              <option value="Bachelor of Science major in Molecular Biology and Biotechnology">
+                Bachelor of Science major in Molecular Biology and Biotechnology
+              </option>
+              <option value="Chemistry">Chemistry</option>
+              <option value="Data Science and Analytics">
+                Data Science and Analytics
+              </option>
+              <option value="Microbiology">Microbiology</option>
+              <option value="Psychology">Psychology</option>
+              <option value="Hospitality Management, major in Culinary Entrepreneurship">
+                Hospitality Management, major in Culinary Entrepreneurship
+              </option>
+              <option value="Hospitality Management, major in Hospitality Leadership">
+                Hospitality Management, major in Hospitality Leadership
+              </option>
+              <option value="Tourism Management, major in Recreation and Leisure Management">
+                Tourism Management, major in Recreation and Leisure Management
+              </option>
+              <option value="Tourism Management, major in Travel Operation and Service Management">
+                Tourism Management, major in Travel Operation and Service
+                Management
+              </option>
+              <option value="Doctor of Canon Law">Doctor of Canon Law</option>
+              <option value="Licentiate in Canon Law">
+                Licentiate in Canon Law
+              </option>
+              <option value="Bachelor of Canon Law">
+                Bachelor of Canon Law
+              </option>
+              <option value="Doctor of Philosophy">Doctor of Philosophy</option>
+              <option value="Licentiate in Philosophy">
+                Licentiate in Philosophy
+              </option>
+              <option value="Bachelor of Philosophy (Classical)">
+                Bachelor of Philosophy (Classical)
+              </option>
+              <option value="Doctor of Sacred Theology">
+                Doctor of Sacred Theology
+              </option>
+              <option value="Licentiate in Sacred Theology">
+                Licentiate in Sacred Theology
+              </option>
+              <option value="Bachelor of Sacred Theology">
+                Bachelor of Sacred Theology
+              </option>
+            </select>
+          </div>
+          <div className="flex flex-col md:flex-row md:items-center">
+            <select
+              className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-44"
+              value={selectedBatch}
+              onChange={(e) => setSelectedBatch(e.target.value)}
+            >
+              <option value="">All Batches</option>
+              {uniqueYears.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

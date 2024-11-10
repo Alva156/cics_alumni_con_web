@@ -1653,7 +1653,7 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Secondary"
+              aria-label="👥"
             />
             <div
               role="tabpanel"
@@ -1780,7 +1780,7 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Contacts"
+              aria-label="📱"
             />
             <div
               role="tabpanel"
@@ -1878,7 +1878,7 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Attachments"
+              aria-label="📓"
             />
             <div
               role="tabpanel"
@@ -1939,7 +1939,7 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Education"
+              aria-label="🎓"
             />
             <div
               role="tabpanel"
@@ -2153,7 +2153,7 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Career"
+              aria-label="🧑🏻‍💻"
             />
             <div
               role="tabpanel"
@@ -2267,7 +2267,7 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Settings"
+              aria-label="🛠️"
             />
             <div
               role="tabpanel"

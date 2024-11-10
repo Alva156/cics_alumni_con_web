@@ -116,7 +116,7 @@ const Navbar = () => {
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <details>
-                    <summary>Contents</summary>
+                  <summary className="p-2.5">Contents</summary>
                     <ul className="p-2.5 z-50">
                       <li className="p-1">
                         <button onClick={() => navigate("/user-companies")}>

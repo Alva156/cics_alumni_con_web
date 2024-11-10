@@ -240,7 +240,7 @@ function ForgotPassword() {
               </button>
             </div>
 
-            {!otpSent && (
+            {!otpSentForEmail && !otpSentForSMS && (
               <button
                 onClick={() => navigate("/login")}
                 className="btn md:w-64 w-52 bg-[#C5C5C5] text-black hover:bg-[#C5C5C5] hover:text-black mt-2"

@@ -12,7 +12,7 @@ const Navbar = () => {
   const [loading, setLoading] = useState(false);
 
   const LoadingSpinner = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-100">
       <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
     </div>
   );
@@ -117,7 +117,7 @@ const Navbar = () => {
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <details>
                   <summary className="p-2.5">Contents</summary>
-                    <ul className="p-2.5 z-50">
+                    <ul className="p-2.5 z-100">
                       <li className="p-1">
                         <button onClick={() => navigate("/user-companies")}>
                           Companies
@@ -206,7 +206,7 @@ const Navbar = () => {
             <li className="px-2.5 pr-8">
               <details ref={detailsRef}>
                 <summary className="font-bold text-gray-700">Contents</summary>
-                <ul className="px-2.5 bg-white pr-8 z-20">
+                <ul className="px-2.5 bg-white pr-8 z-100">
                   <li className="p-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
@@ -287,7 +287,7 @@ const Navbar = () => {
           </a>
 
           {isTooltipVisible && (
-            <div className="absolute top-full mt-1 mr-3.5 md:mr-7 bg-gray-800 text-white text-xxs md:text-xs rounded py-1 px-1.5 z-10">
+            <div className="absolute top-full mt-1 mr-3.5 md:mr-7 bg-gray-800 text-white text-xxs md:text-xs rounded py-1 px-1.5 z-100">
               Logout
             </div>
           )}

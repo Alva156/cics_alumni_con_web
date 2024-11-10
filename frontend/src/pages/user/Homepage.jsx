@@ -224,7 +224,7 @@ const Homepage = () => {
   return (
     <div className="homepage-wrapper">
       {showLoginMessage && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-100">
           <p>Login success!</p>
         </div>
       )}

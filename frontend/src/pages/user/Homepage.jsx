@@ -229,14 +229,20 @@ const Homepage = () => {
         </div>
       )}
       <div className="homepage-container">
-        <div className="background-news-container">
-          {/* Background Video Section */}
-          <div className="background-section">
-            <video autoPlay muted ref={videoRef} className="background-video">
-              <source src={ustbg} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            <div className="video-footer">Photo Courtesy of UST SITE</div>
+  <div className="background-news-container">
+    {/* Background Video Section */}
+    <div className="background-section">
+      <video 
+        autoPlay 
+        muted 
+        ref={videoRef} 
+        className="background-video"
+        playsInline // Ensures the video doesn't go fullscreen on iOS
+      >
+        <source src={ustbg} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div className="video-footer">Photo Courtesy of UST SITE</div>
           </div>
 
           {/* News and Events Carousel Section */}

@@ -94,7 +94,7 @@ const Navbar = () => {
             {isDropdownOpen && (
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow"
+                className="menu menu-sm dropdown-content bg-white z-100 mt-3 w-72 p-2 shadow"
               >
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <button onClick={() => navigate("/")}>Home</button>

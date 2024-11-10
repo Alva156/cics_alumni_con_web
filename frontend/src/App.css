@@ -1,7 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
 
+/* Ensure the navbar is always on top */
 .navbar {
-  z-index: 1000; /* Makes sure the navbar stays above other elements */
+  top: 0;
+  left: 0;
+  z-index: 9999; /* High z-index value to keep it on top */
+}
+
+/* Ensure the dropdown has a higher z-index as well */
+.menu.menu-sm.dropdown-content {
+  z-index: 10000; /* Higher than the other content */
 }
 
 body {

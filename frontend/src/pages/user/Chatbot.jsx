@@ -737,10 +737,25 @@ function Chatbot() {
     /// About Alumni Connect
     "What is Alumni Connect?": [
       "Alumni Connect is a web-based platform designed for the alumni of the University of Santo Tomas College of Information and Computing Sciences (UST CICS). The project aims to create a dedicated online space to address the challenges of collecting comprehensive alumni data and fostering networking opportunities. Ultimately, this initiative seeks to strengthen the UST CICS community while enhancing career development and improving curriculum pathways for its members.",
+      "<strong> Please note that this project is a capstone project for studies at UST and is entirely independent of the university. It is not affiliated with any official UST services, and no authorization has been granted by the university for this domain or project. </strong>",
     ],
 
     "Who are the proponents of Alumni Connect?": [
       "The proponents of Alumni Connect are Andrei Cimoune Alvarico, Alessandra Claire Cruz, James Lorenz Santos, and Denise Anne Valdivieso. They are 4th-year Information Technology students specializing in Web Development at the University of Santo Tomas.",
+    ],
+
+    "CICS Alumni Connect": [
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> cicsalumniconnect@gmail.com",
+    ],
+
+    "University of Santo Tomas": [
+      "<strong><i class='fas fa-university'></i> Campus Location:</strong> University of Santo Tomas, España Boulevard, Sampaloc, Manila 1008, Philippines",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> inquiries@ust.edu.ph",
+    ],
+
+    "UST CICS Office": [
+      "<strong><i class='fas fa-building'></i> Location:</strong> 2/F Blessed Pier Giorgio Frassati Building",
+      "<strong><i class='fas fa-phone'></i> Contact Details:</strong> +63-2-3406-1611 local 8518",
     ],
   };
 
@@ -772,6 +787,7 @@ function Chatbot() {
           "Jobs",
           "College Office Information",
           "About Alumni Connect",
+          "Question not in FAQ?",
         ]);
       } else if (previousStep === 3) {
         addChatMessage("chatbot", "You chose:");
@@ -789,6 +805,7 @@ function Chatbot() {
       "Jobs",
       "College Office Information",
       "About Alumni Connect",
+      "Question not in FAQ?",
     ]);
     setStepHistory([1]);
     setStep(2);
@@ -881,6 +898,12 @@ function Chatbot() {
           "What is Alumni Connect?",
           "Who are the proponents of Alumni Connect?",
           "Go back",
+        ];
+      } else if (option === "Question not in FAQ?") {
+        options = [
+          "CICS Alumni Connect",
+          "University of Santo Tomas",
+          "UST CICS Office",
         ];
       }
       setCurrentOptions(options); // Save options for the current step

@@ -2153,7 +2153,7 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="🧑🏻‍💻"
+              aria-label="💼"
             />
             <div
               role="tabpanel"

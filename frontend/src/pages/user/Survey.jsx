@@ -230,38 +230,38 @@ function Survey() {
   };
 
   const filteredAndSortedSurveys = unansweredSurveys
-  .filter((survey) => {
-    return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
-  })
-  .sort((a, b) => {
-    if (sortOption === "Name (A-Z)") {
-      return a.name.localeCompare(b.name);
-    } else if (sortOption === "Name (Z-A)") {
-      return b.name.localeCompare(a.name);
-    } else if (sortOption === "Responses (Lowest-Highest)") {
-      return (a.responseCount || 0) - (b.responseCount || 0);
-    } else if (sortOption === "Responses (Highest-Lowest)") {
-      return (b.responseCount || 0) - (a.responseCount || 0);
-    }
-    return 0;
-  });
+    .filter((survey) => {
+      return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
+    })
+    .sort((a, b) => {
+      if (sortOption === "Name (A-Z)") {
+        return a.name.localeCompare(b.name);
+      } else if (sortOption === "Name (Z-A)") {
+        return b.name.localeCompare(a.name);
+      } else if (sortOption === "Responses (Lowest-Highest)") {
+        return (a.responseCount || 0) - (b.responseCount || 0);
+      } else if (sortOption === "Responses (Highest-Lowest)") {
+        return (b.responseCount || 0) - (a.responseCount || 0);
+      }
+      return 0;
+    });
 
   const filteredAndSortedAnsweredSurveys = answeredSurveys
-  .filter((survey) => {
-    return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
-  })
-  .sort((a, b) => {
-    if (sortOption === "Name (A-Z)") {
-      return a.name.localeCompare(b.name);
-    } else if (sortOption === "Name (Z-A)") {
-      return b.name.localeCompare(a.name);
-    } else if (sortOption === "Responses (Lowest-Highest)") {
-      return (a.responseCount || 0) - (b.responseCount || 0);
-    } else if (sortOption === "Responses (Highest-Lowest)") {
-      return (b.responseCount || 0) - (a.responseCount || 0);
-    }
-    return 0;
-  });
+    .filter((survey) => {
+      return survey.name.toLowerCase().includes(searchTerm.toLowerCase());
+    })
+    .sort((a, b) => {
+      if (sortOption === "Name (A-Z)") {
+        return a.name.localeCompare(b.name);
+      } else if (sortOption === "Name (Z-A)") {
+        return b.name.localeCompare(a.name);
+      } else if (sortOption === "Responses (Lowest-Highest)") {
+        return (a.responseCount || 0) - (b.responseCount || 0);
+      } else if (sortOption === "Responses (Highest-Lowest)") {
+        return (b.responseCount || 0) - (a.responseCount || 0);
+      }
+      return 0;
+    });
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -280,34 +280,36 @@ function Survey() {
       <h1 className="text-2xl font-medium text-gray-700 mb-6">Survey</h1>
 
       <div className="mb-4 relative">
-      <input
-        type="text"
-        placeholder="Search Company"
-        className="w-full border border-black rounded-lg px-4 py-2"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <span
-        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-        onClick={() => setSearchTerm("")}
-      >
+        <input
+          type="text"
+          placeholder="Search Survey"
+          className="w-full border border-black rounded-lg px-4 py-2"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <span
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+          onClick={() => setSearchTerm("")}
+        >
           X
         </span>
       </div>
 
       <div className="mb-6">
         <span className="text-sm">Sort by:</span>
-        <select className="ml-2 border border-black rounded px-3 py-1 text-sm"
-        value={sortOption}
-        onChange={(e) => setSortOption(e.target.value)}>
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+        >
           <option value="Name (A-Z)">Name (A-Z)</option>
-        <option value="Name (Z-A)">Name (Z-A)</option>
-        <option value="Responses (Lowest-Highest)">
-          Responses (Lowest-Highest)
-        </option>
-        <option value="Responses (Highest-Lowest)">
-          Responses (Highest-Lowest)
-        </option>
+          <option value="Name (Z-A)">Name (Z-A)</option>
+          <option value="Responses (Lowest-Highest)">
+            Responses (Lowest-Highest)
+          </option>
+          <option value="Responses (Highest-Lowest)">
+            Responses (Highest-Lowest)
+          </option>
         </select>
       </div>
 
@@ -390,24 +392,21 @@ function Survey() {
             ))}
 
             {/* BOTTOM BUTTONS */}
-            <div className="flex justify-center mt-16 space-x-3">
-              <div>
-                <button
-                  className="btn md:w-64 w-52 bg-fgray text-white"
-                  onClick={closeModal}
-                >
-                  Cancel
-                </button>
-              </div>
-              <div>
-                <button
-                  className="btn md:w-64 w-52 bg-green text-white"
-                  onClick={handleSaveResponse}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
+<div className="flex justify-center gap-2 mt-8">
+  <button
+    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+    onClick={closeModal}
+  >
+    Cancel
+  </button>
+  <button
+    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+    onClick={handleSaveResponse}
+  >
+    Save
+  </button>
+</div>
+
           </div>
         </div>
       )}

@@ -1660,7 +1660,7 @@ function AdminSurveyTool() {
         </div>
       )}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">Delete Survey</h2>
             <p>Are you sure you want to delete this survey?</p>
@@ -2541,7 +2541,7 @@ function AdminSurveyTool() {
             {/* Button to add a new question */}
             <div className="mb-6">
               <button
-                className="btn md:w-64 w-44 bg-green text-white"
+                className="btn btn-sm w-29 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={() => {
                   setQuestions([
                     ...questions,
@@ -2555,13 +2555,13 @@ function AdminSurveyTool() {
 
             <div className="flex justify-center mt-16 space-x-3">
               <button
-                className="btn md:w-64 w-44 bg-fgray text-white"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
-                className="btn md:w-64 w-44 bg-green text-white"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={handleUpdateSurvey}
               >
                 Save
@@ -2654,22 +2654,22 @@ function AdminSurveyTool() {
             {/* Button to add a new question */}
             <div className="mb-6">
               <button
-                className="btn md:w-64 w-44 bg-green text-white"
+                className="btn btn-sm w-29 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={addQuestion}
               >
                 Add Question
               </button>
             </div>
 
-            <div className="flex justify-center mt-16 space-x-3">
+            <div className="flex justify-center gap-2 mt-4">
               <button
-                className="btn md:w-64 w-44 bg-fgray text-white"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
-                className="btn md:w-64 w-44 bg-green text-white"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={handleSaveSurvey}
               >
                 Save
@@ -2680,7 +2680,7 @@ function AdminSurveyTool() {
       )}
       {/* Publish/Unpublish Confirmation Modal */}
       {isPublishModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">
               {surveys.find((survey) => survey._id === selectedSurveyId)

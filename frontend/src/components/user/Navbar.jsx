@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../App.css";
 import { MdOutlineLogout } from "react-icons/md";
@@ -55,6 +55,14 @@ const Navbar = () => {
   };
   const closeModal = () => {
     setModalVisible(false);
+  };
+
+  const detailsRef = useRef(null);
+  const handleNavigateAndClose = (path) => {
+    navigate(path);
+    if (detailsRef.current) {
+      detailsRef.current.open = false; // Close the dropdown
+    }
   };
 
   return (
@@ -196,13 +204,13 @@ const Navbar = () => {
               </button>
             </li>
             <li className="px-2.5 pr-8">
-              <details>
+              <details ref={detailsRef}>
                 <summary className="font-bold text-gray-700">Contents</summary>
                 <ul className="px-2.5 bg-white pr-8 z-20">
                   <li className="p-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => navigate("/user-companies")}
+                      onClick={() => handleNavigateAndClose("/user-companies")}
                     >
                       Companies
                     </button>
@@ -210,7 +218,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => navigate("/user-news")}
+                      onClick={() => handleNavigateAndClose("/user-news")}
                     >
                       News
                     </button>
@@ -218,7 +226,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => navigate("/user-events")}
+                      onClick={() => handleNavigateAndClose("/user-events")}
                     >
                       Events
                     </button>
@@ -226,7 +234,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => navigate("/user-certifications")}
+                      onClick={() => handleNavigateAndClose("/user-certifications")}
                     >
                       Certifications
                     </button>
@@ -234,7 +242,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => navigate("/user-documentrequest")}
+                      onClick={() => handleNavigateAndClose("/user-documentrequest")}
                     >
                       Document Request Steps
                     </button>
@@ -242,7 +250,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => navigate("/user-job")}
+                      onClick={() => handleNavigateAndClose("/user-job")}
                     >
                       Job/Internship Referrals
                     </button>

@@ -473,16 +473,16 @@ function AdminCertifications() {
                 }
               />
             </div>
-            <div className="flex flex-col md:flex-row justify-center gap-4 mb-4">
+            <div className="flex justify-center gap-2 mt-4">
               <button
-                className="btn bg-zinc-800 text-white w-full md:w-64 py-2 rounded-lg"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateCertifications}
-                className="btn bg-green text-white w-full md:w-64 py-2 rounded-lg"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
               >
                 Save
               </button>
@@ -584,15 +584,15 @@ function AdminCertifications() {
                 placeholder="Enter Certifications Details"
               />
             </div>
-            <div className="flex flex-col md:flex-row justify-center gap-4 mb-4">
+            <div className="flex justify-center gap-2 mt-4">
               <button
-                className="btn bg-zinc-800 text-white w-full md:w-64 py-2 rounded-lg"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
-                className="btn bg-green text-white w-full md:w-64 py-2 rounded-lg"
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
                 onClick={handleCreateCertifications}
               >
                 Add

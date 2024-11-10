@@ -386,7 +386,7 @@ function AdminAccount() {
         </div>
       )}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">Delete Profile Image</h2>
             <p>Are you sure you want to delete your Profile Image?</p>
@@ -481,7 +481,7 @@ function AdminAccount() {
           <div className="py-1">
             <button
               type="button"
-              className="btn md:w-64 w-52 bg-orange text-white" // Add a function to handle saving
+              className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-orange text-white px-4 py-2 md:px-6 md:py-3"
               onClick={openEmailModal}
               aria-label="Save" // Added aria-label for accessibility
             >
@@ -491,16 +491,16 @@ function AdminAccount() {
         </div>
       </form>
 
-      <div className="flex justify-center mt-4 space-x-3 mb-12">
+      <div className="flex justify-center gap-2 mt-4 mb-12">
         <button
-          className="btn md:w-64 w-52 bg-green text-white"
+          className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
           onClick={handleSave}
         >
           Save
         </button>
         <button
           onClick={openPassModal}
-          className="btn md:w-64 w-52 bg-[#E58008] text-white"
+          className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-[#E58008] text-white px-4 py-2 md:px-6 md:py-3"
         >
           Reset Password
         </button>

@@ -278,11 +278,11 @@ const AdminDashboard = () => {
 
   return (
     <div
-      className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12 "
+      className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-4 mb-12 "
       ref={dashboardRef}
     >
       <div className=" flex justify-between items-center">
-        <h1 className="text-xl mb-4">Dashboard</h1>
+        <h1 className="text-2xl font-medium text-gray-700">Dashboard</h1>
         <button
           onClick={exportToPDF}
           className="header btn mb-4 text-sm  md:w-64 w-44 bg-blue text-white"

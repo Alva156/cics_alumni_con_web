@@ -1083,7 +1083,7 @@ function AdminThreads() {
         </div>
       )}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="ttext-2xl mb-4">Delete Thread</h2>
             <p>Are you sure you want to delete this thread?</p>
@@ -1105,7 +1105,7 @@ function AdminThreads() {
         </div>
       )}
       {isNotifModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">
               {selectedThread?.notifEnabled

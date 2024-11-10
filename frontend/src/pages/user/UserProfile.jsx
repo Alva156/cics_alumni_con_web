@@ -1394,7 +1394,7 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Primary"
+              aria-label="👤"
               defaultChecked
             />
             <div

@@ -78,18 +78,20 @@ exports.getAllThreads = async (req, res) => {
     const threadsWithReplyCount = await Promise.all(
       threads.map(async (thread) => {
         const replyCount = await Reply.countDocuments({ threadId: thread._id });
+
         return {
           ...thread,
           replyCount,
           isOwner:
             userProfileId &&
+            thread.userProfileId && // Check that userProfileId is not null
             thread.userProfileId._id.toString() === userProfileId.toString(),
         };
       })
     );
-
     res.status(200).json(threadsWithReplyCount);
   } catch (error) {
+    console.error("Error fetching threads:", error); // Log the error in detail
     res.status(500).json({ message: "Error fetching threads", error });
   }
 };

@@ -576,7 +576,7 @@ function Threads() {
       return 0;
     });
   };
-  
+
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-0 mb-12">
       <div className="carousel relative bg-white m-3 max-w-full overflow-hidden">
@@ -620,7 +620,6 @@ function Threads() {
           <option>Oldest</option>
         </select>
       </div>
-
 
       <div className="flex justify-between items-center mb-4 mt-12">
         {searchTerm.trim() ? (

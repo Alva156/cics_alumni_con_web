@@ -60,6 +60,7 @@ function UserProfile() {
   const [otpSent, setOtpSent] = useState(false);
   const [maxId, setMaxId] = useState(1);
   const [isDeleteModalPicOpen, setIsDeleteModalPicOpen] = useState(false);
+  
   const handleDeleteProfileImage = async () => {
     try {
       await axios.delete(`${backendUrl}/profile/deleteProfileImage`, {
@@ -462,6 +463,52 @@ function UserProfile() {
     setConfirmCallback(() => onConfirm); // Store the confirm action to execute later
     setIsConfirmationModalOpen(true); // Open modal
   };
+  
+  // Get all elements with the class "tab"
+const tabs = document.querySelectorAll('.tab');
+
+// Loop through each tab and add the event listeners
+tabs.forEach(tab => {
+  tab.addEventListener('mouseenter', () => {
+    // Change the aria-label on hover
+    if (tab.getAttribute('aria-label') === '🛠') {
+      tab.setAttribute('aria-label', 'Settings');
+    } else if (tab.getAttribute('aria-label') === '🏠︎') {
+      tab.setAttribute('aria-label', 'Primary');
+    } else if (tab.getAttribute('aria-label') === '♥︎') {
+      tab.setAttribute('aria-label', 'Secondary');
+    }else if (tab.getAttribute('aria-label') === '☎︎') {
+      tab.setAttribute('aria-label', 'Contacts');
+    }else if (tab.getAttribute('aria-label') === '⬇') {
+      tab.setAttribute('aria-label', 'Attachments');
+    }else if (tab.getAttribute('aria-label') === '✎') {
+      tab.setAttribute('aria-label', 'Education');
+    }else if (tab.getAttribute('aria-label') === '★') {
+      tab.setAttribute('aria-label', 'Career');
+    }
+    
+  });
+
+  tab.addEventListener('mouseleave', () => {
+    // Reset the aria-label to the original text when the mouse leaves
+    if (tab.getAttribute('aria-label') === 'Settings') {
+      tab.setAttribute('aria-label', '🛠');
+    } else if (tab.getAttribute('aria-label') === 'Primary') {
+      tab.setAttribute('aria-label', '🏠︎');
+    } else if (tab.getAttribute('aria-label') === 'Secondary') {
+      tab.setAttribute('aria-label', '♥︎');
+    }else if (tab.getAttribute('aria-label') === 'Contacts') {
+      tab.setAttribute('aria-label', '☎︎');
+    }else if (tab.getAttribute('aria-label') === 'Attachments') {
+      tab.setAttribute('aria-label', '⬇');
+    }else if (tab.getAttribute('aria-label') === 'Education') {
+      tab.setAttribute('aria-label', '✎');
+    }else if (tab.getAttribute('aria-label') === 'Career') {
+      tab.setAttribute('aria-label', '★');
+    }
+  });
+});
+
 
   const addSecondaryEducationSection = async () => {
     if (hasUnsavedSecondaryChanges) {
@@ -1390,13 +1437,14 @@ function UserProfile() {
             className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg"
           >
             <input
-              type="radio"
-              name="my_tabs_2"
-              role="tab"
-              className="tab"
-              aria-label="👤"
-              defaultChecked
-            />
+  type="radio"
+  name="my_tabs_2"
+  role="tab"
+  className="tab"
+  aria-label="🏠︎"
+  defaultChecked
+  title="Primary Information" 
+/>
 
             <div
               role="tabpanel"
@@ -1653,7 +1701,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Secondary"
+              aria-label="♥︎"
+              title="Secondary Information" 
             />
             <div
               role="tabpanel"
@@ -1780,7 +1829,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Contacts"
+              aria-label="☎︎"
+              title="Contact Information" 
             />
             <div
               role="tabpanel"
@@ -1878,7 +1928,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Attachments"
+              aria-label="⬇"
+              title="Attachments" 
             />
             <div
               role="tabpanel"
@@ -1939,7 +1990,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Education"
+              aria-label="✎"
+              title="Educational Background" 
             />
             <div
               role="tabpanel"
@@ -2153,7 +2205,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Career"
+              aria-label="★"
+              title="Career" 
             />
             <div
               role="tabpanel"
@@ -2267,7 +2320,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Settings"
+              aria-label="🛠"
+              title="Settings"
             />
             <div
               role="tabpanel"

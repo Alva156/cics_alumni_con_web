@@ -92,6 +92,7 @@ const Navbar = () => {
                 />
               </svg>
             </div>
+            {/* Mobile */}
             {isDropdownOpen && (
               <ul
                 tabIndex={0}
@@ -196,6 +197,7 @@ const Navbar = () => {
             )}
           </div>
         </div>
+        {/* Desktop */}
         <div className="navbar-center hidden lg:flex py-1">
           <ul className="menu menu-horizontal px-1">
             <li className="px-2.5 pr-8">

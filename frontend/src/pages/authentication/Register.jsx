@@ -164,6 +164,10 @@ function Register() {
             {/* Form Fields */}
             <label className="block mb-1 mt-2 text-xs font-medium">
               Student ID Number
+              <span className="text-xs font-light italic">
+                {" "}
+                (e.g. 2001007121 )
+              </span>
             </label>
             <input
               type="text"

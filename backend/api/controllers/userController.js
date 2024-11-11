@@ -83,6 +83,9 @@ exports.registerUser = async (req, res) => {
     if (studentNum && studentNum.trim() !== "") {
       matchingRecord = csvData.find(
         (row) =>
+          row.studentNum &&
+          row.studentNum.trim() !== "0000000000" &&
+          row.studentNum.trim() !== "" && // Skip if CSV studentNum is empty
           row.studentNum.trim() === studentNum.trim() &&
           row.firstName.trim().toLowerCase() ===
             firstName.trim().toLowerCase() &&

@@ -1,5 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
 
+/* Ensure the navbar is always on top */
+.navbar {
+  top: 0;
+  left: 0;
+  z-index: 9999; /* High z-index value to keep it on top */
+}
+
+/* Ensure the dropdown has a higher z-index as well */
+.menu.menu-sm.dropdown-content {
+  z-index: 10000; /* Higher than the other content */
+}
+
 body {
   font-family: "Roboto", sans-serif;
   background-color: #f6f6f6;
@@ -62,7 +74,7 @@ body {
   color: white;
   padding: 10px;
   border-radius: 5px;
-  z-index: 20;
+  z-index: 10;
   text-align: right;
 }
 
@@ -178,7 +190,6 @@ body {
   .news-events-section {
     width: 100%; /* Stack news and events full-width */
     margin-top: 5px;
-    margin-left: -7px;
   }
 }
 
@@ -214,15 +225,22 @@ body {
 .carousel-news {
   display: flex;
   scroll-snap-type: x mandatory;
-  overflow-x: scroll; /* Horizontal scrolling */
-  overflow: hidden; /* Hide the scrollbar */
-  scroll-padding: 0 24px;
+  overflow-x: auto; /* Allow horizontal scrolling */
+  overflow-y: hidden; /* Prevent vertical overflow */
+  scroll-padding: 0; /* Remove side padding */
   scroll-behavior: smooth; /* Smooth sliding effect */
   width: 100%; /* Ensure it takes the full width */
+  flex-wrap: nowrap; /* Prevent wrapping of items */
+  -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+  scrollbar-width: none; /* For Firefox */
+}
+
+.carousel-news::-webkit-scrollbar, .carousel-events::-webkit-scrollbar {
+  display: none; /* Hide the scrollbar for Webkit-based browsers */
 }
 
 .carousel-news .item {
-  flex: none; /* Prevent items from shrinking */
+  flex: 0 0 auto; /* Prevent items from shrinking or growing */
   scroll-snap-align: start;
   width: 100%; /* Full width to ensure only one card is shown */
   transition: transform 0.3s ease-in-out;
@@ -240,11 +258,13 @@ body {
 .carousel-events {
   display: flex;
   scroll-snap-type: x mandatory;
-  overflow-x: scroll; /* Horizontal scrolling */
-  overflow: hidden; /* Hide the scrollbar */
-  scroll-padding: 0 24px;
+  overflow-x: auto; /* Allow horizontal scrolling */
+  overflow-y: hidden; /* Prevent vertical overflow */
+  scroll-padding: 0; /* Remove side padding */
   scroll-behavior: smooth; /* Smooth sliding effect */
   width: 100%; /* Ensure it takes the full width */
+  -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+  scrollbar-width: none; /* For Firefox */
 }
 
 .carousel-events .item {

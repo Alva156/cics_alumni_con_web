@@ -142,40 +142,40 @@ const Homepage = () => {
 
   const nextNews = () => {
     setCurrentNewsIndex((prevIndex) => {
-      const nextIndex = prevIndex === news.length - 1 ? 0 : prevIndex + 1;
+      const nextIndex = (prevIndex + 1) % news.length; // Use modulus for infinite loop
       slideTo(nextIndex, newsCarouselRef);
       return nextIndex;
     });
     handleManualSlide("news");
   };
-
+  
   const prevNews = () => {
     setCurrentNewsIndex((prevIndex) => {
-      const prevIndexValue = prevIndex === 0 ? news.length - 1 : prevIndex - 1;
+      const prevIndexValue = (prevIndex - 1 + news.length) % news.length; // Modulus for wrapping around
       slideTo(prevIndexValue, newsCarouselRef);
       return prevIndexValue;
     });
     handleManualSlide("news");
   };
-
+  
   const nextEvent = () => {
     setCurrentEventsIndex((prevIndex) => {
-      const nextIndex = prevIndex === events.length - 1 ? 0 : prevIndex + 1;
+      const nextIndex = (prevIndex + 1) % events.length; // Use modulus for infinite loop
       slideTo(nextIndex, eventsCarouselRef);
       return nextIndex;
     });
     handleManualSlide("events");
   };
-
+  
   const prevEvent = () => {
     setCurrentEventsIndex((prevIndex) => {
-      const prevIndexValue =
-        prevIndex === 0 ? events.length - 1 : prevIndex - 1;
+      const prevIndexValue = (prevIndex - 1 + events.length) % events.length; // Modulus for wrapping around
       slideTo(prevIndexValue, eventsCarouselRef);
       return prevIndexValue;
     });
     handleManualSlide("events");
   };
+  
 
   const slideTo = (index, carouselRef) => {
     const carousel = carouselRef.current;
@@ -534,3 +534,4 @@ const Homepage = () => {
 };
 
 export default Homepage;
+/*  */

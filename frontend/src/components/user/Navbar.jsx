@@ -12,7 +12,7 @@ const Navbar = () => {
   const [loading, setLoading] = useState(false);
 
   const LoadingSpinner = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
       <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
     </div>
   );
@@ -60,10 +60,9 @@ const Navbar = () => {
   const detailsRef = useRef(null);
   const handleNavigateAndClose = (path) => {
     navigate(path);
-    if (detailsRef.current) {
-      detailsRef.current.open = false; // Close the dropdown
-    }
+    setIsDropdownOpen(false); // Close the dropdown after navigating
   };
+  
 
   return (
     <div>
@@ -92,80 +91,52 @@ const Navbar = () => {
               </svg>
             </div>
             {isDropdownOpen && (
-              <ul
-                tabIndex={0}
-                className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow"
-              >
-                <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button onClick={() => navigate("/")}>Home</button>
-                </li>
-                <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button onClick={() => navigate("/user-userprofile")}>
-                    User Profile
-                  </button>
-                </li>
-                <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button onClick={() => navigate("/user-survey")}>
-                    Survey
-                  </button>
-                </li>
-                <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button onClick={() => navigate("/user-threads")}>
-                    Threads
-                  </button>
-                </li>
-                <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <details>
-                    <summary>Contents</summary>
-                    <ul className="p-2.5 z-50">
-                      <li className="p-1">
-                        <button onClick={() => navigate("/user-companies")}>
-                          Companies
-                        </button>
-                      </li>
-                      <li className="p-1">
-                        <button onClick={() => navigate("/user-news")}>
-                          News
-                        </button>
-                      </li>
-                      <li className="p-1">
-                        <button onClick={() => navigate("/user-events")}>
-                          Events
-                        </button>
-                      </li>
-                      <li className="p-1">
-                        <button
-                          onClick={() => navigate("/user-certifications")}
-                        >
-                          Certifications
-                        </button>
-                      </li>
-                      <li className="p-1">
-                        <button
-                          onClick={() => navigate("/user-documentrequest")}
-                        >
-                          Document Request Steps
-                        </button>
-                      </li>
-                      <li className="p-1">
-                        <button onClick={() => navigate("/user-job")}>
-                          Job/Internship Referrals
-                        </button>
-                      </li>
-                    </ul>
-                  </details>
-                </li>
-                <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button onClick={() => navigate("/user-alumni")}>
-                    Alumni
-                  </button>
-                </li>
-                <li className="p-2.5 ">
-                  <button onClick={() => navigate("/user-chatbot")}>
-                    Chatbot
-                  </button>
-                </li>
-              </ul>
+              <ul tabIndex={0} className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow">
+              <li className="p-2.5 border-b border-hgray last:border-b-0">
+                <button onClick={() => handleNavigateAndClose("/")}>Home</button>
+              </li>
+              <li className="p-2.5 border-b border-hgray last:border-b-0">
+                <button onClick={() => handleNavigateAndClose("/user-userprofile")}>User Profile</button>
+              </li>
+              <li className="p-2.5 border-b border-hgray last:border-b-0">
+                <button onClick={() => handleNavigateAndClose("/user-survey")}>Survey</button>
+              </li>
+              <li className="p-2.5 border-b border-hgray last:border-b-0">
+                <button onClick={() => handleNavigateAndClose("/user-threads")}>Threads</button>
+              </li>
+              <li className="p-2.5 border-b border-hgray last:border-b-0">
+                <details>
+                  <summary className="p-2.5">Contents</summary>
+                  <ul className="p-2.5 z-20">
+                    <li className="p-1">
+                      <button onClick={() => handleNavigateAndClose("/user-companies")}>Companies</button>
+                    </li>
+                    <li className="p-1">
+                      <button onClick={() => handleNavigateAndClose("/user-news")}>News</button>
+                    </li>
+                    <li className="p-1">
+                      <button onClick={() => handleNavigateAndClose("/user-events")}>Events</button>
+                    </li>
+                    <li className="p-1">
+                      <button onClick={() => handleNavigateAndClose("/user-certifications")}>Certifications</button>
+                    </li>
+                    <li className="p-1">
+                      <button onClick={() => handleNavigateAndClose("/user-documentrequest")}>Document Request Steps</button>
+                    </li>
+                    <li className="p-1">
+                      <button onClick={() => handleNavigateAndClose("/user-job")}>Job/Internship Referrals</button>
+                    </li>
+                  </ul>
+                </details>
+              </li>
+              <li className="p-2.5 border-b border-hgray last:border-b-0">
+                <button onClick={() => handleNavigateAndClose("/user-alumni")}>Alumni</button>
+              </li>
+              <li className="p-2.5">
+                <button onClick={() => handleNavigateAndClose("/user-chatbot")}>FAQs</button>
+              </li>
+            </ul>
+            
             )}
           </div>
         </div>
@@ -287,7 +258,7 @@ const Navbar = () => {
           </a>
 
           {isTooltipVisible && (
-            <div className="absolute top-full mt-1 mr-3.5 md:mr-7 bg-gray-800 text-white text-xxs md:text-xs rounded py-1 px-1.5 z-10">
+            <div className="absolute top-full mt-1 mr-3.5 md:mr-7 bg-gray-800 text-white text-xxs md:text-xs rounded py-1 px-1.5 z-20">
               Logout
             </div>
           )}

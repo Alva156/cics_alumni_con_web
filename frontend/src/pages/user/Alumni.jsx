@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 function Alumni() {
+
+  
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [alumni, setAlumni] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,6 +52,83 @@ function Alumni() {
     fetchAttachments();
   }, [backendUrl]);
 
+  // Fetch alumni
+  useEffect(() => {
+    const fetchAlumni = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/profile/alumni`, {
+          withCredentials: true,
+        });
+        setAlumni(response.data.alumni);
+      } catch (error) {
+        console.error("Error fetching alumni:", error);
+      }
+    };
+    fetchAlumni();
+  }, [backendUrl]);
+
+  // Handle hover effects using useEffect
+  useEffect(() => {
+    // Select all elements with the class 'tab'
+    const tabs = document.querySelectorAll('.tab');
+
+    // Function that handles mouse enter event on tab
+    const handleMouseEnter = (tab) => {
+      // Change aria-label for different tab items based on the original label
+      if (tab.getAttribute('aria-label') === '🛠') {
+        tab.setAttribute('aria-label', 'Settings');
+      } else if (tab.getAttribute('aria-label') === '🏠︎') {
+        tab.setAttribute('aria-label', 'Primary');
+      } else if (tab.getAttribute('aria-label') === '♥︎') {
+        tab.setAttribute('aria-label', 'Secondary');
+      } else if (tab.getAttribute('aria-label') === '☎︎') {
+        tab.setAttribute('aria-label', 'Contacts');
+      } else if (tab.getAttribute('aria-label') === '⬇') {
+        tab.setAttribute('aria-label', 'Attachments');
+      } else if (tab.getAttribute('aria-label') === '✎') {
+        tab.setAttribute('aria-label', 'Education');
+      } else if (tab.getAttribute('aria-label') === '★') {
+        tab.setAttribute('aria-label', 'Career');
+      }
+    };
+
+    // Function that handles mouse leave event on tab
+    const handleMouseLeave = (tab) => {
+      // Reset aria-label back to original values when mouse leaves the tab
+      if (tab.getAttribute('aria-label') === 'Settings') {
+        tab.setAttribute('aria-label', '🛠');
+      } else if (tab.getAttribute('aria-label') === 'Primary') {
+        tab.setAttribute('aria-label', '🏠︎');
+      } else if (tab.getAttribute('aria-label') === 'Secondary') {
+        tab.setAttribute('aria-label', '♥︎');
+      } else if (tab.getAttribute('aria-label') === 'Contacts') {
+        tab.setAttribute('aria-label', '☎︎');
+      } else if (tab.getAttribute('aria-label') === 'Attachments') {
+        tab.setAttribute('aria-label', '⬇');
+      } else if (tab.getAttribute('aria-label') === 'Education') {
+        tab.setAttribute('aria-label', '✎');
+      } else if (tab.getAttribute('aria-label') === 'Career') {
+        tab.setAttribute('aria-label', '★');
+      }
+    };
+
+    // Attach mouseenter and mouseleave event listeners to each tab
+    tabs.forEach((tab) => {
+      tab.addEventListener('mouseenter', () => handleMouseEnter(tab)); // Add mouseenter listener to change aria-label
+      tab.addEventListener('mouseleave', () => handleMouseLeave(tab)); // Add mouseleave listener to reset aria-label
+    });
+
+    // Cleanup event listeners when component unmounts or modal is closed
+    return () => {
+      tabs.forEach((tab) => {
+        // Remove the event listeners when component unmounts or modal state changes
+        tab.removeEventListener('mouseenter', () => handleMouseEnter(tab));
+        tab.removeEventListener('mouseleave', () => handleMouseLeave(tab));
+      });
+    };
+  }, [isModalOpen]); // Re-run the effect when modal state changes
+  
+
   const openPreviewModal = (attachment) => {
     setPreviewAttachment(attachment);
     setIsPreviewModalOpen(true);
@@ -60,12 +139,16 @@ function Alumni() {
     setPreviewAttachment(null);
   };
 
+  
+
   const renderAttachment = (attachment) => {
     if (typeof attachment !== "object" || !attachment.filename) {
       return <p key="invalid">Invalid attachment data</p>;
     }
 
     const { filename } = attachment;
+
+    
 
     return (
       <div key={filename} className="mb-4">
@@ -582,13 +665,14 @@ function Alumni() {
               className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg"
             >
               <input
-                type="radio"
-                name="my_tabs_2"
-                role="tab"
-                className="tab"
-                aria-label="Primary"
-                defaultChecked
-              />
+  type="radio"
+  name="my_tabs_2"
+  role="tab"
+  className="tab"
+  aria-label="🏠︎"
+  defaultChecked
+  title="Primary Information" 
+/>
               <div
                 role="tabpanel"
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6"
@@ -653,12 +737,13 @@ function Alumni() {
                 </p>
               </div>
               <input
-                type="radio"
-                name="my_tabs_2"
-                role="tab"
-                className="tab"
-                aria-label="Secondary"
-              />
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="♥︎"
+              title="Secondary Information" 
+            />
               <div
                 role="tabpanel"
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6"
@@ -694,12 +779,13 @@ function Alumni() {
                 </p>
               </div>
               <input
-                type="radio"
-                name="my_tabs_2"
-                role="tab"
-                className="tab"
-                aria-label="Contacts"
-              />
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="☎︎"
+              title="Contact Information" 
+            />
               <div
                 role="tabpanel"
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6"
@@ -770,12 +856,13 @@ function Alumni() {
                 </p>
               </div>
               <input
-                type="radio"
-                name="my_tabs_2"
-                role="tab"
-                className="tab"
-                aria-label="Attachments"
-              />
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="⬇"
+              title="Attachments" 
+            />
               <div
                 role="tabpanel"
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6"
@@ -794,12 +881,13 @@ function Alumni() {
               </div>
 
               <input
-                type="radio"
-                name="my_tabs_2"
-                role="tab"
-                className="tab"
-                aria-label="Education"
-              />
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="✎"
+              title="Educational Background" 
+            />
               <div
                 role="tabpanel"
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6"
@@ -827,12 +915,13 @@ function Alumni() {
                 ))}
               </div>
               <input
-                type="radio"
-                name="my_tabs_2"
-                role="tab"
-                className="tab"
-                aria-label="Career"
-              />
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="★"
+              title="Career" 
+            />
               <div
                 role="tabpanel"
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6"
@@ -855,5 +944,7 @@ function Alumni() {
     </div>
   );
 }
+
+
 
 export default Alumni;

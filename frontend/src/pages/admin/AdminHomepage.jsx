@@ -103,7 +103,13 @@ const AdminHomepage = () => {
         <div className="background-news-container">
           {/* Background Video Section */}
           <div className="background-section">
-            <video autoPlay muted ref={videoRef} className="background-video">
+            <video
+              autoPlay
+              muted
+              ref={videoRef}
+              className="background-video"
+              playsInline
+            >
               <source src={ustbg} type="video/mp4" />
               Your browser does not support the video tag.
             </video>

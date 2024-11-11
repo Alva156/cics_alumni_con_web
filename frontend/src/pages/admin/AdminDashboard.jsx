@@ -60,6 +60,19 @@ const AdminDashboard = () => {
       return 13;
     }
   }
+  const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  // Helper function to generate an array of colors for the chart
+  const generateColorsForChoices = (choices) => {
+    return choices.map(() => generateRandomColor());
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -95,35 +108,43 @@ const AdminDashboard = () => {
     scales: {
       x: {
         ticks: {
-          color: "#000000",
-          font: {
-            weight: "bold",
-            size: fontSize,
-          },
-        },
-        grid: {
           display: false,
         },
       },
       y: {
         beginAtZero: true,
         ticks: {
-          color: "#000000",
-          font: {
-            weight: "bold",
-            size: fontSize,
-          },
           stepSize,
         },
       },
     },
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: "bottom",
+        labels: {
+          generateLabels: (chart) => {
+            const data = chart.data;
+            return data.labels.map((label, i) => {
+              const value = data.datasets[0].data[i] || 0;
+              return {
+                text: `${label} - ${value}`,
+                fillStyle: data.datasets[0].backgroundColor[i],
+                hidden: false,
+                index: i,
+              };
+            });
+          },
+          font: {
+            size: (context) => {
+              const width = context.chart.width;
+              return width > 800 ? 14 : width > 500 ? 12 : 8;
+            },
+          },
+        },
       },
     },
   });
-
   const options1 = createOptions(100);
   const options2 = createOptions(2);
 
@@ -133,7 +154,7 @@ const AdminDashboard = () => {
       {
         label: "Number of Alumni",
         data: collegeValues,
-        backgroundColor: "#BE142E",
+        backgroundColor: generateColorsForChoices(collegeKeys),
         borderRadius: 4,
       },
     ],
@@ -145,7 +166,7 @@ const AdminDashboard = () => {
       {
         label: "Number of Alumni",
         data: collegeProgramValues,
-        backgroundColor: "#BE142E",
+        backgroundColor: generateColorsForChoices(collegeProgramKeys),
         borderRadius: 4,
       },
     ],
@@ -156,8 +177,11 @@ const AdminDashboard = () => {
     datasets: [
       {
         label: "Number of Alumni",
-        data: dashboardData.usersPerStartYear, // Use the dynamic number of users
-        backgroundColor: "#BE142E",
+        // Ensure data is correctly mapped to the start years
+        data: startYears.map(
+          (year) => dashboardData.usersPerStartYear[year] || 0
+        ),
+        backgroundColor: generateColorsForChoices(startYears),
         borderRadius: 4,
       },
     ],
@@ -168,12 +192,23 @@ const AdminDashboard = () => {
     datasets: [
       {
         label: "Number of Alumni Graduated",
-        data: dashboardData.usersPerGradYear, // Use the dynamic number of graduated users
-        backgroundColor: "#BE142E",
+        // Ensure data is correctly mapped to the grad years
+        data: gradYears.map(
+          (year) => dashboardData.usersPerGradYear[year] || 0
+        ),
+        backgroundColor: generateColorsForChoices(gradYears),
         borderRadius: 4,
       },
     ],
   };
+
+  const employmentStatusColors = generateColorsForChoices([
+    "Employed",
+    "Self-Employed",
+    "Unemployed",
+    "Underemployed",
+    "Freelancing",
+  ]);
 
   const data5 = {
     labels: [
@@ -187,31 +222,31 @@ const AdminDashboard = () => {
       {
         label: "Number of Alumni",
         data: dashboardData.usersPerEmploymentStatus,
-        backgroundColor: "#BE142E",
+        backgroundColor: employmentStatusColors, // Apply dynamic colors
         borderRadius: 4,
       },
     ],
   };
-
+  const workIndustryColors = generateColorsForChoices(["Public", "Private"]);
   const data6 = {
     labels: ["Public", "Private"],
     datasets: [
       {
         label: "Number of Alumni",
         data: dashboardData.usersPerWorkIndustry,
-        backgroundColor: "#BE142E",
+        backgroundColor: workIndustryColors,
         borderRadius: 4,
       },
     ],
   };
 
   const data7 = {
-    labels: timeToJobKeys,
+    labels: timeToJobKeys.map((key) => `${key} Months`),
     datasets: [
       {
         label: "Number of Alumni",
         data: timeToJobValues,
-        backgroundColor: "#BE142E",
+        backgroundColor: generateColorsForChoices(timeToJobKeys),
         borderRadius: 4,
       },
     ],
@@ -222,22 +257,44 @@ const AdminDashboard = () => {
       {
         label: "Number of Alumni",
         data: specializationValues,
-        backgroundColor: "#BE142E",
+        backgroundColor: generateColorsForChoices(specializationKeys),
         borderRadius: 4,
       },
     ],
   };
+  const genderColors = generateColorsForChoices(["Male", "Female"]);
   const data9 = {
     labels: ["Male", "Female"],
     datasets: [
       {
         label: "Number of Alumni",
         data: dashboardData.usersPerGender,
-        backgroundColor: "#BE142E",
+        backgroundColor: genderColors,
         borderRadius: 4,
       },
     ],
   };
+  const regionColors = generateColorsForChoices([
+    "NCR",
+    "CAR",
+    "Region I",
+    "Region II",
+    "Region III",
+    "Region IV-A",
+    "Region IV-B",
+    "Region V",
+    "Region VI",
+    "NIR",
+    "Region VII",
+    "Region VIII",
+    "Region IX",
+    "Region X",
+    "Region XI",
+    "Region XII",
+    "Region XIII",
+    "BARMM",
+    "N/A",
+  ]);
   const data10 = {
     labels: [
       "NCR",
@@ -264,7 +321,7 @@ const AdminDashboard = () => {
       {
         label: "Number of Alumni",
         data: dashboardData.usersPerRegion,
-        backgroundColor: "#BE142E",
+        backgroundColor: regionColors,
         borderRadius: 4,
       },
     ],
@@ -335,7 +392,7 @@ const AdminDashboard = () => {
           <div className="text-sm text-black-600">
             Number of Alumni per Region
           </div>
-          <div className="h-48 mt-8">
+          <div className="h-80 mt-8">
             <Bar data={data10} options={options1} />
           </div>
         </div>

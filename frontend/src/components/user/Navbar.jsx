@@ -60,9 +60,10 @@ const Navbar = () => {
   const detailsRef = useRef(null);
   const handleNavigateAndClose = (path) => {
     navigate(path);
-    setIsDropdownOpen(false); // Close the dropdown after navigating
+    if (detailsRef.current) {
+      detailsRef.current.open = false; // Close the dropdown
+    }
   };
-  
 
   return (
     <div>
@@ -91,52 +92,106 @@ const Navbar = () => {
               </svg>
             </div>
             {isDropdownOpen && (
-              <ul tabIndex={0} className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow">
-              <li className="p-2.5 border-b border-hgray last:border-b-0">
-                <button onClick={() => handleNavigateAndClose("/")}>Home</button>
-              </li>
-              <li className="p-2.5 border-b border-hgray last:border-b-0">
-                <button onClick={() => handleNavigateAndClose("/user-userprofile")}>User Profile</button>
-              </li>
-              <li className="p-2.5 border-b border-hgray last:border-b-0">
-                <button onClick={() => handleNavigateAndClose("/user-survey")}>Survey</button>
-              </li>
-              <li className="p-2.5 border-b border-hgray last:border-b-0">
-                <button onClick={() => handleNavigateAndClose("/user-threads")}>Threads</button>
-              </li>
-              <li className="p-2.5 border-b border-hgray last:border-b-0">
-                <details>
-                  <summary className="p-2.5">Contents</summary>
-                  <ul className="p-2.5 z-20">
-                    <li className="p-1">
-                      <button onClick={() => handleNavigateAndClose("/user-companies")}>Companies</button>
-                    </li>
-                    <li className="p-1">
-                      <button onClick={() => handleNavigateAndClose("/user-news")}>News</button>
-                    </li>
-                    <li className="p-1">
-                      <button onClick={() => handleNavigateAndClose("/user-events")}>Events</button>
-                    </li>
-                    <li className="p-1">
-                      <button onClick={() => handleNavigateAndClose("/user-certifications")}>Certifications</button>
-                    </li>
-                    <li className="p-1">
-                      <button onClick={() => handleNavigateAndClose("/user-documentrequest")}>Document Request Steps</button>
-                    </li>
-                    <li className="p-1">
-                      <button onClick={() => handleNavigateAndClose("/user-job")}>Job/Internship Referrals</button>
-                    </li>
-                  </ul>
-                </details>
-              </li>
-              <li className="p-2.5 border-b border-hgray last:border-b-0">
-                <button onClick={() => handleNavigateAndClose("/user-alumni")}>Alumni</button>
-              </li>
-              <li className="p-2.5">
-                <button onClick={() => handleNavigateAndClose("/user-chatbot")}>FAQs</button>
-              </li>
-            </ul>
-            
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow"
+              >
+                <li className="p-2.5 border-b border-hgray last:border-b-0">
+                  <button onClick={() => handleNavigateAndClose("/")}>
+                    Home
+                  </button>
+                </li>
+                <li className="p-2.5 border-b border-hgray last:border-b-0">
+                  <button
+                    onClick={() => handleNavigateAndClose("/user-userprofile")}
+                  >
+                    User Profile
+                  </button>
+                </li>
+                <li className="p-2.5 border-b border-hgray last:border-b-0">
+                  <button
+                    onClick={() => handleNavigateAndClose("/user-survey")}
+                  >
+                    Survey
+                  </button>
+                </li>
+                <li className="p-2.5 border-b border-hgray last:border-b-0">
+                  <button
+                    onClick={() => handleNavigateAndClose("/user-threads")}
+                  >
+                    Threads
+                  </button>
+                </li>
+                <li className="p-2.5 border-b border-hgray last:border-b-0">
+                  <details>
+                    <summary className="p-2.5">Contents</summary>
+                    <ul className="p-2.5 z-20">
+                      <li className="p-1">
+                        <button
+                          onClick={() =>
+                            handleNavigateAndClose("/user-companies")
+                          }
+                        >
+                          Companies
+                        </button>
+                      </li>
+                      <li className="p-1">
+                        <button
+                          onClick={() => handleNavigateAndClose("/user-news")}
+                        >
+                          News
+                        </button>
+                      </li>
+                      <li className="p-1">
+                        <button
+                          onClick={() => handleNavigateAndClose("/user-events")}
+                        >
+                          Events
+                        </button>
+                      </li>
+                      <li className="p-1">
+                        <button
+                          onClick={() =>
+                            handleNavigateAndClose("/user-certifications")
+                          }
+                        >
+                          Certifications
+                        </button>
+                      </li>
+                      <li className="p-1">
+                        <button
+                          onClick={() =>
+                            handleNavigateAndClose("/user-documentrequest")
+                          }
+                        >
+                          Document Request Steps
+                        </button>
+                      </li>
+                      <li className="p-1">
+                        <button
+                          onClick={() => handleNavigateAndClose("/user-job")}
+                        >
+                          Job/Internship Referrals
+                        </button>
+                      </li>
+                    </ul>
+                  </details>
+                </li>
+                <li className="p-2.5 border-b border-hgray last:border-b-0">
+                  <button
+                    onClick={() => handleNavigateAndClose("/user-alumni")}
+                  >
+                    Alumni
+                  </button>
+                </li>
+                <li className="p-2.5">
+                  <button
+                    onClick={() => handleNavigateAndClose("/user-chatbot")}
+                  >
+                    FAQs
+                  </button>
+                </li>
+              </ul>
             )}
           </div>
         </div>
@@ -205,7 +260,9 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/user-certifications")}
+                      onClick={() =>
+                        handleNavigateAndClose("/user-certifications")
+                      }
                     >
                       Certifications
                     </button>
@@ -213,7 +270,9 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/user-documentrequest")}
+                      onClick={() =>
+                        handleNavigateAndClose("/user-documentrequest")
+                      }
                     >
                       Document Request Steps
                     </button>

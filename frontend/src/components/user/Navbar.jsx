@@ -63,6 +63,7 @@ const Navbar = () => {
     if (detailsRef.current) {
       detailsRef.current.open = false; // Close the dropdown
     }
+    setIsDropdownOpen(false);
   };
 
   return (

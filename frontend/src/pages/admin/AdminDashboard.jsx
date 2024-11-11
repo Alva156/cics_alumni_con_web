@@ -291,7 +291,7 @@ const AdminDashboard = () => {
         </button>
       </div>
 
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Number of Users</div>
           <div className="text-lg font-medium mb-1 mt-2">
@@ -299,7 +299,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of currently working alumni
@@ -310,7 +310,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="chart mb-4 p-6 border border-black rounded-lg cursor-pointer">
+      <div className="chart mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of Alumni per College
@@ -320,7 +320,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of Alumni per Gender
@@ -330,7 +330,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of Alumni per Region
@@ -340,7 +340,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of Alumni per College Program
@@ -350,7 +350,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of Alumni per Specialization
@@ -368,7 +368,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Batch (Year Graduated)</div>
           <div className="h-48 mt-8">
@@ -376,7 +376,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Employment Status</div>
           <div className="h-48 mt-8">
@@ -384,7 +384,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Work Industry</div>
           <div className="h-48 mt-8">
@@ -392,7 +392,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             How long it takes to land a job (Months)

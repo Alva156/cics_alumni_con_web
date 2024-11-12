@@ -519,14 +519,14 @@ function AdminJobs() {
             >
               &times;
             </button>
-            <div className="text-xl mb-3">Add New Jobs</div>
+            <div className="text-xl mb-3">Add New Job/Internship</div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Jobs Name</label>
+              <label className="block text-sm mb-1">Job/Internship Name</label>
               <input
                 id="jobs-name"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Jobs Name"
+                placeholder="Enter Job/Internship Name Name"
               />
             </div>
             <div className="mb-4">
@@ -535,11 +535,11 @@ function AdminJobs() {
                 id="jobs-address"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Jobs Address"
+                placeholder="Enter Job Address"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Jobs Image</label>
+              <label className="block text-sm mb-1">Job/Internship Image</label>
               <input
                 id="jobs-image"
                 type="file"
@@ -552,7 +552,7 @@ function AdminJobs() {
               <textarea
                 id="jobs-description"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Jobs Description"
+                placeholder="Enter Job/Internship Description"
               />
             </div>
             <div className="mb-4">
@@ -561,7 +561,7 @@ function AdminJobs() {
                 id="jobs-contact"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Jobs Details"
+                placeholder="Enter Contact Details"
               />
             </div>
             <div className="flex justify-center gap-2 mt-4">

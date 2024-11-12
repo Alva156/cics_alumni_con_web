@@ -531,14 +531,14 @@ function AdminEvents() {
             >
               &times;
             </button>
-            <div className="text-xl mb-3">Add New Events</div>
+            <div className="text-xl mb-3">Add New Event</div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Events Name</label>
+              <label className="block text-sm mb-1">Event Name</label>
               <input
                 id="events-name"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Events Name"
+                placeholder="Enter Event Name"
               />
             </div>
             <div className="mb-4">
@@ -547,11 +547,11 @@ function AdminEvents() {
                 id="events-address"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Events Address"
+                placeholder="Enter Event Address"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Events Image</label>
+              <label className="block text-sm mb-1">Event Image</label>
               <input
                 id="events-image"
                 type="file"
@@ -564,7 +564,7 @@ function AdminEvents() {
               <textarea
                 id="events-description"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Events Description"
+                placeholder="Enter Event Description"
               />
             </div>
             <div className="mb-4">
@@ -573,7 +573,7 @@ function AdminEvents() {
                 id="events-contact"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Events Details"
+                placeholder="Enter Event Details"
               />
             </div>
             <div className="flex justify-center gap-2 mt-4">

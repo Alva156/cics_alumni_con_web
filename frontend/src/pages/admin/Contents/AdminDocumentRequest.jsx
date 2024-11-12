@@ -431,7 +431,7 @@ function AdminDocuments() {
             </button>
             <div className="text-xl mb-3">Edit Documents</div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Documents Name</label>
+              <label className="block text-sm mb-1">Document Name</label>
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -460,7 +460,7 @@ function AdminDocuments() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Documents Image</label>
+              <label className="block text-sm mb-1">Document File</label>
               <input
                 id="documents-image"
                 type="file"
@@ -561,9 +561,9 @@ function AdminDocuments() {
             >
               &times;
             </button>
-            <div className="text-xl mb-3">Add New Documents</div>
+            <div className="text-xl mb-3">Add New Document</div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Documents Name</label>
+              <label className="block text-sm mb-1">Document Name</label>
               <input
                 id="documents-name"
                 type="text"
@@ -581,7 +581,7 @@ function AdminDocuments() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Documents Image</label>
+              <label className="block text-sm mb-1">Document File</label>
               <input
                 id="documents-image"
                 type="file"

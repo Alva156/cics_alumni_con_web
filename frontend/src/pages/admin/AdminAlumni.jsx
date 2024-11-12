@@ -19,11 +19,13 @@ function AdminAlumni() {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
+
   const uniqueYears = [
     ...new Set(
       alumni.map((alum) => alum.yearGraduatedCollege).filter((year) => year)
     ),
   ].sort((a, b) => a - b);
+  const [activeTab, setActiveTab] = useState("primary");
   const modalRef = useRef(null);
   const [selectedAlumni, setSelectedAlumni] = useState({
     secondaryEducation: [],
@@ -31,6 +33,7 @@ function AdminAlumni() {
     careerBackground: [],
   });
   const [attachments, setAttachments] = useState([]);
+
   useEffect(() => {
     const fetchAttachments = async () => {
       try {
@@ -47,6 +50,82 @@ function AdminAlumni() {
     fetchAttachments();
   }, [backendUrl]);
 
+  // Fetch alumni
+  useEffect(() => {
+    const fetchAlumni = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/profile/alumni`, {
+          withCredentials: true,
+        });
+        setAlumni(response.data.alumni);
+      } catch (error) {
+        console.error("Error fetching alumni:", error);
+      }
+    };
+    fetchAlumni();
+  }, [backendUrl]);
+
+  // Handle hover effects using useEffect
+  useEffect(() => {
+    // Select all elements with the class 'tab'
+    const tabs = document.querySelectorAll(".tab");
+
+    // Function that handles mouse enter event on tab
+    const handleMouseEnter = (tab) => {
+      // Change aria-label for different tab items based on the original label
+      if (tab.getAttribute("aria-label") === "🛠") {
+        tab.setAttribute("aria-label", "Settings");
+      } else if (tab.getAttribute("aria-label") === "🏠︎") {
+        tab.setAttribute("aria-label", "Primary");
+      } else if (tab.getAttribute("aria-label") === "♥︎") {
+        tab.setAttribute("aria-label", "Secondary");
+      } else if (tab.getAttribute("aria-label") === "☎︎") {
+        tab.setAttribute("aria-label", "Contacts");
+      } else if (tab.getAttribute("aria-label") === "⬇") {
+        tab.setAttribute("aria-label", "Attachments");
+      } else if (tab.getAttribute("aria-label") === "✎") {
+        tab.setAttribute("aria-label", "Education");
+      } else if (tab.getAttribute("aria-label") === "★") {
+        tab.setAttribute("aria-label", "Career");
+      }
+    };
+
+    // Function that handles mouse leave event on tab
+    const handleMouseLeave = (tab) => {
+      // Reset aria-label back to original values when mouse leaves the tab
+      if (tab.getAttribute("aria-label") === "Settings") {
+        tab.setAttribute("aria-label", "🛠");
+      } else if (tab.getAttribute("aria-label") === "Primary") {
+        tab.setAttribute("aria-label", "🏠︎");
+      } else if (tab.getAttribute("aria-label") === "Secondary") {
+        tab.setAttribute("aria-label", "♥︎");
+      } else if (tab.getAttribute("aria-label") === "Contacts") {
+        tab.setAttribute("aria-label", "☎︎");
+      } else if (tab.getAttribute("aria-label") === "Attachments") {
+        tab.setAttribute("aria-label", "⬇");
+      } else if (tab.getAttribute("aria-label") === "Education") {
+        tab.setAttribute("aria-label", "✎");
+      } else if (tab.getAttribute("aria-label") === "Career") {
+        tab.setAttribute("aria-label", "★");
+      }
+    };
+
+    // Attach mouseenter and mouseleave event listeners to each tab
+    tabs.forEach((tab) => {
+      tab.addEventListener("mouseenter", () => handleMouseEnter(tab)); // Add mouseenter listener to change aria-label
+      tab.addEventListener("mouseleave", () => handleMouseLeave(tab)); // Add mouseleave listener to reset aria-label
+    });
+
+    // Cleanup event listeners when component unmounts or modal is closed
+    return () => {
+      tabs.forEach((tab) => {
+        // Remove the event listeners when component unmounts or modal state changes
+        tab.removeEventListener("mouseenter", () => handleMouseEnter(tab));
+        tab.removeEventListener("mouseleave", () => handleMouseLeave(tab));
+      });
+    };
+  }, [isModalOpen]); // Re-run the effect when modal state changes
+
   const openPreviewModal = (attachment) => {
     setPreviewAttachment(attachment);
     setIsPreviewModalOpen(true);
@@ -55,6 +134,29 @@ function AdminAlumni() {
   const closePreviewModal = () => {
     setIsPreviewModalOpen(false);
     setPreviewAttachment(null);
+  };
+
+  const downloadAttachment = async (filename) => {
+    try {
+      const response = await axios.get(
+        `${backendUrl}/profile/attachments/download/${filename}`,
+        {
+          responseType: "blob", // This ensures the response is processed as a binary Blob
+          withCredentials: true, // Include credentials if needed
+        }
+      );
+
+      // Create a download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", filename); // Filename to save as
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link); // Clean up
+    } catch (error) {
+      console.error("Error downloading the attachment:", error);
+    }
   };
 
   const renderAttachment = (attachment) => {
@@ -75,7 +177,6 @@ function AdminAlumni() {
       </div>
     );
   };
-
   useEffect(() => {
     const fetchAlumni = async () => {
       try {
@@ -94,6 +195,7 @@ function AdminAlumni() {
     setIsPreviewModalOpen(false);
     setSelectedAlumni(alumni);
     setIsModalOpen(true);
+    setActiveTab("primary");
   };
 
   const closeModal = () => {
@@ -138,9 +240,7 @@ function AdminAlumni() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <div className="flex items-center mb-4">
-        <h1 className="text-2xl font-medium text-gray-700">Alumni</h1>
-      </div>
+      <h1 className="text-2xl font-medium text-gray-700 mb-6">Alumni</h1>
 
       <div className="mb-4 relative">
         <input
@@ -549,12 +649,11 @@ function AdminAlumni() {
                   <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 text-center">
                     {previewAttachment.filename}
                   </h2>
-                  <iframe
+                  <embed
                     src={`${backendUrl}/profile/attachments/preview/${previewAttachment.filename}`}
                     className="mb-4 w-full h-64"
-                    title="File Preview"
-                    frameBorder="0"
-                  ></iframe>
+                    type="application/pdf"
+                  />
 
                   <div className="flex justify-end space-x-2 sm:space-x-4 mt-4">
                     <button
@@ -564,9 +663,9 @@ function AdminAlumni() {
                       Cancel
                     </button>
                     <button
-                      onClick={() => {
-                        window.location.href = `${backendUrl}/profile/attachments/download/${previewAttachment.filename}`;
-                      }}
+                      onClick={() =>
+                        downloadAttachment(previewAttachment.filename)
+                      }
                       className="px-3 py-2 bg-blue text-white rounded-md text-sm sm:text-base hover:bg-blue-700 transition-colors"
                     >
                       Download
@@ -576,14 +675,18 @@ function AdminAlumni() {
               </div>
             )}
 
-            <div role="tablist" className="tabs tabs-lifted mb-6">
+            <div
+              role="tablist"
+              className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg"
+            >
               <input
                 type="radio"
                 name="my_tabs_2"
                 role="tab"
                 className="tab"
-                aria-label="Primary"
+                aria-label="🏠︎"
                 defaultChecked
+                title="Primary Information"
               />
               <div
                 role="tabpanel"
@@ -648,13 +751,13 @@ function AdminAlumni() {
                   {selectedAlumni.timeToJob || "-"}
                 </p>
               </div>
-
               <input
                 type="radio"
                 name="my_tabs_2"
                 role="tab"
                 className="tab"
-                aria-label="Secondary"
+                aria-label="♥︎"
+                title="Secondary Information"
               />
               <div
                 role="tabpanel"
@@ -690,13 +793,13 @@ function AdminAlumni() {
                   {selectedAlumni.placeOfEmployment || "-"}
                 </p>
               </div>
-
               <input
                 type="radio"
                 name="my_tabs_2"
                 role="tab"
                 className="tab"
-                aria-label="Contacts"
+                aria-label="☎︎"
+                title="Contact Information"
               />
               <div
                 role="tabpanel"
@@ -767,13 +870,13 @@ function AdminAlumni() {
                   )}
                 </p>
               </div>
-
               <input
                 type="radio"
                 name="my_tabs_2"
                 role="tab"
                 className="tab"
-                aria-label="Attachments"
+                aria-label="⬇"
+                title="Attachments"
               />
               <div
                 role="tabpanel"
@@ -797,7 +900,8 @@ function AdminAlumni() {
                 name="my_tabs_2"
                 role="tab"
                 className="tab"
-                aria-label="Education"
+                aria-label="✎"
+                title="Educational Background"
               />
               <div
                 role="tabpanel"
@@ -805,6 +909,7 @@ function AdminAlumni() {
               >
                 <h1 className="text-xl mb-4">Educational Background</h1>
                 <p className="text-xs mb-1">Secondary Education</p>
+
                 {selectedAlumni.secondaryEducation.map((edu, index) => (
                   <div key={index}>
                     <p className="text-s font-bold">{edu.schoolName}</p>
@@ -824,13 +929,13 @@ function AdminAlumni() {
                   </div>
                 ))}
               </div>
-
               <input
                 type="radio"
                 name="my_tabs_2"
                 role="tab"
                 className="tab"
-                aria-label="Career"
+                aria-label="★"
+                title="Career"
               />
               <div
                 role="tabpanel"

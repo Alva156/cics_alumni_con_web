@@ -539,14 +539,14 @@ function AdminCertifications() {
             >
               &times;
             </button>
-            <div className="text-xl mb-3">Add New Certifications</div>
+            <div className="text-xl mb-3">Add New Certification</div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Certifications Name</label>
+              <label className="block text-sm mb-1">Certification Name</label>
               <input
                 id="certifications-name"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Certifications Name"
+                placeholder="Enter Certification Name"
               />
             </div>
             <div className="mb-4">
@@ -555,11 +555,11 @@ function AdminCertifications() {
                 id="certifications-address"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Certifications Address"
+                placeholder="Enter Certification Address"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Certifications Image</label>
+              <label className="block text-sm mb-1">Certification Image</label>
               <input
                 id="certifications-image"
                 type="file"
@@ -572,7 +572,7 @@ function AdminCertifications() {
               <textarea
                 id="certifications-description"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Certifications Description"
+                placeholder="Enter Certification Description"
               />
             </div>
             <div className="mb-4">
@@ -581,7 +581,7 @@ function AdminCertifications() {
                 id="certifications-contact"
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
-                placeholder="Enter Certifications Details"
+                placeholder="Enter Certification Details"
               />
             </div>
             <div className="flex justify-center gap-2 mt-4">

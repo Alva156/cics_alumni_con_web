@@ -236,7 +236,7 @@ function AdminCompanies() {
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       {showSuccessMessage && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-100">
           <p>{showMessage}</p>
         </div>
       )}
@@ -281,55 +281,43 @@ function AdminCompanies() {
         </button>
       </div>
       <hr className="mb-6 border-black" />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCompanies.map((company) => (
-          <div
-            key={company._id}
-            className="relative mb-4 p-4 border border-black rounded-lg flex flex-col hover:bg-gray-200 transition-colors cursor-pointer"
-            onClick={() => openViewModal(company)}
-          >
-            <img
-              src={`${backendUrl}${company.image}`}
-              alt={company.name}
-              className="w-full h-48 object-cover rounded-t-lg mb-4 mt-4"
-            />
-            <div className="absolute top-2 right-2 flex space-x-2">
-              <div
-                className="w-8 h-8 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedCompany(company);
-                  setIsDeleteModalOpen(true);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Delete
-                </span>
-                <i className="fas fa-trash text-white"></i>{" "}
-                {/* Icon for Delete */}
-              </div>
-              <div
-                className="w-8 h-8 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEditModal(company);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Edit
-                </span>
-                <i className="fas fa-edit text-white"></i> {/* Icon for Edit */}
-              </div>
+      {filteredCompanies.map((company) => (
+        <div
+          key={company._id}
+          className="mb-4 p-4 border border-black rounded-lg flex justify-between items-center hover:bg-gray-200 transition-colors cursor-pointer"
+          onClick={() => openViewModal(company)}
+        >
+          <div>
+            <div className="text-md font-medium mb-1">{company.name}</div>
+            <div className="text-sm text-black-600">{company.address}</div>
+          </div>
+          <div className="flex items-center">
+            <div
+              className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-4 relative group"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedCompany(company); // Set the company to delete
+                setIsDeleteModalOpen(true); // Open the delete modal
+              }}
+            >
+              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                Delete
+              </span>
             </div>
-            <div>
-              <div className="text-md font-medium mb-1">{company.name}</div>
-              <div className="text-sm text-black-600">{company.address}</div>
+            <div
+              className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+              onClick={(e) => {
+                e.stopPropagation();
+                openEditModal(company);
+              }}
+            >
+              <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                Edit
+              </span>
             </div>
           </div>
-        ))}
-      </div>
-
+        </div>
+      ))}
       {/* View Modal */}
       {isViewModalOpen && selectedCompany && (
         <div
@@ -454,16 +442,16 @@ function AdminCompanies() {
                 }
               />
             </div>
-            <div className="flex justify-center gap-2 mt-4">
+            <div className="flex flex-col md:flex-row justify-center gap-4 mb-4">
               <button
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+                className="btn bg-zinc-800 text-white w-full md:w-64 py-2 rounded-lg"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpdateCompany}
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+                className="btn bg-green text-white w-full md:w-64 py-2 rounded-lg"
               >
                 Save
               </button>
@@ -472,7 +460,7 @@ function AdminCompanies() {
         </div>
       )}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="text-2xl mb-4">Delete Company</h2>
             <p>Are you sure you want to delete this company?</p>
@@ -563,15 +551,15 @@ function AdminCompanies() {
                 placeholder="Enter Company Details"
               />
             </div>
-            <div className="flex justify-center gap-2 mt-4">
+            <div className="flex flex-col md:flex-row justify-center gap-4 mb-4">
               <button
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+                className="btn bg-zinc-800 text-white w-full md:w-64 py-2 rounded-lg"
                 onClick={closeModal}
               >
                 Cancel
               </button>
               <button
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+                className="btn bg-green text-white w-full md:w-64 py-2 rounded-lg"
                 onClick={handleCreateCompany}
               >
                 Add

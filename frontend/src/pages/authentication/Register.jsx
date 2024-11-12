@@ -164,10 +164,6 @@ function Register() {
             {/* Form Fields */}
             <label className="block mb-1 mt-2 text-xs font-medium">
               Student ID Number
-              <span className="text-xs font-light italic">
-                {" "}
-                (e.g. 2001007121 )
-              </span>
             </label>
             <input
               type="text"
@@ -232,12 +228,7 @@ function Register() {
               style={{ height: "30px" }}
             />
             <label className="block mb-1 text-xs font-medium">
-              Mobile Number *{" "}
-              <span className="text-xs font-light italic">
-                {" "}
-                ( include country code before your number, e.g.,{" "}
-                <span className="font-medium">63</span> 9125559207 for PH )
-              </span>
+              Mobile Number *
             </label>
             <input
               type="number"
@@ -322,7 +313,7 @@ function Register() {
             <button
               type="submit"
               onClick={handleSubmit}
-              className="btn bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 mt-4 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
+              className="bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 transition duration-300 ease-in-out hover:bg-[#a10c2b] mt-4"
             >
               SIGN UP
             </button>
@@ -331,7 +322,7 @@ function Register() {
               Already have an account?
             </p>
             <button
-              className=" btn bg-[#2D2B2B] text-white font-bold text-l py-2 px-3 w-full mb-3  transition duration-300 ease-in-out hover:bg-[#1a1a1a]"
+              className="bg-[#2D2B2B] text-white font-bold text-l py-2 px-3 w-full transition duration-300 ease-in-out hover:bg-[#1a1a1a]"
               onClick={() => navigate("/login")}
             >
               SIGN IN

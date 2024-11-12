@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import sampleidpic from "../../assets/sampleidpic.jpg";
 import blankprofilepic from "../../assets/blankprofilepic.jpg";
-import { Filter } from "bad-words";
 
 function AdminThreads() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -10,7 +9,6 @@ function AdminThreads() {
   const [allThreads, setAllThreads] = useState([]);
   const [newThread, setNewThread] = useState({ title: "", content: "" });
   const [selectedThread, setSelectedThread] = useState(null);
-  const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -34,115 +32,6 @@ function AdminThreads() {
   const [selectedReply, setSelectedReply] = useState(null);
   const [isDeleteReplyModalOpen, setIsDeleteReplyModalOpen] = useState(false);
   const [replyToDelete, setReplyToDelete] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const LoadingSpinner = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
-    </div>
-  );
-  const filter = new Filter();
-  const customBadWords = [
-    "putang ina",
-    "bobo",
-    "tanga",
-    "sira ulo",
-    "gago",
-    "bwisit",
-    "hayop",
-    "bastard",
-    "peste",
-    "ulol",
-    "tarantado",
-    "hinayupak",
-    "lintik",
-    "demonyo",
-    "salot",
-    "lecheng",
-    "putik",
-    "inutil",
-    "lapastangan",
-    "walang hiya",
-    "punyeta",
-    "hudas",
-    "yawa",
-    "burat",
-    "titi",
-    "kupal",
-    "unggoy",
-    "gunggong",
-    "ulupong",
-    "buwisit",
-    "tang ina",
-    "puke",
-    "kantot",
-    "kantutan",
-    "kantotan",
-    "torjak",
-    "dede",
-    "pepe",
-    "puday",
-    "bilat",
-    "tae",
-    "mangmang",
-    "iyot",
-    "shet",
-    "pakyu",
-    "damn",
-    "shit",
-    "fuck",
-    "fucker",
-    "bitch",
-    "asshole",
-    "bastard",
-    "dickhead",
-    "motherfucker",
-    "son of a bitch",
-    "whore",
-    "slut",
-    "cunt",
-    "jerk",
-    "idiot",
-    "bitchass",
-    "nigger",
-    "shitty",
-    "bullshit",
-    "laspag",
-    "pakyu",
-    "tangina",
-    "batugan",
-    "tameme",
-    "santong kabayo",
-    "abnoy",
-    "duwag",
-    "tuta",
-    "bakla",
-    "tomboy",
-    "bading",
-    "bugok",
-    "gagu",
-    "kingina",
-    "putragis",
-    "yabag",
-    "bayag",
-    "katangahan",
-    "kasumpa-sumpa",
-    "kagaguhan",
-    "putres",
-    "leche",
-    "puta",
-    "bobong",
-    "pakyong ina",
-    "shithead",
-    "faggot",
-    "moron",
-    "crap",
-    "anus",
-    "motherfreaker",
-    "gaylord",
-    "jabol",
-  ];
-
-  filter.addWords(...customBadWords);
 
   const showValidation = (message) => {
     setValidationMessage(message);
@@ -200,14 +89,6 @@ function AdminThreads() {
       showError("Please fill in both the title and content fields.");
       return;
     }
-    // Check for bad words in the title and content
-    if (
-      filter.isProfane(newThread.title) ||
-      filter.isProfane(newThread.content)
-    ) {
-      showError("Your post contains prohibited words and cannot be posted.");
-      return;
-    }
     try {
       const response = await axios.post(
         `${backendUrl}/threads/create`,
@@ -233,14 +114,6 @@ function AdminThreads() {
   const handleUpdateThread = async () => {
     if (!selectedThread.title || !selectedThread.content) {
       showError("Please fill in both the title and content fields.");
-      return;
-    }
-    // Check for bad words in the title and content
-    if (
-      filter.isProfane(selectedThread.title) ||
-      filter.isProfane(selectedThread.content)
-    ) {
-      showError("Your post contains prohibited words and cannot be posted.");
       return;
     }
     if (!selectedThread) return;
@@ -300,48 +173,6 @@ function AdminThreads() {
       console.error("Error deleting thread:", error);
     }
   };
-  const handleNotif = async () => {
-    if (!selectedThread) return;
-
-    try {
-      // Toggle the notifEnabled status based on the current state
-      const newNotifStatus = !selectedThread.notifEnabled;
-
-      await axios.put(
-        `${backendUrl}/threads/silence/${selectedThread._id}`,
-        { notifEnabled: newNotifStatus }, // Send new notifEnabled status
-        {
-          withCredentials: true,
-        }
-      );
-
-      // Update the notifEnabled status for the selected thread in both `myThreads` and `allThreads`
-      const updatedMyThreads = myThreads.map((thread) =>
-        thread._id === selectedThread._id
-          ? { ...thread, notifEnabled: newNotifStatus }
-          : thread
-      );
-      const updatedAllThreads = allThreads.map((thread) =>
-        thread._id === selectedThread._id
-          ? { ...thread, notifEnabled: newNotifStatus }
-          : thread
-      );
-
-      setMyThreads(updatedMyThreads);
-      setAllThreads(updatedAllThreads);
-
-      // Optionally update state or show a message
-      showValidation(
-        `Thread notifications ${
-          newNotifStatus ? "enabled" : "disabled"
-        } successfully!`
-      );
-      setIsNotifModalOpen(false);
-    } catch (error) {
-      console.error("Error toggling notifications:", error);
-    }
-  };
-
   const fetchReplies = async (threadId) => {
     try {
       const response = await axios.get(
@@ -365,19 +196,10 @@ function AdminThreads() {
   }, [selectedThread]);
 
   const handleCreateReply = async () => {
-    // Check if the reply content is empty
     if (!newReply.trim()) {
-      showError("Reply content cannot be empty."); // Show error message immediately
+      showError("Reply content cannot be empty.");
       return;
     }
-
-    // Check for bad words in the reply content
-    if (filter.isProfane(newReply)) {
-      showError("Your reply contains prohibited words and cannot be posted."); // Show error message immediately
-      return;
-    }
-
-    setLoading(true); // Start loading immediately
 
     try {
       const response = await axios.post(
@@ -408,21 +230,11 @@ function AdminThreads() {
 
       // Clear the reply input
       setNewReply("");
-
-      // Show success message after loading
-      setTimeout(() => {
-        setLoading(false); // Stop loading after 1 second
-        showValidation("Reply created successfully!"); // Show success message
-      }, 1000);
+      showValidation("Reply created successfully!");
     } catch (error) {
       console.error("Error creating reply:", error);
-
-      // Stop loading immediately on error
-      setLoading(false);
-      showError("Failed to create reply. Please try again."); // Show error message immediately
     }
   };
-
   const handleEditReply = (reply) => {
     setSelectedReply({
       ...reply,
@@ -434,11 +246,6 @@ function AdminThreads() {
   const handleUpdateReply = async (replyId) => {
     if (!selectedReply.content.trim()) {
       showError("Reply content cannot be empty.");
-      return;
-    }
-    // Check for bad words in the updated reply content
-    if (filter.isProfane(selectedReply.content)) {
-      showError("Your reply contains prohibited words and cannot be updated.");
       return;
     }
 
@@ -501,16 +308,11 @@ function AdminThreads() {
   };
 
   const openViewModal = (thread) => {
-    setNewReply("");
     setSelectedThread(thread);
     setIsViewModalOpen(true);
     fetchReplies(thread._id);
   };
 
-  const openNotifModal = (thread) => {
-    setSelectedThread(thread);
-    setIsNotifModalOpen(true);
-  };
   const openEditModal = (thread) => {
     setSelectedThread(thread);
     setIsEditModalOpen(true);
@@ -531,7 +333,6 @@ function AdminThreads() {
     setIsEditModalOpen(false);
     setIsAddModalOpen(false);
     setIsDeleteModalOpen(false);
-    setIsNotifModalOpen(false);
     setSelectedThread(null);
     setThreadToDelete(null);
   };
@@ -574,8 +375,8 @@ function AdminThreads() {
   };
 
   return (
-    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-0 mb-12">
-      <div className="carousel relative bg-white m-3 max-w-full overflow-hidden">
+    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+      <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
         {showErrorMessage && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-[80]">
             <p>{errorMessage}</p>
@@ -587,7 +388,10 @@ function AdminThreads() {
           </div>
         )}
       </div>
-      <h1 className="text-2xl font-medium text-gray-700 mb-6">Threads</h1>
+
+      <div className="flex items-center mb-4">
+        <h1 className="text-2xl font-medium text-gray-700">Threads</h1>
+      </div>
       <div className="mb-4 relative">
         <input
           type="text"
@@ -661,18 +465,6 @@ function AdminThreads() {
                     </span>
                   </div>
                   <div
-                    className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openNotifModal(thread);
-                    }}
-                  >
-                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                      Notifications
-                    </span>
-                  </div>
-
-                  <div
                     className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -716,17 +508,6 @@ function AdminThreads() {
                   >
                     <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
                       Delete
-                    </span>
-                  </div>
-                  <div
-                    className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openNotifModal(thread);
-                    }}
-                  >
-                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                      Notifications
                     </span>
                   </div>
                   <div
@@ -778,17 +559,6 @@ function AdminThreads() {
                     >
                       <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
                         Delete
-                      </span>
-                    </div>
-                    <div
-                      className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openNotifModal(thread);
-                      }}
-                    >
-                      <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                        Notifications
                       </span>
                     </div>
                     <div
@@ -870,16 +640,13 @@ function AdminThreads() {
 
       {isViewModalOpen && selectedThread && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          {loading && <LoadingSpinner />} {/* Show loading spinner */}
           <div className="bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] relative mx-4">
             {/* Header section */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center">
                 <img
                   src={
-                    selectedThread.userProfileId.profileImage
-                      ? `${backendUrl}${selectedThread.userProfileId.profileImage}`
-                      : blankprofilepic
+                    selectedThread.userProfileId.profileImage || blankprofilepic
                   } // Replace with dynamic user avatar
                   alt="User Avatar"
                   className="w-14 h-14 mr-3"
@@ -941,11 +708,7 @@ function AdminThreads() {
                   className="p-4 border border-black rounded-lg flex items-start mb-2"
                 >
                   <img
-                    src={
-                      reply.userProfileId.profileImage
-                        ? `${backendUrl}${reply.userProfileId.profileImage}`
-                        : blankprofilepic
-                    }
+                    src={reply.userProfileId.profileImage || blankprofilepic}
                     alt="User Avatar"
                     className="w-10 h-10 mr-3"
                   />
@@ -1083,7 +846,7 @@ function AdminThreads() {
         </div>
       )}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
             <h2 className="ttext-2xl mb-4">Delete Thread</h2>
             <p>Are you sure you want to delete this thread?</p>
@@ -1099,36 +862,6 @@ function AdminThreads() {
                 onClick={() => setIsDeleteModalOpen(false)}
               >
                 Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {isNotifModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-            <h2 className="text-2xl mb-4">
-              {selectedThread?.notifEnabled
-                ? "Turn Off Notifications"
-                : "Turn On Notifications"}
-            </h2>
-            <p>
-              {selectedThread?.notifEnabled
-                ? "Do you want to disable notifications for this thread?"
-                : "Do you want to enable notifications for this thread?"}
-            </p>
-            <div className="flex justify-end mt-4">
-              <button
-                className="btn btn-sm w-24 bg-red text-white mr-2"
-                onClick={handleNotif}
-              >
-                Yes
-              </button>
-              <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={() => setIsNotifModalOpen(false)}
-              >
-                No
               </button>
             </div>
           </div>

@@ -20,6 +20,5 @@ router.put("/update/:id", authenticateJWT, threadController.updateThread);
 
 // Delete a thread by ID
 router.delete("/delete/:id", authenticateJWT, threadController.deleteThread);
-router.put("/silence/:id", authenticateJWT, threadController.silenceThread);
 
 module.exports = router;

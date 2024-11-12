@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../App.css";
 import { MdOutlineLogout } from "react-icons/md";
@@ -55,15 +55,6 @@ const NavbarAdmin = () => {
     setModalVisible(false);
   };
 
-  const detailsRef = useRef(null);
-  const handleNavigateAndClose = (path) => {
-    navigate(path);
-    if (detailsRef.current) {
-      detailsRef.current.open = false; // Close the dropdown
-    }
-    setIsDropdownOpen(false);
-  };
-
   return (
     <div>
       <div className="navbar bg-white text-black font-light print:hidden">
@@ -90,7 +81,6 @@ const NavbarAdmin = () => {
                 />
               </svg>
             </div>
-            {/* Mobile */}
             {isDropdownOpen && (
               <ul
                 tabIndex={0}
@@ -99,7 +89,7 @@ const NavbarAdmin = () => {
                 <li className="p-2.5  border-b border-hgray last:border-b-0">
                   <button
                     className="font-bold text-gray-700"
-                    onClick={() => handleNavigateAndClose("/admin/homepage")}
+                    onClick={() => navigate("/admin/homepage")}
                   >
                     Home
                   </button>
@@ -107,7 +97,7 @@ const NavbarAdmin = () => {
                 <li className="p-2.5  border-b border-hgray last:border-b-0">
                   <button
                     className="font-bold text-gray-700"
-                    onClick={() => handleNavigateAndClose("/admin/dashboard")}
+                    onClick={() => navigate("/admin/dashboard")}
                   >
                     Dashboard
                   </button>
@@ -115,7 +105,7 @@ const NavbarAdmin = () => {
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <button
                     className="font-bold text-gray-700"
-                    onClick={() => handleNavigateAndClose("/admin/surveytool")}
+                    onClick={() => navigate("/admin/surveytool")}
                   >
                     Survey Tool
                   </button>
@@ -123,7 +113,7 @@ const NavbarAdmin = () => {
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <button
                     className="font-bold text-gray-700"
-                    onClick={() => handleNavigateAndClose("/admin/threads")}
+                    onClick={() => navigate("/admin/threads")}
                   >
                     Threads
                   </button>
@@ -135,9 +125,7 @@ const NavbarAdmin = () => {
                       <li className="p-1">
                         <button
                           className="font-bold text-gray-700"
-                          onClick={() =>
-                            handleNavigateAndClose("/admin/companies")
-                          }
+                          onClick={() => navigate("/admin/companies")}
                         >
                           Companies
                         </button>
@@ -145,7 +133,7 @@ const NavbarAdmin = () => {
                       <li className="p-1">
                         <button
                           className="font-bold text-gray-700"
-                          onClick={() => handleNavigateAndClose("/admin/news")}
+                          onClick={() => navigate("/admin/news")}
                         >
                           News
                         </button>
@@ -153,9 +141,7 @@ const NavbarAdmin = () => {
                       <li className="p-1">
                         <button
                           className="font-bold text-gray-700"
-                          onClick={() =>
-                            handleNavigateAndClose("/admin/events")
-                          }
+                          onClick={() => navigate("/admin/events")}
                         >
                           Events
                         </button>
@@ -163,9 +149,7 @@ const NavbarAdmin = () => {
                       <li className="p-1">
                         <button
                           className="font-bold text-gray-700"
-                          onClick={() =>
-                            handleNavigateAndClose("/admin/certifications")
-                          }
+                          onClick={() => navigate("/admin/certifications")}
                         >
                           Certifications
                         </button>
@@ -173,9 +157,7 @@ const NavbarAdmin = () => {
                       <li className="p-1">
                         <button
                           className="font-bold text-gray-700"
-                          onClick={() =>
-                            handleNavigateAndClose("/admin/documentrequest")
-                          }
+                          onClick={() => navigate("/admin/documentrequest")}
                         >
                           Document Request Steps
                         </button>
@@ -183,7 +165,7 @@ const NavbarAdmin = () => {
                       <li className="p-1">
                         <button
                           className="font-bold text-gray-700"
-                          onClick={() => handleNavigateAndClose("/admin/job")}
+                          onClick={() => navigate("/admin/job")}
                         >
                           Job/Internship Referrals
                         </button>
@@ -194,7 +176,7 @@ const NavbarAdmin = () => {
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <button
                     className="font-bold text-gray-700"
-                    onClick={() => handleNavigateAndClose("/admin/alumni")}
+                    onClick={() => navigate("/admin/alumni")}
                   >
                     Alumni
                   </button>
@@ -202,7 +184,7 @@ const NavbarAdmin = () => {
                 <li className="p-2.5 ">
                   <button
                     className="font-bold text-gray-700"
-                    onClick={() => handleNavigateAndClose("/admin/reports")}
+                    onClick={() => navigate("/admin/reports")}
                   >
                     Reports
                   </button>
@@ -210,7 +192,7 @@ const NavbarAdmin = () => {
                 <li className="p-2.5 ">
                   <button
                     className="font-bold text-gray-700"
-                    onClick={() => handleNavigateAndClose("/admin/account")}
+                    onClick={() => navigate("/admin/account")}
                   >
                     Account
                   </button>
@@ -219,7 +201,6 @@ const NavbarAdmin = () => {
             )}
           </div>
         </div>
-        {/* Desktop */}
         <div className="navbar-center hidden lg:flex py-1 ">
           <ul className="menu menu-horizontal px-1 ">
             <li className="px-2.5 pr-1 xl:pr-8">
@@ -255,13 +236,13 @@ const NavbarAdmin = () => {
               </button>
             </li>
             <li className="px-2.5 pr-1 xl:pr-8">
-              <details ref={detailsRef}>
+              <details>
                 <summary className="font-bold text-gray-700">Contents</summary>
                 <ul className="px-2.5 bg-white pr-1 z-20">
                   <li className="p-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/admin/companies")}
+                      onClick={() => navigate("/admin/companies")}
                     >
                       Companies
                     </button>
@@ -269,7 +250,7 @@ const NavbarAdmin = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/admin/news")}
+                      onClick={() => navigate("/admin/news")}
                     >
                       News
                     </button>
@@ -277,7 +258,7 @@ const NavbarAdmin = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/admin/events")}
+                      onClick={() => navigate("/admin/events")}
                     >
                       Events
                     </button>
@@ -285,9 +266,7 @@ const NavbarAdmin = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() =>
-                        handleNavigateAndClose("/admin/certifications")
-                      }
+                      onClick={() => navigate("/admin/certifications")}
                     >
                       Certifications
                     </button>
@@ -295,9 +274,7 @@ const NavbarAdmin = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() =>
-                        handleNavigateAndClose("/admin/documentrequest")
-                      }
+                      onClick={() => navigate("/admin/documentrequest")}
                     >
                       Document Request Steps
                     </button>
@@ -305,7 +282,7 @@ const NavbarAdmin = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/admin/job")}
+                      onClick={() => navigate("/admin/job")}
                     >
                       Job/Internship Referrals
                     </button>

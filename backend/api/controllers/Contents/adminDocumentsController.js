@@ -256,7 +256,7 @@ const sendEmailNotification = async (emailAddresses, subject, message) => {
         <div style="background-color: #f5f5f5; padding: 20px;">
           <div style="background-color: #ffffff; padding: 20px; max-width: 600px; margin: 0 auto; border-radius: 8px;">
             <div style="text-align: center; padding-bottom: 20px;">
-             
+              <img src="https://your-logo-url.com/logo.png" alt="Company Logo" style="max-width: 150px;">
             </div>
             <div style="background-color: #ff4b4b; color: #ffffff; padding: 15px; border-radius: 8px;">
               <h1 style="margin: 0; font-size: 24px; text-align: center;">${subject}</h1>
@@ -277,7 +277,7 @@ const sendEmailNotification = async (emailAddresses, subject, message) => {
       </div>`;
 
     const mailOptions = {
-      from: '"CICS Alumni Connect" <' + process.env.EMAIL_USER + ">",
+      from: process.env.EMAIL_USER,
       bcc: emailAddresses, // Use 'bcc' to hide recipients
       subject: subject,
       html: htmlContent,

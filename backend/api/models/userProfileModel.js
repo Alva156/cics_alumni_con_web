@@ -19,19 +19,10 @@ const userProfileSchema = new Schema({
         type: Date,
         required: true,
     },
-    gender: {
-        type: String,
-    },
-    region: {
-        type: String,
-    },
     accountEmail: {
         type: String,
     },
     profession: {
-        type: String,
-    },
-    college: {
         type: String,
     },
     collegeProgram: {
@@ -72,16 +63,11 @@ const userProfileSchema = new Schema({
     },
     attachments: [
         {
-            _id: { 
-                type: String, 
-                required: true 
-            },
-            filename: {
+            fileName: {
                 type: String, // The original file name
                 required: true,
-                trim: true,
             },
-            filepath: {
+            filePath: {
                 type: String, // The path where the file is stored
                 required: true,
             },

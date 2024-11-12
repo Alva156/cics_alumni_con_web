@@ -186,7 +186,7 @@ function Login() {
             </div>
 
             <button
-              className="btn bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 mt-4 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
+              className="bg-[#BE142E] text-white font-bold text-lg py-3 px-6 w-full mb-6 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
               onClick={handleSubmit}
             >
               SIGN IN
@@ -196,7 +196,7 @@ function Login() {
               Don&apos;t have an account?
             </p>
             <button
-              className=" btn bg-[#2D2B2B] text-white font-bold text-l py-2 px-3 w-full mb-3  transition duration-300 ease-in-out hover:bg-[#1a1a1a]"
+              className="bg-[#2D2B2B] text-white font-bold text-lg py-3 px-6 w-full transition duration-300 ease-in-out hover:bg-[#1a1a1a]"
               onClick={() => navigate("/dataprivacy")}
             >
               SIGN UP

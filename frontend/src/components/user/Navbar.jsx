@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../App.css";
 import { MdOutlineLogout } from "react-icons/md";
@@ -12,7 +12,7 @@ const Navbar = () => {
   const [loading, setLoading] = useState(false);
 
   const LoadingSpinner = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
     </div>
   );
@@ -57,15 +57,6 @@ const Navbar = () => {
     setModalVisible(false);
   };
 
-  const detailsRef = useRef(null);
-  const handleNavigateAndClose = (path) => {
-    navigate(path);
-    if (detailsRef.current) {
-      detailsRef.current.open = false; // Close the dropdown
-    }
-    setIsDropdownOpen(false);
-  };
-
   return (
     <div>
       <div className="navbar bg-white text-black font-light ">
@@ -92,87 +83,64 @@ const Navbar = () => {
                 />
               </svg>
             </div>
-            {/* Mobile */}
             {isDropdownOpen && (
               <ul
                 tabIndex={0}
                 className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow"
               >
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button onClick={() => handleNavigateAndClose("/")}>
-                    Home
-                  </button>
+                  <button onClick={() => navigate("/")}>Home</button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button
-                    onClick={() => handleNavigateAndClose("/user-userprofile")}
-                  >
+                  <button onClick={() => navigate("/user-userprofile")}>
                     User Profile
                   </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button
-                    onClick={() => handleNavigateAndClose("/user-survey")}
-                  >
+                  <button onClick={() => navigate("/user-survey")}>
                     Survey
                   </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button
-                    onClick={() => handleNavigateAndClose("/user-threads")}
-                  >
+                  <button onClick={() => navigate("/user-threads")}>
                     Threads
                   </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <details>
-                    <summary className="p-2.5">Contents</summary>
-                    <ul className="p-2.5 z-20">
+                    <summary>Contents</summary>
+                    <ul className="p-2.5 z-50">
                       <li className="p-1">
-                        <button
-                          onClick={() =>
-                            handleNavigateAndClose("/user-companies")
-                          }
-                        >
+                        <button onClick={() => navigate("/user-companies")}>
                           Companies
                         </button>
                       </li>
                       <li className="p-1">
-                        <button
-                          onClick={() => handleNavigateAndClose("/user-news")}
-                        >
+                        <button onClick={() => navigate("/user-news")}>
                           News
                         </button>
                       </li>
                       <li className="p-1">
-                        <button
-                          onClick={() => handleNavigateAndClose("/user-events")}
-                        >
+                        <button onClick={() => navigate("/user-events")}>
                           Events
                         </button>
                       </li>
                       <li className="p-1">
                         <button
-                          onClick={() =>
-                            handleNavigateAndClose("/user-certifications")
-                          }
+                          onClick={() => navigate("/user-certifications")}
                         >
                           Certifications
                         </button>
                       </li>
                       <li className="p-1">
                         <button
-                          onClick={() =>
-                            handleNavigateAndClose("/user-documentrequest")
-                          }
+                          onClick={() => navigate("/user-documentrequest")}
                         >
                           Document Request Steps
                         </button>
                       </li>
                       <li className="p-1">
-                        <button
-                          onClick={() => handleNavigateAndClose("/user-job")}
-                        >
+                        <button onClick={() => navigate("/user-job")}>
                           Job/Internship Referrals
                         </button>
                       </li>
@@ -180,24 +148,19 @@ const Navbar = () => {
                   </details>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button
-                    onClick={() => handleNavigateAndClose("/user-alumni")}
-                  >
+                  <button onClick={() => navigate("/user-alumni")}>
                     Alumni
                   </button>
                 </li>
-                <li className="p-2.5">
-                  <button
-                    onClick={() => handleNavigateAndClose("/user-chatbot")}
-                  >
-                    FAQs
+                <li className="p-2.5 ">
+                  <button onClick={() => navigate("/user-chatbot")}>
+                    Chatbot
                   </button>
                 </li>
               </ul>
             )}
           </div>
         </div>
-        {/* Desktop */}
         <div className="navbar-center hidden lg:flex py-1">
           <ul className="menu menu-horizontal px-1">
             <li className="px-2.5 pr-8">
@@ -233,13 +196,13 @@ const Navbar = () => {
               </button>
             </li>
             <li className="px-2.5 pr-8">
-              <details ref={detailsRef}>
+              <details>
                 <summary className="font-bold text-gray-700">Contents</summary>
                 <ul className="px-2.5 bg-white pr-8 z-20">
                   <li className="p-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/user-companies")}
+                      onClick={() => navigate("/user-companies")}
                     >
                       Companies
                     </button>
@@ -247,7 +210,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/user-news")}
+                      onClick={() => navigate("/user-news")}
                     >
                       News
                     </button>
@@ -255,7 +218,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/user-events")}
+                      onClick={() => navigate("/user-events")}
                     >
                       Events
                     </button>
@@ -263,9 +226,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() =>
-                        handleNavigateAndClose("/user-certifications")
-                      }
+                      onClick={() => navigate("/user-certifications")}
                     >
                       Certifications
                     </button>
@@ -273,9 +234,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() =>
-                        handleNavigateAndClose("/user-documentrequest")
-                      }
+                      onClick={() => navigate("/user-documentrequest")}
                     >
                       Document Request Steps
                     </button>
@@ -283,7 +242,7 @@ const Navbar = () => {
                   <li className="px-1 border-b border-hgray last:border-b-0">
                     <button
                       className="font-bold text-gray-700"
-                      onClick={() => handleNavigateAndClose("/user-job")}
+                      onClick={() => navigate("/user-job")}
                     >
                       Job/Internship Referrals
                     </button>
@@ -304,7 +263,7 @@ const Navbar = () => {
                 className="font-bold text-gray-700"
                 onClick={() => navigate("/user-chatbot")}
               >
-                FAQs
+                Chatbot
               </button>
             </li>
           </ul>
@@ -320,7 +279,7 @@ const Navbar = () => {
           </a>
 
           {isTooltipVisible && (
-            <div className="absolute top-full mt-1 mr-3.5 md:mr-7 bg-gray-800 text-white text-xxs md:text-xs rounded py-1 px-1.5 z-20">
+            <div className="absolute top-full mt-1 mr-3.5 md:mr-7 bg-gray-800 text-white text-xxs md:text-xs rounded py-1 px-1.5 z-10">
               Logout
             </div>
           )}

@@ -7,19 +7,16 @@ import forgotpasswordImage from "../../assets/forgotpassword_image.jpg";
 function ForgotPassword() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [email, setEmail] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [otpType, setOtpType] = useState(null);
   const [showOTPForm, setShowOTPForm] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [modal2Visible, setModal2Visible] = useState(false);
   const [modal3Visible, setModal3Visible] = useState(false);
-  const [otpSentForEmail, setOtpSentForEmail] = useState(false);
-  const [otpSentForSMS, setOtpSentForSMS] = useState(false);
-
   const navigate = useNavigate();
 
   const clearErrorAfterDelay = () => {
@@ -31,17 +28,14 @@ function ForgotPassword() {
   };
 
   useEffect(() => {
-    if (timer > 0 && (otpSentForEmail || otpSentForSMS)) {
+    if (timer > 0 && otpSent) {
       const interval = setInterval(() => {
         setTimer((prev) => prev - 1);
       }, 1000);
 
       return () => clearInterval(interval);
-    } else if (timer === 0) {
-      setOtpSentForEmail(false);
-      setOtpSentForSMS(false);
     }
-  }, [timer, otpSentForEmail, otpSentForSMS]);
+  }, [timer, otpSent]);
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
@@ -63,11 +57,10 @@ function ForgotPassword() {
       });
       if (response.data.msg) {
         setOtpType("email");
-        setOtpSentForEmail(true);
-        setOtpSentForSMS(false); // Ensure SMS state remains unchanged
+        setOtpSent(true);
         setShowOTPForm(true);
         setTimer(300); // 5 minutes timer
-        setSuccess("OTP sent to your email successfully");
+        setSuccess("OTP sent to email successfully");
         clearSuccessAfterDelay();
       } else {
         setError("Failed to send OTP");
@@ -75,38 +68,6 @@ function ForgotPassword() {
       }
     } catch (err) {
       console.error(err);
-      setError("An error occurred while sending OTP");
-      clearErrorAfterDelay();
-    }
-    setLoading(false);
-  };
-  const handleSendSMSOTP = async () => {
-    setLoading(true);
-    if (!mobileNumber) {
-      setError("Please enter your mobile number");
-      clearErrorAfterDelay();
-      setLoading(false);
-      return;
-    }
-    try {
-      const response = await axios.post(`${backendUrl}/users/forget`, {
-        mobileNumber,
-      });
-      if (response.data.msg) {
-        setOtpType("sms");
-        setOtpSentForSMS(true);
-        setOtpSentForEmail(false); // Ensure email state remains unchanged
-        setShowOTPForm(true);
-        setTimer(300);
-        setSuccess(
-          "OTP sent to your mobile number successfully. Expect the OTP to be sent by 'PhilSMS'"
-        );
-        clearSuccessAfterDelay();
-      } else {
-        setError("Failed to send OTP");
-        clearErrorAfterDelay();
-      }
-    } catch (err) {
       setError("An error occurred while sending OTP");
       clearErrorAfterDelay();
     }
@@ -121,28 +82,54 @@ function ForgotPassword() {
       setLoading(false);
       return;
     }
-    const dataToSend =
-      otpType === "email" ? { email, otp } : { mobileNumber, otp };
+
+    const dataToSend = { email, otp };
     try {
       const response = await axios.post(
         `${backendUrl}/users/verifypassword`,
         dataToSend,
         { withCredentials: true }
       );
-      if (response.data.msg === "OTP verified successfully") {
+      if (response.data.msg) {
         setSuccess("OTP verified successfully");
         clearSuccessAfterDelay();
-        setTimeout(() => navigate("/resetpassword"), 3000);
+        setTimeout(() => navigate("/resetpassword"), 3000); // 3 seconds pause before navigating
       } else {
-        setError("An unexpected error occurred");
+        setError("Invalid OTP");
         clearErrorAfterDelay();
       }
     } catch (err) {
-      if (err.response && err.response.status === 400) {
-        setError("Invalid OTP");
+      console.error(err);
+      setError("An error occurred while verifying OTP");
+      clearErrorAfterDelay();
+    }
+    setLoading(false);
+  };
+
+  const handleResendOtp = async () => {
+    if (!email) {
+      setError("Please enter your email");
+      clearErrorAfterDelay();
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(`${backendUrl}/users/forget`, {
+        email,
+      });
+      if (response.data.msg) {
+        setSuccess("OTP resent successfully");
+        setTimer(300); // Reset timer
+        setOtp(""); // Clear previous OTP
+        clearSuccessAfterDelay();
       } else {
-        setError("An error occurred while verifying OTP");
+        setError("Failed to resend OTP");
+        clearErrorAfterDelay();
       }
+    } catch (err) {
+      console.error(err);
+      setError("An error occurred while resending OTP");
       clearErrorAfterDelay();
     }
     setLoading(false);
@@ -179,7 +166,7 @@ function ForgotPassword() {
         {/* Left Form */}
         <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-start bg-white">
           <div className="flex flex-col justify-start h-full">
-            <div className="mb-1">
+            <div className="mb-6">
               <h1 className="text-2xl md:text-3xl font-bold mb-6 mt-1 text-left">
                 Welcome, CICS Alumni!
               </h1>
@@ -189,66 +176,37 @@ function ForgotPassword() {
               <p className="text-left text-sm md:text-base">
                 Choose preferred platform to send OTP
               </p>
-              <div className="h-4 mt-4 mb-1">
-                {error && <p className="text-red text-xs">{error}</p>}
-                {success && <p className="text-green text-xs">{success}</p>}
-              </div>
+            </div>
+            <div className=" mb-4">
+              {success && <p className="text-green">{success}</p>}
+              {error && <p className="text-red">{error}</p>}
             </div>
 
-            <label className="block mb-4 text-sm font-medium">
-              Mobile Number{" "}
-              <span className="text-xs font-light italic">
-                {" "}
-                ( include country code before your number, e.g.,{" "}
-                <span className="font-medium">63</span> 9125559207 for PH )
-              </span>
+            <label className="block mb-2 text-sm font-medium">
+              Mobile Number
             </label>
-            <div className="flex items-center mb-4">
-              <input
-                type="tel"
-                className="p-2 border border-black bg-[#D9D9D9] w-full"
-                onChange={(e) => setMobileNumber(e.target.value)}
-                style={{ height: "40px" }}
-              />
-              <button
-                onClick={handleSendSMSOTP}
-                className="btn w-auto ml-2 bg-black text-white hover:bg-black hover:text-white"
-                disabled={loading}
-              >
-                {otpSentForSMS && timer > 0
-                  ? "Resend OTP (SMS)"
-                  : "Send OTP (SMS)"}
-              </button>
-            </div>
+            <input
+              type="tel"
+              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
+              style={{ height: "40px" }}
+            />
+            <button className="bg-[#3D3C3C] text-white text-lg py-2 px-6 w-64 mb-0 mt-0 transition duration-300 ease-in-out hover:bg-[#2C2C2C]">
+              Send SMS
+            </button>
 
             <label className="block mb-2 mt-6 text-sm font-medium">Email</label>
-            <div className="flex items-center mb-4">
-              <input
-                type="email"
-                className="p-2 border border-black bg-[#D9D9D9] w-full"
-                onChange={(e) => setEmail(e.target.value)}
-                style={{ height: "40px" }}
-              />
-              <button
-                onClick={handleSendEmailOTP}
-                className="btn w-auto ml-2 bg-black text-white hover:bg-black hover:text-white"
-                disabled={loading}
-              >
-                {otpSentForEmail && timer > 0
-                  ? "Resend OTP (Email)"
-                  : "Send OTP (Email)"}
-              </button>
-            </div>
-
-            {!otpSentForEmail && !otpSentForSMS && (
-              <button
-                onClick={() => navigate("/login")}
-                className="btn md:w-64 w-52 bg-[#C5C5C5] text-black hover:bg-[#C5C5C5] hover:text-black mt-2"
-              >
-                Cancel
-              </button>
-            )}
-
+            <input
+              type="email"
+              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ height: "40px" }}
+            />
+            <button
+              onClick={handleSendEmailOTP}
+              className="bg-[#3D3C3C] mb-4 text-white text-lg py-2 px-6 w-64 mb-0 mt-0 transition duration-300 ease-in-out hover:bg-[#2C2C2C]"
+            >
+              Send Email
+            </button>
             {showOTPForm && (
               <>
                 <label className="block mb-2 mt-6 text-sm font-medium">
@@ -261,23 +219,31 @@ function ForgotPassword() {
                   className="mb-3 p-2 border border-black bg-[#D9D9D9] w-full"
                   style={{ height: "40px" }}
                 />
-                {timer > 0 && (
-                  <div className="mb-4 mt-4">
+                {otpSent && (
+                  <div className="mb-4">
                     <p className="text-left text-sm md:text-base">
                       OTP valid for: {formatTime(timer)}
                     </p>
                   </div>
                 )}
+
                 <button
                   onClick={handleVerifyOTP}
-                  className="btn md:w-64 w-52 bg-green text-white mt-2 hover:bg-green hover:text-white"
+                  className="bg-[#056E34] text-white text-lg py-2 px-6 w-64 mb-2 mt-0 transition duration-300 ease-in-out hover:bg-[#004A1C]"
                   disabled={loading}
                 >
                   Confirm
                 </button>
                 <button
+                  onClick={handleResendOtp}
+                  className="bg-[#BE142E] text-white text-lg py-2 px-6 w-64 mb-2 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
+                >
+                  Resend OTP
+                </button>
+
+                <button
                   onClick={() => setModal2Visible(true)}
-                  className="btn md:w-64 w-52 bg-[#C5C5C5] text-black hover:bg-[#C5C5C5] hover:text-black mt-2"
+                  className="bg-[#C5C5C5] text-black text-lg py-2 px-6 w-64 transition duration-300 ease-in-out hover:bg-[#A8A8A8]"
                 >
                   Cancel
                 </button>
@@ -295,8 +261,6 @@ function ForgotPassword() {
             className="object-cover w-full h-full"
           />
         </div>
-
-        {/* Modal 2 */}
         {modal2Visible && (
           <dialog id="my_modal_5" className="modal modal-middle " open>
             <div className="modal-box">
@@ -323,8 +287,6 @@ function ForgotPassword() {
             </div>
           </dialog>
         )}
-
-        {/* Modal 3 */}
         {modal3Visible && (
           <dialog id="my_modal_5" className="modal modal-middle " open>
             <div className="modal-box">

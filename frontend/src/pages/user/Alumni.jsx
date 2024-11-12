@@ -75,15 +75,15 @@ function Alumni() {
     // Function that handles mouse enter event on tab
     const handleMouseEnter = (tab) => {
       // Change aria-label for different tab items based on the original label
-      if (tab.getAttribute('aria-label') === '🛠') {
+      if (tab.getAttribute('aria-label') === '⚙︎') {
         tab.setAttribute('aria-label', 'Settings');
-      } else if (tab.getAttribute('aria-label') === '🏠︎') {
+      } else if (tab.getAttribute('aria-label') === '➤') {
         tab.setAttribute('aria-label', 'Primary');
-      } else if (tab.getAttribute('aria-label') === '♥︎') {
+      } else if (tab.getAttribute('aria-label') === '✦') {
         tab.setAttribute('aria-label', 'Secondary');
       } else if (tab.getAttribute('aria-label') === '☎︎') {
         tab.setAttribute('aria-label', 'Contacts');
-      } else if (tab.getAttribute('aria-label') === '⬇') {
+      } else if (tab.getAttribute('aria-label') === '✙') {
         tab.setAttribute('aria-label', 'Attachments');
       } else if (tab.getAttribute('aria-label') === '✎') {
         tab.setAttribute('aria-label', 'Education');
@@ -96,15 +96,15 @@ function Alumni() {
     const handleMouseLeave = (tab) => {
       // Reset aria-label back to original values when mouse leaves the tab
       if (tab.getAttribute('aria-label') === 'Settings') {
-        tab.setAttribute('aria-label', '🛠');
+        tab.setAttribute('aria-label', '⚙︎');
       } else if (tab.getAttribute('aria-label') === 'Primary') {
-        tab.setAttribute('aria-label', '🏠︎');
+        tab.setAttribute('aria-label', '➤');
       } else if (tab.getAttribute('aria-label') === 'Secondary') {
-        tab.setAttribute('aria-label', '♥︎');
+        tab.setAttribute('aria-label', '✦');
       } else if (tab.getAttribute('aria-label') === 'Contacts') {
         tab.setAttribute('aria-label', '☎︎');
       } else if (tab.getAttribute('aria-label') === 'Attachments') {
-        tab.setAttribute('aria-label', '⬇');
+        tab.setAttribute('aria-label', '✙');
       } else if (tab.getAttribute('aria-label') === 'Education') {
         tab.setAttribute('aria-label', '✎');
       } else if (tab.getAttribute('aria-label') === 'Career') {
@@ -669,7 +669,7 @@ function Alumni() {
   name="my_tabs_2"
   role="tab"
   className="tab"
-  aria-label="🏠︎"
+  aria-label="➤"
   defaultChecked
   title="Primary Information" 
 />
@@ -741,7 +741,7 @@ function Alumni() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="♥︎"
+              aria-label="✦"
               title="Secondary Information" 
             />
               <div
@@ -860,7 +860,7 @@ function Alumni() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="⬇"
+              aria-label="✙"
               title="Attachments" 
             />
               <div

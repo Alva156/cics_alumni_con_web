@@ -42,46 +42,52 @@ function Certifications() {
   );
 
   // Sort certifications based on selected criteria
-  const sortedCertifications = filteredCertifications.sort((a, b) => {
-    if (sortCriteria === "Name (A-Z)") {
-      return a.name.localeCompare(b.name);
-    } else if (sortCriteria === "Name (Z-A)") {
-      return b.name.localeCompare(a.name);
-    }
-    return 0;
-  });
+const sortedCertifications = filteredCertifications.sort((a, b) => {
+  if (sortCriteria === "Name (A-Z)") {
+    return a.name.localeCompare(b.name);
+  } else if (sortCriteria === "Name (Z-A)") {
+    return b.name.localeCompare(a.name);
+  } else if (sortCriteria === "Most Recent") {
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  } else if (sortCriteria === "Oldest") {
+    return new Date(a.createdAt) - new Date(b.createdAt);
+  }
+  return 0;
+});
 
-  return (
-    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-2xl font-medium text-gray-700 mb-6">Certifications</h1>
+return (
+  <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+    <h1 className="text-2xl font-medium text-gray-700 mb-6">Certifications</h1>
 
-      <div className="mb-4 relative">
-        <input
-          type="text"
-          placeholder="Search Certifications"
-          className="w-full border border-black rounded-lg px-4 py-2"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <span
-          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-          onClick={() => setSearchTerm("")}
-        >
-          X
-        </span>
-      </div>
+    <div className="mb-4 relative">
+      <input
+        type="text"
+        placeholder="Search Certifications"
+        className="w-full border border-black rounded-lg px-4 py-2"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <span
+        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+        onClick={() => setSearchTerm("")}
+      >
+        X
+      </span>
+    </div>
 
-      <div className="mb-6">
-        <span className="text-sm">Sort by:</span>
-        <select
-          className="ml-2 border border-black rounded px-3 py-1 text-sm"
-          value={sortCriteria}
-          onChange={(e) => setSortCriteria(e.target.value)}
-        >
-          <option>Name (A-Z)</option>
-          <option>Name (Z-A)</option>
-        </select>
-      </div>
+    <div className="mb-6">
+      <span className="text-sm">Sort by:</span>
+      <select
+        className="ml-2 border border-black rounded px-3 py-1 text-sm"
+        value={sortCriteria}
+        onChange={(e) => setSortCriteria(e.target.value)}
+      >
+        <option>Name (A-Z)</option>
+        <option>Name (Z-A)</option>
+        <option>Most Recent</option>
+        <option>Oldest</option>
+      </select>
+    </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {sortedCertifications.map((certification) => (
@@ -103,7 +109,8 @@ function Certifications() {
             </p>
             <a
               href="#"
-              className="text-blue-500 text-sm font-medium hover:underline"
+              style={{ color: "#be142e" }}
+              className="text-sm font-medium hover:underline"
             >
               Read More
             </a>
@@ -127,14 +134,18 @@ function Certifications() {
             >
               &times;
             </button>
-            <div className="text-2xl font-medium mb-2">{selectedCertification.name}</div>
+            <div className="text-2xl font-medium mb-2">
+              {selectedCertification.name}
+            </div>
             <div className="text-md mb-2">{selectedCertification.address}</div>
             <img
               src={`${backendUrl}${selectedCertification.image}`}
               alt={selectedCertification.name}
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
-            <div className="text-sm mb-4">{selectedCertification.description}</div>
+            <div className="text-sm mb-4">
+              {selectedCertification.description}
+            </div>
             <div className="text-sm font-medium mb-2">Contact Details</div>
             <a
               href={`mailto:${selectedCertification.contact}`}

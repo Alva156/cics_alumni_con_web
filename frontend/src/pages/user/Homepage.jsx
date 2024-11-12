@@ -8,6 +8,7 @@ import homepage1 from "../../assets/homepage1.jpg";
 import homepage2 from "../../assets/homepage2.jpg";
 import homepage3 from "../../assets/homepage3.jpg";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const Homepage = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -17,8 +18,14 @@ const Homepage = () => {
   const [events, setEvents] = useState([]);
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [currentEventsIndex, setCurrentEventsIndex] = useState(0);
+  const [autoSlideNews, setAutoSlideNews] = useState(true);
+  const [autoSlideEvents, setAutoSlideEvents] = useState(true);
   const videoRef = useRef(null);
   const navigate = useNavigate();
+  const newsCarouselRef = useRef(null); // Reference for news carousel
+  const eventsCarouselRef = useRef(null); // Reference for events carousel
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const images = [homepage1, homepage2, homepage3];
   const credits = [
@@ -31,6 +38,54 @@ const Homepage = () => {
     AOS.init({ duration: 1000, once: true });
     fetchNews();
     fetchEvents();
+
+    // Automatic image carousel transition
+    const imageInterval = setInterval(() => {
+      nextImage();
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(imageInterval); // Clear interval on component unmount
+  }, []);
+
+  useEffect(() => {
+    // Automatically slide news every 3 seconds
+    const autoSlide = setInterval(() => {
+      if (autoSlideNews) {
+        nextNews();
+      }
+    }, 3000); // 3 seconds
+
+    return () => clearInterval(autoSlide); // Cleanup on unmount
+  }, [autoSlideNews, news]);
+
+  useEffect(() => {
+    // Automatically slide events every 3 seconds
+    const autoSlideInterval = setInterval(() => {
+      if (autoSlideEvents) {
+        nextEvent();
+      }
+    }, 3000); // 3 seconds
+
+    return () => clearInterval(autoSlideInterval); // Cleanup on unmount
+  }, [autoSlideEvents, events]);
+
+  useEffect(() => {
+    const handleVideoFullScreen = () => {
+      const videoElement = videoRef.current;
+      if (videoElement) {
+        // Prevent full-screen on mobile devices
+        if (window.innerWidth <= 768) {
+          videoElement.removeAttribute("controlsList"); // Remove fullscreen control
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleVideoFullScreen);
+    handleVideoFullScreen(); // Call it initially
+
+    return () => {
+      window.removeEventListener("resize", handleVideoFullScreen);
+    };
   }, []);
 
   const fetchNews = async () => {
@@ -86,193 +141,208 @@ const Homepage = () => {
   };
 
   const nextNews = () => {
-    setCurrentNewsIndex((prevIndex) =>
-      prevIndex === news.length - 1 ? 0 : prevIndex + 1
-    );
+    setCurrentNewsIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % news.length; // Use modulus for infinite loop
+      slideTo(nextIndex, newsCarouselRef);
+      return nextIndex;
+    });
+    handleManualSlide("news");
   };
-
+  
   const prevNews = () => {
-    setCurrentNewsIndex((prevIndex) =>
-      prevIndex === 0 ? news.length - 1 : prevIndex - 1
-    );
+    setCurrentNewsIndex((prevIndex) => {
+      const prevIndexValue = (prevIndex - 1 + news.length) % news.length; // Modulus for wrapping around
+      slideTo(prevIndexValue, newsCarouselRef);
+      return prevIndexValue;
+    });
+    handleManualSlide("news");
   };
-
+  
   const nextEvent = () => {
-    setCurrentEventsIndex((prevIndex) =>
-      prevIndex === events.length - 1 ? 0 : prevIndex + 1
-    );
+    setCurrentEventsIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % events.length; // Use modulus for infinite loop
+      slideTo(nextIndex, eventsCarouselRef);
+      return nextIndex;
+    });
+    handleManualSlide("events");
+  };
+  
+  const prevEvent = () => {
+    setCurrentEventsIndex((prevIndex) => {
+      const prevIndexValue = (prevIndex - 1 + events.length) % events.length; // Modulus for wrapping around
+      slideTo(prevIndexValue, eventsCarouselRef);
+      return prevIndexValue;
+    });
+    handleManualSlide("events");
+  };
+  
+
+  const slideTo = (index, carouselRef) => {
+    const carousel = carouselRef.current;
+    const scrollAmount = index * carousel.clientWidth; // Slide by one card
+    carousel.scrollTo({
+      left: scrollAmount,
+      behavior: "smooth",
+    });
   };
 
-  const prevEvent = () => {
-    setCurrentEventsIndex((prevIndex) =>
-      prevIndex === 0 ? events.length - 1 : prevIndex - 1
-    );
+  const handleManualSlide = (type) => {
+    // Stop auto sliding
+    if (type === "news") {
+      setAutoSlideNews(false);
+      setTimeout(() => {
+        setAutoSlideNews(true); // Resume auto sliding
+      }, 10000); // 10 seconds delay
+    } else if (type === "events") {
+      setAutoSlideEvents(false);
+      setTimeout(() => {
+        setAutoSlideEvents(true); // Resume auto sliding
+      }, 10000); // 10 seconds delay
+    }
   };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    window.scrollTo(0, 0); // Scroll to the top of the page
+  };
+  useEffect(() => {
+    const storedLoginStatus = localStorage.getItem("isLoggedIn");
+    const messageShown = sessionStorage.getItem("loginMessageShown");
+
+    setIsLoggedIn(storedLoginStatus === "true");
+
+    if (storedLoginStatus === "true" && messageShown !== "true") {
+      setShowLoginMessage(true);
+      sessionStorage.setItem("loginMessageShown", "true");
+
+      setTimeout(() => {
+        setShowLoginMessage(false);
+      }, 5000);
+    }
+  }, []);
 
   return (
-    <div
-      style={{ paddingTop: "12px", paddingRight: "45px", paddingLeft: "45px" }}
-    >
-      <div className="homepage-container " style={{ display: "flex" }}>
-        <div
-          className="background-news-container"
-          style={{ display: "flex", width: "100%" }}
-        >
-          {/* Background Video Section */}
-          <div
-            className="background-section"
-            style={{
-              position: "relative",
-              width: "70%",
-              marginTop: "30px",
-            }}
-          >
-            <video
-              autoPlay
-              muted
-              ref={videoRef}
-              className="background-video"
-              style={{ width: "100%" }}
-            >
-              <source src={ustbg} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-            <div
-              className="absolute"
-              style={{
-                position: "absolute",
-                bottom: "20px",
-                right: "20px",
-                backgroundColor: "rgba(0, 0, 0, 0.4)",
-                color: "white",
-                padding: "10px",
-                borderRadius: "5px",
-                zIndex: "20",
-                textAlign: "right",
-              }}
-            >
-              Photo Courtesy of UST SITE
-            </div>
+    <div className="homepage-wrapper">
+      {showLoginMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+          <p>Login success!</p>
+        </div>
+      )}
+      <div className="homepage-container">
+  <div className="background-news-container">
+    {/* Background Video Section */}
+    <div className="background-section">
+      <video 
+        autoPlay 
+        muted 
+        ref={videoRef} 
+        className="background-video"
+        playsInline // Ensures the video doesn't go fullscreen on iOS
+      >
+        <source src={ustbg} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div className="video-footer">Photo Courtesy of UST SITE</div>
           </div>
 
           {/* News and Events Carousel Section */}
-          <div
-            style={{
-              width: "30%",
-              display: "flex",
-              flexDirection: "column",
-              padding: "20px",
-            }}
-          >
+          <div className="news-events-section">
             {/* News Carousel */}
-            <div
-              className="news-carousel-container"
-              data-aos="fade-up"
-              style={{ position: "relative", width: "110%", maxWidth: "430px" }}
-            >
-              <h2 className="text-2xl font-medium mb-4">Latest News</h2>
-              <div className="flex justify-center items-center">
-                {news.length > 0 && (
-                  <div
-                    className="bg-white border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-                    style={{ height: "340px", width: "100%" }}
-                  >
-                    <img
-                      src={`${import.meta.env.VITE_BACKEND_URL}${
-                        news[currentNewsIndex].image
-                      }`}
-                      alt={news[currentNewsIndex].name}
-                      className="w-full h-48 object-cover rounded-t-lg mb-4"
-                    />
-                    <div className="p-3">
-                      <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
-                        {news[currentNewsIndex].name}
+            <div className="news-carousel-container" data-aos="fade-up">
+              <h2 className="news-title">
+                <Link to="/user-news" className="news-link">
+                  Latest News
+                </Link>
+              </h2>
+
+              <div className="carousel-wrapper">
+                <ul className="carousel-news" ref={newsCarouselRef}>
+                  {news.map((item, index) => (
+                    <li className="item" key={index}>
+                      <img
+                        src={`${import.meta.env.VITE_BACKEND_URL}${item.image}`}
+                        alt={item.name}
+                        className="news-image"
+                      />
+                      <div className="news-content">
+                        <div className="carousel-news-title">{item.name}</div>
+                        <p className="news-description">
+                          {item.description.slice(0, 30)}...
+                        </p>
+                        <a
+                          href="#"
+                          className="read-more-link"
+                          onClick={() =>
+                            handleNavigation(
+                              `/user-news?id=${news[currentNewsIndex]._id}`
+                            )
+                          }
+                        >
+                          Read More
+                        </a>
                       </div>
-                      <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
-                        {news[currentNewsIndex].description.slice(0, 100)}...
-                      </p>
-                      <a
-                        href="#"
-                        style={{ color: "#be142e" }}
-                        className="text-sm font-medium hover:underline"
-                      >
-                        Read More
-                      </a>
-                    </div>
-                  </div>
-                )}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              {/* Next and Previous buttons inside the carousel */}
-              <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
-                <button className="carousel-button prev" onClick={prevNews}>
-                  ❮
-                </button>
-              </div>
-              <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-                <button className="carousel-button next" onClick={nextNews}>
-                  ❯
-                </button>
-              </div>
+
+              <button className="carousel-button prev" onClick={prevNews}>
+                ❮
+              </button>
+              <button className="carousel-button next" onClick={nextNews}>
+                ❯
+              </button>
             </div>
 
-            {/* Events Carousel Section */}
-            <div
-              className="events-carousel-container"
-              data-aos="fade-up"
-              style={{
-                position: "relative",
-                width: "110%",
-                maxWidth: "430px",
-                marginTop: "20px",
-              }}
-            >
-              <h2 className="text-2xl font-medium mb-4">Upcoming Events</h2>
-              <div className="flex justify-center items-center">
-                {events.length > 0 && (
-                  <div
-                    className="bg-white border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-                    style={{ height: "340px", width: "100%" }}
-                  >
-                    <img
-                      src={`${import.meta.env.VITE_BACKEND_URL}${
-                        events[currentEventsIndex].image
-                      }`}
-                      alt={events[currentEventsIndex].name}
-                      className="w-full h-48 object-cover rounded-t-lg mb-4"
-                    />
-                    <div className="p-3">
-                      <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
-                        {events[currentEventsIndex].name}
+            {/* Events Carousel */}
+            <div className="events-carousel-container" data-aos="fade-up">
+              <h2 className="events-title">
+                <Link to="/user-events" className="events-link">
+                  Upcoming Events
+                </Link>
+              </h2>
+
+              <div className="carousel-wrapper">
+                <ul className="carousel-events" ref={eventsCarouselRef}>
+                  {events.map((item, index) => (
+                    <li className="item" key={index}>
+                      <img
+                        src={`${import.meta.env.VITE_BACKEND_URL}${item.image}`}
+                        alt={item.name}
+                        className="events-image"
+                      />
+                      <div className="events-content">
+                        <div className="carousel-events-title">{item.name}</div>
+                        <p className="events-description">
+                          {item.description.slice(0, 30)}...
+                        </p>
+                        <a
+                          href="#"
+                          className="read-more-link"
+                          onClick={() =>
+                            handleNavigation(
+                              `/user-events?id=${events[currentEventsIndex]._id}`
+                            )
+                          }
+                        >
+                          Read More
+                        </a>
                       </div>
-                      <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
-                        {events[currentEventsIndex].description.slice(0, 100)}
-                        ...
-                      </p>
-                      <a
-                        href="#"
-                        style={{ color: "#be142e" }}
-                        className="text-sm font-medium hover:underline"
-                      >
-                        Read More
-                      </a>
-                    </div>
-                  </div>
-                )}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              {/* Next and Previous buttons inside the carousel */}
-              <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
-                <button className="carousel-button prev" onClick={prevEvent}>
-                  ❮
-                </button>
-              </div>
-              <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-                <button className="carousel-button next" onClick={nextEvent}>
-                  ❯
-                </button>
-              </div>
+
+              <button className="carousel-button prev" onClick={prevEvent}>
+                ❮
+              </button>
+              <button className="carousel-button next" onClick={nextEvent}>
+                ❯
+              </button>
             </div>
           </div>
         </div>
+
         <div className="carousel-container" data-aos="fade-up">
           <button className="carousel-button prev" onClick={prevPage}>
             ❮
@@ -282,49 +352,9 @@ const Homepage = () => {
               <div className="carousel-page">
                 <div className="square-container">
                   <div className="square-item">
-                    <div className="logo userprofile-logo"></div>
-                    <h3>Profile</h3>
-                    <button onClick={() => navigate("/user-userprofile")}>
-                      Go to Profile
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo survey-logo"></div>
-                    <h3>Survey</h3>
-                    <button onClick={() => navigate("/user-survey")}>
-                      Take Survey
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo threads-logo"></div>
-                    <h3>Threads</h3>
-                    <button onClick={() => navigate("/user-threads")}>
-                      View Threads
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo alumni-logo"></div>
-                    <h3>Alumni</h3>
-                    <button onClick={() => navigate("/user-alumni")}>
-                      Alumni Network
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo chatbot-logo"></div>
-                    <h3>Chatbot</h3>
-                    <button onClick={() => navigate("/user-chatbot")}>
-                      Chat with Us
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="carousel-page">
-                <div className="square-container">
-                  <div className="square-item">
                     <div className="logo companies-logo"></div>
                     <h3>Companies</h3>
-                    <button onClick={() => navigate("/user-companies")}>
+                    <button onClick={() => handleNavigation("/user-companies")}>
                       View Companies
                     </button>
                   </div>
@@ -336,10 +366,12 @@ const Homepage = () => {
                         View News/Events
                       </button>
                       <div className="dropdown-content">
-                        <button onClick={() => navigate("/user-news")}>
+                        <button onClick={() => handleNavigation("/user-news")}>
                           News
                         </button>
-                        <button onClick={() => navigate("/user-events")}>
+                        <button
+                          onClick={() => handleNavigation("/user-events")}
+                        >
                           Events
                         </button>
                       </div>
@@ -348,22 +380,68 @@ const Homepage = () => {
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>
                     <h3>Certifications</h3>
-                    <button onClick={() => navigate("/user-certifications")}>
+                    <button
+                      onClick={() => handleNavigation("/user-certifications")}
+                    >
                       View Certifications
                     </button>
                   </div>
                   <div className="square-item">
                     <div className="logo documents-logo"></div>
                     <h3>Documents</h3>
-                    <button onClick={() => navigate("/user-documentrequest")}>
+                    <button
+                      onClick={() => handleNavigation("/user-documentrequest")}
+                    >
                       View Documents
                     </button>
                   </div>
                   <div className="square-item">
                     <div className="logo jobs-logo"></div>
                     <h3>Job/Internship</h3>
-                    <button onClick={() => navigate("/user-job")}>
+                    <button onClick={() => handleNavigation("/user-job")}>
                       View Jobs/Internships
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="carousel-page">
+                <div className="square-container">
+                  <div className="square-item">
+                    <div className="logo userprofile-logo"></div>
+                    <h3>Profile</h3>
+                    <button
+                      onClick={() => handleNavigation("/user-userprofile")}
+                    >
+                      Go to Profile
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo survey-logo"></div>
+                    <h3>Survey</h3>
+                    <button onClick={() => handleNavigation("/user-survey")}>
+                      Take Survey
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo threads-logo"></div>
+                    <h3>Threads</h3>
+                    <button onClick={() => handleNavigation("/user-threads")}>
+                      View Threads
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo alumni-logo"></div>
+                    <h3>Alumni</h3>
+                    <button onClick={() => handleNavigation("/user-alumni")}>
+                      Alumni Network
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo chatbot-logo"></div>
+                    <h3>FAQs</h3>
+                    <button onClick={() => handleNavigation("/user-chatbot")}>
+                      Ask Questions
                     </button>
                   </div>
                 </div>
@@ -402,7 +480,15 @@ const Homepage = () => {
                     currentImage === index ? "active" : ""
                   }`}
                 >
-                  <img src={image} alt={`carousel-${index}`} />
+                  <img
+                    src={image}
+                    alt={`carousel-${index}`}
+                    style={{
+                      width: "100%", // Make sure image covers the width of the container
+                      height: "100%", // Make sure image covers the height of the container
+                      objectFit: "cover", // Cover the container without stretching
+                    }}
+                  />
                   <div
                     className="absolute bottom-4 right-4 bg-black text-white text-sm p-2 rounded"
                     style={{
@@ -416,6 +502,7 @@ const Homepage = () => {
                       fontSize: "14px",
                       zIndex: "20",
                       textAlign: "right",
+                      objectFit: "fill",
                     }}
                   >
                     {credits[index]}{" "}
@@ -447,3 +534,4 @@ const Homepage = () => {
 };
 
 export default Homepage;
+/*  */

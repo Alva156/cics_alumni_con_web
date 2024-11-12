@@ -231,11 +231,12 @@ body {
   scroll-behavior: smooth; /* Smooth sliding effect */
   width: 100%; /* Ensure it takes the full width */
   flex-wrap: nowrap; /* Prevent wrapping of items */
-  -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
   scrollbar-width: none; /* For Firefox */
 }
 
-.carousel-news::-webkit-scrollbar, .carousel-events::-webkit-scrollbar {
+.carousel-news::-webkit-scrollbar,
+.carousel-events::-webkit-scrollbar {
   display: none; /* Hide the scrollbar for Webkit-based browsers */
 }
 
@@ -263,7 +264,7 @@ body {
   scroll-padding: 0; /* Remove side padding */
   scroll-behavior: smooth; /* Smooth sliding effect */
   width: 100%; /* Ensure it takes the full width */
-  -ms-overflow-style: none;  /* For Internet Explorer and Edge */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
   scrollbar-width: none; /* For Firefox */
 }
 

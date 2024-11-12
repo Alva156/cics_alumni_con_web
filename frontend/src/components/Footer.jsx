@@ -148,6 +148,12 @@ const Footer = () => {
             Computing Sciences.
           </p>
         </div>
+
+        <p className="mb-2 text-xs text-gray-500 font-light">
+          Logos and images used with permission from the CICS Office and
+          organizations.
+        </p>
+
         <p className="text-xs">
           Developers: Andrei Cimoune Alvarico, Alessandra Claire Cruz, James
           Lorenz Santos, Denise Anne Valdivieso

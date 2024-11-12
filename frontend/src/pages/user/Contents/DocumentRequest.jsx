@@ -42,53 +42,52 @@ function Documents() {
   );
 
   // Sort documents based on selected criteria
-const sortedDocuments = filteredDocuments.sort((a, b) => {
-  if (sortCriteria === "Name (A-Z)") {
-    return a.name.localeCompare(b.name);
-  } else if (sortCriteria === "Name (Z-A)") {
-    return b.name.localeCompare(a.name);
-  } else if (sortCriteria === "Most Recent") {
-    return new Date(b.createdAt) - new Date(a.createdAt);
-  } else if (sortCriteria === "Oldest") {
-    return new Date(a.createdAt) - new Date(b.createdAt);
-  }
-  return 0;
-});
+  const sortedDocuments = filteredDocuments.sort((a, b) => {
+    if (sortCriteria === "Name (A-Z)") {
+      return a.name.localeCompare(b.name);
+    } else if (sortCriteria === "Name (Z-A)") {
+      return b.name.localeCompare(a.name);
+    } else if (sortCriteria === "Most Recent") {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    } else if (sortCriteria === "Oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    return 0;
+  });
 
-return (
-  <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-    <h1 className="text-2xl font-medium text-gray-700 mb-6">Documents</h1>
+  return (
+    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+      <h1 className="text-2xl font-medium text-gray-700 mb-6">Documents</h1>
 
-    <div className="mb-4 relative">
-      <input
-        type="text"
-        placeholder="Search Documents"
-        className="w-full border border-black rounded-lg px-4 py-2"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <span
-        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-        onClick={() => setSearchTerm("")}
-      >
-        X
-      </span>
-    </div>
+      <div className="mb-4 relative">
+        <input
+          type="text"
+          placeholder="Search Documents"
+          className="w-full border border-black rounded-lg px-4 py-2"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <span
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+          onClick={() => setSearchTerm("")}
+        >
+          X
+        </span>
+      </div>
 
-    <div className="mb-6">
-      <span className="text-sm">Sort by:</span>
-      <select
-        className="ml-2 border border-black rounded px-3 py-1 text-sm"
-        value={sortCriteria}
-        onChange={(e) => setSortCriteria(e.target.value)}
-      >
-        <option>Name (A-Z)</option>
-        <option>Name (Z-A)</option>
-        <option>Most Recent</option>
-        <option>Oldest</option>
-      </select>
-    </div>
-
+      <div className="mb-6">
+        <span className="text-sm">Sort by:</span>
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortCriteria}
+          onChange={(e) => setSortCriteria(e.target.value)}
+        >
+          <option>Name (A-Z)</option>
+          <option>Name (Z-A)</option>
+          <option>Most Recent</option>
+          <option>Oldest</option>
+        </select>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {sortedDocuments.map((document) => (
@@ -97,19 +96,25 @@ return (
             className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
             onClick={() => openViewModal(document)}
           >
-            {document.image.endsWith(".pdf") ? (
-              <iframe
-                src={`${backendUrl}${document.image}`}
-                title={document.name}
-                className="w-full h-48 object-cover rounded-t-lg mb-4"
-                frameBorder="0"
-              />
+            {/* Check if document.image exists before rendering */}
+            {document.image ? (
+              document.image.endsWith(".pdf") ? (
+                <embed
+                  src={`${backendUrl}${document.image}`}
+                  type="application/pdf"
+                  className="w-full h-48 object-cover rounded-t-lg mb-4"
+                />
+              ) : (
+                <img
+                  src={`${backendUrl}${document.image}`}
+                  alt={document.name}
+                  className="w-full h-48 object-cover rounded-t-lg mb-4"
+                />
+              )
             ) : (
-              <img
-                src={`${backendUrl}${document.image}`}
-                alt={document.name}
-                className="w-full h-48 object-cover rounded-t-lg mb-4"
-              />
+              <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg mb-4">
+                <span className="text-gray-500">No Image Available</span>
+              </div>
             )}
             <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
               {document.name}
@@ -149,19 +154,24 @@ return (
             </div>
             <div className="text-md mb-2">{selectedDocument.address}</div>
             {/* Conditional rendering for images and PDFs */}
-            {selectedDocument.image.endsWith(".pdf") ? (
-              <iframe
-                src={`${backendUrl}${selectedDocument.image}`}
-                title={selectedDocument.name}
-                className="mb-4 w-full h-64"
-                frameBorder="0"
-              />
+            {selectedDocument && selectedDocument.image ? (
+              selectedDocument.image.endsWith(".pdf") ? (
+                <embed
+                  src={`${backendUrl}${selectedDocument.image}`}
+                  type="application/pdf"
+                  className="mb-4 w-full h-48 md:h-64 lg:h-80"
+                />
+              ) : (
+                <img
+                  src={`${backendUrl}${selectedDocument.image}`}
+                  alt={selectedDocument.name}
+                  className="mb-4 w-full h-64 object-cover rounded"
+                />
+              )
             ) : (
-              <img
-                src={`${backendUrl}${selectedDocument.image}`}
-                alt={selectedDocument.name}
-                className="mb-4 w-full h-64 object-cover rounded"
-              />
+              <div className="mb-4 w-full h-64 bg-gray-200 flex items-center justify-center rounded">
+                <span className="text-gray-500">No Image Available</span>
+              </div>
             )}
             <div className="text-sm mb-4">{selectedDocument.description}</div>
             <div className="text-sm font-medium mb-2">Contact Details</div>

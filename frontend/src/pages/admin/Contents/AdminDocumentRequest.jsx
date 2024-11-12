@@ -305,16 +305,17 @@ function AdminDocuments() {
             className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer relative" // Added relative position
             onClick={() => openViewModal(documents)}
           >
-            {documents.image.endsWith(".pdf") ? (
-              <iframe
+            {documents.image && documents.image.endsWith(".pdf") ? (
+              <embed
                 src={`${backendUrl}${documents.image}`}
-                title={documents.name}
+                type="application/pdf"
                 className="w-full h-48 object-cover rounded-t-lg mb-4"
-                frameBorder="0"
               />
             ) : (
               <img
-                src={`${backendUrl}${documents.image}`}
+                src={`${backendUrl}${
+                  documents.image || "/path/to/default-image.jpg"
+                }`} // Provide a default image path if needed
                 alt={documents.name}
                 className="w-full h-48 object-cover rounded-t-lg mb-4"
               />
@@ -381,19 +382,24 @@ function AdminDocuments() {
             </div>
             <div className="text-md mb-2">{selectedDocuments.address}</div>
             {/* Conditional rendering for images and PDFs */}
-            {selectedDocuments.image.endsWith(".pdf") ? (
-              <iframe
-                src={`${backendUrl}${selectedDocuments.image}`}
-                title={selectedDocuments.name}
-                className="mb-4 w-full h-48 md:h-64 lg:h-80"
-                frameBorder="0"
-              ></iframe>
+            {selectedDocuments.image ? (
+              selectedDocuments.image.endsWith(".pdf") ? (
+                <embed
+                  src={`${backendUrl}${selectedDocuments.image}`}
+                  type="application/pdf"
+                  className="mb-4 w-full h-48 md:h-64 lg:h-80"
+                />
+              ) : (
+                <img
+                  src={`${backendUrl}${selectedDocuments.image}`}
+                  alt={selectedDocuments.name}
+                  className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
+                />
+              )
             ) : (
-              <img
-                src={`${backendUrl}${selectedDocuments.image}`}
-                alt={selectedDocuments.name}
-                className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
-              />
+              <div className="mb-4 w-full h-48 md:h-64 lg:h-80 bg-gray-200 flex items-center justify-center rounded">
+                <span className="text-gray-500">No Image Available</span>
+              </div>
             )}
             <div className="text-sm mb-4">{selectedDocuments.description}</div>
             <div className="text-sm font-medium mb-2">Contact Details</div>

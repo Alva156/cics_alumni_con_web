@@ -47,6 +47,10 @@ function News() {
       return a.name.localeCompare(b.name);
     } else if (sortCriteria === "Name (Z-A)") {
       return b.name.localeCompare(a.name);
+    } else if (sortCriteria === "Most Recent") {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    } else if (sortCriteria === "Oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
     }
     return 0;
   });
@@ -80,37 +84,39 @@ function News() {
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
+          <option>Most Recent</option>
+          <option>Oldest</option>
         </select>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  {filteredNews.map((news) => (
-    <div
-      key={news._id}
-      className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-      onClick={() => openViewModal(news)}
-    >
-      <img
-        src={`${backendUrl}${news.image}`}
-        alt={news.name}
-        className="w-full h-48 object-cover rounded-t-lg mb-4"
-      />
-      <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
-        {news.name}
+        {filteredNews.map((news) => (
+          <div
+            key={news._id}
+            className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            onClick={() => openViewModal(news)}
+          >
+            <img
+              src={`${backendUrl}${news.image}`}
+              alt={news.name}
+              className="w-full h-48 object-cover rounded-t-lg mb-4"
+            />
+            <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+              {news.name}
+            </div>
+            <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+              {news.description.slice(0, 100)}...
+            </p>
+            <a
+              href="#"
+              style={{ color: "#be142e" }}
+              className="text-sm font-medium hover:underline"
+            >
+              Read More
+            </a>
+          </div>
+        ))}
       </div>
-      <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
-        {news.description.slice(0, 100)}...
-      </p>
-      <a
-        href="#"
-        className="text-blue-500 text-sm font-medium hover:underline"
-      >
-        Read More
-      </a>
-    </div>
-  ))}
-</div>
-
 
       {/* View Modal */}
       {isViewModalOpen && selectedNews && (

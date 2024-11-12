@@ -78,18 +78,20 @@ exports.getAllThreads = async (req, res) => {
     const threadsWithReplyCount = await Promise.all(
       threads.map(async (thread) => {
         const replyCount = await Reply.countDocuments({ threadId: thread._id });
+
         return {
           ...thread,
           replyCount,
           isOwner:
             userProfileId &&
+            thread.userProfileId && // Check that userProfileId is not null
             thread.userProfileId._id.toString() === userProfileId.toString(),
         };
       })
     );
-
     res.status(200).json(threadsWithReplyCount);
   } catch (error) {
+    console.error("Error fetching threads:", error); // Log the error in detail
     res.status(500).json({ message: "Error fetching threads", error });
   }
 };
@@ -178,5 +180,36 @@ exports.deleteThread = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error deleting thread", error: error.message });
+  }
+};
+exports.silenceThread = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userProfileId = decoded.profileId;
+
+    const thread = await Thread.findById(req.params.id);
+    if (!thread) {
+      return res.status(404).json({ message: "Thread not found" });
+    }
+
+    if (thread.userProfileId.toString() !== userProfileId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // Set notifEnabled based on the value passed in the request body
+    const { notifEnabled } = req.body;
+    thread.notifEnabled = notifEnabled;
+    await thread.save();
+
+    res.status(200).json({
+      message: `Thread notifications ${
+        notifEnabled ? "enabled" : "disabled"
+      } successfully`,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating thread notifications", error });
   }
 };

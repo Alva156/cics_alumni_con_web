@@ -1,36 +1,102 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import ustbg from "../../assets/adminhomepage.mp4";
+import "../../AdminHomepage.css";
 import homepage1 from "../../assets/homepage1.jpg";
 import homepage2 from "../../assets/homepage2.jpg";
-import { useNavigate } from "react-router-dom";
+import homepage3 from "../../assets/homepage3.jpg";
+import dashboard2 from "../../assets/dashboard2.jpg";
+import reports2 from "../../assets/reports2.jpg";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
-function AdminHomepage() {
-  const navigate = useNavigate();
-  const images = [
-    { src: homepage1, title: "", text: "Welcome to CICS Alumni Connect!" },
-    {
-      src: homepage2,
-      title: "Mission Statement",
-      text: "To foster a vibrant and connected community of CICS alumni by providing a digital platform that enables meaningful interactions, continuous professional growth, and lasting relationships. We strive to support our alumni in their career journeys and empower them to contribute positively to society and the future of CICS.",
-    },
-    {
-      src: homepage2,
-      title: "Vision Statement",
-      text: "To be the leading platform that bridges the gap between past and present CICS students, cultivating a global network of professionals who are committed to lifelong learning, collaboration, and the advancement of their respective fields. We envision a future where every CICS alumnus feels connected, valued, and inspired to make a difference.",
-    },
-  ];
-
-  const [currentSlide, setCurrentSlide] = useState(0);
+const AdminHomepage = () => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [fade, setFade] = useState(false);
+  const [currentImage, setCurrentImage] = useState(0);
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const totalSlides = images.length;
+  const videoRef = useRef(null);
+  const navigate = useNavigate();
 
-  const nextSlide = () => {
-    setCurrentSlide((prevSlide) => (prevSlide + 1) % totalSlides);
+  const images = [homepage1, homepage2, homepage3];
+  const credits = [
+    "Photo Courtesy of ICS",
+    "Photo Courtesy of ICS",
+    "Photo Courtesy of CSS",
+  ];
+
+  useEffect(() => {
+    AOS.init({ duration: 1000, once: true });
+    fetchNews();
+    fetchEvents();
+
+    // Automatic image carousel transition
+    const imageInterval = setInterval(() => {
+      nextImage();
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(imageInterval); // Clear interval on component unmount
+  }, []);
+
+  const fetchNews = async () => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    try {
+      const response = await axios.get(`${backendUrl}/news/view`, {
+        withCredentials: true,
+      });
+      setNews(response.data);
+    } catch (error) {
+      console.error("Error fetching news:", error);
+    }
   };
 
-  const prevSlide = () => {
-    setCurrentSlide((prevSlide) => (prevSlide - 1 + totalSlides) % totalSlides);
+  const fetchEvents = async () => {
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
+    try {
+      const response = await axios.get(`${backendUrl}/events/view`, {
+        withCredentials: true,
+      });
+      setEvents(response.data);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
+
+  const nextPage = () => {
+    setFade(true);
+    setTimeout(() => {
+      setCurrentPage((prevPage) => (prevPage === 1 ? 0 : prevPage + 1));
+      setFade(false);
+    }, 500);
+  };
+
+  const prevPage = () => {
+    setFade(true);
+    setTimeout(() => {
+      setCurrentPage((prevPage) => (prevPage === 0 ? 1 : prevPage - 1));
+      setFade(false);
+    }, 500);
+  };
+
+  const nextImage = () => {
+    setCurrentImage((prevImage) =>
+      prevImage === images.length - 1 ? 0 : prevImage + 1
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImage((prevImage) =>
+      prevImage === 0 ? images.length - 1 : prevImage - 1
+    );
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    window.scrollTo(0, 0); // Scroll to the top of the page
   };
 
   useEffect(() => {
@@ -47,260 +113,323 @@ function AdminHomepage() {
         setShowLoginMessage(false);
       }, 5000);
     }
-
-    const interval = setInterval(nextSlide, 8000);
-    return () => clearInterval(interval);
   }, []);
 
   return (
-    <div>
-      <div className="carousel relative bg-white m-6 max-w-full overflow-hidden">
-        {showLoginMessage && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
-            <p>Login success!</p>
+    <div className="homepage-wrapper">
+      {showLoginMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+          <p>Login success!</p>
+        </div>
+      )}
+      <div className="homepage-container">
+        <div className="background-news-container">
+          {/* Background Video Section */}
+          <div className="background-section">
+            <video
+              autoPlay
+              muted
+              ref={videoRef}
+              className="background-video"
+              playsInline
+            >
+              <source src={ustbg} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div className="video-footer">Photo Courtesy of UST SITE</div>
           </div>
-        )}
-        <div
-          className="flex transition-transform duration-700 ease-in-out"
-          style={{
-            transform: `translateX(-${currentSlide * 100}%)`,
-            width: `${totalSlides * 100}%`,
-          }}
-        >
-          {images.map((image, index) => (
-            <div className="relative w-full flex-shrink-0" key={index}>
-              <img
-                src={image.src}
-                className="w-full object-cover h-48 sm:h-64 md:h-[22rem] lg:h-[26rem] xl:h-130 2xl:h-[44rem] transition-opacity duration-300 ease-in-out"
-                alt={`Slide ${index + 1}`}
-              />
-              {/* Red opacity overlay for the first image */}
-              {index === 0 && (
-                <div className="absolute inset-0 bg-red opacity-40 "></div>
-              )}
 
-              <div
-                className={`absolute inset-0 flex items-center justify-center text-center p-4 z-20 ${
-                  index === 0
-                    ? "bg-red-600 bg-opacity-70 text-white text-lg p-[4rem] sm:text-2xl  md:text-3xl lg:text-5xl xl:text-6xl font-bold p-6 rounded-lg"
-                    : "bg-black bg-opacity-60 text-white text-xxs p-[4rem] sm:text-sm sm:p-24 md:text-lg md:p-28 lg:text-xl lg:p-40 xl:text-2xl xl:p-52 2xl:text-4xl 2xl:p-64 rounded-lg"
-                }`}
-              >
-                <span>
-                  <h2 className="mb-4 font-bold">{image.title}</h2>
-                  {image.text}
-                </span>
+          {/* Dashboard and Reports Section */}
+          <div className="news-events-section">
+            {/* Dashboard */}
+            <div className="news-carousel-container" data-aos="fade-up">
+              <h2 className="news-title">
+                <Link to="/admin/dashboard" className="news-link">
+                  Admin Dashboard
+                </Link>
+              </h2>
+
+              <div className="carousel-wrapper">
+                <ul className="news-item">
+                  <li className="item">
+                    <img
+                      src={dashboard2}
+                      alt="Dashboard"
+                      className="news-image"
+                    />
+                    <div className="news-content">
+                      <p className="news-description">
+                        Offers key tools and insights for managing the system
+                        efficiently.
+                      </p>
+                      <button
+                        style={{
+                          marginTop: "10px",
+                          padding: "5px 10px",
+                          backgroundColor: "#be142e",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          transition: "background-color 0.3s",
+                        }}
+                        onClick={() => handleNavigation("/admin/dashboard")}
+                        onMouseOver={(e) =>
+                          (e.target.style.backgroundColor = "#232323")
+                        }
+                        onMouseOut={(e) =>
+                          (e.target.style.backgroundColor = "#be142e")
+                        }
+                      >
+                        Go to Dashboard
+                      </button>
+                    </div>
+                  </li>
+                </ul>
               </div>
             </div>
-          ))}
+
+            {/* Reports */}
+            <div className="events-carousel-container" data-aos="fade-up">
+              <h2 className="events-title">
+                <Link to="/admin/reports" className="events-link">
+                  Admin Reports
+                </Link>
+              </h2>
+
+              <div className="carousel-wrapper">
+                <ul className="events-item">
+                  <li className="item">
+                    <img
+                      src={reports2}
+                      alt="Reports"
+                      className="events-image"
+                    />
+                    <div className="events-content">
+                      <p className="events-description">
+                        Provides a summary of alumni data and activities.
+                      </p>
+                      <button
+                        style={{
+                          marginTop: "10px",
+                          padding: "5px 10px",
+                          backgroundColor: "#be142e",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          transition: "background-color 0.3s",
+                        }}
+                        onClick={() => handleNavigation("/admin/reports")}
+                        onMouseOver={(e) =>
+                          (e.target.style.backgroundColor = "#232323")
+                        }
+                        onMouseOut={(e) =>
+                          (e.target.style.backgroundColor = "#be142e")
+                        }
+                      >
+                        Go to Reports
+                      </button>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="absolute left-1 right-1 top-1/2 flex -translate-y-1/2 transform justify-between">
-          <button
-            onClick={prevSlide}
-            className="bg-gray-500 text-white p-2 rounded-full hover:bg-gray-700 focus:outline-none text-xs md:text-sm lg:text-base xl:text-lg w-7 h-7 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-18 m-2 md:m-3 lg:m-4 xl:m-5"
-          >
+
+        <div className="carousel-container" data-aos="fade-up">
+          <button className="carousel-button prev" onClick={prevPage}>
             ❮
           </button>
-          <button
-            onClick={nextSlide}
-            className="bg-gray-500 text-white p-2 rounded-full hover:bg-gray-700 focus:outline-none text-xs md:text-sm lg:text-base xl:text-lg w-7 h-7 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-18 m-2 md:m-3 lg:m-4 xl:m-5"
-          >
+          <div className={`carousel-content ${fade ? "fade" : ""}`}>
+            {currentPage === 0 ? (
+              <div className="carousel-page">
+                <div className="square-container">
+                  <div className="square-item">
+                    <div className="logo companies-logo"></div>
+                    <h3>Companies</h3>
+                    <button
+                      onClick={() => handleNavigation("/admin/companies")}
+                    >
+                      Manage Companies
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo newsevents-logo"></div>
+                    <h3>News/Events</h3>
+                    <div className="dropdown">
+                      <button className="dropdown-button">
+                        Manage News/Events
+                      </button>
+                      <div className="dropdown-content">
+                        <button onClick={() => handleNavigation("/admin/news")}>
+                          News
+                        </button>
+                        <button
+                          onClick={() => handleNavigation("/admin/events")}
+                        >
+                          Events
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo certifications-logo"></div>
+                    <h3>Certifications</h3>
+                    <button
+                      onClick={() => handleNavigation("/admin/certifications")}
+                    >
+                      Manage Certifications
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo documents-logo"></div>
+                    <h3>Documents</h3>
+                    <button
+                      onClick={() => handleNavigation("/admin/documentrequest")}
+                    >
+                      Manage Documents
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo jobs-logo"></div>
+                    <h3>Job/Internship</h3>
+                    <button onClick={() => handleNavigation("/admin/job")}>
+                      Manage Job/Internship
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="carousel-page">
+                <div className="square-container">
+                  <div className="square-item">
+                    <div className="logo userprofile-logo"></div>
+                    <h3>Dashboard</h3>
+                    <button
+                      onClick={() => handleNavigation("/admin/dashboard")}
+                    >
+                      Go to Dashboard
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo survey-logo"></div>
+                    <h3>Survey</h3>
+                    <button
+                      onClick={() => handleNavigation("/admin/surveytool")}
+                    >
+                      Manage Survey
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo threads-logo"></div>
+                    <h3>Threads</h3>
+                    <button onClick={() => handleNavigation("/admin/threads")}>
+                      Manage Threads
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo alumni-logo"></div>
+                    <h3>Alumni</h3>
+                    <button onClick={() => handleNavigation("/admin/alumni")}>
+                      View Alumni
+                    </button>
+                  </div>
+                  <div className="square-item">
+                    <div className="logo chatbot-logo"></div>
+                    <h3>Reports</h3>
+                    <button onClick={() => handleNavigation("/admin/reports")}>
+                      View Reports
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          <button className="carousel-button next" onClick={nextPage}>
             ❯
           </button>
         </div>
-      </div>
-      <div className="relative bg-white m-6 max-w-full group">
-        <img
-          src={homepage2}
-          alt="Homepage2"
-          className="w-full object-cover h-48 sm:h-64 md:h-[22rem] lg:h-[26rem] xl:h-130 2xl:h-[44rem]"
-        />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="bg-red w-full h-full bg-opacity-70 text-white text-xxs p-16 sm:text-xs sm:p-24 md:text-lg md:p-28 lg:text-xl lg:p-40 xl:text-2xl xl:p-52 2xl:text-4xl 2xl:p-64 rounded-lg text-center">
-            This page provides an overview of recorded data of CICS Alumni.
-          </p>
-        </div>
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
-          <button
-            onClick={() => navigate("/admin/dashboard")}
-            className="homepage-text tracking-extra-wide font-light  hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-          >
-            DASHBOARD
-          </button>
-        </div>
-      </div>
 
-      <div className="relative bg-white m-6 max-w-full group">
-        <img
-          src={homepage2}
-          alt="Homepage2"
-          className="w-full object-cover h-48 sm:h-64 md:h-[22rem] lg:h-[26rem] xl:h-130 2xl:h-[44rem]"
-        />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="bg-red w-full h-full bg-opacity-70 text-white text-xxs p-16 sm:text-xs sm:p-24 md:text-lg md:p-28 lg:text-xl lg:p-40 xl:text-2xl xl:p-52 2xl:text-4xl 2xl:p-64 rounded-lg text-center">
-            This page is where you can create surveys that is to be answered by
-            the registered CICS alumni of this website.
-          </p>
-        </div>
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
-          <button
-            onClick={() => navigate("/admin/surveytool")}
-            className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-          >
-            SURVEY TOOL
-          </button>
-        </div>
-      </div>
-      <div className="relative bg-white m-6 max-w-full group">
-        <img
-          src={homepage2}
-          alt="Homepage2"
-          className="w-full object-cover h-48 sm:h-64 md:h-[22rem] lg:h-[26rem] xl:h-130 2xl:h-[44rem]"
-        />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="bg-red w-full h-full bg-opacity-70 text-white text-[0.45rem] p-16 sm:text-xs sm:p-24 md:text-lg md:p-28 lg:text-xl lg:p-40 xl:text-2xl xl:p-52 2xl:text-4xl 2xl:p-64 rounded-lg text-center">
-            A dedicated space for alumni to engage in discussions, share
-            experiences, and collaborate on various topics relevant to their
-            field and network. This section fosters a sense of community and
-            facilitates meaningful interactions among CICS alumni.
-          </p>
-        </div>
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
-          <button
-            onClick={() => navigate("/admin/threads")}
-            className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-          >
-            THREADS
-          </button>
-        </div>
-      </div>
-      <div className="relative bg-white m-6 max-w-full  group">
-        <img
-          src={homepage2}
-          alt="Homepage2"
-          className="w-full object-cover h-52 sm:h-60 md:h-96 lg:h-[28rem] xl:h-130 2xl:h-[44rem]"
-        />
-        <div className="absolute inset-0 flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-red  bg-opacity-70 p-4 rounded-lg">
-          <p className=" mb-32 text-white text-xxs  md:mb-36 lg:mb-48 sm:text-sm md:text-lg lg:text-xl xl:text-2xl 2xl:text-4xl text-center">
-            Pages where you can create the latest companies, news, events,
-            certifications, documents, and job/interviews that are related to
-            CICS
-          </p>
-        </div>
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex flex-col space-y-4 pt-8">
-          <div className="flex justify-between space-x-2">
-            <button
-              onClick={() => navigate("/admin/companies")}
-              className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.7rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-            >
-              Companies
-            </button>
-            <button
-              onClick={() => navigate("/admin/news")}
-              className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.7rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-            >
-              News
-            </button>
+        <div className="mission-vision-section fixed-height" data-aos="fade-up">
+          <div className="mission-vision-content">
+            <h2 className="mission-title">Our Mission</h2>
+            <p className="mission-text">
+              To cultivate a community that fosters growth, innovation, and
+              collaboration among alumni and students, inspiring them to achieve
+              their fullest potential and contribute positively to society.
+            </p>
+            <h2 className="vision-title">Our Vision</h2>
+            <p className="vision-text">
+              To be a leading alumni network that empowers individuals to
+              connect, share knowledge, and create impactful solutions for a
+              better future.
+            </p>
           </div>
-          <div className="flex justify-between space-x-4">
-            <button
-              onClick={() => navigate("/admin/events")}
-              className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.7rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-            >
-              Events
+          <div className="image-carousel-container">
+            <button className="carousel-button prev" onClick={prevImage}>
+              ❮
             </button>
-            <button
-              onClick={() => navigate("/admin/certifications")}
-              className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B]  text-[0.6rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-            >
-              Certifications
+            <div className="carousel-images">
+              {images.map((image, index) => (
+                <div
+                  key={index}
+                  className={`carousel-image ${
+                    currentImage === index ? "active" : ""
+                  }`}
+                >
+                  <img
+                    src={image}
+                    alt={`carousel-${index}`}
+                    style={{
+                      width: "100%", // Make sure image covers the width of the container
+                      height: "100%", // Make sure image covers the height of the container
+                      objectFit: "cover", // Cover the container without stretching
+                    }}
+                  />
+                  <div
+                    className="absolute bottom-4 right-4 bg-black text-white text-sm p-2 rounded"
+                    style={{
+                      position: "absolute",
+                      bottom: "20px",
+                      right: "20px",
+                      backgroundColor: "rgba(0, 0, 0, 0.4)",
+                      color: "white",
+                      padding: "10px",
+                      borderRadius: "5px",
+                      fontSize: "14px",
+                      zIndex: "20",
+                      textAlign: "right",
+                      objectFit: "fill",
+                    }}
+                  >
+                    {credits[index]}{" "}
+                    {/* Display the credit based on the current index */}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button className="carousel-button next" onClick={nextImage}>
+              ❯
             </button>
-          </div>
-          <div className="flex justify-between space-x-4">
-            <button
-              onClick={() => navigate("/admin/documentrequest")}
-              className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.7rem] w-36 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-            >
-              Documents
-            </button>
-            <button
-              onClick={() => navigate("/admin/job")}
-              className="homepage-text tracking-extra-wide font-light hover:bg-[#2D2B2B] text-[0.57rem] w-36 h-7 bg-[#2D2B2B] text-white rounded  btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-            >
-              Job/Internship
-            </button>
-          </div>
-        </div>
-      </div>
 
-      <div className="relative bg-white m-6 max-w-full group">
-        <img
-          src={homepage2}
-          alt="Homepage2"
-          className="w-full object-cover h-48 sm:h-64 md:h-[22rem] lg:h-[26rem] xl:h-130 2xl:h-[44rem]"
-        />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="bg-red w-full h-full bg-opacity-70 text-white text-[0.48rem] p-16  sm:text-xs sm:p-24 md:text-lg md:p-28 lg:text-xl lg:p-40 xl:text-2xl xl:p-52 2xl:text-4xl 2xl:p-64 rounded-lg text-center">
-            A page that lets users view and connect with registered CICS alumni.
-            Search for profiles to see educational backgrounds, career details,
-            and achievements, facilitating networking and engagement within the
-            CICS community.
-          </p>
-        </div>
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
-          <button
-            onClick={() => navigate("/admin/alumni")}
-            className="homepage-text tracking-extra-wide font-light  hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-          >
-            ALUMNI
-          </button>
-        </div>
-      </div>
-      <div className="relative bg-white m-6 max-w-full group">
-        <img
-          src={homepage2}
-          alt="Homepage2"
-          className="w-full object-cover h-48 sm:h-64 md:h-[22rem] lg:h-[26rem] xl:h-130 2xl:h-[44rem]"
-        />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="bg-red w-full h-full bg-opacity-70 text-white text-[0.48rem] p-16 sm:text-xs sm:p-24 md:text-lg md:p-28 lg:text-xl lg:p-40 xl:text-2xl xl:p-52 2xl:text-4xl 2xl:p-64 rounded-lg text-center">
-            This page presents detailed data on registered users, including
-            primary, secondary, and contact information. It offers a
-            comprehensive view of user details, helping to manage and analyze
-            key information efficiently.
-          </p>
-        </div>
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
-          <button
-            onClick={() => navigate("/admin/account")}
-            className="homepage-text tracking-extra-wide font-light  hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-          >
-            REPORTS
-          </button>
-        </div>
-      </div>
-      <div className="relative bg-white m-6 max-w-full group">
-        <img
-          src={homepage2}
-          alt="Homepage2"
-          className="w-full object-cover h-48 sm:h-64 md:h-[22rem] lg:h-[26rem] xl:h-130 2xl:h-[44rem]"
-        />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <p className="bg-red w-full h-full bg-opacity-70 text-white text-xxs p-16 sm:text-xs sm:p-24 md:text-lg md:p-28 lg:text-xl lg:p-40 xl:text-2xl xl:p-52 2xl:text-4xl 2xl:p-64 rounded-lg text-center">
-            A page that allows you to to update their email address and name.
-          </p>
-        </div>
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center">
-          <button
-            onClick={() => navigate("/admin-account")}
-            className="homepage-text tracking-extra-wide font-light  hover:bg-[#2D2B2B] w-52 h-7 bg-[#2D2B2B] text-white rounded btn btn-xs sm:btn-sm md:btn-md lg:btn-lg w-32 sm:w-60 md:w-64 lg:w-96"
-          >
-            ACCOUNT
-          </button>
+            <div className="carousel-indicators">
+              {images.map((_, index) => (
+                <span
+                  key={index}
+                  className={`indicator ${
+                    currentImage === index ? "active" : ""
+                  }`}
+                  onClick={() => setCurrentImage(index)}
+                ></span>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default AdminHomepage;

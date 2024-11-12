@@ -5,6 +5,7 @@ import { uniqueId } from "lodash"; // Make sure you import uniqueId
 import imageCompression from "browser-image-compression";
 import { useNavigate } from "react-router-dom";
 import profilesymbol from "../../assets/userprofile.png";
+import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function UserProfile() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -13,14 +14,24 @@ function UserProfile() {
   const [validationMessage, setValidationMessage] = useState("");
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showValidationMessage2, setShowValidationMessage2] = useState(false);
+  const [validationMessage2, setValidationMessage2] = useState("");
+  const [showErrorMessage2, setShowErrorMessage2] = useState(false);
+  const [errorMessage2, setErrorMessage2] = useState("");
   const [isPassModalOpen, setIsPassModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [birthday, setBirthday] = useState("");
+  const [gender, setGender] = useState("");
+  const [region, setRegion] = useState("");
   const [profession, setProfession] = useState("");
+  const [college, setCollege] = useState("");
   const [collegeProgram, setCollegeProgram] = useState("");
+  const [availablePrograms, setAvailablePrograms] = useState([]);
   const [specialization, setSpecialization] = useState("");
   const [yearStartedCollege, setYearStartedCollege] = useState("");
   const [yearGraduatedCollege, setYearGraduatedCollege] = useState("");
@@ -38,12 +49,162 @@ function UserProfile() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [otherContact, setOtherContact] = useState("");
   const [profileImage, setProfileImage] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
   const [accountEmail, setAccountEmail] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [initialAccountEmail, setInitialAccountEmail] = useState("");
   const [profileId, setProfileId] = useState(null);
+  const [newEmail, setNewEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(0);
+  const [otpSent, setOtpSent] = useState(false);
+  const [maxId, setMaxId] = useState(1);
+  const [isDeleteModalPicOpen, setIsDeleteModalPicOpen] = useState(false);
+  
+  const handleDeleteProfileImage = async () => {
+    try {
+      await axios.delete(`${backendUrl}/profile/deleteProfileImage`, {
+        withCredentials: true,
+      });
+      // Reset to the blank profile image and clear the preview
+      setProfileImage(blankprofilepic);
+      setValidationMessage("Profile image deleted successfully!");
+      setShowValidationMessage(true);
+      setImagePreview(null);
+      setIsDeleteModalPicOpen(false); // Close the modal
+      setTimeout(() => {
+        setShowValidationMessage(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error deleting profile image:", error);
+      setErrorMessage("Failed to delete profile image. Please try again.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
+    }
+  };
+
+  useEffect(() => {
+    if (timer > 0 && otpSent) {
+      const interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [timer, otpSent]);
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+  };
+
+  const sendOTP = async () => {
+    if (!newEmail.trim()) {
+      setErrorMessage2("Please fill up the required fields.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+      return;
+    }
+
+    if (newEmail.endsWith("@ust.edu.ph")) {
+      setErrorMessage2("UST email is not allowed.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/profile/send-otp`,
+        { newEmail },
+        { withCredentials: true }
+      );
+
+      if (
+        response.status === 200 &&
+        response.data.msg === "OTP sent successfully"
+      ) {
+        setValidationMessage2("OTP sent successfully.");
+        setShowValidationMessage2(true);
+        setOtpSent(true);
+        setTimer(300); // 5 minutes in seconds (300 seconds)
+        setTimeout(() => setShowValidationMessage2(false), 3000);
+      } else {
+        setErrorMessage2("Failed to send OTP. Please try again.");
+        setShowErrorMessage2(true);
+        setTimeout(() => setShowErrorMessage2(false), 3000);
+      }
+    } catch (error) {
+      console.error(
+        "Error sending OTP:",
+        error.response?.data || error.message
+      );
+      setErrorMessage2("Error sending OTP. Please try again.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+    }
+  };
+
+  const verifyOTPAndUpdateEmail = async () => {
+    if (!newEmail.trim() || !otp.trim()) {
+      setErrorMessage2("Please fill up the required fields.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/profile/verify-otp`,
+        { newEmail, otp },
+        { withCredentials: true }
+      );
+
+      // Check if the response status is 200
+      if (response.status === 200 && response.data.success) {
+        setNewEmail(""); // Clear new email input
+        setOtp(""); // Clear OTP input
+        setValidationMessage(
+          "Email changed successfully! Please log in using your new email."
+        );
+        setModalVisible(true);
+
+        setIsEmailModalOpen(false);
+        setAccountEmail(newEmail); // Update the account email
+        setOtpSent(false);
+        setTimer(0);
+      } else {
+        setErrorMessage2("Invalid OTP. Please try again.");
+        setShowErrorMessage2(true);
+        setTimeout(() => setShowErrorMessage2(false), 3000);
+      }
+    } catch (error) {
+      console.error(
+        "Error verifying OTP:",
+        error.response?.data || error.message
+      );
+      setErrorMessage2("Invalid OTP. Please try again.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
+    }
+  };
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteAttachmentModalOpen, setIsDeleteAttachmentModalOpen] =
+    useState(false);
   const [sectionToDelete, setSectionToDelete] = useState(null);
+  const [attachmentToDelete, setAttachmentToDelete] = useState(null);
+
+  const [hasUnsavedSecondaryChanges, setHasUnsavedSecondaryChanges] =
+    useState(false);
+  const [hasUnsavedTertiaryChanges, setHasUnsavedTertiaryChanges] =
+    useState(false);
+  const [hasUnsavedCompanyChanges, setHasUnsavedCompanyChanges] =
+    useState(false);
+
+  const [isConfirmationModalOpen, setIsConfirmationModalOpen] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [confirmCallback, setConfirmCallback] = useState(null);
 
   const [secondaryEducationSections, setSecondaryEducationSections] = useState([
     { schoolName: "", yearStarted: "", yearEnded: "" },
@@ -62,103 +223,365 @@ function UserProfile() {
     },
   ]);
 
-  // Initialize attachments state
+  const collegePrograms = {
+    "UST-AMV College of Accountancy": [
+      "Accountancy",
+      "Accounting Information System",
+      "Management Accounting",
+    ],
+    "College of Architecture": ["Architecture"],
+    "Faculty of Arts and Letters": [
+      "Asian Studies",
+      "Behavioral Science",
+      "Communication",
+      "Creative Writing",
+      "Economics",
+      "English Language Studies",
+      "History",
+      "Journalism",
+      "Legal Management",
+      "Literature",
+      "Philosophy",
+      "Political Science",
+      "Sociology",
+    ],
+    "Faculty of Civil Law": ["Juris Doctor"],
+    "College of Commerce and Business Administration": [
+      "Business Administration, major in Business Economics",
+      "Business Administration, major in Financial Management",
+      "Business Administration, major in Human Resource Management",
+      "Business Administration, major in Marketing Management",
+      "Entrepreneurship",
+    ],
+    "College of Education": [
+      "Secondary Education Major in English",
+      "Secondary Education Major in Filipino",
+      "Secondary Education Major in Mathematics",
+      "Secondary Education Major in Religious and Values Education",
+      "Secondary Education Major in Science",
+      "Secondary Education Major in Social Studies",
+      "Early Childhood Education",
+      "Elementary Education",
+      "Special Needs Education, major in Early Childhood Education",
+      "Food Technology",
+      "Nutrition and Dietetics",
+      "Bachelor of Library and Information Science",
+    ],
+    "Faculty of Engineering": [
+      "Chemical Engineering",
+      "Civil Engineering",
+      "Electrical Engineering",
+      "Electronics Engineering",
+      "Industrial Engineering",
+      "Mechanical Engineering",
+    ],
+    "College of Fine Arts and Design": [
+      "Fine Arts, major in Advertising Arts",
+      "Fine Arts, major in Industrial Design",
+      "Interior Design",
+      "Fine Arts, major in Painting",
+    ],
+    "College of Information and Computing Sciences": [
+      "Computer Science",
+      "Information Systems",
+      "Information Technology",
+    ],
+    "Faculty of Medicine and Surgery": [
+      "Basic Human Studies",
+      "Doctor of Medicine",
+      "Master in Clinical Audiology",
+      "Master in Pain Management",
+    ],
+    "Conservatory of Music": [
+      "Performance, major in Bassoon",
+      "Performance, major in Choral Conducting",
+      "Performance, major in Clarinet",
+      "Composition",
+      "Performance, major in Double Bass",
+      "Performance, major in Flute",
+      "Performance, major in French Horn",
+      "Performance, major in Guitar",
+      "Jazz",
+      "Musicology",
+      "Music Education",
+      "Music Theatre",
+      "Music Technology",
+      "Performance, major in Oboe",
+      "Performance, major in Orchestral Conducting",
+      "Performance, major in Percussion",
+      "Performance, major in Piano",
+      "Performance, major in Saxophone",
+      "Performance, major in Trombone",
+      "Performance, major in Trumpet",
+      "Performance, major in Tuba",
+      "Performance, major in Viola",
+      "Performance, major in Violin",
+      "Performance, major in Violoncello",
+      "Performance, major in Voice",
+    ],
+    "College of Nursing": ["Nursing"],
+    "Faculty of Pharmacy": [
+      "Biochemistry",
+      "Medical Technology",
+      "Pharmacy",
+      "Pharmacy, major in Clinical Pharmacy",
+      "Doctor of Pharmacy",
+    ],
+    "Institute of Physical Education and Athletics": [
+      "Fitness and Sports Management",
+    ],
+    "College of Rehabilitation Sciences": [
+      "Occupational Therapy",
+      "Physical Therapy",
+      "Speech-Language Pathology",
+      "Sports Science",
+    ],
+    "College of Science": [
+      "Applied Mathematics, major in Actuarial Science",
+      "Applied Physics, major in Instrumentation",
+      "Biology, major in Environmental Biology",
+      "Biology, major in Medical Biology",
+      "Bachelor of Science major in Molecular Biology and Biotechnology",
+      "Chemistry",
+      "Data Science and Analytics",
+      "Microbiology",
+      "Psychology",
+    ],
+    "College of Tourism and Hospitality Management": [
+      "Hospitality Management, major in Culinary Entrepreneurship",
+      "Hospitality Management, major in Hospitality Leadership",
+      "Tourism Management, major in Recreation and Leisure Management",
+      "Tourism Management, major in Travel Operation and Service Management",
+    ],
+    "Faculty of Canon Law": [
+      "Doctor of Canon Law",
+      "Licentiate in Canon Law",
+      "Bachelor of Canon Law",
+    ],
+    "Faculty of Philosophy": [
+      "Doctor of Philosophy",
+      "Licentiate in Philosophy",
+      "Bachelor of Philosophy (Classical)",
+    ],
+    "Faculty of Sacred Theology": [
+      "Doctor of Sacred Theology",
+      "Licentiate in Sacred Theology",
+      "Bachelor of Sacred Theology",
+    ],
+  };
+
+  const handleCollegeChange = (e) => {
+    const selectedCollege = e.target.value;
+    setCollege(selectedCollege);
+
+    // Reset the college program selection when the college changes
+    setCollegeProgram(""); // Ensure college program resets
+  };
+
+  // Initialize state for attachments, assuming that attachments are fetched with correct _id values
   const [attachments, setAttachments] = useState([
-    { id: uniqueId(), filename: "", filepath: "" },
+    { _id: 1, file: null, filename: "", filepath: "" }, // This should be replaced with data from the backend
   ]);
 
-  // Handler for file selection
-
-  // Update attachments state after file upload
-  const handleFileChange = (e, index) => {
-    const file = e.target.files[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      axios
-        .post(`${backendUrl}/profile/uploadattachment`, formData, {
+  // Set maxId based on the maximum _id from the fetched attachments, or use 1 if no attachments exist
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/profile/userprofile`, {
           withCredentials: true,
-        })
-        .then((response) => {
-          if (
-            response.data &&
-            response.data.filename &&
-            response.data.filepath
-          ) {
-            const newAttachments = [...attachments];
-            newAttachments[index] = {
-              id: uniqueId(),
-              filename: response.data.filename,
-              filepath: response.data.filepath,
-            };
-            setAttachments(newAttachments);
-          } else {
-            console.error("Unexpected response format:", response.data);
-          }
-        })
-        .catch((error) => {
-          console.error("Error uploading file:", error);
         });
-    }
-  };
+        const profileData = response.data;
 
-  // Function to add a new attachment field
+        if (profileData) {
+          // Fetch attachments from backend data and update the attachments state
+          const fetchedAttachments = profileData.attachments || [];
+          setAttachments(fetchedAttachments);
+
+          // Update maxId based on the highest _id from the fetched attachments
+          const highestId = fetchedAttachments.reduce(
+            (max, attachment) => Math.max(max, attachment._id),
+            1
+          );
+          setMaxId(highestId); // Set the maxId to the highest _id found
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      }
+    };
+
+    fetchProfile();
+  }, [backendUrl]);
+
+  // Function to add a new attachment with a unique ID
   const addAttachment = () => {
+    const newId = maxId + 1; // Calculate new ID based on the current max ID
     setAttachments((prev) => [
       ...prev,
-      { id: uniqueId(), fileName: "", filePath: "" },
+      { _id: newId, file: null, filename: "", filepath: "" }, // New attachment with unique _id
     ]);
+    setMaxId(newId); // Update the maxId state
   };
 
-  const handleAttachmentChange = async (e, id) => {
-    const file = e.target.files[0];
+  // Function to handle file changes and replace an attachment while retaining its _id
+  const handleFileChange = (e, index) => {
+    const file = e.target.files[0]; // Get the selected file from input
     if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
+      console.log(`Selected input field: ${index + 1}`);
 
-      try {
-        const response = await axios.post(
-          `${backendUrl}/uploadAttachment`,
-          formData,
-          {
-            withCredentials: true,
-          }
-        );
+      setAttachments((prevAttachments) => {
+        const updatedAttachments = [...prevAttachments];
+        const existingAttachment = updatedAttachments[index];
 
-        // Add the response data (which includes fileName and filePath) to the attachments state
-        setAttachments((prev) => [
-          ...prev,
-          {
-            id: response.data.id,
-            fileName: response.data.fileName,
-            filePath: response.data.filePath,
-            file: null,
-          },
-        ]);
-      } catch (error) {
-        console.error("Error uploading file:", error);
-      }
+        console.log("Existing attachment:", existingAttachment);
+
+        // Only update if the file is different
+        if (existingAttachment.file !== file) {
+          console.log(`Replacing file: ${existingAttachment.filename}`);
+
+          // Ensure the _id is retained from the existing attachment
+          updatedAttachments[index] = {
+            ...existingAttachment, // Keep the existing data, including _id
+            file, // Set the new file object
+            filename: file.name, // Update the filename
+          };
+
+          console.log(`Retained ID: ${existingAttachment._id}`);
+          console.log(`New file: ${file.name}`);
+        } else {
+          console.log(`No change in file for input field: ${index + 1}`);
+        }
+
+        return updatedAttachments; // Return the updated attachments array with retained IDs
+      });
+    } else {
+      console.log(`No file selected for input field: ${index + 1}`);
     }
   };
 
-  const addSecondaryEducationSection = () => {
-    setSecondaryEducationSections([
-      ...secondaryEducationSections,
+  const openConfirmationModal = (message, onConfirm) => {
+    setConfirmationMessage(message);
+    setConfirmCallback(() => onConfirm); // Store the confirm action to execute later
+    setIsConfirmationModalOpen(true); // Open modal
+  };
+  
+  // Get all elements with the class "tab"
+const tabs = document.querySelectorAll('.tab');
+
+// Loop through each tab and add the event listeners
+tabs.forEach(tab => {
+  tab.addEventListener('mouseenter', () => {
+    // Change the aria-label on hover
+    if (tab.getAttribute('aria-label') === '🛠') {
+      tab.setAttribute('aria-label', 'Settings');
+    } else if (tab.getAttribute('aria-label') === '🏠︎') {
+      tab.setAttribute('aria-label', 'Primary');
+    } else if (tab.getAttribute('aria-label') === '♥︎') {
+      tab.setAttribute('aria-label', 'Secondary');
+    }else if (tab.getAttribute('aria-label') === '☎︎') {
+      tab.setAttribute('aria-label', 'Contacts');
+    }else if (tab.getAttribute('aria-label') === '⬇') {
+      tab.setAttribute('aria-label', 'Attachments');
+    }else if (tab.getAttribute('aria-label') === '✎') {
+      tab.setAttribute('aria-label', 'Education');
+    }else if (tab.getAttribute('aria-label') === '★') {
+      tab.setAttribute('aria-label', 'Career');
+    }
+    
+  });
+
+  tab.addEventListener('mouseleave', () => {
+    // Reset the aria-label to the original text when the mouse leaves
+    if (tab.getAttribute('aria-label') === 'Settings') {
+      tab.setAttribute('aria-label', '🛠');
+    } else if (tab.getAttribute('aria-label') === 'Primary') {
+      tab.setAttribute('aria-label', '🏠︎');
+    } else if (tab.getAttribute('aria-label') === 'Secondary') {
+      tab.setAttribute('aria-label', '♥︎');
+    }else if (tab.getAttribute('aria-label') === 'Contacts') {
+      tab.setAttribute('aria-label', '☎︎');
+    }else if (tab.getAttribute('aria-label') === 'Attachments') {
+      tab.setAttribute('aria-label', '⬇');
+    }else if (tab.getAttribute('aria-label') === 'Education') {
+      tab.setAttribute('aria-label', '✎');
+    }else if (tab.getAttribute('aria-label') === 'Career') {
+      tab.setAttribute('aria-label', '★');
+    }
+  });
+});
+
+
+  const addSecondaryEducationSection = async () => {
+    if (hasUnsavedSecondaryChanges) {
+      openConfirmationModal(
+        "You have unsaved changes in the secondary education section. Do you want to proceed?",
+        async () => {
+          await handleSubmit(); // Handle any async submission
+          setSecondaryEducationSections((prev) => [
+            ...prev,
+            { schoolName: "", yearStarted: "", yearEnded: "" },
+          ]);
+          setHasUnsavedSecondaryChanges(true); // Mark unsaved changes
+        }
+      );
+      return; // Stop execution until user confirms
+    }
+
+    setSecondaryEducationSections((prev) => [
+      ...prev,
       { schoolName: "", yearStarted: "", yearEnded: "" },
     ]);
+    setHasUnsavedSecondaryChanges(true); // Set unsaved changes
   };
 
-  const addTertiaryEducationSection = () => {
-    setTertiaryEducationSections([
-      ...tertiaryEducationSections,
+  // Function to add a new tertiary education section
+  const addTertiaryEducationSection = async () => {
+    if (hasUnsavedTertiaryChanges) {
+      openConfirmationModal(
+        "You have unsaved changes in the tertiary education section. Do you want to proceed?",
+        async () => {
+          await handleSubmit(); // Handle any async submission
+          setTertiaryEducationSections((prev) => [
+            ...prev,
+            { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
+          ]);
+          setHasUnsavedTertiaryChanges(true);
+        }
+      );
+      return;
+    }
+
+    setTertiaryEducationSections((prev) => [
+      ...prev,
       { schoolName: "", program: "", yearStarted: "", yearEnded: "" },
     ]);
+    setHasUnsavedTertiaryChanges(true);
   };
 
-  const addCompanySection = () => {
-    setCompanySections([
-      ...companySections,
+  // Function to add a new company section
+  const addCompanySection = async () => {
+    if (hasUnsavedCompanyChanges) {
+      openConfirmationModal(
+        "You have unsaved changes in the company section. Do you want to proceed?",
+        async () => {
+          await handleSubmit();
+          setCompanySections((prev) => [
+            ...prev,
+            {
+              id: uniqueId(),
+              companyName: "",
+              position: "",
+              yearStarted: "",
+              yearEnded: "",
+            },
+          ]);
+          setHasUnsavedCompanyChanges(true);
+        }
+      );
+      return;
+    }
+
+    setCompanySections((prev) => [
+      ...prev,
       {
         id: uniqueId(),
         companyName: "",
@@ -167,101 +590,13 @@ function UserProfile() {
         yearEnded: "",
       },
     ]);
+    setHasUnsavedCompanyChanges(true);
   };
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      try {
-        const options = {
-          maxSizeMB: 1, // Limit to 1MB
-          maxWidthOrHeight: 500, // Adjust dimensions to limit size
-          useWebWorker: true,
-        };
-        const compressedFile = await imageCompression(file, options);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setProfileImage(reader.result); // This will set the base64 string of the compressed image
-        };
-        reader.readAsDataURL(compressedFile);
-      } catch (error) {
-        console.error("Error compressing image:", error);
-      }
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    switch (name) {
-      case "accountEmail":
-        setAccountEmail(value);
-        break;
-      case "firstName":
-        setFirstName(value);
-        break;
-      case "lastName":
-        setLastName(value);
-        break;
-      case "birthday":
-        setBirthday(value);
-        break;
-      case "profession":
-        setProfession(value);
-        break;
-      case "collegeProgram":
-        setCollegeProgram(value);
-        break;
-      case "specialization":
-        setSpecialization(value);
-        break;
-      case "yearStartedCollege":
-        setYearStartedCollege(value);
-        break;
-      case "yearGraduatedCollege":
-        setYearGraduatedCollege(value);
-        break;
-      case "timeToJob":
-        setTimeToJob(value);
-        break;
-      case "employmentStatus":
-        setEmploymentStatus(value);
-        break;
-      case "professionAlignment":
-        setProfessionAlignment(value);
-        break;
-      case "workIndustry":
-        setWorkIndustry(value);
-        break;
-      case "maritalStatus":
-        setMaritalStatus(value);
-        break;
-      case "salaryRange":
-        setSalaryRange(value);
-        break;
-      case "placeOfEmployment":
-        setPlaceOfEmployment(value);
-        break;
-      case "linkedIn":
-        setLinkedIn(value);
-        break; // Fixed state name here
-      case "facebook":
-        setFacebook(value);
-        break;
-      case "instagram":
-        setInstagram(value);
-        break;
-      case "email":
-        setEmail(value);
-        break;
-      case "mobileNumber":
-        setMobileNumber(value);
-        break;
-      case "otherContact":
-        setOtherContact(value);
-        break;
-      default:
-        break;
-    }
+    setProfileImage(file); // Set the File object directly
+    setImagePreview(URL.createObjectURL(file)); // Set preview URL for the selected image
   };
 
   const handleSectionChange = (sectionType, sectionId, e) => {
@@ -293,6 +628,11 @@ function UserProfile() {
     setSectionToDelete({ sectionType, sectionId }); // Store the section type and ID
   };
 
+  const initiateDeleteAttachment = (attachmentId) => {
+    setIsDeleteAttachmentModalOpen(true);
+    setAttachmentToDelete({ attachmentId });
+  };
+
   const handleDeleteSection = async () => {
     if (!sectionToDelete) {
       return;
@@ -309,7 +649,7 @@ function UserProfile() {
     }
 
     try {
-      // Step 1: Call the DELETE endpoint to remove the section from the database
+      // Call the DELETE endpoint to remove the section from the database
       const deleteResponse = await axios.delete(
         `${backendUrl}/profile/${sectionType}/${profileId}/${sectionId}`,
         { withCredentials: true }
@@ -318,129 +658,34 @@ function UserProfile() {
       console.log("Delete response:", deleteResponse);
 
       if (deleteResponse.status === 200) {
-        // Step 2: Update the frontend state after successful deletion
+        // Update the frontend state after successful deletion
         if (sectionType === "company-section") {
-          setCompanySections((prevSections) => {
-            const updatedSections = prevSections.filter(
-              (section) => section._id !== sectionId
-            );
-            console.log(
-              "Updated company sections after deletion:",
-              updatedSections
-            );
-            return updatedSections;
-          });
-        } else if (sectionType === "secondary-section") {
-          setSecondaryEducationSections((prevSections) => {
-            const updatedSections = prevSections.filter(
-              (section) => section._id !== sectionId
-            );
-            console.log(
-              "Updated secondary education sections after deletion:",
-              updatedSections
-            );
-            return updatedSections;
-          });
-        } else if (sectionType === "tertiary-section") {
-          setTertiaryEducationSections((prevSections) => {
-            const updatedSections = prevSections.filter(
-              (section) => section._id !== sectionId
-            );
-            console.log(
-              "Updated tertiary education sections after deletion:",
-              updatedSections
-            );
-            return updatedSections;
-          });
-        }
-
-        // Step 3: Update the profile with the remaining sections
-        const updatedUserData = {
-          firstName,
-          lastName,
-          birthday,
-          profession,
-          accountEmail,
-          collegeProgram,
-          specialization,
-          yearStartedCollege,
-          yearGraduatedCollege,
-          timeToJob,
-          employmentStatus,
-          workIndustry,
-          professionAlignment,
-          maritalStatus,
-          salaryRange,
-          placeOfEmployment,
-          profileImage,
-          attachments: attachments.map((attachment) => ({
-            fileName: attachment.fileName,
-            file: attachment.file,
-          })),
-          secondaryEducation: secondaryEducationSections.filter(
-            (section) => section._id !== sectionId
-          ),
-          tertiaryEducation: tertiaryEducationSections.filter(
-            (section) => section._id !== sectionId
-          ),
-          careerBackground: companySections.filter(
-            (section) => section._id !== sectionId
-          ),
-          contactInformation: {
-            linkedIn,
-            facebook,
-            instagram,
-            email,
-            mobileNumber,
-            other: otherContact,
-          },
-        };
-
-        // Step 4: Call the PUT endpoint to update the profile
-        const updateResponse = await axios.put(
-          `${backendUrl}/profile/updateprofile`,
-          updatedUserData,
-          { withCredentials: true }
-        );
-
-        console.log("Profile updated after section deletion:", updateResponse);
-
-        if (updateResponse.status === 200) {
-          alert(
-            `${sectionType.replace(
-              "-",
-              " "
-            )} deleted and profile updated successfully!`
+          setCompanySections((prevSections) =>
+            prevSections.filter((section) => section._id !== sectionId)
           );
-        } else {
-          alert("Failed to update profile. Please try again.");
+        } else if (sectionType === "secondary-section") {
+          setSecondaryEducationSections((prevSections) =>
+            prevSections.filter((section) => section._id !== sectionId)
+          );
+        } else if (sectionType === "tertiary-section") {
+          setTertiaryEducationSections((prevSections) =>
+            prevSections.filter((section) => section._id !== sectionId)
+          );
         }
-      } else {
-        alert(
-          `Failed to delete ${sectionType.replace("-", " ")}. Please try again.`
-        );
+
+        // Set validation message for successful deletion
+        setValidationMessage("Profile updated successfully!");
+        setShowValidationMessage(true); // Show the validation message
+
+        setTimeout(() => {
+          setShowValidationMessage(false);
+        }, 3000);
       }
     } catch (error) {
-      console.error(
-        `Error deleting ${sectionType.replace("-", " ")} or updating profile:`,
-        error
+      console.error("Error deleting section:", error);
+      alert(
+        `Failed to delete ${sectionType.replace("-", " ")}. Please try again.`
       );
-      if (error.response) {
-        console.log("Response status:", error.response.status);
-        console.log("Response data:", error.response.data);
-        alert(
-          `Failed to delete ${sectionType.replace("-", " ")}. Reason: ${
-            error.response.data.message || "Please try again."
-          }`
-        );
-      } else {
-        alert(
-          `Failed to delete ${sectionType.replace(
-            "-",
-            " "
-          )}. Please check your network connection.`
-        );
-      }
     }
 
     // Close the modal and clear the sectionToDelete
@@ -448,20 +693,76 @@ function UserProfile() {
     setSectionToDelete(null);
   };
 
-  const handleSave = (e) => {
-    console.log("saved");
+  const handleDeleteAttachment = async () => {
+    if (!attachmentToDelete) {
+      console.log("No attachment to delete.");
+      return;
+    }
+
+    const { attachmentId } = attachmentToDelete;
+
+    console.log("Delete button clicked for attachment");
+    console.log("Attachment ID in function:", attachmentId);
+
+    if (!profileId || !attachmentId) {
+      console.log("Profile ID or Attachment ID is missing.");
+      return;
+    }
+
+    try {
+      // Call the DELETE endpoint to remove the attachment from the database
+      const deleteAttachmentResponse = await axios.delete(
+        `${backendUrl}/profile/${profileId}/${attachmentId}`,
+        { withCredentials: true }
+      );
+
+      console.log("Delete response:", deleteAttachmentResponse);
+
+      if (deleteAttachmentResponse.status === 200) {
+        // Update the frontend state after successful deletion
+        setAttachments((prevAttachments) =>
+          prevAttachments.filter(
+            (attachment) => attachment._id !== attachmentId
+          )
+        );
+
+        // Set validation message for successful deletion
+        setValidationMessage("Attachment deleted successfully!");
+        setShowValidationMessage(true); // Show the validation message
+
+        setTimeout(() => {
+          setShowValidationMessage(false);
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error deleting attachment:", error);
+      alert(`Failed to delete attachment. Please try again.`);
+    }
+
+    // Close the modal and clear the attachmentToDelete
+    setIsDeleteAttachmentModalOpen(false);
+    setAttachmentToDelete(null);
+  };
+
+  const handleSave = async (e) => {
     e.preventDefault(); // Prevent default form submission
-    handleSubmit(e); // Call the handleSubmit function to save the form data
+    console.log("saved");
+
+    await handleSubmit(e); // Call the handleSubmit function to save the form data
+
+    setHasUnsavedSecondaryChanges(false);
+    setHasUnsavedTertiaryChanges(false);
+    setHasUnsavedCompanyChanges(false);
   };
 
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault(); // Check if the event is present before calling preventDefault
+    if (e) e.preventDefault(); // Prevent default form submission
 
     // Validate required fields
     if (!firstName || !lastName) {
-      setValidationMessage("First Name and Last Name are required.");
-      setShowValidationMessage(true);
-      setTimeout(() => setShowValidationMessage(false), 3000);
+      setErrorMessage("First Name and Last Name are required.");
+      setShowErrorMessage(true);
+      setTimeout(() => setShowErrorMessage(false), 3000);
       return; // Prevent submission
     }
 
@@ -472,8 +773,10 @@ function UserProfile() {
       firstName,
       lastName,
       birthday,
+      gender,
+      region,
       profession,
-      accountEmail,
+      college,
       collegeProgram,
       specialization,
       yearStartedCollege,
@@ -485,11 +788,6 @@ function UserProfile() {
       maritalStatus,
       salaryRange,
       placeOfEmployment,
-      profileImage,
-      attachments: attachments.map((attachment) => ({
-        fileName: attachment.fileName,
-        file: attachment.file, // include the file object here
-      })),
       secondaryEducation: secondaryEducationSections,
       tertiaryEducation: tertiaryEducationSections,
       careerBackground: companySections,
@@ -503,10 +801,32 @@ function UserProfile() {
       },
     };
 
+    const formData = new FormData();
+
+    attachments.forEach((attachment) => {
+      if (attachment.file) {
+        formData.append("attachments", attachment.file);
+        formData.append("attachmentIds", attachment._id || "");
+        console.log("Appending attachment ID:", attachment._id); // Add the ID or empty string
+      }
+    });
+
+    if (profileImage) {
+      formData.append("profileImage", profileImage);
+      console.log("Appending profile image:", profileImage.name); // Log profile image name
+    }
+
     try {
       // Check if the profile exists
       await axios.get(`${backendUrl}/profile/userprofile`, {
         withCredentials: true,
+      });
+
+      await axios.put(`${backendUrl}/profile/updateprofile`, formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       // Update the existing profile
@@ -514,16 +834,46 @@ function UserProfile() {
         withCredentials: true,
       });
 
+      // Re-fetch the profile to ensure we have the latest data
+      const updatedProfileResponse = await axios.get(
+        `${backendUrl}/profile/userprofile`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      const updatedProfile = await axios.get(
+        `${backendUrl}/profile/userprofile`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setAttachments(
+        updatedProfile.data.attachments.map((attachment) => ({
+          _id: attachment._id, // The unique ID from the backend
+          filename: attachment.filename,
+          filepath: attachment.filepath,
+        }))
+      );
+
+      setProfileImage(updatedProfile.data.profileImage); // Update the image state with new image
+      setImagePreview(null); // Clear the preview after upload
+      // Update state with the newly fetched data
+      setCompanySections(updatedProfileResponse.data.careerBackground || []);
+      setSecondaryEducationSections(
+        updatedProfileResponse.data.secondaryEducation || []
+      );
+      setTertiaryEducationSections(
+        updatedProfileResponse.data.tertiaryEducation || []
+      );
+
       // Check if the email has changed
       if (accountEmail !== initialAccountEmail) {
         setShowValidationMessage(false);
-
-        // Set validation message for the modal
         setValidationMessage(
           "Email changed successfully! Please log in using your new email."
         );
-
-        // Show the modal only, without the background message
         setModalVisible(true); // Show modal
       } else {
         // Only show the success message if the email has NOT changed
@@ -549,14 +899,16 @@ function UserProfile() {
           "Error saving profile:",
           error.response ? error.response.data : error.message
         );
-        setErrorMessage("Error saving profile. Please try again.");
+        setErrorMessage(
+          error.response.data.msg || "Error saving profile. Please try again."
+        );
         setShowErrorMessage(true);
         setTimeout(() => setShowErrorMessage(false), 3000);
       }
     }
 
     // Validation message for successful save (if email has not changed)
-    if (accountEmail === initialAccountEmail) {
+    if (accountEmail === initialAccountEmail && showErrorMessage) {
       setShowValidationMessage(true);
       setTimeout(() => setShowValidationMessage(false), 3000);
     }
@@ -575,7 +927,10 @@ function UserProfile() {
           // Populate form fields with fetched profile data
           setFirstName(profileData.firstName || "");
           setLastName(profileData.lastName || "");
+          setGender(profileData.gender || "");
+          setRegion(profileData.region || "");
           setProfession(profileData.profession || "");
+          setCollege(profileData.college || "");
           setCollegeProgram(profileData.collegeProgram || "");
           setSpecialization(profileData.specialization || "");
           setYearStartedCollege(profileData.yearStartedCollege || "");
@@ -594,7 +949,7 @@ function UserProfile() {
           setAccountEmail(profileData.accountEmail || "");
           setMobileNumber(profileData.contactInformation?.mobileNumber || "");
           setOtherContact(profileData.contactInformation?.other || "");
-          setProfileImage(profileData.profileImage || "");
+          setProfileImage(profileData.profileImage || blankprofilepic);
           setInitialAccountEmail(profileData.accountEmail || "");
 
           setProfileId(profileData._id);
@@ -625,12 +980,12 @@ function UserProfile() {
 
   const handlePasswordSub = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
+    setErrorMessage2("");
 
-    if (!newPassword || !confirmPassword) {
-      setErrorMessage("All fields are required.");
-      setShowErrorMessage(true);
-      setTimeout(() => setShowErrorMessage(false), 3000);
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      setErrorMessage2("All fields are required.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
       return;
     }
 
@@ -638,23 +993,23 @@ function UserProfile() {
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
     if (!passwordRegex.test(newPassword)) {
-      setErrorMessage("Password must meet the complexity requirements.");
-      setShowErrorMessage(true);
-      setTimeout(() => setShowErrorMessage(false), 3000);
+      setErrorMessage2("Password must meet the complexity requirements.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      setShowErrorMessage(true);
-      setTimeout(() => setShowErrorMessage(false), 3000);
+      setErrorMessage2("New and Confirm Passwords do not match.");
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
       return;
     }
 
     try {
       const response = await axios.post(
         `${backendUrl}/profile/changepassword`,
-        { newPassword }, // Only new password
+        { oldPassword, newPassword }, // Include old password in the request
         { withCredentials: true }
       );
 
@@ -663,16 +1018,24 @@ function UserProfile() {
           "Password changed successfully! Please log in using your new password."
         );
         setModalVisible(true);
+        setIsPassModalOpen(false);
       } else {
-        setErrorMessage("Failed to reset password.");
-        setShowErrorMessage(true);
-        setTimeout(() => setShowErrorMessage(false), 3000);
+        setErrorMessage2(response.data.error || "Failed to reset password.");
+        setShowErrorMessage2(true);
+        setTimeout(() => setShowErrorMessage2(false), 3000);
       }
     } catch (err) {
       console.error("Error resetting password:", err);
-      setErrorMessage("Server error occurred.");
-      setShowErrorMessage(true);
-      setTimeout(() => setShowErrorMessage(false), 3000);
+
+      // Check if error response from server exists and has a message
+      if (err.response && err.response.data && err.response.data.error) {
+        setErrorMessage2(err.response.data.error);
+      } else {
+        setErrorMessage2("Server error occurred.");
+      }
+
+      setShowErrorMessage2(true);
+      setTimeout(() => setShowErrorMessage2(false), 3000);
     }
   };
 
@@ -701,12 +1064,36 @@ function UserProfile() {
     setIsPassModalOpen(false);
   };
 
+  const openEmailModal = () => {
+    setIsEmailModalOpen(true);
+  };
+
+  // Function to close the password modal
+  const closeEmailModal = () => {
+    setIsEmailModalOpen(false);
+    setOtpSent(false);
+    setTimer(0);
+    setNewEmail("");
+    setOtp("");
+  };
+
   return (
     <>
       {/* Password Modal */}
       {isPassModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 z-50 ">
-          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4 ">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          {showErrorMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2  bg-red text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{errorMessage2}</p>
+            </div>
+          )}
+          {showValidationMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2  bg-green text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{validationMessage2}</p>
+            </div>
+          )}
+
+          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
             <button
               onClick={closePassModal}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
@@ -727,6 +1114,20 @@ function UserProfile() {
               </svg>
             </button>
 
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">
+                Old Password
+              </label>
+              <input
+                type="password"
+                name="oldPassword"
+                placeholder="Old Password"
+                className="input input-sm input-bordered w-full h-10"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                required
+              />
+            </div>
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium">
                 New Password
@@ -773,26 +1174,161 @@ function UserProfile() {
             </p>
             <div className="flex justify-center gap-2 mt-8">
               <button
+                onClick={closePassModal}
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Cancel
+              </button>
+              <button
                 onClick={handlePasswordSub}
                 className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
               >
                 Save
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isDeleteModalPicOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Profile Image</h2>
+            <p>Are you sure you want to delete your Profile Image?</p>
+            <div className="flex justify-center gap-4 mt-4">
               <button
-                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
-                onClick={closePassModal}
+                className="btn btn-sm w-24 bg-[#3D3C3C] text-white px-4 py-2"
+                onClick={() => setIsDeleteModalPicOpen(false)} // Close the modal on cancel
               >
                 Cancel
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-red text-white px-4 py-2"
+                onClick={handleDeleteProfileImage} // Trigger the delete function
+              >
+                Delete
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Email Modal */}
+      {isEmailModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          {/* Error and Validation Messages */}
+          {showErrorMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{errorMessage2}</p>
+            </div>
+          )}
+          {showValidationMessage2 && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{validationMessage2}</p>
+            </div>
+          )}
+
+          {/* Modal Content */}
+          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
+            {/* Modal Body */}
+            <div className="mb-4">
+              <div className="block mb-2 text-sm font-medium">
+                Updating Email Address
+              </div>
+              <div className="block mb-2 text-sm font-light">
+                Update your account email address using the email OTP option.
+              </div>
+            </div>
+
+            {/* Current Email Display */}
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">
+                Current Account Email
+              </label>
+              <input
+                type="email"
+                className="input input-sm input-bordered w-full h-10"
+                required
+                name="accountEmail"
+                value={accountEmail}
+                readOnly
+              />
+            </div>
+
+            {/* New Email Input and Send OTP Button */}
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium">
+                New Email *
+              </label>
+              <input
+                type="email"
+                placeholder="Type new email"
+                className="input input-sm input-bordered w-full h-10"
+                required
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)} // This captures user input
+              />
+              <button
+                onClick={sendOTP}
+                className="btn btn-sm mt-2 w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Send OTP
+              </button>
+            </div>
+
+            {otpSent && timer > 0 && (
+              <div className="mb-4">
+                <p className="text-left text-sm md:text-base">
+                  OTP valid for: {formatTime(timer)}
+                </p>
+              </div>
+            )}
+
+            {/* OTP Input and Verify Button */}
+            <div className="mb-2 mt-2">
+              <label className="block mt-2 mb-2 text-sm font-medium">
+                Enter OTP *
+              </label>
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                className="input input-sm input-bordered w-full h-10"
+                required
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+              <button
+                onClick={sendOTP}
+                className="btn btn-sm mt-1 w-28 md:btn-md md:w-52 lg:w-60 bg-[#BE142E] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Resend OTP
+              </button>
+            </div>
+
+            {/* Save and Cancel Buttons */}
+            <div className="flex justify-center gap-2 mt-8">
+              <button
+                onClick={closeEmailModal}
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={verifyOTPAndUpdateEmail}
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal */}
       {modalVisible && (
         <dialog id="my_modal_5" className="modal modal-middle " open>
           <div className="modal-box">
-            <p className="py-4">{validationMessage}</p>
+            <p className="py-4">{validationMessage || validationMessage2}</p>
+
             <div className="modal-action">
               <button
                 onClick={handleExitModal}
@@ -816,23 +1352,72 @@ function UserProfile() {
         </div>
       )}
 
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      {isConfirmationModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
-            <h2 className="text-2xl mb-4">Delete Section</h2>
-            <p>Are you sure you want to delete this section?</p>
+            <h2 className="text-2xl mb-4">Confirm Action</h2>
+            <p>{confirmationMessage}</p>
             <div className="flex justify-end mt-4">
               <button
                 className="btn btn-sm w-24 bg-red text-white mr-2"
+                onClick={() => {
+                  if (confirmCallback) confirmCallback(); // Execute the stored callback
+                  setIsConfirmationModalOpen(false); // Close the modal
+                }}
+              >
+                Yes
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-gray-500 text-white"
+                onClick={() => setIsConfirmationModalOpen(false)} // Close modal on cancel
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Section</h2>
+            <p>Are you sure you want to delete this section?</p>
+            <div className="flex justify-center gap-4 mt-4">
+              <button
+                className="btn btn-sm w-24 bg-[#3D3C3C] text-white px-4 py-2"
+                onClick={() => setIsDeleteModalOpen(false)} // Close the modal on cancel
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-red text-white px-4 py-2"
                 onClick={handleDeleteSection} // Call the actual delete function on confirm
               >
                 Delete
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isDeleteAttachmentModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+            <h2 className="text-2xl mb-4">Delete Attachment</h2>
+            <p>Are you sure you want to delete this attachment?</p>
+            <div className="flex justify-center gap-4 mt-4">
               <button
-                className="btn btn-sm w-24 bg-gray-500 text-white"
-                onClick={() => setIsDeleteModalOpen(false)} // Close the modal on cancel
+                className="btn btn-sm w-24 bg-[#3D3C3C] text-white px-4 py-2"
+                onClick={() => setIsDeleteAttachmentModalOpen(false)} // Close the modal on cancel
               >
                 Cancel
+              </button>
+              <button
+                className="btn btn-sm w-24 bg-red text-white px-4 py-2"
+                onClick={handleDeleteAttachment} // Call the delete function for attachments on confirm
+              >
+                Delete
               </button>
             </div>
           </div>
@@ -852,13 +1437,15 @@ function UserProfile() {
             className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg"
           >
             <input
-              type="radio"
-              name="my_tabs_2"
-              role="tab"
-              className="tab"
-              aria-label="Primary"
-              defaultChecked
-            />
+  type="radio"
+  name="my_tabs_2"
+  role="tab"
+  className="tab"
+  aria-label="🏠︎"
+  defaultChecked
+  title="Primary Information" 
+/>
+
             <div
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 tab-active"
@@ -868,17 +1455,36 @@ function UserProfile() {
                   {/* PRIMARY INFORMATION */}
                   <div className="text-xl py-4">Primary Information</div>
 
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="h-40 w-40 border-2"
-                  />
+                  <div className="py-1">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Image Preview"
+                        className="h-40 w-40 border-2 mb-4"
+                      />
+                    ) : (
+                      <img
+                        src={
+                          profileImage === blankprofilepic
+                            ? blankprofilepic
+                            : `${backendUrl}${profileImage}`
+                        }
+                        alt="Profile"
+                        className="h-40 w-40 border-2 mb-4"
+                      />
+                    )}
+                    <div className="flex justify-between items-center pt-4">
+                      <label className="text-sm">Profile Picture</label>
+                      <button
+                        type="button"
+                        onClick={() => setIsDeleteModalPicOpen(true)}
+                        className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer"
+                      ></button>
+                    </div>
 
-                  <div className="mt-4">
-                    <label className="pt-4 pb-2 text-sm">Profile Picture</label>
                     <input
                       type="file"
-                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10"
+                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mt-2"
                       onChange={handleImageChange}
                       accept="image/*"
                     />
@@ -924,6 +1530,55 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
+                    <label className="pt-4 pb-2 text-sm">Gender</label>
+                    <select
+                      name="gender"
+                      className="select select-bordered select-sm  w-full h-10"
+                      onChange={(e) => setGender(e.target.value)}
+                      value={gender}
+                    >
+                      <option value="" disabled>
+                        Choose
+                      </option>
+                      <option>Male</option>
+                      <option>Female</option>
+                    </select>
+                  </div>
+
+                  <div className="py-1">
+                    <label className="pt-4 pb-2 text-sm">Region</label>
+                    <select
+                      name="region"
+                      className="select select-bordered select-sm  w-full h-10"
+                      onChange={(e) => setRegion(e.target.value)}
+                      value={region}
+                    >
+                      <option value="" disabled>
+                        Choose
+                      </option>
+                      <option>NCR</option>
+                      <option>CAR</option>
+                      <option>Region I</option>
+                      <option>Region II</option>
+                      <option>Region III</option>
+                      <option>Region IV-A </option>
+                      <option>Region IV-B </option>
+                      <option>Region V</option>
+                      <option>Region VI</option>
+                      <option>NIR</option>
+                      <option>Region VII</option>
+                      <option>Region VIII</option>
+                      <option>Region IX</option>
+                      <option>Region X</option>
+                      <option>Region XI</option>
+                      <option>Region XII</option>
+                      <option>Region XIII</option>
+                      <option>BARMM</option>
+                      <option>N/A</option>
+                    </select>
+                  </div>
+
+                  <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">Profession</label>
                     <input
                       type="text"
@@ -936,37 +1591,57 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">College Program</label>
+                    <label className="pt-4 pb-2 text-sm">College</label>
                     <select
-                      className="select select-bordered select-sm border-2 w-full h-10"
-                      onChange={(e) => setCollegeProgram(e.target.value)}
-                      name="collegeProgram"
-                      value={collegeProgram}
+                      className="select select-bordered select-sm w-full h-10"
+                      onChange={handleCollegeChange}
+                      name="college"
+                      value={college}
                     >
                       <option value="" disabled>
                         Choose
                       </option>
-                      <option>Computer Science</option>
-                      <option>Information Systems</option>
-                      <option>Information Technology</option>
+                      {/* Dynamically render colleges */}
+                      {Object.keys(collegePrograms).map((collegeName) => (
+                        <option key={collegeName} value={collegeName}>
+                          {collegeName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="py-1">
+                    <label className="pt-4 pb-2 text-sm">College Program</label>
+                    <select
+                      className="select select-bordered select-sm w-full h-10"
+                      onChange={(e) => setCollegeProgram(e.target.value)}
+                      name="collegeProgram"
+                      value={collegeProgram}
+                      disabled={!college}
+                    >
+                      <option value="" disabled>
+                        Choose
+                      </option>
+                      {/* Dynamically render college programs based on selected college */}
+                      {college &&
+                        collegePrograms[college].map((program) => (
+                          <option key={program} value={program}>
+                            {program}
+                          </option>
+                        ))}
                     </select>
                   </div>
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">Specialization</label>
-                    <select
-                      className="select select-bordered select-sm border-2 w-full h-10"
+                    <input
+                      type="text"
+                      placeholder="Type here"
+                      className="input input-sm input-bordered w-full h-10"
                       onChange={(e) => setSpecialization(e.target.value)}
                       name="specialization"
                       value={specialization}
-                    >
-                      <option value="" disabled>
-                        Choose
-                      </option>
-                      <option>Web Development</option>
-                      <option>Networking</option>
-                      <option>Automation</option>
-                    </select>
+                    />
                   </div>
 
                   <div className="py-1">
@@ -974,8 +1649,11 @@ function UserProfile() {
                       Year Started on College Program
                     </label>
                     <input
-                      type="date"
-                      placeholder="Type here"
+                      type="number"
+                      min="1990" // Set the minimum acceptable year
+                      max="2024" // Set the maximum acceptable year
+                      step="1" // Allow only whole numbers (no decimals)
+                      placeholder="YYYY"
                       className="input input-sm input-bordered w-full h-10"
                       name="yearStartedCollege"
                       value={yearStartedCollege}
@@ -988,8 +1666,11 @@ function UserProfile() {
                       Year Graduated on College Program
                     </label>
                     <input
-                      type="date"
-                      placeholder="Type here"
+                      type="number"
+                      min="1990" // Set the minimum acceptable year
+                      max="2024" // Set the maximum acceptable year
+                      step="1" // Allow only whole numbers (no decimals)
+                      placeholder="YYYY"
                       className="input input-sm input-bordered w-full h-10"
                       name="yearGraduatedCollege"
                       value={yearGraduatedCollege}
@@ -1002,7 +1683,7 @@ function UserProfile() {
                       Time it took to land a job after graduation (Months)
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       placeholder="Type here"
                       className="input input-sm input-bordered w-full h-10"
                       name="timeToJob"
@@ -1020,7 +1701,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Secondary"
+              aria-label="♥︎"
+              title="Secondary Information" 
             />
             <div
               role="tabpanel"
@@ -1033,7 +1715,7 @@ function UserProfile() {
                   <label className="pt-4 pb-2 text-sm">Employment Status</label>
                   <select
                     name="employmentStatus"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setEmploymentStatus(e.target.value)}
                     value={employmentStatus}
                   >
@@ -1041,6 +1723,7 @@ function UserProfile() {
                       Choose
                     </option>
                     <option>Employed</option>
+                    <option>Self-employed</option>
                     <option>Unemployed</option>
                     <option>Underemployed</option>
                     <option>Freelancing</option>
@@ -1051,15 +1734,15 @@ function UserProfile() {
                   <label className="pt-4 pb-2 text-sm">Work Industry</label>
                   <select
                     name="workIndustry"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setWorkIndustry(e.target.value)}
                     value={workIndustry}
                   >
                     <option value="" disabled>
                       Choose
                     </option>
-                    <option>Local</option>
-                    <option>International</option>
+                    <option>Public</option>
+                    <option>Private</option>
                   </select>
                 </div>
 
@@ -1069,7 +1752,7 @@ function UserProfile() {
                   </label>
                   <select
                     name="professionAlignment"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setProfessionAlignment(e.target.value)}
                     value={professionAlignment}
                   >
@@ -1085,7 +1768,7 @@ function UserProfile() {
                   <label className="pt-4 pb-2 text-sm">Marital Status</label>
                   <select
                     name="maritalStatus"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setMaritalStatus(e.target.value)}
                     value={maritalStatus}
                   >
@@ -1105,7 +1788,7 @@ function UserProfile() {
                   </label>
                   <select
                     name="salaryRange"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setSalaryRange(e.target.value)}
                     value={salaryRange}
                   >
@@ -1126,7 +1809,7 @@ function UserProfile() {
                   </label>
                   <select
                     name="placeOfEmployment"
-                    className="select select-bordered select-sm border-2 w-full h-10"
+                    className="select select-bordered select-sm  w-full h-10"
                     onChange={(e) => setPlaceOfEmployment(e.target.value)}
                     value={placeOfEmployment}
                   >
@@ -1146,7 +1829,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Contacts"
+              aria-label="☎︎"
+              title="Contact Information" 
             />
             <div
               role="tabpanel"
@@ -1192,7 +1876,9 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Email Address</label>
+                  <label className="pt-4 pb-2 text-sm">
+                    Alternative Email Address
+                  </label>
                   <input
                     type="email"
                     placeholder="Type here"
@@ -1204,7 +1890,15 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Mobile Number</label>
+                  <label className="pt-4 pb-2 text-sm">
+                    Mobile Number{" "}
+                    <span className="text-xs font-light italic">
+                      {" "}
+                      ( include country code before your number, e.g.,{" "}
+                      <span className="font-medium">63</span> 9125559207 for PH
+                      )
+                    </span>
+                  </label>
                   <input
                     type="tel"
                     placeholder="Type here"
@@ -1234,7 +1928,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Attachments"
+              aria-label="⬇"
+              title="Attachments" 
             />
             <div
               role="tabpanel"
@@ -1257,15 +1952,30 @@ function UserProfile() {
 
                 {attachments.map((attachment, index) => (
                   <div key={attachment.id}>
-                    <label className="pt-4 pb-2 text-sm">
-                      Attachment {index + 1}{" "}
-                      {/* Change to index + 1 for better user experience */}
-                    </label>
-                    <div className="text-sm text-gray-600">
-                      {attachment.filename || "No file uploaded."}
+                    <div className="flex flex-row justify-between items-center w-full">
+                      <div className="left">
+                        <label className="pt-4 pb-2 text-sm">
+                          Attachment {index + 1}{" "}
+                          {/* Change to index + 1 for better user experience */}
+                        </label>
+                        <div className="text-sm text-gray-600">
+                          {attachment.filename || "No file uploaded."}
+                        </div>
+                      </div>
+                      <div className="right">
+                        <button
+                          type="button"
+                          className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2"
+                          onClick={() =>
+                            initiateDeleteAttachment(attachment._id)
+                          }
+                        ></button>
+                      </div>
                     </div>
+
                     <input
                       type="file"
+                      name={`attachment-${index}`}
                       accept="application/pdf"
                       className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
                       onChange={(e) => handleFileChange(e, index)} // Pass the correct index
@@ -1280,7 +1990,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Education"
+              aria-label="✎"
+              title="Educational Background" 
             />
             <div
               role="tabpanel"
@@ -1297,6 +2008,7 @@ function UserProfile() {
                   <div className="text-lg w-1/2">Secondary Education</div>
                   <div className="text-lg w-1/2 text-end">
                     <button
+                      type="button"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addSecondaryEducationSection}
                     >
@@ -1327,32 +2039,41 @@ function UserProfile() {
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Started</label>
                       <input
-                        type="date"
+                        type="number"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
                         onChange={(e) =>
                           handleSectionChange("secondary", section._id, e)
                         }
                         name="yearStarted"
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
 
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Ended</label>
                       <input
-                        type="date"
+                        type="number"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
                         onChange={(e) =>
                           handleSectionChange("secondary", section._id, e)
                         }
                         name="yearEnded"
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
 
                     {/* Delete Button */}
                     <div className="flex justify-end">
                       <button
+                        type="button"
                         className="btn btn-sm w-36 bg-red text-white mt-2"
                         onClick={
                           () => {
@@ -1376,6 +2097,7 @@ function UserProfile() {
                   <div className="text-lg w-1/2">Tertiary Education</div>
                   <div className="text-lg w-1/2 text-end">
                     <button
+                      type="button"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addTertiaryEducationSection}
                     >
@@ -1423,13 +2145,17 @@ function UserProfile() {
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Started</label>
                       <input
-                        type="date"
+                        type="number"
                         name="yearStarted"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
                         onChange={(e) =>
                           handleSectionChange("tertiary", section._id, e)
                         }
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
 
@@ -1437,18 +2163,23 @@ function UserProfile() {
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Ended</label>
                       <input
-                        type="date"
+                        type="number"
                         name="yearEnded"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
                         onChange={(e) =>
                           handleSectionChange("tertiary", section._id, e)
                         }
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
                     {/* Delete Button */}
                     <div className="flex justify-end">
                       <button
+                        type="button"
                         className="btn btn-sm w-36 bg-red text-white mt-2"
                         onClick={
                           () => {
@@ -1474,7 +2205,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Career"
+              aria-label="★"
+              title="Career" 
             />
             <div
               role="tabpanel"
@@ -1488,6 +2220,7 @@ function UserProfile() {
                   </div>
                   <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
+                      type="button"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addCompanySection}
                     >
@@ -1533,31 +2266,40 @@ function UserProfile() {
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Started</label>
                       <input
-                        type="date"
+                        type="number"
                         name="yearStarted"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearStarted}
                         onChange={(e) =>
                           handleSectionChange("company", section._id, e)
                         }
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
                     {/* Year Ended */}
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Ended</label>
                       <input
-                        type="date"
+                        type="number"
                         name="yearEnded"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.yearEnded}
                         onChange={(e) =>
                           handleSectionChange("company", section._id, e)
                         }
+                        min="1990" // Set the minimum acceptable year
+                        max="2024" // Set the maximum acceptable year
+                        step="1" // Allow only whole numbers (no decimals)
+                        placeholder="YYYY"
                       />
                     </div>
                     {/* Delete Button */}
                     <div className="flex justify-end">
                       <button
+                        type="button"
                         className="btn btn-sm w-36 bg-red text-white mt-2"
                         onClick={() => {
                           console.log("Profile ID:", profileId);
@@ -1578,7 +2320,8 @@ function UserProfile() {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="Settings"
+              aria-label="🛠"
+              title="Settings"
             />
             <div
               role="tabpanel"
@@ -1589,15 +2332,26 @@ function UserProfile() {
                 <div className="text-xl py-4 mt-4">Settings</div>
 
                 <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Account Email *</label>
+                  <label className="pt-4 pb-2 text-sm">Account Email </label>
                   <input
-                    type="email" // Changed type to email for better validation
+                    type="email"
+                    className="input input-sm input-bordered w-full h-10"
+                    required
                     name="accountEmail"
                     value={accountEmail}
-                    onChange={(e) => setAccountEmail(e.target.value)}
-                    placeholder="Type here"
-                    className="input input-sm input-bordered w-full h-10"
+                    readOnly
                   />
+                </div>
+
+                <div className="py-1">
+                  <button
+                    type="button"
+                    className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-orange text-white px-4 py-2 md:px-6 md:py-3"
+                    onClick={openEmailModal}
+                    aria-label="Save" // Added aria-label for accessibility
+                  >
+                    Change Account Email
+                  </button>
                 </div>
               </div>
               {/* END OF SETTINGS */}
@@ -1608,24 +2362,20 @@ function UserProfile() {
       </form>
       <div>
         {/* BOTTOM BUTTONS */}
-        <div className="flex justify-center mt-16 space-x-3 mb-12">
-          <div>
-            <button
-              className="btn md:w-64 w-52 bg-green text-white"
-              onClick={handleSave} // Add a function to handle saving
-              aria-label="Save" // Added aria-label for accessibility
-            >
-              Save
-            </button>
-          </div>
-          <div className="">
-            <button
-              onClick={openPassModal}
-              className="btn md:w-64 w-full bg-fgray text-white"
-            >
-              Reset Password
-            </button>
-          </div>
+        <div className="flex justify-center gap-2 mt-4 mb-12">
+          <button
+            className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+            onClick={handleSave} // Add a function to handle saving
+            aria-label="Save" // Added aria-label for accessibility
+          >
+            Save
+          </button>
+          <button
+            onClick={openPassModal}
+            className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-fgray text-white px-4 py-2 md:px-6 md:py-3"
+          >
+            Reset Password
+          </button>
         </div>
 
         {/* END OF BOTTOM BUTTONS */}

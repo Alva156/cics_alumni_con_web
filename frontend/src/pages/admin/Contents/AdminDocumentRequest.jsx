@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
+import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
+import pdfWorker from "pdfjs-dist";
+import "../../../App.css";
 
 function AdminDocuments() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -305,20 +308,37 @@ function AdminDocuments() {
             className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer relative" // Added relative position
             onClick={() => openViewModal(documents)}
           >
-            {documents.image && documents.image.endsWith(".pdf") ? (
-              <embed
-                src={`${backendUrl}${documents.image}`}
-                type="application/pdf"
-                className="w-full h-48 object-cover rounded-t-lg mb-4"
-              />
+            {/* Check if document.image exists before rendering */}
+            {documents.image ? (
+              documents.image.endsWith(".pdf") ? (
+                <div className="overflow-y-hidden object-contain">
+                  <Worker workerUrl={pdfWorker}>
+                  <div className="w-full max-h-48 overflow-hidden mb-4">
+                    <Viewer
+                      fileUrl={`${backendUrl}${documents.image}`}
+                      renderTextLayer={false}
+                      initialPage={0} // Show the first page only in the preview
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        objectFit: "contain", // Ensures the PDF fits without stretching
+                      }}
+                    />
+                  </div>
+                </Worker>
+                </div>
+                
+              ) : (
+                <img
+                  src={`${backendUrl}${documents.image}`}
+                  alt={documents.name}
+                  className="w-full h-48 object-cover rounded-t-lg mb-4"
+                />
+              )
             ) : (
-              <img
-                src={`${backendUrl}${
-                  documents.image || "/path/to/default-image.jpg"
-                }`} // Provide a default image path if needed
-                alt={documents.name}
-                className="w-full h-48 object-cover rounded-t-lg mb-4"
-              />
+              <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg mb-4">
+                <span className="text-gray-500">No Image Available</span>
+              </div>
             )}
 
             <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -382,22 +402,35 @@ function AdminDocuments() {
             </div>
             <div className="text-md mb-2">{selectedDocuments.address}</div>
             {/* Conditional rendering for images and PDFs */}
-            {selectedDocuments.image ? (
+            {selectedDocuments && selectedDocuments.image ? (
               selectedDocuments.image.endsWith(".pdf") ? (
-                <embed
-                  src={`${backendUrl}${selectedDocuments.image}`}
-                  type="application/pdf"
-                  className="mb-4 w-full h-48 md:h-64 lg:h-80"
-                />
+                <div className="px-10">
+                  <Worker workerUrl={pdfWorker}>
+                  <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
+                    {" "}
+                    {/* Added flex and centering */}
+                    <Viewer
+                      fileUrl={`${backendUrl}${selectedDocuments.image}`}
+                      renderTextLayer={false}
+                      style={{
+                        width: "100%", // Ensure it takes full width
+                        height: "100%", // Adjusts height relative to the container's height
+                        objectFit: "contain", // Ensures the PDF is fully contained within the container
+                      }}
+                    />
+                  </div>
+                </Worker>
+                </div>
+                
               ) : (
                 <img
                   src={`${backendUrl}${selectedDocuments.image}`}
                   alt={selectedDocuments.name}
-                  className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
+                  className="mb-4 w-full h-64 object-cover rounded"
                 />
               )
             ) : (
-              <div className="mb-4 w-full h-48 md:h-64 lg:h-80 bg-gray-200 flex items-center justify-center rounded">
+              <div className="mb-4 w-full h-64 bg-gray-200 flex items-center justify-center rounded">
                 <span className="text-gray-500">No Image Available</span>
               </div>
             )}

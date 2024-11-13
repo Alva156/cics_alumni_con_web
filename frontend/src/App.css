@@ -746,3 +746,6 @@ screens */
 .carousel-button:hover {
   background: rgba(0, 0, 0, 0.7);
 }
+.rpv-core__text-layer {
+  display: none !important;
+}

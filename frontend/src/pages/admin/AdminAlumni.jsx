@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
+import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js";
+import "../../App.css";
 
 function AdminAlumni() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -12,6 +15,8 @@ function AdminAlumni() {
   const [selectedProgram, setSelectedProgram] = useState("");
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedBatch, setSelectedBatch] = useState("");
+  const [previewFileUrl, setPreviewFileUrl] = useState(null);
+
   const formatDate = (dateString) => {
     if (!dateString || isNaN(new Date(dateString).getTime())) {
       return "";
@@ -126,14 +131,28 @@ function AdminAlumni() {
     };
   }, [isModalOpen]); // Re-run the effect when modal state changes
 
-  const openPreviewModal = (attachment) => {
+  const openPreviewModal = async (attachment) => {
     setPreviewAttachment(attachment);
-    setIsPreviewModalOpen(true);
+
+    try {
+      const response = await axios.get(
+        `${backendUrl}/profile/attachments/preview/${attachment.filename}`,
+        { withCredentials: true, responseType: "blob" } // Set responseType to 'blob' to handle binary data
+      );
+
+      // Create a temporary URL for the blob data
+      const fileUrl = URL.createObjectURL(response.data);
+      setPreviewFileUrl(fileUrl); // Store the file URL in the state
+      setIsPreviewModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching the file:", error);
+    }
   };
 
   const closePreviewModal = () => {
     setIsPreviewModalOpen(false);
     setPreviewAttachment(null);
+    setPreviewFileUrl(null); // Clear the file URL when the modal closes
   };
 
   const downloadAttachment = async (filename) => {
@@ -698,7 +717,7 @@ function AdminAlumni() {
               &times;
             </button>
             {/* Preview Modal */}
-            {isPreviewModalOpen && previewAttachment && (
+            {isPreviewModalOpen && previewAttachment && previewFileUrl && (
               <div
                 className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
                 style={{ zIndex: 9999 }}
@@ -710,11 +729,20 @@ function AdminAlumni() {
                   <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 text-center">
                     {previewAttachment.filename}
                   </h2>
-                  <embed
-                    src={`${backendUrl}/profile/attachments/preview/${previewAttachment.filename}`}
-                    className="mb-4 w-full h-64"
-                    type="application/pdf"
-                  />
+
+                  {/* Conditional rendering of Viewer component */}
+                  <Worker workerUrl={pdfWorker}>
+                    <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
+                      <Viewer
+                        fileUrl={previewFileUrl} // Use the URL fetched via axios
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
+                  </Worker>
 
                   <div className="flex justify-end space-x-2 sm:space-x-4 mt-4">
                     <button

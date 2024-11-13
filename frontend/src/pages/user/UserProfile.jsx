@@ -1943,7 +1943,6 @@ function UserProfile() {
                     </button>
                   </div>
                 </div>
-                <hr className="10000px" />
 
                 {/* Horizontal rule after Attachments header */}
                 {attachments.map((attachment, index) => (

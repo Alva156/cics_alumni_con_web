@@ -135,19 +135,23 @@ function Documents() {
           >
             {document.image ? (
               document.image.endsWith(".pdf") ? (
-                <Worker workerUrl={pdfWorker}>
-                  <div className="w-full max-h-48 overflow-hidden mb-4">
-                    <Viewer
-                      fileUrl={`${backendUrl}${document.image}`}
-                      initialPage={0}
-                      style={{
-                        height: "100%",
-                        width: "100%",
-                        objectFit: "contain", // Ensures the PDF fits without stretching
-                      }}
-                    />
-                  </div>
-                </Worker>
+                <div className="flex justify-center items-center text-center text-xl md:px-0 lg:px-0 px-12 xl:px-0 2xl:px-12">
+  <Worker workerUrl={pdfWorker}>
+    <div className="w-full h-48 mb-4 overflow-hidden object-cover">
+      <Viewer
+        fileUrl={`${backendUrl}${document.image}`}
+        initialPage={0}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover", // Ensures the content fills the space
+        }}
+      />
+    </div>
+  </Worker>
+</div>
+
+                
               ) : (
                 <img
                   src={`${backendUrl}${document.image}`}
@@ -199,18 +203,21 @@ function Documents() {
             <div className="text-md mb-2">{selectedDocument.address}</div>
             {selectedDocument && selectedDocument.image ? (
               selectedDocument.image.endsWith(".pdf") ? (
-                <Worker workerUrl={pdfWorker}>
-                  <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
+                <div className="px-10">
+                  <Worker workerUrl={pdfWorker}>
+                  <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center px-">
                     <Viewer
                       fileUrl={`${backendUrl}${selectedDocument.image}`}
                       style={{
                         width: "100%",
                         height: "100%",
-                        objectFit: "contain",
+                        objectFit: "cover"
                       }}
                     />
                   </div>
                 </Worker>
+                </div>
+                
               ) : (
                 <img
                   src={`${backendUrl}${selectedDocument.image}`}

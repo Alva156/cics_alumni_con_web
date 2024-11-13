@@ -1933,7 +1933,6 @@ function UserProfile() {
                 {/* ATTACHMENTS */}
                 <div className="flex items-center w-full">
                   <div className="text-xl py-4 mt-4 w-1/2">Attachments</div>
-                  <hr className="w-full" />
                   <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
                       type="button" // Prevent form submission
@@ -1944,6 +1943,8 @@ function UserProfile() {
                     </button>
                   </div>
                 </div>
+                <hr className="w-full" />
+
                 {/* Horizontal rule after Attachments header */}
                 {attachments.map((attachment, index) => (
                   <div key={attachment.id}>

@@ -1944,10 +1944,13 @@ function UserProfile() {
                   </div>
                 </div>
 
-                <div className="hidden flex-wrap">
-                  <p>
-                    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                  </p>
+                <div className="py-1 hidden">
+                  <label className="pt-4 pb-2 text-sm">School Name</label>
+                  <input
+                    type="text"
+                    placeholder="Type here"
+                    className="input input-sm input-bordered w-full h-10"
+                  />
                 </div>
 
                 {/* Horizontal rule after Attachments header */}

@@ -1931,15 +1931,13 @@ function UserProfile() {
             />
             <div
               role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-100"
             >
               <div>
                 {/* ATTACHMENTS */}
-                <div className="flex flex-col sm:flex-row items-center w-full">
-                  <div className="text-xl py-4 mt-4 sm:w-1/2 w-full text-center sm:text-left">
-                    Attachments
-                  </div>
-                  <div className="text-xl py-4 mt-4 sm:w-1/2 w-full text-center sm:text-end">
+                <div className="flex items-center w-full">
+                  <div className="text-xl py-4 mt-4 w-1/2">Attachments</div>
+                  <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
                       type="button" // Prevent form submission
                       className="btn btn-sm w-36 bg-green text-white"
@@ -1952,10 +1950,10 @@ function UserProfile() {
 
                 {attachments.map((attachment, index) => (
                   <div key={attachment.id}>
-                    <div className="flex flex-col sm:flex-row justify-between items-center w-full">
+                    <div className="flex flex-row justify-between items-center w-full">
                       <div className="left">
                         <label className="pt-4 pb-2 text-sm">
-                          Attachment {index + 1}
+                          Attachment {index + 1}{" "}
                           {/* Change to index + 1 for better user experience */}
                         </label>
                         <div className="text-sm text-gray-600">
@@ -1969,9 +1967,7 @@ function UserProfile() {
                           onClick={() =>
                             initiateDeleteAttachment(attachment._id)
                           }
-                        >
-                          {/* Add your delete icon here */}
-                        </button>
+                        ></button>
                       </div>
                     </div>
 

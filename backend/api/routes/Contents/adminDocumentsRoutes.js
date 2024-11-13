@@ -33,5 +33,10 @@ router.delete(
   authenticateJWT,
   adminDocumentsController.deleteDocuments
 );
+router.get(
+  "/download/:filename",
+  authenticateJWT,
+  adminDocumentsController.downloadDocument
+);
 
 module.exports = router;

@@ -289,3 +289,31 @@ const sendEmailNotification = async (emailAddresses, subject, message) => {
     console.error("Error sending email:", error.message);
   }
 };
+exports.downloadDocument = async (req, res) => {
+  try {
+    const { filename } = req.params;
+
+    // Define the full path to the file directly
+    const filePath = path.join(
+      __dirname,
+      "../../../uploads/contents/documents",
+      filename
+    );
+
+    // Check if the file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ msg: "File not found on the server" });
+    }
+
+    // Trigger the file download
+    res.download(filePath, filename, (err) => {
+      if (err) {
+        console.error("Error during file download:", err);
+        res.status(500).json({ error: "Error downloading the file" });
+      }
+    });
+  } catch (error) {
+    console.error("Error downloading document:", error);
+    res.status(500).json({ error: "Server Error", message: error.message });
+  }
+};

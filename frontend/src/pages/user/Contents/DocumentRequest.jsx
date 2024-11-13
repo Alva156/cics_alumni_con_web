@@ -54,6 +54,39 @@ function Documents() {
     }
     return 0;
   });
+  const downloadDocument = async (imagePath) => {
+    if (!imagePath) {
+      console.error("Error: No image path provided for download.");
+      return;
+    }
+
+    try {
+      const filename = imagePath.split("/").pop();
+      const downloadUrl = `${backendUrl}/documents/download/${filename}`;
+      console.log("Download URL:", downloadUrl);
+
+      const response = await axios.get(downloadUrl, {
+        responseType: "blob",
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        const blob = new Blob([response.data]);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename; // Use the filename from the URL
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      } else {
+        console.error("Download failed:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error downloading the document:", error);
+    }
+  };
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -181,6 +214,16 @@ function Documents() {
             >
               {selectedDocument.contact}
             </a>
+            {/* Download button */}
+            <button
+              onClick={() =>
+                selectedDocument.image &&
+                downloadDocument(selectedDocument.image)
+              }
+              className="mt-4 block text-sm text-red underline"
+            >
+              Download Document
+            </button>
           </div>
         </div>
       )}

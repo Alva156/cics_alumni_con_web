@@ -1937,7 +1937,7 @@ tabs.forEach(tab => {
             >
               <div>
                 {/* ATTACHMENTS */}
-                <div className="flex items-center">
+                <div className="flex items-center w-full">
                   <div className="text-xl py-4 mt-4 w-1/2">Attachments</div>
                   <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
@@ -1999,12 +1999,12 @@ tabs.forEach(tab => {
             >
               <div>
                 {/* EDUCATIONAL BACKGROUND */}
-                <div className="text-xl py-4 mt-4 w-1/2">
+                <div className="text-xl py-4 mt-4 w-1/2 w-full">
                   Educational Background
                 </div>
 
                 {/* SECONDARY EDUCATION */}
-                <div className="flex items-center">
+                <div className="flex items-center w-full">
                   <div className="text-lg w-1/2">Secondary Education</div>
                   <div className="text-lg w-1/2 text-end">
                     <button
@@ -2093,7 +2093,7 @@ tabs.forEach(tab => {
                 ))}
 
                 {/* TERTIARY EDUCATION */}
-                <div className="flex items-center mt-8">
+                <div className="flex items-center mt-8 w-full">
                   <div className="text-lg w-1/2">Tertiary Education</div>
                   <div className="text-lg w-1/2 text-end">
                     <button
@@ -2214,7 +2214,7 @@ tabs.forEach(tab => {
             >
               <div>
                 {/* CAREER */}
-                <div className="flex items-center">
+                <div className="flex items-center w-full">
                   <div className="text-xl py-4 mt-4 w-1/2">
                     Career Background
                   </div>
@@ -2327,12 +2327,12 @@ tabs.forEach(tab => {
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6"
             >
-              <div>
+              <div className="w-full">
                 {/* SETTINGS */}
-                <div className="text-xl py-4 mt-4">Settings</div>
+                <div className="text-xl py-4 mt-4 w-full">Settings</div>
 
-                <div className="py-1">
-                  <label className="pt-4 pb-2 text-sm">Account Email </label>
+                <div className="py-1 w-full">
+                  <label className="pt-4 pb-2 text-sm w-full">Account Email </label>
                   <input
                     type="email"
                     className="input input-sm input-bordered w-full h-10"
@@ -2343,7 +2343,7 @@ tabs.forEach(tab => {
                   />
                 </div>
 
-                <div className="py-1">
+                <div className="py-1 w-full">
                   <button
                     type="button"
                     className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-orange text-white px-4 py-2 md:px-6 md:py-3"

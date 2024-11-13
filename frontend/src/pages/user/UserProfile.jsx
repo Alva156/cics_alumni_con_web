@@ -1443,7 +1443,6 @@ function UserProfile() {
               defaultChecked
               title="Primary Information"
             />
-
             <div
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 tab-active w-full"
@@ -1692,7 +1691,6 @@ function UserProfile() {
                 </div>
               </div>
             </div>
-
             {/* SECONDARY INFORMATION */}
             <input
               type="radio"
@@ -1820,7 +1818,6 @@ function UserProfile() {
                 </div>
               </div>
             </div>
-
             {/* CONTACT INFORMATION */}
             <input
               type="radio"
@@ -1920,7 +1917,6 @@ function UserProfile() {
                 </div>
               </div>
             </div>
-
             <input
               type="radio"
               name="my_tabs_2"
@@ -1929,7 +1925,7 @@ function UserProfile() {
               aria-label="✙"
               title="Attachments"
             />
-            <hr className="w-full" />
+            <hr className="w-full" /> {/* Horizontal rule to separate tabs */}
             <div
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
@@ -1948,7 +1944,8 @@ function UserProfile() {
                     </button>
                   </div>
                 </div>
-
+                <hr className="w-full my-4" />{" "}
+                {/* Horizontal rule to separate Attachments header */}
                 {attachments.map((attachment, index) => (
                   <div key={attachment.id}>
                     <div className="flex flex-row justify-between items-center w-full">
@@ -1971,7 +1968,8 @@ function UserProfile() {
                         ></button>
                       </div>
                     </div>
-
+                    <hr className="w-full my-2" />{" "}
+                    {/* Horizontal rule to separate each attachment */}
                     <input
                       type="file"
                       name={`attachment-${index}`}
@@ -1983,7 +1981,6 @@ function UserProfile() {
                 ))}
               </div>
             </div>
-
             <input
               type="radio"
               name="my_tabs_2"
@@ -2198,7 +2195,6 @@ function UserProfile() {
                 ))}
               </div>
             </div>
-
             <input
               type="radio"
               name="my_tabs_2"
@@ -2313,7 +2309,6 @@ function UserProfile() {
                 ))}
               </div>
             </div>
-
             <input
               type="radio"
               name="my_tabs_2"

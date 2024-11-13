@@ -471,15 +471,15 @@ const tabs = document.querySelectorAll('.tab');
 tabs.forEach(tab => {
   tab.addEventListener('mouseenter', () => {
     // Change the aria-label on hover
-    if (tab.getAttribute('aria-label') === '🛠') {
+    if (tab.getAttribute('aria-label') === '⚙︎') {
       tab.setAttribute('aria-label', 'Settings');
-    } else if (tab.getAttribute('aria-label') === '🏠︎') {
+    } else if (tab.getAttribute('aria-label') === '➤') {
       tab.setAttribute('aria-label', 'Primary');
-    } else if (tab.getAttribute('aria-label') === '♥︎') {
+    } else if (tab.getAttribute('aria-label') === '✦') {
       tab.setAttribute('aria-label', 'Secondary');
     }else if (tab.getAttribute('aria-label') === '☎︎') {
       tab.setAttribute('aria-label', 'Contacts');
-    }else if (tab.getAttribute('aria-label') === '⬇') {
+    }else if (tab.getAttribute('aria-label') === '✙') {
       tab.setAttribute('aria-label', 'Attachments');
     }else if (tab.getAttribute('aria-label') === '✎') {
       tab.setAttribute('aria-label', 'Education');
@@ -492,15 +492,15 @@ tabs.forEach(tab => {
   tab.addEventListener('mouseleave', () => {
     // Reset the aria-label to the original text when the mouse leaves
     if (tab.getAttribute('aria-label') === 'Settings') {
-      tab.setAttribute('aria-label', '🛠');
+      tab.setAttribute('aria-label', '⚙︎');
     } else if (tab.getAttribute('aria-label') === 'Primary') {
-      tab.setAttribute('aria-label', '🏠︎');
+      tab.setAttribute('aria-label', '➤');
     } else if (tab.getAttribute('aria-label') === 'Secondary') {
-      tab.setAttribute('aria-label', '♥︎');
+      tab.setAttribute('aria-label', '✦');
     }else if (tab.getAttribute('aria-label') === 'Contacts') {
       tab.setAttribute('aria-label', '☎︎');
     }else if (tab.getAttribute('aria-label') === 'Attachments') {
-      tab.setAttribute('aria-label', '⬇');
+      tab.setAttribute('aria-label', '✙');
     }else if (tab.getAttribute('aria-label') === 'Education') {
       tab.setAttribute('aria-label', '✎');
     }else if (tab.getAttribute('aria-label') === 'Career') {
@@ -1441,7 +1441,7 @@ tabs.forEach(tab => {
   name="my_tabs_2"
   role="tab"
   className="tab"
-  aria-label="🏠︎"
+  aria-label="➤"
   defaultChecked
   title="Primary Information" 
 />
@@ -1701,7 +1701,7 @@ tabs.forEach(tab => {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="♥︎"
+              aria-label="✦"
               title="Secondary Information" 
             />
             <div
@@ -1928,7 +1928,7 @@ tabs.forEach(tab => {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="⬇"
+              aria-label="✙"
               title="Attachments" 
             />
             <div
@@ -2320,7 +2320,7 @@ tabs.forEach(tab => {
               name="my_tabs_2"
               role="tab"
               className="tab"
-              aria-label="🛠"
+              aria-label="⚙︎"
               title="Settings"
             />
             <div

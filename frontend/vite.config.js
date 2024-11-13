@@ -42,6 +42,9 @@ export default defineConfig({
       devOptions: {
         enabled: true, // Allows testing of PWA features in development mode.
       },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // Increase limit to 10 MB
+      },
     }),
   ],
   build: {

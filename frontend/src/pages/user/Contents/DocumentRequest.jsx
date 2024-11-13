@@ -4,6 +4,17 @@ import axios from "axios";
 import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js";
 import "../../../App.css";
+import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+import { themePlugin } from "@react-pdf-viewer/theme";
+import { DarkIcon, LightIcon } from '@react-pdf-viewer/theme';
+import { fullScreenPlugin } from '@react-pdf-viewer/full-screen';
+import { SpecialZoomLevel } from '@react-pdf-viewer/core';
+import { ExitFullScreenIcon, FullScreenIcon } from '@react-pdf-viewer/full-screen';
+
+
+// Import styles
+import '@react-pdf-viewer/full-screen/lib/styles/index.css';
 
 function Documents() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -92,6 +103,11 @@ function Documents() {
     }
   };
 
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
+  const themePluginInstance = themePlugin();
+  const darkIcon = DarkIcon();
+  const fullScreenPluginInstance = fullScreenPlugin();
+
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       <h1 className="text-2xl font-medium text-gray-700 mb-6">Documents</h1>
@@ -135,20 +151,21 @@ function Documents() {
           >
             {document.image ? (
               document.image.endsWith(".pdf") ? (
-                <div className="flex justify-center items-center text-center text-xl md:px-0 lg:px-0 px-12 xl:px-0 2xl:px-12">
+                <div className="overflow-y-hidden object-contain">
                   <Worker workerUrl={pdfWorker}>
-                    <div className="w-full h-48 mb-4 overflow-hidden object-cover">
-                      <Viewer
-                        fileUrl={`${backendUrl}${document.image}`}
-                        initialPage={0}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover", // Ensures the content fills the space
-                        }}
-                      />
-                    </div>
-                  </Worker>
+                  <div className="w-full max-h-48 overflow-hidden mb-4">
+                    <Viewer
+                      fileUrl={`${backendUrl}${document.image}`}
+                      renderTextLayer={false}
+                      initialPage={0} // Show the first page only in the preview
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        objectFit: "contain", // Ensures the PDF fits without stretching
+                      }}
+                    />
+                  </div>
+                </Worker>
                 </div>
               ) : (
                 <img
@@ -201,7 +218,6 @@ function Documents() {
             <div className="text-md mb-2">{selectedDocument.address}</div>
             {selectedDocument && selectedDocument.image ? (
               selectedDocument.image.endsWith(".pdf") ? (
-                <div className="px-10">
                   <Worker workerUrl={pdfWorker}>
                     <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center px-">
                       <Viewer
@@ -211,10 +227,11 @@ function Documents() {
                           height: "100%",
                           objectFit: "cover",
                         }}
+                        plugins={[fullScreenPluginInstance]}
                       />
                     </div>
                   </Worker>
-                </div>
+
               ) : (
                 <img
                   src={`${backendUrl}${selectedDocument.image}`}

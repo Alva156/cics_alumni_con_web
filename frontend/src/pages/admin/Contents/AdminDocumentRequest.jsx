@@ -311,7 +311,7 @@ function AdminDocuments() {
             {/* Check if document.image exists before rendering */}
             {documents.image ? (
               documents.image.endsWith(".pdf") ? (
-                <div className="flex justify-center items-center text-center text-xl md:px-0 lg:px-0 px-12 xl:px-0 2xl:px-12">
+                <div className="overflow-y-hidden object-contain">
                   <Worker workerUrl={pdfWorker}>
                   <div className="w-full max-h-48 overflow-hidden mb-4">
                     <Viewer

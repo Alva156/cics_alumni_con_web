@@ -311,7 +311,8 @@ function AdminDocuments() {
             {/* Check if document.image exists before rendering */}
             {documents.image ? (
               documents.image.endsWith(".pdf") ? (
-                <Worker workerUrl={pdfWorker}>
+                <div className="flex justify-center items-center text-center text-xl md:px-0 lg:px-0 px-12 xl:px-0 2xl:px-12">
+                  <Worker workerUrl={pdfWorker}>
                   <div className="w-full max-h-48 overflow-hidden mb-4">
                     <Viewer
                       fileUrl={`${backendUrl}${documents.image}`}
@@ -325,6 +326,8 @@ function AdminDocuments() {
                     />
                   </div>
                 </Worker>
+                </div>
+                
               ) : (
                 <img
                   src={`${backendUrl}${documents.image}`}
@@ -401,7 +404,8 @@ function AdminDocuments() {
             {/* Conditional rendering for images and PDFs */}
             {selectedDocuments && selectedDocuments.image ? (
               selectedDocuments.image.endsWith(".pdf") ? (
-                <Worker workerUrl={pdfWorker}>
+                <div className="px-10">
+                  <Worker workerUrl={pdfWorker}>
                   <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
                     {" "}
                     {/* Added flex and centering */}
@@ -416,6 +420,8 @@ function AdminDocuments() {
                     />
                   </div>
                 </Worker>
+                </div>
+                
               ) : (
                 <img
                   src={`${backendUrl}${selectedDocuments.image}`}

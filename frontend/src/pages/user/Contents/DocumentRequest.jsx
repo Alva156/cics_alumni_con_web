@@ -136,22 +136,20 @@ function Documents() {
             {document.image ? (
               document.image.endsWith(".pdf") ? (
                 <div className="flex justify-center items-center text-center text-xl md:px-0 lg:px-0 px-12 xl:px-0 2xl:px-12">
-  <Worker workerUrl={pdfWorker}>
-    <div className="w-full h-48 mb-4 overflow-hidden object-cover">
-      <Viewer
-        fileUrl={`${backendUrl}${document.image}`}
-        initialPage={0}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover", // Ensures the content fills the space
-        }}
-      />
-    </div>
-  </Worker>
-</div>
-
-                
+                  <Worker workerUrl={pdfWorker}>
+                    <div className="w-full h-48 mb-4 overflow-hidden object-cover">
+                      <Viewer
+                        fileUrl={`${backendUrl}${document.image}`}
+                        initialPage={0}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover", // Ensures the content fills the space
+                        }}
+                      />
+                    </div>
+                  </Worker>
+                </div>
               ) : (
                 <img
                   src={`${backendUrl}${document.image}`}
@@ -205,19 +203,18 @@ function Documents() {
               selectedDocument.image.endsWith(".pdf") ? (
                 <div className="px-10">
                   <Worker workerUrl={pdfWorker}>
-                  <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center px-">
-                    <Viewer
-                      fileUrl={`${backendUrl}${selectedDocument.image}`}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover"
-                      }}
-                    />
-                  </div>
-                </Worker>
+                    <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center px-">
+                      <Viewer
+                        fileUrl={`${backendUrl}${selectedDocument.image}`}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
+                  </Worker>
                 </div>
-                
               ) : (
                 <img
                   src={`${backendUrl}${selectedDocument.image}`}

@@ -1929,11 +1929,11 @@ function UserProfile() {
               aria-label="✙"
               title="Attachments"
             />
+            <hr className="w-full" />
             <div
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
             >
-              <hr className="w-full" />
               <div>
                 {/* ATTACHMENTS */}
                 <div className="flex items-center w-full">

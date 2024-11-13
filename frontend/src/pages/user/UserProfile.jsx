@@ -1944,7 +1944,7 @@ function UserProfile() {
                   </div>
                 </div>
 
-                <label className="pt-4 pb-2 text-sm text-white sr-only ">
+                <label className="pt-4 text-sm text-white sr-only ">
                   Mobile Number{" "}
                   <span className="text-xs font-light italic">
                     {" "}

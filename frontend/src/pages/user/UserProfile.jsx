@@ -1925,7 +1925,7 @@ function UserProfile() {
               aria-label="✙"
               title="Attachments"
             />
-            <hr className="w-full" /> {/* Horizontal rule to separate tabs */}
+            <hr /> {/* Horizontal rule to separate tabs */}
             <div
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
@@ -1944,8 +1944,7 @@ function UserProfile() {
                     </button>
                   </div>
                 </div>
-                <hr className="w-full my-4" />{" "}
-                {/* Horizontal rule to separate Attachments header */}
+                <hr /> {/* Horizontal rule to separate Attachments header */}
                 {attachments.map((attachment, index) => (
                   <div key={attachment.id}>
                     <div className="flex flex-row justify-between items-center w-full">
@@ -1968,8 +1967,7 @@ function UserProfile() {
                         ></button>
                       </div>
                     </div>
-                    <hr className="w-full my-2" />{" "}
-                    {/* Horizontal rule to separate each attachment */}
+                    <hr /> {/* Horizontal rule to separate each attachment */}
                     <input
                       type="file"
                       name={`attachment-${index}`}

@@ -1448,7 +1448,7 @@ tabs.forEach(tab => {
 
             <div
               role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6 tab-active"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6 tab-active w-full"
             >
               <div>
                 <div className="text-black font-light">
@@ -1706,7 +1706,7 @@ tabs.forEach(tab => {
             />
             <div
               role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
             >
               <div>
                 <div className="text-xl py-4 mt-4">Secondary Information</div>
@@ -1834,7 +1834,7 @@ tabs.forEach(tab => {
             />
             <div
               role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
             >
               <div>
                 <div className="text-xl py-4 mt-4">Contact Information</div>
@@ -1933,7 +1933,7 @@ tabs.forEach(tab => {
             />
             <div
               role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
             >
               <div>
                 {/* ATTACHMENTS */}
@@ -1995,11 +1995,11 @@ tabs.forEach(tab => {
             />
             <div
               role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
             >
               <div>
                 {/* EDUCATIONAL BACKGROUND */}
-                <div className="text-xl py-4 mt-4 w-1/2 w-full">
+                <div className="text-xl py-4 mt-4 w-full">
                   Educational Background
                 </div>
 
@@ -2210,7 +2210,7 @@ tabs.forEach(tab => {
             />
             <div
               role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
             >
               <div>
                 {/* CAREER */}
@@ -2325,7 +2325,7 @@ tabs.forEach(tab => {
             />
             <div
               role="tabpanel"
-              className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+              className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
             >
               <div className="w-full">
                 {/* SETTINGS */}

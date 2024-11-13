@@ -1944,8 +1944,10 @@ function UserProfile() {
                   </div>
                 </div>
 
-                <div className="hidden">
-                  <p>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</p>
+                <div className="hidden flex-wrap">
+                  <p>
+                    AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                  </p>
                 </div>
 
                 {/* Horizontal rule after Attachments header */}

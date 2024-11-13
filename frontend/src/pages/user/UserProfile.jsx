@@ -1925,7 +1925,6 @@ function UserProfile() {
               aria-label="✙"
               title="Attachments"
             />
-            <hr /> {/* Horizontal rule to separate tabs */}
             <div
               role="tabpanel"
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
@@ -1943,15 +1942,16 @@ function UserProfile() {
                       +
                     </button>
                   </div>
+                  <hr className="w-full" />
                 </div>
-                <hr /> {/* Horizontal rule to separate Attachments header */}
+                {/* Horizontal rule after Attachments header */}
                 {attachments.map((attachment, index) => (
                   <div key={attachment.id}>
                     <div className="flex flex-row justify-between items-center w-full">
                       <div className="left">
                         <label className="pt-4 pb-2 text-sm">
                           Attachment {index + 1}{" "}
-                          {/* Change to index + 1 for better user experience */}
+                          {/* Display the attachment number */}
                         </label>
                         <div className="text-sm text-gray-600">
                           {attachment.filename || "No file uploaded."}
@@ -1967,13 +1967,12 @@ function UserProfile() {
                         ></button>
                       </div>
                     </div>
-                    <hr /> {/* Horizontal rule to separate each attachment */}
                     <input
                       type="file"
                       name={`attachment-${index}`}
                       accept="application/pdf"
                       className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
-                      onChange={(e) => handleFileChange(e, index)} // Pass the correct index
+                      onChange={(e) => handleFileChange(e, index)} // Handle file change for each attachment
                     />
                   </div>
                 ))}

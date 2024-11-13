@@ -1705,7 +1705,7 @@ function UserProfile() {
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
             >
               <div>
-                <div className="text-xl py-4 mt-4">Secondary Information</div>
+                <div className="text-xl py-4">Secondary Information</div>
 
                 <div className="py-1">
                   <label className="pt-4 pb-2 text-sm">Employment Status</label>
@@ -1832,7 +1832,7 @@ function UserProfile() {
               className="tab-content bg-base-100 border-base-300 rounded-box p-6 w-full"
             >
               <div>
-                <div className="text-xl py-4 mt-4">Contact Information</div>
+                <div className="text-xl py-4">Contact Information</div>
 
                 <div className="py-1">
                   <label className="pt-4 pb-2 text-sm">LinkedIn</label>
@@ -1932,7 +1932,7 @@ function UserProfile() {
               <div>
                 {/* ATTACHMENTS */}
                 <div className="flex items-center w-full">
-                  <div className="text-xl py-4 mt-4 w-1/2">Attachments</div>
+                  <div className="text-xl py-4 w-1/2">Attachments</div>
                   <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
                       type="button" // Prevent form submission
@@ -1944,7 +1944,14 @@ function UserProfile() {
                   </div>
                 </div>
 
-                <label className="pt-4 pb-2 text-sm text-white opacity-0 "></label>
+                <label className="pt-4 pb-2 text-sm text-white sr-only ">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PH )
+                  </span>
+                </label>
 
                 {/* Horizontal rule after Attachments header */}
                 {attachments.map((attachment, index) => (
@@ -1994,7 +2001,7 @@ function UserProfile() {
             >
               <div>
                 {/* EDUCATIONAL BACKGROUND */}
-                <div className="text-xl py-4 mt-4 w-full">
+                <div className="text-xl py-4 w-full">
                   Educational Background
                 </div>
 
@@ -2209,9 +2216,7 @@ function UserProfile() {
               <div>
                 {/* CAREER */}
                 <div className="flex items-center w-full">
-                  <div className="text-xl py-4 mt-4 w-1/2">
-                    Career Background
-                  </div>
+                  <div className="text-xl py-4 w-1/2">Career Background</div>
                   <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
                       type="button"
@@ -2322,7 +2327,7 @@ function UserProfile() {
             >
               <div className="w-full">
                 {/* SETTINGS */}
-                <div className="text-xl py-4 mt-4 w-full">Settings</div>
+                <div className="text-xl py-4 w-full">Settings</div>
 
                 <div className="py-1 w-full">
                   <label className="pt-4 pb-2 text-sm w-full">

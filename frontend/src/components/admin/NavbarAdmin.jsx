@@ -130,7 +130,9 @@ const NavbarAdmin = () => {
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <details>
-                    <summary>Contents</summary>
+                    <summary className="p-2.5 font-bold text-gray-700">
+                      Contents
+                    </summary>
                     <ul className="p-2.5 z-50">
                       <li className="p-1">
                         <button
@@ -199,7 +201,7 @@ const NavbarAdmin = () => {
                     Alumni
                   </button>
                 </li>
-                <li className="p-2.5 ">
+                <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <button
                     className="font-bold text-gray-700"
                     onClick={() => handleNavigateAndClose("/admin/reports")}

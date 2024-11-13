@@ -99,12 +99,16 @@ const Navbar = () => {
                 className="menu menu-sm dropdown-content bg-white z-20 mt-3 w-72 p-2 shadow"
               >
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
-                  <button onClick={() => handleNavigateAndClose("/")}>
+                  <button
+                    className="font-bold text-gray-700"
+                    onClick={() => handleNavigateAndClose("/")}
+                  >
                     Home
                   </button>
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <button
+                    className="font-bold text-gray-700"
                     onClick={() => handleNavigateAndClose("/user-userprofile")}
                   >
                     User Profile
@@ -112,6 +116,7 @@ const Navbar = () => {
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <button
+                    className="font-bold text-gray-700"
                     onClick={() => handleNavigateAndClose("/user-survey")}
                   >
                     Survey
@@ -119,6 +124,7 @@ const Navbar = () => {
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <button
+                    className="font-bold text-gray-700"
                     onClick={() => handleNavigateAndClose("/user-threads")}
                   >
                     Threads
@@ -126,10 +132,13 @@ const Navbar = () => {
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <details>
-                    <summary className="p-2.5">Contents</summary>
+                    <summary className="p-2.5 font-bold text-gray-700">
+                      Contents
+                    </summary>
                     <ul className="p-2.5 z-20">
                       <li className="p-1">
                         <button
+                          className="font-bold text-gray-700"
                           onClick={() =>
                             handleNavigateAndClose("/user-companies")
                           }
@@ -139,6 +148,7 @@ const Navbar = () => {
                       </li>
                       <li className="p-1">
                         <button
+                          className="font-bold text-gray-700"
                           onClick={() => handleNavigateAndClose("/user-news")}
                         >
                           News
@@ -146,6 +156,7 @@ const Navbar = () => {
                       </li>
                       <li className="p-1">
                         <button
+                          className="font-bold text-gray-700"
                           onClick={() => handleNavigateAndClose("/user-events")}
                         >
                           Events
@@ -153,6 +164,7 @@ const Navbar = () => {
                       </li>
                       <li className="p-1">
                         <button
+                          className="font-bold text-gray-700"
                           onClick={() =>
                             handleNavigateAndClose("/user-certifications")
                           }
@@ -162,6 +174,7 @@ const Navbar = () => {
                       </li>
                       <li className="p-1">
                         <button
+                          className="font-bold text-gray-700"
                           onClick={() =>
                             handleNavigateAndClose("/user-documentrequest")
                           }
@@ -171,6 +184,7 @@ const Navbar = () => {
                       </li>
                       <li className="p-1">
                         <button
+                          className="font-bold text-gray-700"
                           onClick={() => handleNavigateAndClose("/user-job")}
                         >
                           Job/Internship Referrals
@@ -181,6 +195,7 @@ const Navbar = () => {
                 </li>
                 <li className="p-2.5 border-b border-hgray last:border-b-0">
                   <button
+                    className="font-bold text-gray-700"
                     onClick={() => handleNavigateAndClose("/user-alumni")}
                   >
                     Alumni
@@ -188,6 +203,7 @@ const Navbar = () => {
                 </li>
                 <li className="p-2.5">
                   <button
+                    className="font-bold text-gray-700"
                     onClick={() => handleNavigateAndClose("/user-chatbot")}
                   >
                     FAQs

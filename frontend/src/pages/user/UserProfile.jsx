@@ -60,7 +60,7 @@ function UserProfile() {
   const [otpSent, setOtpSent] = useState(false);
   const [maxId, setMaxId] = useState(1);
   const [isDeleteModalPicOpen, setIsDeleteModalPicOpen] = useState(false);
-  
+
   const handleDeleteProfileImage = async () => {
     try {
       await axios.delete(`${backendUrl}/profile/deleteProfileImage`, {
@@ -463,52 +463,50 @@ function UserProfile() {
     setConfirmCallback(() => onConfirm); // Store the confirm action to execute later
     setIsConfirmationModalOpen(true); // Open modal
   };
-  
+
   // Get all elements with the class "tab"
-const tabs = document.querySelectorAll('.tab');
+  const tabs = document.querySelectorAll(".tab");
 
-// Loop through each tab and add the event listeners
-tabs.forEach(tab => {
-  tab.addEventListener('mouseenter', () => {
-    // Change the aria-label on hover
-    if (tab.getAttribute('aria-label') === '⚙︎') {
-      tab.setAttribute('aria-label', 'Settings');
-    } else if (tab.getAttribute('aria-label') === '➤') {
-      tab.setAttribute('aria-label', 'Primary');
-    } else if (tab.getAttribute('aria-label') === '✦') {
-      tab.setAttribute('aria-label', 'Secondary');
-    }else if (tab.getAttribute('aria-label') === '☎︎') {
-      tab.setAttribute('aria-label', 'Contacts');
-    }else if (tab.getAttribute('aria-label') === '✙') {
-      tab.setAttribute('aria-label', 'Attachments');
-    }else if (tab.getAttribute('aria-label') === '✎') {
-      tab.setAttribute('aria-label', 'Education');
-    }else if (tab.getAttribute('aria-label') === '★') {
-      tab.setAttribute('aria-label', 'Career');
-    }
-    
+  // Loop through each tab and add the event listeners
+  tabs.forEach((tab) => {
+    tab.addEventListener("mouseenter", () => {
+      // Change the aria-label on hover
+      if (tab.getAttribute("aria-label") === "⚙︎") {
+        tab.setAttribute("aria-label", "Settings");
+      } else if (tab.getAttribute("aria-label") === "➤") {
+        tab.setAttribute("aria-label", "Primary");
+      } else if (tab.getAttribute("aria-label") === "✦") {
+        tab.setAttribute("aria-label", "Secondary");
+      } else if (tab.getAttribute("aria-label") === "☎︎") {
+        tab.setAttribute("aria-label", "Contacts");
+      } else if (tab.getAttribute("aria-label") === "✙") {
+        tab.setAttribute("aria-label", "Attachments");
+      } else if (tab.getAttribute("aria-label") === "✎") {
+        tab.setAttribute("aria-label", "Education");
+      } else if (tab.getAttribute("aria-label") === "★") {
+        tab.setAttribute("aria-label", "Career");
+      }
+    });
+
+    tab.addEventListener("mouseleave", () => {
+      // Reset the aria-label to the original text when the mouse leaves
+      if (tab.getAttribute("aria-label") === "Settings") {
+        tab.setAttribute("aria-label", "⚙︎");
+      } else if (tab.getAttribute("aria-label") === "Primary") {
+        tab.setAttribute("aria-label", "➤");
+      } else if (tab.getAttribute("aria-label") === "Secondary") {
+        tab.setAttribute("aria-label", "✦");
+      } else if (tab.getAttribute("aria-label") === "Contacts") {
+        tab.setAttribute("aria-label", "☎︎");
+      } else if (tab.getAttribute("aria-label") === "Attachments") {
+        tab.setAttribute("aria-label", "✙");
+      } else if (tab.getAttribute("aria-label") === "Education") {
+        tab.setAttribute("aria-label", "✎");
+      } else if (tab.getAttribute("aria-label") === "Career") {
+        tab.setAttribute("aria-label", "★");
+      }
+    });
   });
-
-  tab.addEventListener('mouseleave', () => {
-    // Reset the aria-label to the original text when the mouse leaves
-    if (tab.getAttribute('aria-label') === 'Settings') {
-      tab.setAttribute('aria-label', '⚙︎');
-    } else if (tab.getAttribute('aria-label') === 'Primary') {
-      tab.setAttribute('aria-label', '➤');
-    } else if (tab.getAttribute('aria-label') === 'Secondary') {
-      tab.setAttribute('aria-label', '✦');
-    }else if (tab.getAttribute('aria-label') === 'Contacts') {
-      tab.setAttribute('aria-label', '☎︎');
-    }else if (tab.getAttribute('aria-label') === 'Attachments') {
-      tab.setAttribute('aria-label', '✙');
-    }else if (tab.getAttribute('aria-label') === 'Education') {
-      tab.setAttribute('aria-label', '✎');
-    }else if (tab.getAttribute('aria-label') === 'Career') {
-      tab.setAttribute('aria-label', '★');
-    }
-  });
-});
-
 
   const addSecondaryEducationSection = async () => {
     if (hasUnsavedSecondaryChanges) {
@@ -1437,14 +1435,14 @@ tabs.forEach(tab => {
             className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg"
           >
             <input
-  type="radio"
-  name="my_tabs_2"
-  role="tab"
-  className="tab"
-  aria-label="➤"
-  defaultChecked
-  title="Primary Information" 
-/>
+              type="radio"
+              name="my_tabs_2"
+              role="tab"
+              className="tab"
+              aria-label="➤"
+              defaultChecked
+              title="Primary Information"
+            />
 
             <div
               role="tabpanel"
@@ -1702,7 +1700,7 @@ tabs.forEach(tab => {
               role="tab"
               className="tab"
               aria-label="✦"
-              title="Secondary Information" 
+              title="Secondary Information"
             />
             <div
               role="tabpanel"
@@ -1830,7 +1828,7 @@ tabs.forEach(tab => {
               role="tab"
               className="tab"
               aria-label="☎︎"
-              title="Contact Information" 
+              title="Contact Information"
             />
             <div
               role="tabpanel"
@@ -1929,7 +1927,7 @@ tabs.forEach(tab => {
               role="tab"
               className="tab"
               aria-label="✙"
-              title="Attachments" 
+              title="Attachments"
             />
             <div
               role="tabpanel"
@@ -1937,9 +1935,11 @@ tabs.forEach(tab => {
             >
               <div>
                 {/* ATTACHMENTS */}
-                <div className="flex items-center w-full">
-                  <div className="text-xl py-4 mt-4 w-1/2">Attachments</div>
-                  <div className="text-xl py-4 mt-4 w-1/2 text-end">
+                <div className="flex flex-col sm:flex-row items-center w-full">
+                  <div className="text-xl py-4 mt-4 sm:w-1/2 w-full text-center sm:text-left">
+                    Attachments
+                  </div>
+                  <div className="text-xl py-4 mt-4 sm:w-1/2 w-full text-center sm:text-end">
                     <button
                       type="button" // Prevent form submission
                       className="btn btn-sm w-36 bg-green text-white"
@@ -1952,10 +1952,10 @@ tabs.forEach(tab => {
 
                 {attachments.map((attachment, index) => (
                   <div key={attachment.id}>
-                    <div className="flex flex-row justify-between items-center w-full">
+                    <div className="flex flex-col sm:flex-row justify-between items-center w-full">
                       <div className="left">
                         <label className="pt-4 pb-2 text-sm">
-                          Attachment {index + 1}{" "}
+                          Attachment {index + 1}
                           {/* Change to index + 1 for better user experience */}
                         </label>
                         <div className="text-sm text-gray-600">
@@ -1969,7 +1969,9 @@ tabs.forEach(tab => {
                           onClick={() =>
                             initiateDeleteAttachment(attachment._id)
                           }
-                        ></button>
+                        >
+                          {/* Add your delete icon here */}
+                        </button>
                       </div>
                     </div>
 
@@ -1991,7 +1993,7 @@ tabs.forEach(tab => {
               role="tab"
               className="tab"
               aria-label="✎"
-              title="Educational Background" 
+              title="Educational Background"
             />
             <div
               role="tabpanel"
@@ -2206,7 +2208,7 @@ tabs.forEach(tab => {
               role="tab"
               className="tab"
               aria-label="★"
-              title="Career" 
+              title="Career"
             />
             <div
               role="tabpanel"
@@ -2332,7 +2334,9 @@ tabs.forEach(tab => {
                 <div className="text-xl py-4 mt-4 w-full">Settings</div>
 
                 <div className="py-1 w-full">
-                  <label className="pt-4 pb-2 text-sm w-full">Account Email </label>
+                  <label className="pt-4 pb-2 text-sm w-full">
+                    Account Email{" "}
+                  </label>
                   <input
                     type="email"
                     className="input input-sm input-bordered w-full h-10"

@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
+import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
+import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js";
+import "../../../App.css";
 
 function Documents() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -54,6 +57,7 @@ function Documents() {
     }
     return 0;
   });
+
   const downloadDocument = async (imagePath) => {
     if (!imagePath) {
       console.error("Error: No image path provided for download.");
@@ -129,14 +133,21 @@ function Documents() {
             className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
             onClick={() => openViewModal(document)}
           >
-            {/* Check if document.image exists before rendering */}
             {document.image ? (
               document.image.endsWith(".pdf") ? (
-                <embed
-                  src={`${backendUrl}${document.image}`}
-                  type="application/pdf"
-                  className="w-full h-48 object-cover rounded-t-lg mb-4"
-                />
+                <Worker workerUrl={pdfWorker}>
+                  <div className="w-full max-h-48 overflow-hidden mb-4">
+                    <Viewer
+                      fileUrl={`${backendUrl}${document.image}`}
+                      initialPage={0}
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                        objectFit: "contain", // Ensures the PDF fits without stretching
+                      }}
+                    />
+                  </div>
+                </Worker>
               ) : (
                 <img
                   src={`${backendUrl}${document.image}`}
@@ -186,14 +197,20 @@ function Documents() {
               {selectedDocument.name}
             </div>
             <div className="text-md mb-2">{selectedDocument.address}</div>
-            {/* Conditional rendering for images and PDFs */}
             {selectedDocument && selectedDocument.image ? (
               selectedDocument.image.endsWith(".pdf") ? (
-                <embed
-                  src={`${backendUrl}${selectedDocument.image}`}
-                  type="application/pdf"
-                  className="mb-4 w-full h-48 md:h-64 lg:h-80"
-                />
+                <Worker workerUrl={pdfWorker}>
+                  <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
+                    <Viewer
+                      fileUrl={`${backendUrl}${selectedDocument.image}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                      }}
+                    />
+                  </div>
+                </Worker>
               ) : (
                 <img
                   src={`${backendUrl}${selectedDocument.image}`}

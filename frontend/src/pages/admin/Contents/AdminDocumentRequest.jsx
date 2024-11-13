@@ -326,7 +326,7 @@ function AdminDocuments() {
                 </Worker>
               ) : (
                 <img
-                  src={`${backendUrl}${document.image}`}
+                  src={`${backendUrl}${documents.image}`}
                   alt={documents.name}
                   className="w-full h-48 object-cover rounded-t-lg mb-4"
                 />

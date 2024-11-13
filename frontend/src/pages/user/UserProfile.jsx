@@ -1944,14 +1944,14 @@ function UserProfile() {
                   </div>
                 </div>
 
-                <div className="py-1 hidden">
-                  <label className="pt-4 pb-2 text-sm">School Name</label>
-                  <input
-                    type="text"
-                    placeholder="Type here"
-                    className="input input-sm input-bordered w-full h-10"
-                  />
-                </div>
+                <label className="pt-4 pb-2 text-sm text-white opacity-0 ">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PH )
+                  </span>
+                </label>
 
                 {/* Horizontal rule after Attachments header */}
                 {attachments.map((attachment, index) => (

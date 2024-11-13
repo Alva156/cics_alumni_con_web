@@ -3,6 +3,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
 import pdfWorker from "pdfjs-dist";
+import "../../../App.css";
 
 function AdminDocuments() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;

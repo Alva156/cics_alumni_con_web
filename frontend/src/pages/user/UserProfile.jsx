@@ -479,7 +479,7 @@ function UserProfile() {
         tab.setAttribute("aria-label", "Secondary");
       } else if (tab.getAttribute("aria-label") === "☎︎") {
         tab.setAttribute("aria-label", "Contacts");
-      } else if (tab.getAttribute("aria-label") === "✙") {
+      } else if (tab.getAttribute("aria-label") === "") {
         tab.setAttribute("aria-label", "Attachments");
       } else if (tab.getAttribute("aria-label") === "✎") {
         tab.setAttribute("aria-label", "Education");
@@ -499,7 +499,7 @@ function UserProfile() {
       } else if (tab.getAttribute("aria-label") === "Contacts") {
         tab.setAttribute("aria-label", "☎︎");
       } else if (tab.getAttribute("aria-label") === "Attachments") {
-        tab.setAttribute("aria-label", "✙");
+        tab.setAttribute("aria-label", "");
       } else if (tab.getAttribute("aria-label") === "Education") {
         tab.setAttribute("aria-label", "✎");
       } else if (tab.getAttribute("aria-label") === "Career") {

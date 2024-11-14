@@ -1690,6 +1690,14 @@ function UserProfile() {
                   </div>
                 </div>
               </div>
+              <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PH )
+                  </span>
+                </label>
             </div>
             {/* SECONDARY INFORMATION */}
             <input
@@ -1817,6 +1825,14 @@ function UserProfile() {
                   </select>
                 </div>
               </div>
+              <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PH )
+                  </span>
+                </label>
             </div>
             {/* CONTACT INFORMATION */}
             <input
@@ -1916,6 +1932,14 @@ function UserProfile() {
                   />
                 </div>
               </div>
+              <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PH )
+                  </span>
+                </label>
             </div>
             <input
               type="radio"

@@ -271,6 +271,11 @@ function VerifyAccount() {
               type="text"
               value={otp}
               onChange={handleOtpChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleOtpSubmit(e);
+                }
+              }}
               className="mb-3 p-2 border border-black bg-[#D9D9D9] w-full"
               style={{ height: "40px" }}
               disabled={loading}

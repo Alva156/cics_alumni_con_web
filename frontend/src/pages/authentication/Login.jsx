@@ -138,59 +138,66 @@ function Login() {
               </p>
             </div>
 
-            <div className="h-4">
-              {errorMessage && (
-                <p className="text-red text-xs">{errorMessage}</p>
-              )}
-            </div>
+            <form
+              onSubmit={handleSubmit}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
+            >
+              <div className="h-4">
+                {errorMessage && (
+                  <p className="text-red text-xs">{errorMessage}</p>
+                )}
+              </div>
 
-            <label className="block mb-2 mt-6 text-sm font-medium">
-              Email *
-            </label>
-            <input
-              type="email"
-              name="email" // Ensure name is set
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              className="mb-6 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "40px" }}
-            />
-
-            <label className="block mb-2 text-sm font-medium">Password *</label>
-            <div className="relative mb-6">
+              <label className="block mb-2 mt-6 text-sm font-medium">
+                Email *
+              </label>
               <input
-                type={showPassword ? "text" : "password"}
-                name="password" // Ensure name is set
-                placeholder="Enter your password"
-                value={formData.password}
+                type="email"
+                name="email" // Ensure name is set
+                placeholder="Enter your email"
+                value={formData.email}
                 onChange={handleChange}
-                className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                className="mb-6 p-2 border border-black bg-[#D9D9D9] w-full"
                 style={{ height: "40px" }}
               />
-              <span
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-                onClick={togglePasswordVisibility}
-              >
-                <FontAwesomeIcon
-                  icon={showPassword ? faEye : faEyeSlash}
-                  className="text-black"
+
+              <label className="block mb-2 text-sm font-medium">
+                Password *
+              </label>
+              <div className="relative mb-6">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password" // Ensure name is set
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                  style={{ height: "40px" }}
                 />
-              </span>
-            </div>
+                <span
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+                  onClick={togglePasswordVisibility}
+                >
+                  <FontAwesomeIcon
+                    icon={showPassword ? faEye : faEyeSlash}
+                    className="text-black"
+                  />
+                </span>
+              </div>
 
-            <div className="text-sm underline mb-8 block text-left">
-              <button onClick={() => navigate("/forgotpassword")}>
-                Forget Password
+              <div className="text-sm underline mb-8 block text-left">
+                <button onClick={() => navigate("/forgotpassword")}>
+                  Forget Password
+                </button>
+              </div>
+
+              <button
+                type="submit"
+                className="btn bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 mt-4 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
+              >
+                SIGN IN
               </button>
-            </div>
-
-            <button
-              className="btn bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 mt-4 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
-              onClick={handleSubmit}
-            >
-              SIGN IN
-            </button>
+            </form>
 
             <p className="text-left mb-4 mt-8 text-sm">
               Don&apos;t have an account?

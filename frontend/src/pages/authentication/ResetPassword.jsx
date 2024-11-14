@@ -149,89 +149,94 @@ function ResetPassword() {
         {/* Left Form */}
         <div className="w-full md:w-1/2 p-6 md:p-10 flex flex-col justify-start bg-white">
           <div className="flex flex-col justify-start h-full">
-            <div className="mb-6">
-              <h1 className="text-2xl md:text-3xl font-bold mb-6 mt-10 text-left">
-                Welcome back!
-              </h1>
-              <p className="text-left font-bold text-sm mb-3 md:text-base">
-                Please provide a new password for your account.
-              </p>
-              <div className="h-4 mt-4 mb-1">
-                {error && <p className="text-red text-xs">{error}</p>}
-                {success && <p className="text-green text-xs">{success}</p>}
-              </div>
-            </div>
-
-            <label className="block mb-2 text-sm font-medium">
-              New Password *
-            </label>
-            <div className="relative mb-6">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="newPassword"
-                placeholder="Enter your new password"
-                className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
-                value={formData.newPassword}
-                onChange={handleChange}
-                style={{ height: "40px" }}
-              />
-              <span
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-                onClick={togglePasswordVisibility}
-              >
-                <FontAwesomeIcon
-                  icon={showPassword ? faEye : faEyeSlash}
-                  className="text-black"
-                />
-              </span>
-            </div>
-            <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
-              Password Requirements:
-            </p>
-            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
-              At least 8 characters long
-            </p>
-            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
-              Must contain at least one uppercase letter (A-Z)
-            </p>
-            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
-              Must contain at least one digit (0-9)
-            </p>
-            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
-              Must include at least one special character (e.g., !, @, #, $, %,
-              ^, &, *)
-            </p>
-
-            <label className="block mb-1 mt-6 text-sm font-medium">
-              Confirm New Password *
-            </label>
-            <div className="relative mb-6">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                placeholder="Confirm your new password"
-                className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                style={{ height: "40px" }}
-              />
-              <span
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-                onClick={toggleConfirmPasswordVisibility}
-              >
-                <FontAwesomeIcon
-                  icon={showConfirmPassword ? faEye : faEyeSlash}
-                  className="text-black"
-                />
-              </span>
-            </div>
-
-            <button
-              onClick={handleSubmit}
-              className="btn md:w-64 w-52 bg-green text-white mt-2 hover:bg-green hover:text-white"
+            <form
+              onSubmit={handleSubmit}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
             >
-              Confirm
-            </button>
+              <div className="mb-6">
+                <h1 className="text-2xl md:text-3xl font-bold mb-6 mt-10 text-left">
+                  Welcome back!
+                </h1>
+                <p className="text-left font-bold text-sm mb-3 md:text-base">
+                  Please provide a new password for your account.
+                </p>
+                <div className="h-4 mt-4 mb-1">
+                  {error && <p className="text-red text-xs">{error}</p>}
+                  {success && <p className="text-green text-xs">{success}</p>}
+                </div>
+              </div>
+
+              <label className="block mb-2 text-sm font-medium">
+                New Password *
+              </label>
+              <div className="relative mb-6">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="newPassword"
+                  placeholder="Enter your new password"
+                  className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                  value={formData.newPassword}
+                  onChange={handleChange}
+                  style={{ height: "40px" }}
+                />
+                <span
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+                  onClick={togglePasswordVisibility}
+                >
+                  <FontAwesomeIcon
+                    icon={showPassword ? faEye : faEyeSlash}
+                    className="text-black"
+                  />
+                </span>
+              </div>
+              <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
+                Password Requirements:
+              </p>
+              <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+                At least 8 characters long
+              </p>
+              <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+                Must contain at least one uppercase letter (A-Z)
+              </p>
+              <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+                Must contain at least one digit (0-9)
+              </p>
+              <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+                Must include at least one special character (e.g., !, @, #, $,
+                %, ^, &, *)
+              </p>
+
+              <label className="block mb-1 mt-6 text-sm font-medium">
+                Confirm New Password *
+              </label>
+              <div className="relative mb-6">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Confirm your new password"
+                  className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  style={{ height: "40px" }}
+                />
+                <span
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+                  onClick={toggleConfirmPasswordVisibility}
+                >
+                  <FontAwesomeIcon
+                    icon={showConfirmPassword ? faEye : faEyeSlash}
+                    className="text-black"
+                  />
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                className="btn md:w-64 w-52 bg-green text-white mt-2 hover:bg-green hover:text-white"
+              >
+                Confirm
+              </button>
+            </form>
 
             <button
               onClick={() => setModal2Visible(true)}

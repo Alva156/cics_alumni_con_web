@@ -258,6 +258,11 @@ function ForgotPassword() {
                   type="text"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleVerifyOTP();
+                    }
+                  }}
                   className="mb-3 p-2 border border-black bg-[#D9D9D9] w-full"
                   style={{ height: "40px" }}
                 />

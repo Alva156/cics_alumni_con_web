@@ -186,7 +186,10 @@ function Login() {
               </div>
 
               <div className="text-sm underline mb-8 block text-left">
-                <button onClick={() => navigate("/forgotpassword")}>
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgotpassword")}
+                >
                   Forget Password
                 </button>
               </div>

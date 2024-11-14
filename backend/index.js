@@ -10,6 +10,9 @@ const authenticateJWT = require("./middleware/auth"); // Middleware for JWT auth
 const app = express();
 const port = process.env.PORT || 6001;
 
+// Define absolute path for uploads directory
+const uploadsPath = path.join(__dirname, "uploads");
+
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
@@ -23,23 +26,40 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use("/uploads/profileimg", express.static("uploads/profileimg"));
-app.use("/uploads/attachments", express.static("uploads/attachments"));
+
+// Middleware to serve static files from persistent uploads folder
+app.use(
+  "/uploads/profileimg",
+  express.static(path.join(uploadsPath, "profileimg"))
+);
+app.use(
+  "/uploads/attachments",
+  express.static(path.join(uploadsPath, "attachments"))
+);
 app.use(
   "/uploads/contents/companies",
-  express.static("uploads/contents/companies")
+  express.static(path.join(uploadsPath, "contents/companies"))
 );
-app.use("/uploads/contents/news", express.static("uploads/contents/news"));
-app.use("/uploads/contents/events", express.static("uploads/contents/events"));
+app.use(
+  "/uploads/contents/news",
+  express.static(path.join(uploadsPath, "contents/news"))
+);
+app.use(
+  "/uploads/contents/events",
+  express.static(path.join(uploadsPath, "contents/events"))
+);
 app.use(
   "/uploads/contents/certifications",
-  express.static("uploads/contents/certifications")
+  express.static(path.join(uploadsPath, "contents/certifications"))
 );
 app.use(
   "/uploads/contents/documents",
-  express.static("uploads/contents/documents")
+  express.static(path.join(uploadsPath, "contents/documents"))
 );
-app.use("/uploads/contents/jobs", express.static("uploads/contents/jobs"));
+app.use(
+  "/uploads/contents/jobs",
+  express.static(path.join(uploadsPath, "contents/jobs"))
+);
 
 // Database Connection
 mongoose

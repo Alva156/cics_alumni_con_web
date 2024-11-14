@@ -35,7 +35,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Serve static files from uploads folder
+// Serve static files from uploads
 app.use(
   "/uploads/profileimg",
   express.static(path.join(uploadsPath, "profileimg"))

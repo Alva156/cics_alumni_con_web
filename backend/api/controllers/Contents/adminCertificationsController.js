@@ -59,10 +59,7 @@ exports.createCertifications = async (req, res) => {
       const image = req.file
         ? `/uploads/contents/certifications/${req.file.filename}`
         : null;
-      // Log the full file object to see where it's stored
-      if (req.file) {
-        console.log("Image file details:", req.file);
-      }
+
       const certifications = new Certifications({
         userId,
         name,

@@ -8,8 +8,8 @@ const Header = () => {
       {/* Left Side */}
       <div className="flex items-center">
         <img src={cicslogo} alt="UST Logo" className="h-11 mr-4 ml-4 md:h-16" />
-        <div className="col mr-10">
-          <p className="text-black font-light italic text-xs md:text-sm mt-2">
+        <div className="col mr-10 ">
+          <p className="text-black font-light italic text-xs md:text-sm mt-2 w-40">
             University of Santo Tomas
           </p>
           <p className="text-black font-bold italic text-xs md:text-sm mb-1">

@@ -10,8 +10,7 @@ const Header = () => {
         <img
           src={cicslogo}
           alt="UST Logo"
-          className="h-11 mr-4 ml-4 md:h-16"
-          width="60"
+          className="h-auto w-auto max-h-14 max-w-full md:max-h-16 mx-4" // Ensure responsiveness
         />
         <div className="col mr-2">
           <p className="text-black font-light italic text-xs md:text-sm mt-2">
@@ -35,8 +34,7 @@ const Header = () => {
           <img
             src={alumniconnectlogo2}
             alt="Alumni Connect Logo"
-            className="h-11 md:h-16"
-            width="70"
+            className="h-auto w-auto max-h-14 max-w-full md:max-h-16 mx-3"
           />
         </div>
       </div>

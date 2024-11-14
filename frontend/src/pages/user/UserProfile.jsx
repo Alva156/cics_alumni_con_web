@@ -1430,10 +1430,7 @@ function UserProfile() {
           </div>
 
           {/* TABS */}
-          <div
-            role="tablist"
-            className="tabs tabs-lifted sm:tabs-lg tabs-sm"
-          >
+          <div role="tablist" className="tabs tabs-lifted sm:tabs-lg tabs-sm">
             <input
               type="radio"
               name="my_tabs_2"
@@ -1534,9 +1531,7 @@ function UserProfile() {
                       onChange={(e) => setGender(e.target.value)}
                       value={gender}
                     >
-                      <option value="" disabled>
-                        Choose
-                      </option>
+                      <option value="">-</option>
                       <option>Male</option>
                       <option>Female</option>
                     </select>
@@ -1550,9 +1545,7 @@ function UserProfile() {
                       onChange={(e) => setRegion(e.target.value)}
                       value={region}
                     >
-                      <option value="" disabled>
-                        Choose
-                      </option>
+                      <option value="">-</option>
                       <option>NCR</option>
                       <option>CAR</option>
                       <option>Region I</option>
@@ -1595,9 +1588,7 @@ function UserProfile() {
                       name="college"
                       value={college}
                     >
-                      <option value="" disabled>
-                        Choose
-                      </option>
+                      <option value="">-</option>
                       {/* Dynamically render colleges */}
                       {Object.keys(collegePrograms).map((collegeName) => (
                         <option key={collegeName} value={collegeName}>
@@ -1616,9 +1607,7 @@ function UserProfile() {
                       value={collegeProgram}
                       disabled={!college}
                     >
-                      <option value="" disabled>
-                        Choose
-                      </option>
+                      <option value="">-</option>
                       {/* Dynamically render college programs based on selected college */}
                       {college &&
                         collegePrograms[college].map((program) => (
@@ -1715,9 +1704,7 @@ function UserProfile() {
                     onChange={(e) => setEmploymentStatus(e.target.value)}
                     value={employmentStatus}
                   >
-                    <option value="" disabled>
-                      Choose
-                    </option>
+                    <option value="">-</option>
                     <option>Employed</option>
                     <option>Self-employed</option>
                     <option>Unemployed</option>
@@ -1734,9 +1721,7 @@ function UserProfile() {
                     onChange={(e) => setWorkIndustry(e.target.value)}
                     value={workIndustry}
                   >
-                    <option value="" disabled>
-                      Choose
-                    </option>
+                    <option value="">-</option>
                     <option>Public</option>
                     <option>Private</option>
                   </select>
@@ -1752,9 +1737,7 @@ function UserProfile() {
                     onChange={(e) => setProfessionAlignment(e.target.value)}
                     value={professionAlignment}
                   >
-                    <option value="" disabled>
-                      Choose
-                    </option>
+                    <option value="">-</option>
                     <option>Yes</option>
                     <option>No</option>
                   </select>
@@ -1768,9 +1751,7 @@ function UserProfile() {
                     onChange={(e) => setMaritalStatus(e.target.value)}
                     value={maritalStatus}
                   >
-                    <option value="" disabled>
-                      Choose
-                    </option>
+                    <option value="">-</option>
                     <option>Single</option>
                     <option>Married</option>
                     <option>Divorced</option>
@@ -1788,9 +1769,7 @@ function UserProfile() {
                     onChange={(e) => setSalaryRange(e.target.value)}
                     value={salaryRange}
                   >
-                    <option value="" disabled>
-                      Choose
-                    </option>
+                    <option value="">-</option>
                     <option>14K below</option>
                     <option>15-30K</option>
                     <option>31-60K</option>
@@ -1809,22 +1788,21 @@ function UserProfile() {
                     onChange={(e) => setPlaceOfEmployment(e.target.value)}
                     value={placeOfEmployment}
                   >
-                    <option value="" disabled>
-                      Choose
-                    </option>
+                    <option value="">-</option>
                     <option>Local</option>
                     <option>International</option>
                   </select>
                 </div>
               </div>
               <label className="pt-4 text-sm text-white opacity-0">
-                  Mobile Number{" "}
-                  <span className="text-xs font-light italic">
-                    {" "}
-                    ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
-                  </span>
-                </label>
+                Mobile Number{" "}
+                <span className="text-xs font-light italic">
+                  {" "}
+                  ( include country code before your number, e.g.,{" "}
+                  <span className="font-medium">63</span> 9125559207 for
+                  PHAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                </span>
+              </label>
             </div>
             {/* CONTACT INFORMATION */}
             <input
@@ -1925,13 +1903,14 @@ function UserProfile() {
                 </div>
               </div>
               <label className="pt-4 text-sm text-white opacity-0">
-                  Mobile Number{" "}
-                  <span className="text-xs font-light italic">
-                    {" "}
-                    ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAA )
-                  </span>
-                </label>
+                Mobile Number{" "}
+                <span className="text-xs font-light italic">
+                  {" "}
+                  ( include country code before your number, e.g.,{" "}
+                  <span className="font-medium">63</span> 9125559207 for
+                  PHAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                </span>
+              </label>
             </div>
             <input
               type="radio"
@@ -1998,7 +1977,8 @@ function UserProfile() {
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAA )
+                    <span className="font-medium">63</span> 9125559207 for
+                    PHAAAAAAAAAAAAAAAAAAAAAAAAA )
                   </span>
                 </label>
               </div>
@@ -2217,13 +2197,13 @@ function UserProfile() {
                 ))}
               </div>
               <label className="pt-4 text-sm text-white opacity-0 break-words">
-                  Mobile Number{" "}
-                  <span className="text-xs font-light italic">
-                    {" "}
-                    ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PH )
-                  </span>
-                </label>
+                Mobile Number{" "}
+                <span className="text-xs font-light italic">
+                  {" "}
+                  ( include country code before your number, e.g.,{" "}
+                  <span className="font-medium">63</span> 9125559207 for PH )
+                </span>
+              </label>
             </div>
             <input
               type="radio"
@@ -2333,16 +2313,15 @@ function UserProfile() {
                         Delete
                       </button>
                     </div>
-                    
                   </div>
-                  
                 ))}
                 <label className="pt-4 text-sm text-white opacity-0">
                   Mobile Number{" "}
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PH---------------------------------- )
+                    <span className="font-medium">63</span> 9125559207 for
+                    PH---------------------------------- )
                   </span>
                 </label>
               </div>
@@ -2393,7 +2372,8 @@ function UserProfile() {
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PH--------------------------------------- )
+                    <span className="font-medium">63</span> 9125559207 for
+                    PH--------------------------------------- )
                   </span>
                 </label>
               </div>

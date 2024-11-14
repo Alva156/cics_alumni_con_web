@@ -705,7 +705,7 @@ function Alumni() {
 
             <div
               role="tablist"
-              className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg"
+              className="tabs tabs-lifted tabs-sm sm:tabs-lg"
             >
               <input
                 type="radio"
@@ -871,7 +871,7 @@ function Alumni() {
                     href={selectedAlumni.contactInformation.linkedIn}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline break-words max-w-full"
                   >
                     {selectedAlumni.contactInformation.linkedIn}
                   </a>
@@ -884,7 +884,7 @@ function Alumni() {
                     href={selectedAlumni.contactInformation.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline break-words max-w-full"
                   >
                     {selectedAlumni.contactInformation.instagram}
                   </a>
@@ -895,7 +895,7 @@ function Alumni() {
                 {selectedAlumni.contactInformation?.email ? (
                   <a
                     href={`mailto:${selectedAlumni.contactInformation.email}`}
-                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline break-words max-w-full"
                   >
                     {selectedAlumni.contactInformation.email}
                   </a>
@@ -907,7 +907,7 @@ function Alumni() {
                   {selectedAlumni.contactInformation?.mobileNumber ? (
                     <a
                       href={`tel:${selectedAlumni.contactInformation.mobileNumber}`}
-                      className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                      className="text-s mb-2 font-bold text-blue-600 hover:underline break-words max-w-full"
                     >
                       {selectedAlumni.contactInformation.mobileNumber}
                     </a>
@@ -920,7 +920,7 @@ function Alumni() {
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
                   </span>
                 </label>
               </div>
@@ -985,7 +985,7 @@ function Alumni() {
                 {selectedAlumni.tertiaryEducation.map((edu, index) => (
                   <div key={index}>
                     <p className="text-s font-bold break-words">{edu.schoolName}</p>
-                    <p className="text-xs mb-1 italic">{edu.program}</p>
+                    <p className="text-xs mb-1 italic break-words">{edu.program}</p>
                     <p className="text-xs mb-2">
                       {edu.yearStarted} - {edu.yearEnded}
                     </p>
@@ -1010,7 +1010,7 @@ function Alumni() {
               />
               <div
                 role="tabpanel"
-                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6 min-w-60"
               >
                 <h1 className="text-xl mb-4">Career Background</h1>
                 {selectedAlumni.careerBackground.map((career, index) => (

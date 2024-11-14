@@ -1432,7 +1432,7 @@ function UserProfile() {
           {/* TABS */}
           <div
             role="tablist"
-            className="tabs tabs-lifted tabs-xs sm:tabs-sm md:tabs-md lg:tabs-lg"
+            className="tabs tabs-lifted sm:tabs-lg tabs-sm"
           >
             <input
               type="radio"
@@ -2093,6 +2093,14 @@ function UserProfile() {
                     </div>
                   </div>
                 ))}
+                <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PH )
+                  </span>
+                </label>
 
                 {/* TERTIARY EDUCATION */}
                 <div className="flex items-center mt-8 w-full">
@@ -2200,6 +2208,14 @@ function UserProfile() {
                   </div>
                 ))}
               </div>
+              <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PH )
+                  </span>
+                </label>
             </div>
             <input
               type="radio"
@@ -2309,8 +2325,18 @@ function UserProfile() {
                         Delete
                       </button>
                     </div>
+                    
                   </div>
+                  
                 ))}
+                <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PH )
+                  </span>
+                </label>
               </div>
             </div>
             <input

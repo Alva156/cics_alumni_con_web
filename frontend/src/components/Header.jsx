@@ -7,7 +7,12 @@ const Header = () => {
     <header className="bg-hgray w-full mx-auto md:px-12 py-3 flex items-center justify-between px-2">
       {/* Left Side */}
       <div className="flex items-center">
-        <img src={cicslogo} alt="UST Logo" className="h-11 mr-4 ml-4 md:h-16" />
+        <img
+          src={cicslogo}
+          alt="UST Logo"
+          className="h-11 mr-4 ml-4 md:h-16"
+          width="60"
+        />
         <div className="col mr-2">
           <p className="text-black font-light italic text-xs md:text-sm mt-2">
             University of Santo Tomas
@@ -30,7 +35,8 @@ const Header = () => {
           <img
             src={alumniconnectlogo2}
             alt="Alumni Connect Logo"
-            className="w-20 h-11 md:h-16"
+            className="h-11 md:h-16"
+            width="70"
           />
         </div>
       </div>

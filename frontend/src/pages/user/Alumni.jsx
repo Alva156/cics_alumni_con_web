@@ -718,7 +718,7 @@ function Alumni() {
               />
               <div
                 role="tabpanel"
-                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6 min-w-60"
               >
                 <h1 className="text-xl mb-4">Primary Information</h1>
                 {selectedAlumni.profileImage && (
@@ -731,35 +731,35 @@ function Alumni() {
                   </div>
                 )}
                 <p className="text-xs mb-1/2">Name</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {`${selectedAlumni.firstName} ${selectedAlumni.lastName}`}
                 </p>
                 <p className="text-xs mb-1/2">Birthday</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {formatDate(selectedAlumni.birthday)}
                 </p>
                 <p className="text-xs mb-1/2">Gender</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.gender || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Region</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.region || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Profession</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.profession || "-"}
                 </p>
                 <p className="text-xs mb-1/2">College</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.college || "-"}
                 </p>
                 <p className="text-xs mb-1/2">College Program</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.collegeProgram || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Specialization</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.specialization || "-"}
                 </p>
                 <p className="text-xs mb-1/2">
@@ -778,6 +778,15 @@ function Alumni() {
                 <p className="text-s mb-2 font-bold">
                   {selectedAlumni.timeToJob || "-"}
                 </p>
+
+                <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASAAAAAAAAAAAA )
+                  </span>
+                </label>
               </div>
               <input
                 type="radio"
@@ -789,37 +798,46 @@ function Alumni() {
               />
               <div
                 role="tabpanel"
-                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6 min-w-60"
               >
                 <h1 className="text-xl mb-4">Secondary Information</h1>
                 <p className="text-xs mb-1/2">Employment Status</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.employmentStatus || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Work Industry</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.workIndustry || "-"}
                 </p>
                 <p className="text-xs mb-1/2">
                   Is current profession in line with college degree
                 </p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.professionAlignment || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Marital Status</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.maritalStatus || "-"}
                 </p>
                 <p className="text-xs mb-1/2">Salary range (PHP)</p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.salaryRange || "-"}
                 </p>
                 <p className="text-xs mb-1/2">
                   Place of employment (Local or International)
                 </p>
-                <p className="text-s mb-2 font-bold">
+                <p className="text-s mb-2 font-bold break-words">
                   {selectedAlumni.placeOfEmployment || "-"}
                 </p>
+
+                <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                  </span>
+                </label>
               </div>
               <input
                 type="radio"
@@ -831,7 +849,7 @@ function Alumni() {
               />
               <div
                 role="tabpanel"
-                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6 min-w-60"
               >
                 <h1 className="text-xl mb-4">Contacts</h1>
                 <p className="text-xs mb-1/2">Facebook</p>
@@ -840,7 +858,7 @@ function Alumni() {
                     href={selectedAlumni.contactInformation.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-s mb-2 font-bold text-blue-600 hover:underline"
+                    className="text-s mb-2 font-bold text-blue-600 hover:underline break-words max-w-full"
                   >
                     {selectedAlumni.contactInformation.facebook}
                   </a>
@@ -897,6 +915,14 @@ function Alumni() {
                     <p className="text-s mb-2 font-bold">-</p>
                   )}
                 </p>
+                <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                  </span>
+                </label>
               </div>
               <input
                 type="radio"
@@ -908,19 +934,28 @@ function Alumni() {
               />
               <div
                 role="tabpanel"
-                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6 min-w-60"
               >
                 <h1 className="text-xl mb-4">Attachments</h1>
-                <div className="attachments-container">
+                <div className="attachments-container break-words">
                   {selectedAlumni.attachments &&
                   selectedAlumni.attachments.length > 0 ? (
                     selectedAlumni.attachments.map((attachment, index) => (
-                      <div key={index}>{renderAttachment(attachment)}</div>
+                      <div className="break-words" key={index}>{renderAttachment(attachment)}</div>
                     ))
                   ) : (
                     <p>No attachments available.</p>
                   )}
                 </div>
+
+                <label className="pt-4 text-sm break-words text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                  </span>
+                </label>
               </div>
 
               <input
@@ -933,14 +968,14 @@ function Alumni() {
               />
               <div
                 role="tabpanel"
-                className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+                className="tab-content bg-base-100 border-base-300 rounded-box p-6 min-w-60"
               >
                 <h1 className="text-xl mb-4">Educational Background</h1>
                 <p className="text-xs mb-1">Secondary Education</p>
 
                 {selectedAlumni.secondaryEducation.map((edu, index) => (
                   <div key={index}>
-                    <p className="text-s font-bold">{edu.schoolName}</p>
+                    <p className="text-s font-bold break-words">{edu.schoolName}</p>
                     <p className="text-xs mb-2">
                       {edu.yearStarted} - {edu.yearEnded}
                     </p>
@@ -949,13 +984,21 @@ function Alumni() {
                 <p className="text-xs mb-1 mt-3">Tertiary Education</p>
                 {selectedAlumni.tertiaryEducation.map((edu, index) => (
                   <div key={index}>
-                    <p className="text-s font-bold">{edu.schoolName}</p>
+                    <p className="text-s font-bold break-words">{edu.schoolName}</p>
                     <p className="text-xs mb-1 italic">{edu.program}</p>
                     <p className="text-xs mb-2">
                       {edu.yearStarted} - {edu.yearEnded}
                     </p>
                   </div>
                 ))}
+                <label className="pt-4 text-sm text-white ">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PHasdasdasdasdasdasdsasdasdasdasdasds )
+                  </span>
+                </label>
               </div>
               <input
                 type="radio"
@@ -972,14 +1015,23 @@ function Alumni() {
                 <h1 className="text-xl mb-4">Career Background</h1>
                 {selectedAlumni.careerBackground.map((career, index) => (
                   <div key={index}>
-                    <p className="text-s font-bold">{career.companyName}</p>
-                    <p className="text-xs mb-1 italic">{career.position}</p>
+                    <p className="text-s font-bold break-words">{career.companyName}</p>
+                    <p className="text-xs mb-1 italic break-words">{career.position}</p>
                     <p className="text-xs mb-2">
                       {career.yearStarted} - {career.yearEnded}
                     </p>
                   </div>
                 ))}
+                <label className="pt-4 text-sm text-white opacity-0">
+                  Mobile Number{" "}
+                  <span className="text-xs font-light italic">
+                    {" "}
+                    ( include country code before your number, e.g.,{" "}
+                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                  </span>
+                </label>
               </div>
+              
             </div>
           </div>
         </div>

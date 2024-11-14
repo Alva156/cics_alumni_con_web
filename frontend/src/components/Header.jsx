@@ -30,7 +30,7 @@ const Header = () => {
           <img
             src={alumniconnectlogo2}
             alt="Alumni Connect Logo"
-            className="h-11 md:h-16"
+            className="w-11 md:h-16"
           />
         </div>
       </div>

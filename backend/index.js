@@ -4,18 +4,29 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 const path = require("path");
-
-const authenticateJWT = require("./middleware/auth"); // Middleware for JWT auth
+const fs = require("fs");
 
 const app = express();
 const port = process.env.PORT || 6001;
+
+// Ensure necessary directories exist
+const uploadsPath = path.join(__dirname, "uploads");
+const ensureDirectoryExists = (dirPath) => {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+};
+
+ensureDirectoryExists(path.join(uploadsPath, "profileimg"));
+ensureDirectoryExists(path.join(uploadsPath, "attachments"));
+ensureDirectoryExists(path.join(uploadsPath, "contents"));
 
 // Middleware
 app.use(cookieParser());
 app.use(express.json());
 
 // Serve static files from the frontend dist folder
-app.use(express.static(path.join(__dirname, "../frontend/dist"))); // Adjust path based on where your backend is relative to the frontend build
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 const corsOptions = {
   origin: process.env.FRONTEND, // Frontend origin
@@ -23,23 +34,40 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use("/uploads/profileimg", express.static("uploads/profileimg"));
-app.use("/uploads/attachments", express.static("uploads/attachments"));
+
+// Serve static files from uploads folder
+app.use(
+  "/uploads/profileimg",
+  express.static(path.join(uploadsPath, "profileimg"))
+);
+app.use(
+  "/uploads/attachments",
+  express.static(path.join(uploadsPath, "attachments"))
+);
 app.use(
   "/uploads/contents/companies",
-  express.static("uploads/contents/companies")
+  express.static(path.join(uploadsPath, "contents", "companies"))
 );
-app.use("/uploads/contents/news", express.static("uploads/contents/news"));
-app.use("/uploads/contents/events", express.static("uploads/contents/events"));
+app.use(
+  "/uploads/contents/news",
+  express.static(path.join(uploadsPath, "contents", "news"))
+);
+app.use(
+  "/uploads/contents/events",
+  express.static(path.join(uploadsPath, "contents", "events"))
+);
 app.use(
   "/uploads/contents/certifications",
-  express.static("uploads/contents/certifications")
+  express.static(path.join(uploadsPath, "contents", "certifications"))
 );
 app.use(
   "/uploads/contents/documents",
-  express.static("uploads/contents/documents")
+  express.static(path.join(uploadsPath, "contents", "documents"))
 );
-app.use("/uploads/contents/jobs", express.static("uploads/contents/jobs"));
+app.use(
+  "/uploads/contents/jobs",
+  express.static(path.join(uploadsPath, "contents", "jobs"))
+);
 
 // Database Connection
 mongoose
@@ -67,8 +95,6 @@ app.use("/profile", userProfileRoutes);
 app.use("/threads", threadsRoutes);
 app.use("/replies", repliesRoutes);
 app.use("/users", userRoutes);
-app.use("/companies", adminCompaniesRoutes);
-app.use("/profile", userProfileRoutes);
 app.use("/news", adminNewsRoutes);
 app.use("/events", adminEventsRoutes);
 app.use("/certifications", adminCertificationsRoutes);
@@ -76,12 +102,14 @@ app.use("/documents", adminDocumentsRoutes);
 app.use("/jobs", adminJobsRoutes);
 app.use("/survey", surveyRoutes);
 
-app.use(express.json({ limit: "10mb" })); // Increase to 10MB for JSON data
+// JSON and URL parsing limits
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html")); // Ensure this path points to the correct location of index.html
+  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
 });
+
 // Basic Route
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -91,5 +119,6 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
 // Log the FRONTEND URL with a clear message
 console.log(`Frontend URL: ${process.env.FRONTEND}`);

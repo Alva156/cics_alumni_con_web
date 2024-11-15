@@ -435,7 +435,7 @@ function AdminCompanies() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Company Image</label>
+              <label className="block text-sm mb-1">Company Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="company-image" // Add this line
                 type="file"
@@ -556,7 +556,7 @@ function AdminCompanies() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Company Image</label>
+              <label className="block text-sm mb-1">Company Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="company-image" // Add this line
                 type="file"

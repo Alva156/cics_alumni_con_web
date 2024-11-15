@@ -1557,7 +1557,7 @@ function UserProfile() {
                       />
                     )}
                     <div className="flex justify-between items-center pt-4">
-                      <label className="text-sm">Profile Picture</label>
+                      <label className="text-sm">Profile Picture <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span> </label>
                       <button
                         type="button"
                         onClick={() => setIsDeleteModalPicOpen(true)}
@@ -2027,6 +2027,7 @@ function UserProfile() {
                     </button>
                   </div>
                 </div>
+                <div className="text-sm">Upload documents that highlight your qualifications, such as your resume, CV, or other career-related files.  <br /><span className="text-xs font-light italic">(Allowed formats: PDF, JPG, JPEG, PNG, Max size: 5MB)</span></div>
 
                 {/* Horizontal rule after Attachments header */}
                 {attachments.map((attachment, index) => (

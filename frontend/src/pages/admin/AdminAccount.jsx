@@ -435,7 +435,7 @@ function AdminAccount() {
             />
           )}
           <div className="flex justify-between items-center pt-4">
-            <label className="text-sm">Profile Picture</label>
+            <label className="text-sm">Profile Picture <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
             <button
               type="button"
               onClick={() => setIsDeleteModalOpen(true)}

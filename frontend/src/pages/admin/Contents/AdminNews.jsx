@@ -433,7 +433,7 @@ function AdminNews() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">News Image</label>
+              <label className="block text-sm mb-1">News Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="news-image"
                 type="file"
@@ -557,7 +557,7 @@ function AdminNews() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">News Image</label>
+              <label className="block text-sm mb-1">News Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="news-image"
                 type="file"

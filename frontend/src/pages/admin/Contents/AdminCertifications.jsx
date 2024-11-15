@@ -454,7 +454,7 @@ function AdminCertifications() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Certifications Image</label>
+              <label className="block text-sm mb-1">Certification Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="certifications-image"
                 type="file"
@@ -577,7 +577,7 @@ function AdminCertifications() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Certification Image</label>
+              <label className="block text-sm mb-1">Certification Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="certifications-image"
                 type="file"

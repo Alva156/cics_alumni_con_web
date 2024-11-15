@@ -435,7 +435,7 @@ function AdminJobs() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Jobs Image</label>
+              <label className="block text-sm mb-1">Job/Internship Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="jobs-image"
                 type="file"
@@ -558,7 +558,7 @@ function AdminJobs() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Job/Internship Image</label>
+              <label className="block text-sm mb-1">Job/Internship Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="jobs-image"
                 type="file"

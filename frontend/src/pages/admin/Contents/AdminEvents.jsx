@@ -447,7 +447,7 @@ function AdminEvents() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Events Image</label>
+              <label className="block text-sm mb-1">Event Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="events-image"
                 type="file"
@@ -570,7 +570,7 @@ function AdminEvents() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Event Image</label>
+              <label className="block text-sm mb-1">Event Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="events-image"
                 type="file"

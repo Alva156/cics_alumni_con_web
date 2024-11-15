@@ -514,7 +514,7 @@ function AdminDocuments() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Document File</label>
+              <label className="block text-sm mb-1">Document File <span className="text-xs font-light italic">(Allowed formats: PDF, JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="documents-image"
                 type="file"
@@ -637,7 +637,7 @@ function AdminDocuments() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Document File</label>
+              <label className="block text-sm mb-1">Document File <span className="text-xs font-light italic">(Allowed formats: PDF, JPG, JPEG, PNG, Max size: 5MB)</span></label>
               <input
                 id="documents-image"
                 type="file"

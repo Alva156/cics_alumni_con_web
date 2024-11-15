@@ -103,11 +103,6 @@ function Register() {
       setTimeout(() => setError(""), 5000);
       return;
     }
-    if (mobileNumber.length !== 11) {
-      setError("Mobile number must be exactly 11 digits");
-      setTimeout(() => setError(""), 5000);
-      return;
-    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");

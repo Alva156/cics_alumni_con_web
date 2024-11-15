@@ -98,8 +98,7 @@ function AdminJobs() {
     if (
       !selectedJobs.name ||
       !selectedJobs.address ||
-      !selectedJobs.description ||
-      !selectedJobs.contact
+      !selectedJobs.description
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -111,7 +110,10 @@ function AdminJobs() {
     jobsData.append("name", selectedJobs.name);
     jobsData.append("address", selectedJobs.address);
     jobsData.append("description", selectedJobs.description);
-    jobsData.append("contact", selectedJobs.contact);
+    jobsData.append(
+      "contact",
+      selectedJobs.contact ? selectedJobs.contact : ""
+    );
 
     const image = document.getElementById("jobs-image").files[0];
     if (image) {
@@ -173,8 +175,7 @@ function AdminJobs() {
     if (
       !jobsData.get("name") ||
       !jobsData.get("address") ||
-      !jobsData.get("description") ||
-      !jobsData.get("contact")
+      !jobsData.get("description")
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -354,13 +355,29 @@ function AdminJobs() {
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
             <div className="text-sm mb-4">{selectedJobs.description}</div>
-            <div className="text-sm font-medium mb-2">Contact Details</div>
-            <a
-              href={`mailto:${selectedJobs.contact}`}
-              className="block text-sm text-blue-600 underline"
-            >
-              {selectedJobs.contact}
-            </a>
+
+            {/* Conditionally render Website or Contact Details */}
+            {selectedJobs.contact && (
+              <div className="text-sm font-medium mb-2">
+                Website or Contact Details
+                <a
+                  href={
+                    selectedJobs.contact.includes("@") // Check if it's an email
+                      ? `mailto:${selectedJobs.contact}`
+                      : selectedJobs.contact.startsWith("http") // Check if it's a website URL
+                      ? selectedJobs.contact
+                      : selectedJobs.contact.startsWith("+") // Check if it's a phone number (with international code)
+                      ? `tel:${selectedJobs.contact}`
+                      : "#"
+                  }
+                  className="mt-2 block text-sm text-blue-600 underline font-normal"
+                  target="_blank" // This ensures the link opens in a new tab
+                  rel="noopener noreferrer" // Recommended for security reasons when using target="_blank"
+                >
+                  {selectedJobs.contact}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -440,7 +457,9 @@ function AdminJobs() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact</label>
+              <label className="block text-sm mb-1">
+                Website or Contact Details
+              </label>
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -556,7 +575,9 @@ function AdminJobs() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact Details</label>
+              <label className="block text-sm mb-1">
+                Website or Contact Details
+              </label>
               <input
                 id="jobs-contact"
                 type="text"

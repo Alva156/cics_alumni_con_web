@@ -245,13 +245,29 @@ function Documents() {
               </div>
             )}
             <div className="text-sm mb-4">{selectedDocument.description}</div>
-            <div className="text-sm font-medium mb-2">Contact Details</div>
-            <a
-              href={`mailto:${selectedDocument.contact}`}
-              className="block text-sm text-blue-600 underline"
-            >
-              {selectedDocument.contact}
-            </a>
+           
+            {/* Conditionally render Website or Contact Details */}
+            {selectedDocument.contact && (
+              <div className="text-sm font-medium mb-2">
+                Website or Contact Details
+                <a
+                  href={
+                    selectedDocument.contact.includes("@") // Check if it's an email
+                      ? `mailto:${selectedDocument.contact}`
+                      : selectedDocument.contact.startsWith("http") // Check if it's a website URL
+                      ? selectedDocument.contact
+                      : selectedDocument.contact.startsWith("+") // Check if it's a phone number (with international code)
+                      ? `tel:${selectedDocument.contact}`
+                      : "#"
+                  }
+                  className="mt-2 block text-sm text-blue-600 underline font-normal"
+                  target="_blank" // This ensures the link opens in a new tab
+                  rel="noopener noreferrer" // Recommended for security reasons when using target="_blank"
+                >
+                  {selectedDocument.contact}
+                </a>
+              </div>
+            )}
             {/* Download button */}
             <button
               onClick={() =>

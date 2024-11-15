@@ -98,8 +98,7 @@ function AdminCertifications() {
     if (
       !selectedCertifications.name ||
       !selectedCertifications.address ||
-      !selectedCertifications.description ||
-      !selectedCertifications.contact
+      !selectedCertifications.description
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -114,7 +113,10 @@ function AdminCertifications() {
       "description",
       selectedCertifications.description
     );
-    certificationsData.append("contact", selectedCertifications.contact);
+    certificationsData.append(
+      "contact",
+      selectedCertifications.contact ? selectedCertifications.contact : ""
+    );
 
     const image = document.getElementById("certifications-image").files[0];
     if (image) {
@@ -187,8 +189,7 @@ function AdminCertifications() {
     if (
       !certificationsData.get("name") ||
       !certificationsData.get("address") ||
-      !certificationsData.get("description") ||
-      !certificationsData.get("contact")
+      !certificationsData.get("description")
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -374,13 +375,28 @@ function AdminCertifications() {
             <div className="text-sm mb-4">
               {selectedCertifications.description}
             </div>
-            <div className="text-sm font-medium mb-2">Contact Details</div>
-            <a
-              href={`mailto:${selectedCertifications.contact}`}
-              className="block text-sm text-blue-600 underline"
-            >
-              {selectedCertifications.contact}
-            </a>
+            {/* Conditionally render Website or Contact Details */}
+            {selectedCertifications.contact && (
+              <div className="text-sm font-medium mb-2">
+                Website or Contact Details
+                <a
+                  href={
+                    selectedCertifications.contact.includes("@") // Check if it's an email
+                      ? `mailto:${selectedCertifications.contact}`
+                      : selectedCertifications.contact.startsWith("http") // Check if it's a website URL
+                      ? selectedCertifications.contact
+                      : selectedCertifications.contact.startsWith("+") // Check if it's a phone number (with international code)
+                      ? `tel:${selectedCertifications.contact}`
+                      : "#"
+                  }
+                  className="mt-2 block text-sm text-blue-600 underline font-normal"
+                  target="_blank" // This ensures the link opens in a new tab
+                  rel="noopener noreferrer" // Recommended for security reasons when using target="_blank"
+                >
+                  {selectedCertifications.contact}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -460,7 +476,9 @@ function AdminCertifications() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact</label>
+              <label className="block text-sm mb-1">
+                Website or Contact Details
+              </label>
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -576,7 +594,7 @@ function AdminCertifications() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact Details</label>
+              <label className="block text-sm mb-1">Website or Contact Details</label>
               <input
                 id="certifications-contact"
                 type="text"

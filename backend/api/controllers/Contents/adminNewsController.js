@@ -160,7 +160,7 @@ exports.updateNews = async (req, res) => {
       news.address = address || news.address;
       news.image = newImage;
       news.description = description || news.description;
-      news.contact = contact || news.contact;
+      news.contact = contact !== undefined ? contact : news.contact;
 
       await news.save();
       // Fetch all user emails

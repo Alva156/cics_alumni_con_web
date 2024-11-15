@@ -163,7 +163,7 @@ exports.updateEvents = async (req, res) => {
       events.address = address || events.address;
       events.image = newImage || events.image;
       events.description = description || events.description;
-      events.contact = contact || events.contact;
+      events.contact = contact !== undefined ? contact : events.contact;
 
       await events.save();
       // Fetch all user emails

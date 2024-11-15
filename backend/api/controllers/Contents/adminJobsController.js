@@ -163,7 +163,7 @@ exports.updateJobs = async (req, res) => {
       jobs.address = address || jobs.address;
       jobs.image = newImage || jobs.image;
       jobs.description = description || jobs.description;
-      jobs.contact = contact || jobs.contact;
+      jobs.contact = contact !== undefined ? contact : jobs.contact;
 
       await jobs.save();
       // Fetch all user emails

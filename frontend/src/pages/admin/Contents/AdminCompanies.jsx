@@ -98,8 +98,7 @@ function AdminCompanies() {
     if (
       !selectedCompany.name ||
       !selectedCompany.address ||
-      !selectedCompany.description ||
-      !selectedCompany.contact
+      !selectedCompany.description
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -111,7 +110,10 @@ function AdminCompanies() {
     companyData.append("name", selectedCompany.name);
     companyData.append("address", selectedCompany.address);
     companyData.append("description", selectedCompany.description);
-    companyData.append("contact", selectedCompany.contact);
+    companyData.append(
+      "contact",
+      selectedCompany.contact ? selectedCompany.contact : ""
+    );
 
     const image = document.getElementById("company-image").files[0];
     if (image) {
@@ -177,8 +179,7 @@ function AdminCompanies() {
     if (
       !companyData.get("name") ||
       !companyData.get("address") ||
-      !companyData.get("description") ||
-      !companyData.get("contact")
+      !companyData.get("description")
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -356,13 +357,28 @@ function AdminCompanies() {
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
             <div className="text-sm mb-4">{selectedCompany.description}</div>
-            <div className="text-sm font-medium mb-2">Contact Details</div>
-            <a
-              href={`mailto:${selectedCompany.contact}`}
-              className="block text-sm text-blue-600 underline"
-            >
-              {selectedCompany.contact}
-            </a>
+            {/* Conditionally render Website or Contact Details */}
+            {selectedCompany.contact && (
+              <div className="text-sm font-medium mb-2">
+                Website or Contact Details
+                <a
+                  href={
+                    selectedCompany.contact.includes("@") // Check if it's an email
+                      ? `mailto:${selectedCompany.contact}`
+                      : selectedCompany.contact.startsWith("http") // Check if it's a website URL
+                      ? selectedCompany.contact
+                      : selectedCompany.contact.startsWith("+") // Check if it's a phone number (with international code)
+                      ? `tel:${selectedCompany.contact}`
+                      : "#"
+                  }
+                  className="mt-2 block text-sm text-blue-600 underline font-normal"
+                  target="_blank" // This ensures the link opens in a new tab
+                  rel="noopener noreferrer" // Recommended for security reasons when using target="_blank"
+                >
+                  {selectedCompany.contact}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -441,7 +457,9 @@ function AdminCompanies() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact</label>
+              <label className="block text-sm mb-1">
+                Website or Contact Details
+              </label>
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -555,7 +573,7 @@ function AdminCompanies() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact Details</label>
+              <label className="block text-sm mb-1">Website or Contact Details</label>
               <input
                 id="company-contact"
                 type="text"

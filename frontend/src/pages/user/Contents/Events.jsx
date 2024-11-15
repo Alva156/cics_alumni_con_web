@@ -42,53 +42,52 @@ function Events() {
   );
 
   // Sort events based on selected criteria
-const sortedEvents = filteredEvents.sort((a, b) => {
-  if (sortCriteria === "Name (A-Z)") {
-    return a.name.localeCompare(b.name);
-  } else if (sortCriteria === "Name (Z-A)") {
-    return b.name.localeCompare(a.name);
-  } else if (sortCriteria === "Most Recent") {
-    return new Date(b.createdAt) - new Date(a.createdAt);
-  } else if (sortCriteria === "Oldest") {
-    return new Date(a.createdAt) - new Date(b.createdAt);
-  }
-  return 0;
-});
+  const sortedEvents = filteredEvents.sort((a, b) => {
+    if (sortCriteria === "Name (A-Z)") {
+      return a.name.localeCompare(b.name);
+    } else if (sortCriteria === "Name (Z-A)") {
+      return b.name.localeCompare(a.name);
+    } else if (sortCriteria === "Most Recent") {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    } else if (sortCriteria === "Oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    return 0;
+  });
 
-return (
-  <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-    <h1 className="text-2xl font-medium text-gray-700 mb-6">Events</h1>
+  return (
+    <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
+      <h1 className="text-2xl font-medium text-gray-700 mb-6">Events</h1>
 
-    <div className="mb-4 relative">
-      <input
-        type="text"
-        placeholder="Search Events"
-        className="w-full border border-black rounded-lg px-4 py-2"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <span
-        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-        onClick={() => setSearchTerm("")}
-      >
-        X
-      </span>
-    </div>
+      <div className="mb-4 relative">
+        <input
+          type="text"
+          placeholder="Search Events"
+          className="w-full border border-black rounded-lg px-4 py-2"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <span
+          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+          onClick={() => setSearchTerm("")}
+        >
+          X
+        </span>
+      </div>
 
-    <div className="mb-6">
-      <span className="text-sm">Sort by:</span>
-      <select
-        className="ml-2 border border-black rounded px-3 py-1 text-sm"
-        value={sortCriteria}
-        onChange={(e) => setSortCriteria(e.target.value)}
-      >
-        <option>Name (A-Z)</option>
-        <option>Name (Z-A)</option>
-        <option>Most Recent</option>
-        <option>Oldest</option>
-      </select>
-    </div>
-
+      <div className="mb-6">
+        <span className="text-sm">Sort by:</span>
+        <select
+          className="ml-2 border border-black rounded px-3 py-1 text-sm"
+          value={sortCriteria}
+          onChange={(e) => setSortCriteria(e.target.value)}
+        >
+          <option>Name (A-Z)</option>
+          <option>Name (Z-A)</option>
+          <option>Most Recent</option>
+          <option>Oldest</option>
+        </select>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {sortedEvents.map((event) => (
@@ -145,13 +144,29 @@ return (
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
             <div className="text-sm mb-4">{selectedEvents.description}</div>
-            <div className="text-sm font-medium mb-2">Contact Details</div>
-            <a
-              href={`mailto:${selectedEvents.contact}`}
-              className="block text-sm text-blue-600 underline"
-            >
-              {selectedEvents.contact}
-            </a>
+
+            {/* Conditionally render Website or Contact Details */}
+            {selectedEvents.contact && (
+              <div className="text-sm font-medium mb-2">
+                Website or Contact Details
+                <a
+                  href={
+                    selectedEvents.contact.includes("@") // Check if it's an email
+                      ? `mailto:${selectedEvents.contact}`
+                      : selectedEvents.contact.startsWith("http") // Check if it's a website URL
+                      ? selectedEvents.contact
+                      : selectedEvents.contact.startsWith("+") // Check if it's a phone number (with international code)
+                      ? `tel:${selectedEvents.contact}`
+                      : "#"
+                  }
+                  className="mt-2 block text-sm text-blue-600 underline font-normal"
+                  target="_blank" // This ensures the link opens in a new tab
+                  rel="noopener noreferrer" // Recommended for security reasons when using target="_blank"
+                >
+                  {selectedEvents.contact}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       )}

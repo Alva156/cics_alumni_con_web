@@ -168,7 +168,7 @@ exports.updateDocuments = async (req, res) => {
       documents.address = address || documents.address;
       documents.image = newImage || documents.image;
       documents.description = description || documents.description;
-      documents.contact = contact || documents.contact;
+      documents.contact = contact !== undefined ? contact : documents.contact;
 
       await documents.save();
       // Fetch all user emails

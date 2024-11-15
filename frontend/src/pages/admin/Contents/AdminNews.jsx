@@ -98,8 +98,7 @@ function AdminNews() {
     if (
       !selectedNews.name ||
       !selectedNews.address ||
-      !selectedNews.description ||
-      !selectedNews.contact
+      !selectedNews.description
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -111,7 +110,10 @@ function AdminNews() {
     newsData.append("name", selectedNews.name);
     newsData.append("address", selectedNews.address);
     newsData.append("description", selectedNews.description);
-    newsData.append("contact", selectedNews.contact);
+    newsData.append(
+      "contact",
+      selectedNews.contact ? selectedNews.contact : ""
+    );
 
     const image = document.getElementById("news-image").files[0];
     if (image) {
@@ -173,8 +175,7 @@ function AdminNews() {
     if (
       !newsData.get("name") ||
       !newsData.get("address") ||
-      !newsData.get("description") ||
-      !newsData.get("contact")
+      !newsData.get("description")
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -352,13 +353,29 @@ function AdminNews() {
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
             <div className="text-sm mb-4">{selectedNews.description}</div>
-            <div className="text-sm font-medium mb-2">Contact Details</div>
-            <a
-              href={`mailto:${selectedNews.contact}`}
-              className="block text-sm text-blue-600 underline"
-            >
-              {selectedNews.contact}
-            </a>
+
+            {/* Conditionally render Website or Contact Details */}
+            {selectedNews.contact && (
+              <div className="text-sm font-medium mb-2">
+                Website or Contact Details
+                <a
+                  href={
+                    selectedNews.contact.includes("@") // Check if it's an email
+                      ? `mailto:${selectedNews.contact}`
+                      : selectedNews.contact.startsWith("http") // Check if it's a website URL
+                      ? selectedNews.contact
+                      : selectedNews.contact.startsWith("+") // Check if it's a phone number (with international code)
+                      ? `tel:${selectedNews.contact}`
+                      : "#"
+                  }
+                  className="mt-2 block text-sm text-blue-600 underline font-normal"
+                  target="_blank" // This ensures the link opens in a new tab
+                  rel="noopener noreferrer" // Recommended for security reasons when using target="_blank"
+                >
+                  {selectedNews.contact}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -438,7 +455,10 @@ function AdminNews() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact</label>
+              <label className="block text-sm mb-1">
+                {" "}
+                Website or Contact Details
+              </label>
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -554,7 +574,10 @@ function AdminNews() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact Details</label>
+              <label className="block text-sm mb-1">
+                {" "}
+                Website or Contact Details
+              </label>
               <input
                 id="news-contact"
                 type="text"

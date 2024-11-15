@@ -161,7 +161,7 @@ exports.updateCompany = async (req, res) => {
       company.address = address || company.address;
       company.image = newImage || company.image;
       company.description = description || company.description;
-      company.contact = contact || company.contact;
+      company.contact = contact !== undefined ? contact : company.contact;
 
       await company.save();
 

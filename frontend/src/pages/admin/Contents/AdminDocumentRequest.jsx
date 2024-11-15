@@ -101,8 +101,7 @@ function AdminDocuments() {
     if (
       !selectedDocuments.name ||
       !selectedDocuments.address ||
-      !selectedDocuments.description ||
-      !selectedDocuments.contact
+      !selectedDocuments.description
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -114,7 +113,10 @@ function AdminDocuments() {
     documentData.append("name", selectedDocuments.name);
     documentData.append("address", selectedDocuments.address);
     documentData.append("description", selectedDocuments.description);
-    documentData.append("contact", selectedDocuments.contact);
+    documentData.append(
+      "contact",
+      selectedDocuments.contact ? selectedDocuments.contact : ""
+    );
 
     const image = document.getElementById("documents-image").files[0]; // Make sure the input ID matches
     if (image) {
@@ -184,8 +186,7 @@ function AdminDocuments() {
     if (
       !documentsData.get("name") ||
       !documentsData.get("address") ||
-      !documentsData.get("description") ||
-      !documentsData.get("contact")
+      !documentsData.get("description")
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -313,21 +314,20 @@ function AdminDocuments() {
               documents.image.endsWith(".pdf") ? (
                 <div className="overflow-y-hidden object-contain">
                   <Worker workerUrl={pdfWorker}>
-                  <div className="w-full max-h-48 overflow-hidden mb-4">
-                    <Viewer
-                      fileUrl={`${backendUrl}${documents.image}`}
-                      renderTextLayer={false}
-                      initialPage={0} // Show the first page only in the preview
-                      style={{
-                        height: "100%",
-                        width: "100%",
-                        objectFit: "contain", // Ensures the PDF fits without stretching
-                      }}
-                    />
-                  </div>
-                </Worker>
+                    <div className="w-full max-h-48 overflow-hidden mb-4">
+                      <Viewer
+                        fileUrl={`${backendUrl}${documents.image}`}
+                        renderTextLayer={false}
+                        initialPage={0} // Show the first page only in the preview
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          objectFit: "contain", // Ensures the PDF fits without stretching
+                        }}
+                      />
+                    </div>
+                  </Worker>
                 </div>
-                
               ) : (
                 <img
                   src={`${backendUrl}${documents.image}`}
@@ -406,22 +406,21 @@ function AdminDocuments() {
               selectedDocuments.image.endsWith(".pdf") ? (
                 <div className="px-10">
                   <Worker workerUrl={pdfWorker}>
-                  <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
-                    {" "}
-                    {/* Added flex and centering */}
-                    <Viewer
-                      fileUrl={`${backendUrl}${selectedDocuments.image}`}
-                      renderTextLayer={false}
-                      style={{
-                        width: "100%", // Ensure it takes full width
-                        height: "100%", // Adjusts height relative to the container's height
-                        objectFit: "contain", // Ensures the PDF is fully contained within the container
-                      }}
-                    />
-                  </div>
-                </Worker>
+                    <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
+                      {" "}
+                      {/* Added flex and centering */}
+                      <Viewer
+                        fileUrl={`${backendUrl}${selectedDocuments.image}`}
+                        renderTextLayer={false}
+                        style={{
+                          width: "100%", // Ensure it takes full width
+                          height: "100%", // Adjusts height relative to the container's height
+                          objectFit: "contain", // Ensures the PDF is fully contained within the container
+                        }}
+                      />
+                    </div>
+                  </Worker>
                 </div>
-                
               ) : (
                 <img
                   src={`${backendUrl}${selectedDocuments.image}`}
@@ -435,13 +434,29 @@ function AdminDocuments() {
               </div>
             )}
             <div className="text-sm mb-4">{selectedDocuments.description}</div>
-            <div className="text-sm font-medium mb-2">Contact Details</div>
-            <a
-              href={`mailto:${selectedDocuments.contact}`}
-              className="block text-sm text-blue-600 underline"
-            >
-              {selectedDocuments.contact}
-            </a>
+
+            {/* Conditionally render Website or Contact Details */}
+            {selectedDocuments.contact && (
+              <div className="text-sm font-medium mb-2">
+                Website or Contact Details
+                <a
+                  href={
+                    selectedDocuments.contact.includes("@") // Check if it's an email
+                      ? `mailto:${selectedDocuments.contact}`
+                      : selectedDocuments.contact.startsWith("http") // Check if it's a website URL
+                      ? selectedDocuments.contact
+                      : selectedDocuments.contact.startsWith("+") // Check if it's a phone number (with international code)
+                      ? `tel:${selectedDocuments.contact}`
+                      : "#"
+                  }
+                  className="mt-2 block text-sm text-blue-600 underline font-normal"
+                  target="_blank" // This ensures the link opens in a new tab
+                  rel="noopener noreferrer" // Recommended for security reasons when using target="_blank"
+                >
+                  {selectedDocuments.contact}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -521,7 +536,9 @@ function AdminDocuments() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact</label>
+              <label className="block text-sm mb-1">
+                Website or Contact Details
+              </label>
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -637,7 +654,7 @@ function AdminDocuments() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact Details</label>
+              <label className="block text-sm mb-1">Website or Contact Details</label>
               <input
                 id="documents-contact"
                 type="text"

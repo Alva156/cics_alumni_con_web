@@ -164,7 +164,8 @@ exports.updateCertifications = async (req, res) => {
       certifications.address = address || certifications.address;
       certifications.image = newImage || certifications.image;
       certifications.description = description || certifications.description;
-      certifications.contact = contact || certifications.contact;
+      certifications.contact =
+        contact !== undefined ? contact : certifications.contact;
 
       await certifications.save();
 

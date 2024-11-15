@@ -98,8 +98,7 @@ function AdminEvents() {
     if (
       !selectedEvents.name ||
       !selectedEvents.address ||
-      !selectedEvents.description ||
-      !selectedEvents.contact
+      !selectedEvents.description
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -111,7 +110,10 @@ function AdminEvents() {
     eventData.append("name", selectedEvents.name);
     eventData.append("address", selectedEvents.address);
     eventData.append("description", selectedEvents.description);
-    eventData.append("contact", selectedEvents.contact);
+    eventData.append(
+      "contact",
+      selectedEvents.contact ? selectedEvents.contact : ""
+    );
 
     const image = document.getElementById("events-image").files[0];
     if (image) {
@@ -179,8 +181,7 @@ function AdminEvents() {
     if (
       !eventData.get("name") ||
       !eventData.get("address") ||
-      !eventData.get("description") ||
-      !eventData.get("contact")
+      !eventData.get("description")
     ) {
       setshowMessage("Please fill in all required fields.");
       setErrorMessage(true);
@@ -366,13 +367,29 @@ function AdminEvents() {
               className="mb-4 w-full h-48 md:h-64 lg:h-80 object-cover rounded"
             />
             <div className="text-sm mb-4">{selectedEvents.description}</div>
-            <div className="text-sm font-medium mb-2">Contact Details</div>
-            <a
-              href={`mailto:${selectedEvents.contact}`}
-              className="block text-sm text-blue-600 underline"
-            >
-              {selectedEvents.contact}
-            </a>
+
+            {/* Conditionally render Website or Contact Details */}
+            {selectedEvents.contact && (
+              <div className="text-sm font-medium mb-2">
+                Website or Contact Details
+                <a
+                  href={
+                    selectedEvents.contact.includes("@") // Check if it's an email
+                      ? `mailto:${selectedEvents.contact}`
+                      : selectedEvents.contact.startsWith("http") // Check if it's a website URL
+                      ? selectedEvents.contact
+                      : selectedEvents.contact.startsWith("+") // Check if it's a phone number (with international code)
+                      ? `tel:${selectedEvents.contact}`
+                      : "#"
+                  }
+                  className="mt-2 block text-sm text-blue-600 underline font-normal"
+                  target="_blank" // This ensures the link opens in a new tab
+                  rel="noopener noreferrer" // Recommended for security reasons when using target="_blank"
+                >
+                  {selectedEvents.contact}
+                </a>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -452,7 +469,9 @@ function AdminEvents() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact</label>
+              <label className="block text-sm mb-1">
+                Website or Contact Details
+              </label>
               <input
                 type="text"
                 className="w-full border border-black bg-gray-100 rounded-lg px-4 py-1 text-sm"
@@ -568,7 +587,9 @@ function AdminEvents() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Contact Details</label>
+              <label className="block text-sm mb-1">
+                Website or Contact Details
+              </label>
               <input
                 id="events-contact"
                 type="text"

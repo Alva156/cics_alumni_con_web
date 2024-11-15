@@ -1965,7 +1965,7 @@ function UserProfile() {
                     <input
                       type="file"
                       name={`attachment-${index}`}
-                      accept="application/pdf"
+                      accept="image/*,application/pdf"
                       className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
                       onChange={(e) => handleFileChange(e, index)} // Handle file change for each attachment
                     />

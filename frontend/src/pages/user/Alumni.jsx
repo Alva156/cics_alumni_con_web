@@ -669,19 +669,28 @@ function Alumni() {
                     {previewAttachment.filename}
                   </h2>
 
-                  {/* Conditional rendering of Viewer component */}
-                  <Worker workerUrl={pdfWorker}>
-                    <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
-                      <Viewer
-                        fileUrl={previewFileUrl} // Use the URL fetched via axios
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </div>
-                  </Worker>
+                  {/* Conditional rendering of Viewer or Image */}
+                  {previewAttachment.filename.endsWith(".pdf") ? (
+                    <Worker workerUrl={pdfWorker}>
+                      <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
+                        <Viewer
+                          fileUrl={previewFileUrl} // Use the URL fetched via axios
+                          renderTextLayer={false}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      </div>
+                    </Worker>
+                  ) : (
+                    <img
+                      src={previewFileUrl}
+                      alt={previewAttachment.filename}
+                      className="mb-4 w-full h-64 object-cover rounded"
+                    />
+                  )}
 
                   <div className="flex justify-end space-x-2 sm:space-x-4 mt-4">
                     <button
@@ -703,10 +712,7 @@ function Alumni() {
               </div>
             )}
 
-            <div
-              role="tablist"
-              className="tabs tabs-lifted tabs-sm sm:tabs-lg"
-            >
+            <div role="tablist" className="tabs tabs-lifted tabs-sm sm:tabs-lg">
               <input
                 type="radio"
                 name="my_tabs_2"
@@ -784,7 +790,9 @@ function Alumni() {
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASAAAAAAAAAAAA )
+                    <span className="font-medium">63</span> 9125559207 for
+                    PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASAAAAAAAAAAAA
+                    )
                   </span>
                 </label>
               </div>
@@ -835,7 +843,8 @@ function Alumni() {
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                    <span className="font-medium">63</span> 9125559207 for
+                    PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
                   </span>
                 </label>
               </div>
@@ -920,7 +929,8 @@ function Alumni() {
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                    <span className="font-medium">63</span> 9125559207 for
+                    PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
                   </span>
                 </label>
               </div>
@@ -941,7 +951,9 @@ function Alumni() {
                   {selectedAlumni.attachments &&
                   selectedAlumni.attachments.length > 0 ? (
                     selectedAlumni.attachments.map((attachment, index) => (
-                      <div className="break-words" key={index}>{renderAttachment(attachment)}</div>
+                      <div className="break-words" key={index}>
+                        {renderAttachment(attachment)}
+                      </div>
                     ))
                   ) : (
                     <p>No attachments available.</p>
@@ -953,7 +965,8 @@ function Alumni() {
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                    <span className="font-medium">63</span> 9125559207 for
+                    PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
                   </span>
                 </label>
               </div>
@@ -975,7 +988,9 @@ function Alumni() {
 
                 {selectedAlumni.secondaryEducation.map((edu, index) => (
                   <div key={index}>
-                    <p className="text-s font-bold break-words">{edu.schoolName}</p>
+                    <p className="text-s font-bold break-words">
+                      {edu.schoolName}
+                    </p>
                     <p className="text-xs mb-2">
                       {edu.yearStarted} - {edu.yearEnded}
                     </p>
@@ -984,8 +999,12 @@ function Alumni() {
                 <p className="text-xs mb-1 mt-3">Tertiary Education</p>
                 {selectedAlumni.tertiaryEducation.map((edu, index) => (
                   <div key={index}>
-                    <p className="text-s font-bold break-words">{edu.schoolName}</p>
-                    <p className="text-xs mb-1 italic break-words">{edu.program}</p>
+                    <p className="text-s font-bold break-words">
+                      {edu.schoolName}
+                    </p>
+                    <p className="text-xs mb-1 italic break-words">
+                      {edu.program}
+                    </p>
                     <p className="text-xs mb-2">
                       {edu.yearStarted} - {edu.yearEnded}
                     </p>
@@ -996,7 +1015,8 @@ function Alumni() {
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHasdasdasdasdasdasdsasdasdasdasdasds )
+                    <span className="font-medium">63</span> 9125559207 for
+                    PHasdasdasdasdasdasdsasdasdasdasdasds )
                   </span>
                 </label>
               </div>
@@ -1015,8 +1035,12 @@ function Alumni() {
                 <h1 className="text-xl mb-4">Career Background</h1>
                 {selectedAlumni.careerBackground.map((career, index) => (
                   <div key={index}>
-                    <p className="text-s font-bold break-words">{career.companyName}</p>
-                    <p className="text-xs mb-1 italic break-words">{career.position}</p>
+                    <p className="text-s font-bold break-words">
+                      {career.companyName}
+                    </p>
+                    <p className="text-xs mb-1 italic break-words">
+                      {career.position}
+                    </p>
                     <p className="text-xs mb-2">
                       {career.yearStarted} - {career.yearEnded}
                     </p>
@@ -1027,11 +1051,11 @@ function Alumni() {
                   <span className="text-xs font-light italic">
                     {" "}
                     ( include country code before your number, e.g.,{" "}
-                    <span className="font-medium">63</span> 9125559207 for PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
+                    <span className="font-medium">63</span> 9125559207 for
+                    PHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA )
                   </span>
                 </label>
               </div>
-              
             </div>
           </div>
         </div>

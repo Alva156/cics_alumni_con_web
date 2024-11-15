@@ -51,6 +51,12 @@ function ResetPassword() {
     setError("");
     setSuccess("");
 
+    if (!newPassword || !confirmPassword) {
+      setError("Please fill in all password fields");
+      clearErrorAfterDelay();
+      return;
+    }
+
     const passwordRegex =
       /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 

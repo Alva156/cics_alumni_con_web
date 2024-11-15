@@ -160,9 +160,12 @@ function DataPrivacy() {
             <li>Name</li>
             <li>Student ID</li>
             <li>Birthday</li>
+            <li>Gender</li>
+            <li>Region</li>
             <li>Account Email</li>
             <li>Profile Picture</li>
             <li>Profession</li>
+            <li>College </li>
             <li>College Program</li>
             <li>Specialization</li>
             <li>Year Started and Graduated College</li>
@@ -177,7 +180,7 @@ function DataPrivacy() {
               Contact Information (LinkedIn, Facebook, Instagram, Email, Mobile
               Number, and Other)
             </li>
-            <li>Tertiary and Secondary Education Background</li>
+            <li>Secondary and Tertiary Education Background</li>
             <li>Career Background</li>
             <li>Attachments for Profile Boost</li>
             <li>Answers to the surveys made by the system</li>

@@ -87,6 +87,9 @@ exports.registerUser = async (req, res) => {
           row.studentNum.trim() !== "0000000000" &&
           row.studentNum.trim() !== "" && // Skip if CSV studentNum is empty
           row.studentNum.trim() === studentNum.trim() &&
+          row.firstName &&
+          row.lastName &&
+          row.birthday &&
           row.firstName.trim().toLowerCase() ===
             firstName.trim().toLowerCase() &&
           row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
@@ -95,6 +98,9 @@ exports.registerUser = async (req, res) => {
     } else {
       matchingRecord = csvData.find(
         (row) =>
+          row.firstName &&
+          row.lastName &&
+          row.birthday &&
           row.firstName.trim().toLowerCase() ===
             firstName.trim().toLowerCase() &&
           row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&

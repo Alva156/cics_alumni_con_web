@@ -164,174 +164,180 @@ function Register() {
         {/* Left Form */}
         <div className="w-full md:w-1/2 p-2 md:p-4 flex flex-col justify-start bg-white">
           <div className="flex flex-col px-2 md:px-4 pb-2">
-            <div className="mb-2">
-              <h1 className="text-md md:text-lg lg:text-2xl font-bold mb-1 text-left">
-                Welcome, CICS Alumni!
-              </h1>
-              <p className="text-left text-xs md:text-sm">
-                Enter required user information and start connecting with us.
-              </p>
-            </div>
-            <div className="h-4">
-              {error && <p className="text-red text-xs">{error}</p>}
-              {success && <p className="text-green text-xs">{success}</p>}
-            </div>
-            {/* Form Fields */}
-            <label className="block mb-1 mt-2 text-xs font-medium">
-              Student ID Number
-            </label>
-            <input
-              type="text"
-              name="studentNum"
-              placeholder="Enter your Student ID Number"
-              value={formData.studentNum}
-              onChange={handleChange}
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "30px" }}
-            />
-
-            <div className="flex mb-2">
-              <div className="w-1/2 pr-1">
-                <label className="block mb-1 text-xs font-medium">
-                  First Name *
-                </label>
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder="Enter your First Name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="p-2 border border-black bg-[#D9D9D9] w-full"
-                  style={{ height: "30px" }}
-                />
-              </div>
-              <div className="w-1/2 pl-1">
-                <label className="block mb-1 text-xs font-medium">
-                  Last Name *
-                </label>
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder="Enter your Last Name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="p-2 border border-black bg-[#D9D9D9] w-full"
-                  style={{ height: "30px" }}
-                />
-              </div>
-            </div>
-
-            <label className="block mb-1 text-xs font-medium">Birthday *</label>
-            <input
-              type="date"
-              name="birthday"
-              placeholder="Enter your Birthday"
-              value={formData.birthday}
-              onChange={handleChange}
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "30px" }}
-            />
-
-            <label className="block mb-1 text-xs font-medium">Email *</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={handleChange}
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "30px" }}
-            />
-            <label className="block mb-1 text-xs font-medium">
-              Mobile Number *
-            </label>
-            <input
-              type="number"
-              name="mobileNumber"
-              placeholder="Enter your mobile number"
-              value={formData.mobileNumber}
-              onChange={handleChange}
-              className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
-              style={{ height: "30px" }}
-            />
-
-            <div className="flex mb-2">
-              <div className="flex-1 pr-2">
-                <label className="block mb-1 text-xs font-medium">
-                  Password *
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    placeholder="Enter your password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
-                    style={{ height: "30px" }}
-                  />
-                  <span
-                    className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
-                    onClick={togglePasswordVisibility}
-                  >
-                    <FontAwesomeIcon
-                      icon={showPassword ? faEye : faEyeSlash}
-                      className="text-black"
-                    />
-                  </span>
-                </div>
-              </div>
-              <div className="flex-1 pl-2">
-                <label className="block mb-1 text-xs font-medium">
-                  Confirm Password *
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    placeholder="Confirm your password"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
-                    style={{ height: "30px" }}
-                  />
-                  <span
-                    className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
-                    onClick={toggleConfirmPasswordVisibility}
-                  >
-                    <FontAwesomeIcon
-                      icon={showConfirmPassword ? faEye : faEyeSlash}
-                      className="text-black"
-                    />
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-[0.6rem] mt-2 mb-1 ml-2 sm:text-xs">
-              Password Requirements:
-            </p>
-            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
-              At least 8 characters long
-            </p>
-            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
-              Must contain at least one uppercase letter (A-Z)
-            </p>
-            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
-              Must contain at least one digit (0-9)
-            </p>
-            <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
-              Must include at least one special character (e.g., !, @, #, $, %,
-              ^, &, *)
-            </p>
-
-            <button
-              type="submit"
-              onClick={handleSubmit}
-              className="btn bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 mt-4 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
+            <form
+              onSubmit={handleSubmit}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit(e)}
             >
-              SIGN UP
-            </button>
+              <div className="mb-2">
+                <h1 className="text-md md:text-lg lg:text-2xl font-bold mb-1 text-left">
+                  Welcome, CICS Alumni!
+                </h1>
+                <p className="text-left text-xs md:text-sm">
+                  Enter required user information and start connecting with us.
+                </p>
+              </div>
+              <div className="h-4">
+                {error && <p className="text-red text-xs">{error}</p>}
+                {success && <p className="text-green text-xs">{success}</p>}
+              </div>
+              {/* Form Fields */}
+              <label className="block mb-1 mt-2 text-xs font-medium">
+                Student ID Number
+              </label>
+              <input
+                type="text"
+                name="studentNum"
+                placeholder="Enter your Student ID Number"
+                value={formData.studentNum}
+                onChange={handleChange}
+                className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
+                style={{ height: "30px" }}
+              />
+
+              <div className="flex mb-2">
+                <div className="w-1/2 pr-1">
+                  <label className="block mb-1 text-xs font-medium">
+                    First Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder="Enter your First Name"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="p-2 border border-black bg-[#D9D9D9] w-full"
+                    style={{ height: "30px" }}
+                  />
+                </div>
+                <div className="w-1/2 pl-1">
+                  <label className="block mb-1 text-xs font-medium">
+                    Last Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Enter your Last Name"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="p-2 border border-black bg-[#D9D9D9] w-full"
+                    style={{ height: "30px" }}
+                  />
+                </div>
+              </div>
+
+              <label className="block mb-1 text-xs font-medium">
+                Birthday *
+              </label>
+              <input
+                type="date"
+                name="birthday"
+                placeholder="Enter your Birthday"
+                value={formData.birthday}
+                onChange={handleChange}
+                className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
+                style={{ height: "30px" }}
+              />
+
+              <label className="block mb-1 text-xs font-medium">Email *</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+                className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
+                style={{ height: "30px" }}
+              />
+              <label className="block mb-1 text-xs font-medium">
+                Mobile Number *
+              </label>
+              <input
+                type="number"
+                name="mobileNumber"
+                placeholder="Enter your mobile number"
+                value={formData.mobileNumber}
+                onChange={handleChange}
+                className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
+                style={{ height: "30px" }}
+              />
+
+              <div className="flex mb-2">
+                <div className="flex-1 pr-2">
+                  <label className="block mb-1 text-xs font-medium">
+                    Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Enter your password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                      style={{ height: "30px" }}
+                    />
+                    <span
+                      className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
+                      onClick={togglePasswordVisibility}
+                    >
+                      <FontAwesomeIcon
+                        icon={showPassword ? faEye : faEyeSlash}
+                        className="text-black"
+                      />
+                    </span>
+                  </div>
+                </div>
+                <div className="flex-1 pl-2">
+                  <label className="block mb-1 text-xs font-medium">
+                    Confirm Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      placeholder="Confirm your password"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
+                      style={{ height: "30px" }}
+                    />
+                    <span
+                      className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
+                      onClick={toggleConfirmPasswordVisibility}
+                    >
+                      <FontAwesomeIcon
+                        icon={showConfirmPassword ? faEye : faEyeSlash}
+                        className="text-black"
+                      />
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[0.6rem] mt-2 mb-1 ml-2 sm:text-xs">
+                Password Requirements:
+              </p>
+              <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+                At least 8 characters long
+              </p>
+              <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+                Must contain at least one uppercase letter (A-Z)
+              </p>
+              <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+                Must contain at least one digit (0-9)
+              </p>
+              <p className="text-[0.6rem] mt-1 ml-2 sm:text-xs">
+                Must include at least one special character (e.g., !, @, #, $,
+                %, ^, &, *)
+              </p>
+
+              <button
+                type="submit"
+                className="btn bg-[#BE142E] text-white font-bold text-l py-2 px-3 w-full mb-3 mt-4 transition duration-300 ease-in-out hover:bg-[#a10c2b]"
+              >
+                SIGN UP
+              </button>
+            </form>
 
             <p className="text-left mb-1 mt-1 text-xs">
               Already have an account?

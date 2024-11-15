@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../../App.css";
 import axios from "axios";
 import { uniqueId } from "lodash"; // Make sure you import uniqueId
@@ -6,6 +6,8 @@ import imageCompression from "browser-image-compression";
 import { useNavigate } from "react-router-dom";
 import profilesymbol from "../../assets/userprofile.png";
 import blankprofilepic from "../../assets/blankprofilepic.jpg";
+import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
+import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js";
 
 function UserProfile() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -60,6 +62,45 @@ function UserProfile() {
   const [otpSent, setOtpSent] = useState(false);
   const [maxId, setMaxId] = useState(1);
   const [isDeleteModalPicOpen, setIsDeleteModalPicOpen] = useState(false);
+  const [previewAttachment, setPreviewAttachment] = useState(null); // Holds the currently selected attachment for preview
+  const [previewFileUrl, setPreviewFileUrl] = useState(null); // Holds the file URL for the modal
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // Tracks whether the modal is open
+  const modalRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closePreviewModal(); // Use the correct modal closing function
+      }
+    };
+
+    if (isPreviewModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isPreviewModalOpen]);
+
+  const openPreviewModal = async (attachment) => {
+    setPreviewAttachment(attachment);
+
+    try {
+      const response = await axios.get(
+        `${backendUrl}/profile/attachments/preview/${attachment.filename}`,
+        { withCredentials: true, responseType: "blob" }
+      );
+
+      const fileUrl = URL.createObjectURL(response.data);
+      setPreviewFileUrl(fileUrl);
+      setIsPreviewModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching the file:", error);
+    }
+  };
+  const closePreviewModal = () => {
+    setIsPreviewModalOpen(false);
+    setPreviewAttachment(null);
+    setPreviewFileUrl(null);
+  };
 
   const handleDeleteProfileImage = async () => {
     try {
@@ -1187,6 +1228,54 @@ function UserProfile() {
           </div>
         </div>
       )}
+      {/* Preview Modal */}
+      {isPreviewModalOpen && previewAttachment && previewFileUrl && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
+          style={{ zIndex: 9999 }}
+        >
+          <div
+            ref={modalRef}
+            className="bg-white p-4 sm:p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-3xl h-auto overflow-y-auto max-h-full relative"
+          >
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 text-center">
+              {previewAttachment.filename}
+            </h2>
+
+            {/* Conditional rendering of Viewer or Image */}
+            {previewAttachment.filename.endsWith(".pdf") ? (
+              <Worker workerUrl={pdfWorker}>
+                <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center">
+                  <Viewer
+                    fileUrl={previewFileUrl}
+                    renderTextLayer={false}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
+              </Worker>
+            ) : (
+              <img
+                src={previewFileUrl}
+                alt={previewAttachment.filename}
+                className="mb-4 w-full h-64 object-cover rounded"
+              />
+            )}
+
+            <div className="flex justify-end space-x-2 sm:space-x-4 mt-4">
+              <button
+                onClick={closePreviewModal}
+                className="px-3 py-2 bg-gray-300 rounded-md text-sm sm:text-base hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {isDeleteModalPicOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
@@ -1952,7 +2041,12 @@ function UserProfile() {
                           {attachment.filename || "No file uploaded."}
                         </div>
                       </div>
-                      <div className="right">
+                      <div className="right flex space-x-2">
+                        <button
+                          type="button"
+                          className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
+                          onClick={() => openPreviewModal(attachment)}
+                        ></button>
                         <button
                           type="button"
                           className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2"

@@ -40,6 +40,10 @@ function Register() {
       [e.target.name]: e.target.value,
     });
   };
+  const validateEmail = (email) => {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
+  };
   const validatePassword = (password) => {
     const minLength = /.{8,}/; // At least 8 characters
     const upperCase = /[A-Z]/; // At least one uppercase letter
@@ -83,6 +87,13 @@ function Register() {
       !confirmPassword
     ) {
       setError("Please fill in all required fields");
+      setTimeout(() => setError(""), 5000);
+      return;
+    }
+
+    // Email validation
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
       setTimeout(() => setError(""), 5000);
       return;
     }

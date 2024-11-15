@@ -2031,41 +2031,45 @@ function UserProfile() {
 
                 {/* Horizontal rule after Attachments header */}
                 {attachments.map((attachment, index) => (
-                  <div key={attachment.id}>
-                    <div className="flex flex-row justify-between items-center w-full">
-                      <div className="left">
-                        <label className="pt-4 pb-2 text-sm">
-                          Attachment {index + 1}{" "}
-                          {/* Display the attachment number */}
-                        </label>
-                        <div className="text-sm text-gray-600">
-                          {attachment.filename || "No file uploaded."}
-                        </div>
-                      </div>
-                      <div className="right flex space-x-2">
-                        <button
-                          type="button"
-                          className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
-                          onClick={() => openPreviewModal(attachment)}
-                        ></button>
-                        <button
-                          type="button"
-                          className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2"
-                          onClick={() =>
-                            initiateDeleteAttachment(attachment._id)
-                          }
-                        ></button>
-                      </div>
-                    </div>
-                    <input
-                      type="file"
-                      name={`attachment-${index}`}
-                      accept="image/*,application/pdf"
-                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
-                      onChange={(e) => handleFileChange(e, index)} // Handle file change for each attachment
-                    />
-                  </div>
-                ))}
+  <div key={attachment.id || index}>
+    <div className="flex flex-row justify-between items-center w-full">
+      <div className="left">
+        <label className="pt-4 pb-2 text-sm">
+          Attachment {index + 1}{" "}
+          {/* Display the attachment number */}
+        </label>
+        <div className="text-sm text-gray-600">
+          {attachment.filename || "No file uploaded."}
+        </div>
+      </div>
+      {/* Check if attachment is saved by verifying both the filename and the database ID */}
+      {attachment.filename && attachment._id && attachment.filepath && (
+        <div className="right flex space-x-2">
+          <button
+            type="button"
+            className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
+            onClick={() => openPreviewModal(attachment)}
+          ></button>
+          <button
+            type="button"
+            className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2"
+            onClick={() => initiateDeleteAttachment(attachment._id)}
+          ></button>
+        </div>
+      )}
+    </div>
+    <input
+      type="file"
+      name={`attachment-${index}`}
+      accept="image/*,application/pdf"
+      className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-2"
+      onChange={(e) => handleFileChange(e, index)} // Handle file change for each attachment
+    />
+  </div>
+))}
+
+
+
 
                 <label className="pt-4 text-sm text-white opacity-0">
                   Mobile Number{" "}

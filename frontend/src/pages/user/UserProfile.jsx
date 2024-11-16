@@ -2398,7 +2398,7 @@ function UserProfile() {
                     </div>
                     {/* Year Ended */}
                     <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Ended</label>
+                      <label className="pt-4 pb-2 text-sm">Year Ended <span className="text-xs font-light italic"> (Leave blank if still employed)</span></label>
                       <input
                         type="number"
                         name="yearEnded"
@@ -2415,7 +2415,7 @@ function UserProfile() {
                     </div>
                     {/* Remarks */}
                     <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Remarks</label>
+                      <label className="pt-4 pb-2 text-sm">Remarks <span className="text-xs font-light italic"> (e.g., reason for leaving, current role/responsibilities, achievements)</span></label>
                       <input
                         type="text"
                         name="remarks"

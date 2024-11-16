@@ -231,7 +231,7 @@ exports.createUserProfile = async (req, res) => {
       contactInformation: {
         mobileNumber: req.body.mobileNumber,
       },
-      accountEmail: req.body.accountEmail,
+      accountEmail: req.body.email,
     };
 
     // Create a new UserProfile instance
@@ -446,7 +446,9 @@ exports.updateProfile = async (req, res) => {
         if (!updatedUser) {
           return res
             .status(404)
-            .json({ error: "User not found while updating email or mobile number." });
+            .json({
+              error: "User not found while updating email or mobile number.",
+            });
         }
       }
 

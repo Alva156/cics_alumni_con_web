@@ -261,7 +261,7 @@ function UserProfile() {
       position: "",
       yearStarted: "",
       yearEnded: "",
-      remarks:"",
+      remarks: "",
     },
   ]);
 
@@ -612,7 +612,7 @@ function UserProfile() {
               position: "",
               yearStarted: "",
               yearEnded: "",
-              remarks:"",
+              remarks: "",
             },
           ]);
           setHasUnsavedCompanyChanges(true);
@@ -629,7 +629,7 @@ function UserProfile() {
         position: "",
         yearStarted: "",
         yearEnded: "",
-        remarks:"",
+        remarks: "",
       },
     ]);
     setHasUnsavedCompanyChanges(true);
@@ -1734,8 +1734,6 @@ function UserProfile() {
                     </label>
                     <input
                       type="number"
-                      min="1990" // Set the minimum acceptable year
-                      max="2024" // Set the maximum acceptable year
                       step="1" // Allow only whole numbers (no decimals)
                       placeholder="YYYY"
                       className="input input-sm input-bordered w-full h-10"
@@ -1751,8 +1749,6 @@ function UserProfile() {
                     </label>
                     <input
                       type="number"
-                      min="1990" // Set the minimum acceptable year
-                      max="2024" // Set the maximum acceptable year
                       step="1" // Allow only whole numbers (no decimals)
                       placeholder="YYYY"
                       className="input input-sm input-bordered w-full h-10"
@@ -2163,8 +2159,6 @@ function UserProfile() {
                           handleSectionChange("secondary", section._id, e)
                         }
                         name="yearStarted"
-                        min="1990" // Set the minimum acceptable year
-                        max="2024" // Set the maximum acceptable year
                         step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
@@ -2180,8 +2174,6 @@ function UserProfile() {
                           handleSectionChange("secondary", section._id, e)
                         }
                         name="yearEnded"
-                        min="1990" // Set the minimum acceptable year
-                        max="2024" // Set the maximum acceptable year
                         step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
@@ -2271,8 +2263,6 @@ function UserProfile() {
                         onChange={(e) =>
                           handleSectionChange("tertiary", section._id, e)
                         }
-                        min="1990" // Set the minimum acceptable year
-                        max="2024" // Set the maximum acceptable year
                         step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
@@ -2289,8 +2279,6 @@ function UserProfile() {
                         onChange={(e) =>
                           handleSectionChange("tertiary", section._id, e)
                         }
-                        min="1990" // Set the minimum acceptable year
-                        max="2024" // Set the maximum acceptable year
                         step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
@@ -2399,15 +2387,19 @@ function UserProfile() {
                         onChange={(e) =>
                           handleSectionChange("company", section._id, e)
                         }
-                        min="1990" // Set the minimum acceptable year
-                        max="2024" // Set the maximum acceptable year
                         step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
                     </div>
                     {/* Year Ended */}
                     <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Year Ended <span className="text-xs font-light italic"> (Leave blank if still employed)</span></label>
+                      <label className="pt-4 pb-2 text-sm">
+                        Year Ended{" "}
+                        <span className="text-xs font-light italic">
+                          {" "}
+                          (Leave blank if still employed)
+                        </span>
+                      </label>
                       <input
                         type="number"
                         name="yearEnded"
@@ -2416,15 +2408,20 @@ function UserProfile() {
                         onChange={(e) =>
                           handleSectionChange("company", section._id, e)
                         }
-                        min="1990" // Set the minimum acceptable year
-                        max="2024" // Set the maximum acceptable year
                         step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
                       />
                     </div>
                     {/* Remarks */}
                     <div className="py-1">
-                      <label className="pt-4 pb-2 text-sm">Remarks <span className="text-xs font-light italic"> (e.g., reason for leaving, current role/responsibilities, achievements)</span></label>
+                      <label className="pt-4 pb-2 text-sm">
+                        Remarks{" "}
+                        <span className="text-xs font-light italic">
+                          {" "}
+                          (e.g., reason for leaving, current
+                          role/responsibilities, achievements)
+                        </span>
+                      </label>
                       <input
                         type="text"
                         name="remarks"

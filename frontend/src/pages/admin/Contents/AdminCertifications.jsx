@@ -289,7 +289,7 @@ function AdminCertifications() {
           className="btn btn-sm w-36 bg-green text-white relative"
           onClick={openAddModal}
         >
-          +
+          + Add Certification
         </button>
       </div>
 

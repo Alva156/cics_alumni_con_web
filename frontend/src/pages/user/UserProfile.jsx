@@ -2026,14 +2026,14 @@ function UserProfile() {
                 {/* ATTACHMENTS */}
                 <div className="flex items-center w-full">
                   <div className="text-xl py-4 w-1/2">Attachments</div>
-                  <div className="text-xl py-4 mt-4 w-1/2 text-end">
+                  <div className="text-xl py-4 w-1/2 text-end">
                     <button
                       type="button" // Prevent form submission
                       title="Add Attachment"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addAttachment}
                     >
-                      +
+                      + Add Attachment
                     </button>
                   </div>
                 </div>
@@ -2121,7 +2121,7 @@ function UserProfile() {
 
                 {/* SECONDARY EDUCATION */}
                 <div className="flex items-center w-full">
-                  <div className="text-lg w-1/2">Secondary Education</div>
+                  <div className="text-lg w-2/3">Secondary Education</div>
                   <div className="text-lg w-1/2 text-end">
                     <button
                       type="button"
@@ -2129,7 +2129,7 @@ function UserProfile() {
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addSecondaryEducationSection}
                     >
-                      +
+                      + Add Section
                     </button>
                   </div>
                 </div>
@@ -2212,7 +2212,7 @@ function UserProfile() {
 
                 {/* TERTIARY EDUCATION */}
                 <div className="flex items-center mt-8 w-full">
-                  <div className="text-lg w-1/2">Tertiary Education</div>
+                  <div className="text-lg w-2/3">Tertiary Education</div>
                   <div className="text-lg w-1/2 text-end">
                     <button
                       type="button"
@@ -2220,7 +2220,7 @@ function UserProfile() {
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addTertiaryEducationSection}
                     >
-                      +
+                      + Add Section
                     </button>
                   </div>
                 </div>
@@ -2342,15 +2342,15 @@ function UserProfile() {
               <div>
                 {/* CAREER */}
                 <div className="flex items-center w-full">
-                  <div className="text-xl py-4 w-1/2">Career Background</div>
-                  <div className="text-xl py-4 mt-4 w-1/2 text-end">
+                  <div className="text-xl py-4 w-2/3">Career Background</div>
+                  <div className="text-xl py-4 w-1/2 text-end">
                     <button
                       type="button"
                       title="Add Section"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addCompanySection}
                     >
-                      +
+                      + Add Section
                     </button>
                   </div>
                 </div>

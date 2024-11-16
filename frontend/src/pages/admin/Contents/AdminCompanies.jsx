@@ -278,7 +278,7 @@ function AdminCompanies() {
           className="btn btn-sm w-36 bg-green text-white relative"
           onClick={openAddModal}
         >
-          +
+          + Add Company
         </button>
       </div>
       <hr className="mb-6 border-black" />

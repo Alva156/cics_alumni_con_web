@@ -272,12 +272,12 @@ function AdminJobs() {
       </div>
 
       <div className="flex justify-between items-center mb-4">
-        <div className="text-lg">My Listed Jobs</div>
+        <div className="text-lg">My Listed Jobs/Internships</div>
         <button
           className="btn btn-sm w-36 bg-green text-white relative"
           onClick={openAddModal}
         >
-          +
+          + Add Referral
         </button>
       </div>
 

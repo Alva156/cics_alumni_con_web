@@ -261,6 +261,7 @@ function UserProfile() {
       position: "",
       yearStarted: "",
       yearEnded: "",
+      remarks:"",
     },
   ]);
 
@@ -611,6 +612,7 @@ function UserProfile() {
               position: "",
               yearStarted: "",
               yearEnded: "",
+              remarks:"",
             },
           ]);
           setHasUnsavedCompanyChanges(true);
@@ -627,6 +629,7 @@ function UserProfile() {
         position: "",
         yearStarted: "",
         yearEnded: "",
+        remarks:"",
       },
     ]);
     setHasUnsavedCompanyChanges(true);
@@ -1760,10 +1763,10 @@ function UserProfile() {
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">
-                      Time it took to land a job after graduation (Months)
+                      Time it took to land a job after graduation
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       placeholder="Type here"
                       className="input input-sm input-bordered w-full h-10"
                       name="timeToJob"
@@ -2408,6 +2411,20 @@ function UserProfile() {
                         max="2024" // Set the maximum acceptable year
                         step="1" // Allow only whole numbers (no decimals)
                         placeholder="YYYY"
+                      />
+                    </div>
+                    {/* Remarks */}
+                    <div className="py-1">
+                      <label className="pt-4 pb-2 text-sm">Remarks</label>
+                      <input
+                        type="text"
+                        name="remarks"
+                        placeholder="Type here"
+                        className="input input-sm input-bordered w-full h-10"
+                        value={section.remarks}
+                        onChange={(e) =>
+                          handleSectionChange("company", section._id, e)
+                        }
                       />
                     </div>
                     {/* Delete Button */}

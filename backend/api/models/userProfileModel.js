@@ -108,6 +108,7 @@ const userProfileSchema = new Schema({
             position: String,
             yearStarted: String,
             yearEnded: String,
+            remarks: String,
         },
     ],
     contactInformation: {

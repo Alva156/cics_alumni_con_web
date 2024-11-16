@@ -780,7 +780,7 @@ function Alumni() {
                 <p className="text-s mb-2 font-bold">
                   {selectedAlumni.yearGraduatedCollege || "-"}
                 </p>
-                <p className="text-xs mb-1/2">Time to Land a Job (Months)</p>
+                <p className="text-xs mb-1/2">Time to Land a Job</p>
                 <p className="text-s mb-2 font-bold">
                   {selectedAlumni.timeToJob || "-"}
                 </p>
@@ -1041,9 +1041,12 @@ function Alumni() {
                     <p className="text-xs mb-1 italic break-words">
                       {career.position}
                     </p>
-                    <p className="text-xs mb-2">
+                    <p className="text-xs mb-1">
                       {career.yearStarted} - {career.yearEnded}
                     </p>
+                    {career.remarks && (
+                      <p className="text-xs mb-1">Remarks: {career.remarks}</p>
+                    )}
                   </div>
                 ))}
                 <label className="pt-4 text-sm text-white opacity-0">

@@ -241,7 +241,7 @@ const AdminDashboard = () => {
   };
 
   const data7 = {
-    labels: timeToJobKeys.map((key) => `${key} Months`),
+    labels: timeToJobKeys.map((key) => `${key}`),
     datasets: [
       {
         label: "Number of Alumni",
@@ -452,7 +452,7 @@ const AdminDashboard = () => {
       <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
-            How long it takes to land a job (Months)
+            How long it takes to land a job
           </div>
           <div className="h-48 mt-8">
             <Bar data={data7} options={options2} />

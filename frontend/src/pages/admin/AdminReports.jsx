@@ -262,7 +262,7 @@ function AdminReports() {
     Specialization: "specialization",
     "Year Started on College Program": "yearStartedCollege",
     "Year Graduated on College Program": "yearGraduatedCollege",
-    "Time it took to land a job after graduation (months)": "timeToJob",
+    "Time it took to land a job after graduation": "timeToJob",
     "Employment Status": "employmentStatus",
     "Work Industry": "workIndustry",
     "Is current profession in line with college degree": "professionAlignment",

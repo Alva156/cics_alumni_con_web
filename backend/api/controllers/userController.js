@@ -39,6 +39,10 @@ exports.registerUser = async (req, res) => {
       confirmPassword,
     } = req.body;
 
+    // Normalize and trim input values
+    const normalizedFirstName = firstName.trim();
+    const normalizedLastName = lastName.trim();
+
     // Check if the email already exists/registered
     const existingUser = await User.findOne({ email });
 
@@ -48,9 +52,9 @@ exports.registerUser = async (req, res) => {
 
     // Check for duplicate user by name and birthday
     const duplicateUser = await User.findOne({
-      firstName: firstName,
-      lastName: lastName,
-      birthday: birthday,
+      firstName: { $regex: `^${normalizedFirstName}$`, $options: "i" }, // Case-insensitive match
+      lastName: { $regex: `^${normalizedLastName}$`, $options: "i" }, // Case-insensitive match
+      birthday: birthday.trim(),
     });
 
     if (duplicateUser) {
@@ -58,6 +62,8 @@ exports.registerUser = async (req, res) => {
         .status(400)
         .json({ msg: "Duplicate accounts are not allowed." });
     }
+
+    // Your existing CSV validation and other logic remain unchanged...
 
     const csvFilePath = path.join(__dirname, "../alumnilist.csv");
 
@@ -91,8 +97,9 @@ exports.registerUser = async (req, res) => {
           row.lastName &&
           row.birthday &&
           row.firstName.trim().toLowerCase() ===
-            firstName.trim().toLowerCase() &&
-          row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
+            normalizedFirstName.toLowerCase() &&
+          row.lastName.trim().toLowerCase() ===
+            normalizedLastName.toLowerCase() &&
           row.birthday.trim() === formattedBirthday
       );
     } else {
@@ -102,8 +109,9 @@ exports.registerUser = async (req, res) => {
           row.lastName &&
           row.birthday &&
           row.firstName.trim().toLowerCase() ===
-            firstName.trim().toLowerCase() &&
-          row.lastName.trim().toLowerCase() === lastName.trim().toLowerCase() &&
+            normalizedFirstName.toLowerCase() &&
+          row.lastName.trim().toLowerCase() ===
+            normalizedLastName.toLowerCase() &&
           row.birthday.trim() === formattedBirthday
       );
     }

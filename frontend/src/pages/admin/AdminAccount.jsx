@@ -441,6 +441,7 @@ function AdminAccount() {
               onClick={() => setIsDeleteModalOpen(true)}
               className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer"
             ></button>
+            
           </div>
 
           <input

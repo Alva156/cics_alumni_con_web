@@ -1568,6 +1568,7 @@ function UserProfile() {
                       </label>
                       <button
                         type="button"
+                        title="Delete Profile Picture"
                         onClick={() => setIsDeleteModalPicOpen(true)}
                         className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer"
                       ></button>
@@ -2028,6 +2029,7 @@ function UserProfile() {
                   <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
                       type="button" // Prevent form submission
+                      title="Add Attachment"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addAttachment}
                     >
@@ -2063,11 +2065,13 @@ function UserProfile() {
                           <div className="right flex space-x-2">
                             <button
                               type="button"
+                              title="Preview Attachment"
                               className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
                               onClick={() => openPreviewModal(attachment)}
                             ></button>
                             <button
                               type="button"
+                              title="Delete Attachment"
                               className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2"
                               onClick={() =>
                                 initiateDeleteAttachment(attachment._id)
@@ -2121,6 +2125,7 @@ function UserProfile() {
                   <div className="text-lg w-1/2 text-end">
                     <button
                       type="button"
+                      title="Add Section"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addSecondaryEducationSection}
                     >
@@ -2186,6 +2191,7 @@ function UserProfile() {
                     <div className="flex justify-end">
                       <button
                         type="button"
+                        title="Delete Section"
                         className="btn btn-sm w-36 bg-red text-white mt-2"
                         onClick={
                           () => {
@@ -2210,6 +2216,7 @@ function UserProfile() {
                   <div className="text-lg w-1/2 text-end">
                     <button
                       type="button"
+                      title="Add Section"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addTertiaryEducationSection}
                     >
@@ -2292,6 +2299,7 @@ function UserProfile() {
                     <div className="flex justify-end">
                       <button
                         type="button"
+                        title="Delete Section"
                         className="btn btn-sm w-36 bg-red text-white mt-2"
                         onClick={
                           () => {
@@ -2338,6 +2346,7 @@ function UserProfile() {
                   <div className="text-xl py-4 mt-4 w-1/2 text-end">
                     <button
                       type="button"
+                      title="Add Section"
                       className="btn btn-sm w-36 bg-green text-white"
                       onClick={addCompanySection}
                     >
@@ -2431,6 +2440,7 @@ function UserProfile() {
                     <div className="flex justify-end">
                       <button
                         type="button"
+                        title="Delete Section"
                         className="btn btn-sm w-36 bg-red text-white mt-2"
                         onClick={() => {
                           console.log("Profile ID:", profileId);

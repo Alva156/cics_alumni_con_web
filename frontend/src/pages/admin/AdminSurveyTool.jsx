@@ -1016,6 +1016,7 @@ function AdminSurveyTool() {
           />
           <button
             className="ml-2 w-4 h-4 rounded-full bg-[#BE142E]"
+            title="Delete Option"
             onClick={() => handleDeleteOption(questionIndex, optionIndex)}
           ></button>
         </div>
@@ -1726,7 +1727,7 @@ function AdminSurveyTool() {
           className="btn btn-sm w-36 bg-green text-white"
           onClick={openAddModal}
         >
-          +
+          + Create Survey
         </button>
       </div>
       <hr className="mb-6 border-black no-print" />
@@ -2490,6 +2491,7 @@ function AdminSurveyTool() {
                   {/* Delete Question Button */}
                   <button
                     className="ml-2 w-4 h-4 rounded-full bg-[#BE142E] text-sm rounded text-white"
+                    title="Delete Question"
                     onClick={() => handleDeleteQuestion(questionIndex)}
                   ></button>
                 </div>
@@ -2608,6 +2610,7 @@ function AdminSurveyTool() {
                   {/* Delete Question Button */}
                   <button
                     className="ml-2 w-4 h-4 rounded-full bg-[#BE142E] text-sm rounded text-white"
+                    title="Delete Question"
                     onClick={() => handleDeleteQuestion(questionIndex)}
                   ></button>
                 </div>

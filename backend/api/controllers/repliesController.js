@@ -32,10 +32,12 @@ exports.createReply = async (req, res) => {
       "accountEmail"
     );
 
+    // Ensure notifications are sent only if the reply is not from the thread creator
     if (
       thread.notifEnabled &&
       thread.userProfileId &&
-      thread.userProfileId.accountEmail
+      thread.userProfileId.accountEmail &&
+      thread.userProfileId._id.toString() !== userProfileId // New condition
     ) {
       // Configure Nodemailer transporter
       const transporter = nodemailer.createTransport({

@@ -1459,6 +1459,29 @@ function AdminSurveyTool() {
       genders: {},
       regions: {},
     };
+    const countByStatus = (status) =>
+      filteredResponses.reduce((count, response) => {
+        if (
+          response.userId?.employmentStatus?.toLowerCase() ===
+          status.toLowerCase()
+        ) {
+          return count + 1;
+        }
+        return count;
+      }, 0);
+
+    const employmentStatuses = [
+      "Employed",
+      "Self-Employed",
+      "Underemployed",
+      "Freelancing",
+      "Unemployed",
+    ];
+
+    const employmentCounts = employmentStatuses.map((status) => ({
+      status,
+      count: countByStatus(status),
+    }));
 
     filteredResponses.forEach((response) => {
       const { yearGraduatedCollege, college, collegeProgram, gender, region } =
@@ -1518,6 +1541,11 @@ function AdminSurveyTool() {
       ...Object.entries(summaryCounts.regions).map(([region, count]) => [
         "Region",
         region,
+        count,
+      ]),
+      ...employmentCounts.map(({ status, count }) => [
+        "Employment Status",
+        status,
         count,
       ]),
     ];

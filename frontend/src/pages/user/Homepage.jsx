@@ -26,6 +26,11 @@ const Homepage = () => {
   const eventsCarouselRef = useRef(null); // Reference for events carousel
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!isDropdownOpen);
+  };
 
   const images = [homepage1, homepage2, homepage3];
   const credits = [
@@ -362,19 +367,26 @@ const Homepage = () => {
                     <div className="logo newsevents-logo"></div>
                     <h3>News/Events</h3>
                     <div className="dropdown">
-                      <button className="dropdown-button">
-                        View News/Events
+                      <button
+                        className="dropdown-button"
+                        onClick={toggleDropdown}
+                      >
+                        Manage News/Events
                       </button>
-                      <div className="dropdown-content z-50">
-                        <button onClick={() => handleNavigation("/user-news")}>
-                          News
-                        </button>
-                        <button
-                          onClick={() => handleNavigation("/user-events")}
-                        >
-                          Events
-                        </button>
-                      </div>
+                      {isDropdownOpen && ( // Show dropdown content only if open
+                        <div className="dropdown-content">
+                          <button
+                            onClick={() => handleNavigation("/admin/news")}
+                          >
+                            News
+                          </button>
+                          <button
+                            onClick={() => handleNavigation("/admin/events")}
+                          >
+                            Events
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 

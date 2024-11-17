@@ -437,7 +437,7 @@ cing */
 }
 
 .dropdown-content {
-  display: none; /* Hide by default */
+  display: block; /* Hide by default */
   position: absolute; /* Position below the button */
   background-color: white; /* White background */
   border: 1px solid #ccc; /* Light border */

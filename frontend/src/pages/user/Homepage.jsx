@@ -30,6 +30,7 @@ const Homepage = () => {
 
   const toggleDropdown = (event) => {
     event.preventDefault();
+    console.log("Dropdown toggled");
     setDropdownOpen((prev) => !prev);
   };
 
@@ -367,7 +368,7 @@ const Homepage = () => {
                   <div className="square-item">
                     <div className="logo newsevents-logo"></div>
                     <h3>News/Events</h3>
-                    <div className="dropdown">
+                    <div className={`dropdown ${isDropdownOpen ? "open" : ""}`}>
                       <button
                         className="dropdown-button"
                         onClick={toggleDropdown}
@@ -548,4 +549,3 @@ const Homepage = () => {
 };
 
 export default Homepage;
-/*  */

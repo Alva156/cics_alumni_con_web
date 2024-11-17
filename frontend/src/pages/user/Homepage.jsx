@@ -148,7 +148,7 @@ const Homepage = () => {
     });
     handleManualSlide("news");
   };
-  
+
   const prevNews = () => {
     setCurrentNewsIndex((prevIndex) => {
       const prevIndexValue = (prevIndex - 1 + news.length) % news.length; // Modulus for wrapping around
@@ -157,7 +157,7 @@ const Homepage = () => {
     });
     handleManualSlide("news");
   };
-  
+
   const nextEvent = () => {
     setCurrentEventsIndex((prevIndex) => {
       const nextIndex = (prevIndex + 1) % events.length; // Use modulus for infinite loop
@@ -166,7 +166,7 @@ const Homepage = () => {
     });
     handleManualSlide("events");
   };
-  
+
   const prevEvent = () => {
     setCurrentEventsIndex((prevIndex) => {
       const prevIndexValue = (prevIndex - 1 + events.length) % events.length; // Modulus for wrapping around
@@ -175,7 +175,6 @@ const Homepage = () => {
     });
     handleManualSlide("events");
   };
-  
 
   const slideTo = (index, carouselRef) => {
     const carousel = carouselRef.current;
@@ -229,20 +228,20 @@ const Homepage = () => {
         </div>
       )}
       <div className="homepage-container">
-  <div className="background-news-container">
-    {/* Background Video Section */}
-    <div className="background-section">
-      <video 
-        autoPlay 
-        muted 
-        ref={videoRef} 
-        className="background-video"
-        playsInline // Ensures the video doesn't go fullscreen on iOS
-      >
-        <source src={ustbg} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-      <div className="video-footer">Photo Courtesy of UST SITE</div>
+        <div className="background-news-container">
+          {/* Background Video Section */}
+          <div className="background-section">
+            <video
+              autoPlay
+              muted
+              ref={videoRef}
+              className="background-video"
+              playsInline // Ensures the video doesn't go fullscreen on iOS
+            >
+              <source src={ustbg} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div className="video-footer">Photo Courtesy of UST SITE</div>
           </div>
 
           {/* News and Events Carousel Section */}
@@ -358,6 +357,7 @@ const Homepage = () => {
                       View Companies
                     </button>
                   </div>
+
                   <div className="square-item">
                     <div className="logo newsevents-logo"></div>
                     <h3>News/Events</h3>
@@ -365,7 +365,7 @@ const Homepage = () => {
                       <button className="dropdown-button">
                         View News/Events
                       </button>
-                      <div className="dropdown-content">
+                      <div className="dropdown-content z-50">
                         <button onClick={() => handleNavigation("/user-news")}>
                           News
                         </button>
@@ -377,6 +377,7 @@ const Homepage = () => {
                       </div>
                     </div>
                   </div>
+
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>
                     <h3>Certifications</h3>

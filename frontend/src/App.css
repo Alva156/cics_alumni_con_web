@@ -461,6 +461,7 @@ cing */
   text-align: left; /* Align text to the left */
   background: none; /* No background */
   transition: background-color 0.3s; /* Smooth transition */
+  cursor: pointer;
 }
 
 .dropdown-content button:hover {

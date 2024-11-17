@@ -28,8 +28,9 @@ const Homepage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!isDropdownOpen);
+  const toggleDropdown = (event) => {
+    event.preventDefault();
+    setDropdownOpen((prev) => !prev);
   };
 
   const images = [homepage1, homepage2, homepage3];
@@ -373,7 +374,7 @@ const Homepage = () => {
                       >
                         Manage News/Events
                       </button>
-                      {isDropdownOpen && ( // Show dropdown content only if open
+                      {isDropdownOpen && (
                         <div className="dropdown-content">
                           <button
                             onClick={() => handleNavigation("/admin/news")}

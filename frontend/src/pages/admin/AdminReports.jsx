@@ -414,12 +414,12 @@ function AdminReports() {
     const cicsLogoBase64 = await getBase64(cicslogo);
 
     // Add CICS logo (left side)
-    doc.addImage(cicsLogoBase64, "PNG", 40, 30, 48, 48); // Left-side logo
+    doc.addImage(cicsLogoBase64, "PNG", 40, 30, 48, 48);
     doc.setFontSize(10);
     doc.setTextColor("#000000");
-    doc.text("University of Santo Tomas", 100, 52); // Align beside the logo
+    doc.text("University of Santo Tomas", 100, 52);
     doc.setFontSize(8);
-    doc.text("College of Information and Computing Sciences", 100, 62); // Align beside the logo
+    doc.text("College of Information and Computing Sciences", 100, 62);
 
     // Add AlumniConnect logo (right side)
     doc.addImage(
@@ -429,7 +429,7 @@ function AdminReports() {
       30,
       50,
       50
-    ); // Right-side logo
+    );
 
     // Add "Alumni Connect" text beside AlumniConnect logo
     const textY = 60;
@@ -437,10 +437,10 @@ function AdminReports() {
     doc.setFont("helvetica", "bold");
     doc.setTextColor("#2d2b2b");
     const alumniTextWidth = doc.getTextWidth("Alumni");
-    const alumniTextX = doc.internal.pageSize.width - 250; // Position text beside logo
+    const alumniTextX = doc.internal.pageSize.width - 250;
     doc.text("Alumni", alumniTextX, textY);
     doc.setTextColor("#be142e");
-    const connectTextX = alumniTextX + alumniTextWidth + 5; // Slight gap after "Alumni"
+    const connectTextX = alumniTextX + alumniTextWidth + 5;
     doc.text("Connect", connectTextX, textY);
 
     doc.setFontSize(20);
@@ -450,9 +450,7 @@ function AdminReports() {
       "CICS Alumni Connect Report",
       doc.internal.pageSize.width / 2,
       100,
-      {
-        align: "center",
-      }
+      { align: "center" }
     );
 
     // Calculate counts
@@ -479,49 +477,59 @@ function AdminReports() {
       }
     });
 
-    // Apply table style to Alumni Summary with three columns
+    // Alumni Summary
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.setTextColor("#be142e");
-    doc.text("Alumni Summary", 40, 160); // Section title with red color
+    doc.text("Alumni Summary", 40, 160);
 
-    // Prepare the summary data, repeating the category for each entry
-    const summaryData = [];
+    const summaryData = [
+      ["Total Alumni", "", filteredData.length],
+      ...Object.entries(alumniCountByBatch).map(([year, count]) => [
+        "Batch",
+        year,
+        count,
+      ]),
+      ...Object.entries(alumniCountByCollege).map(([college, count]) => [
+        "College",
+        college,
+        count,
+      ]),
+      ...Object.entries(alumniCountByProgram).map(([program, count]) => [
+        "Program",
+        program,
+        count,
+      ]),
+    ];
 
-    // Add total alumni count to the summary
-    summaryData.push(["Total Alumni", "", filteredData.length]);
-
-    Object.entries(alumniCountByBatch).forEach(([year, count]) => {
-      summaryData.push(["Batch", year, count]);
-    });
-
-    Object.entries(alumniCountByCollege).forEach(([college, count]) => {
-      summaryData.push(["College", college, count]);
-    });
-
-    Object.entries(alumniCountByProgram).forEach(([program, count]) => {
-      summaryData.push(["Program", program, count]);
-    });
-
-    // Add table with 3 columns: Category, Field, and Count (with repeating categories)
     autoTable(doc, {
       startY: 170,
-      head: [["Category", "Field", "Count"]], // Table headers
+      head: [["Category", "Field", "Count"]],
       body: summaryData,
-      styles: { fontSize: 10, textColor: "#333" },
-      headStyles: { fillColor: "#be142e", textColor: "#fff" }, // Red header
+      styles: { fontSize: 9.5, textColor: "#333" },
+      headStyles: { fillColor: "#be142e", textColor: "#fff" },
       columnStyles: {
-        0: { cellWidth: 100 },
-        1: { cellWidth: 200 },
-        2: { cellWidth: 80 },
+        0: { cellWidth: 300 },
+        1: { cellWidth: 300 },
+        2: { cellWidth: 150 },
       },
       margin: { top: 5, bottom: 10, left: 40, right: 40 },
     });
+    // Add text below Alumni Summary table
+    const afterSummaryY = doc.autoTable.previous.finalY + 20; // Position 20 pts below the table
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text(
+      "*Individual reports are on the next page",
+      40, // Align with the left margin of the table
+      afterSummaryY
+    );
+    // Add page break for Alumni Tables
+    doc.addPage();
 
-    // Adjusting the Y-coordinate for the next element
-    let startY = doc.autoTable.previous.finalY + 20;
+    // Alumni Data Tables
+    let startY = 40; // Start Y position on the new page
 
-    // Filtered data to be displayed in the table
     filteredData.forEach((row, index) => {
       const defaultFields = [
         ["First Name", row.firstName || "---------"],
@@ -548,14 +556,20 @@ function AdminReports() {
           ...dynamicFields.map((field) => ["", field[0], field[1]]),
         ],
         startY,
-        styles: { fontSize: 10, textColor: "#333" },
+        styles: { fontSize: 9.5, textColor: "#333" },
         headStyles: { fillColor: "#be142e", textColor: "#fff" },
       });
 
-      startY = doc.autoTable.previous.finalY + 20; // Adds space after the table
+      startY = doc.autoTable.previous.finalY + 20;
+
+      // Add new page if content overflows
+      if (startY > doc.internal.pageSize.height - 50) {
+        doc.addPage();
+        startY = 40; // Reset Y position
+      }
     });
 
-    // Add page numbers at the bottom of each page
+    // Add page numbers
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -564,13 +578,11 @@ function AdminReports() {
         `Page ${i} of ${pageCount}`,
         doc.internal.pageSize.width / 2,
         doc.internal.pageSize.height - 15,
-        {
-          align: "center",
-        }
+        { align: "center" }
       );
     }
 
-    // Save the generated PDF
+    // Save the PDF
     doc.save("cicsalumniconnect_report.pdf");
   };
 

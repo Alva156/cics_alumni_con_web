@@ -1492,7 +1492,7 @@ function AdminSurveyTool() {
     doc.setTextColor("#be142e");
     doc.text("Alumni Summary", 40, 160); // Section title with red color
 
-    // Prepare the summary data for the table
+    // Prepare the summary data for the table (remains unchanged)
     const summaryData = [
       ["Total Alumni", "", summaryCounts.totalAlumni],
       ...Object.entries(summaryCounts.batches).map(([year, count]) => [
@@ -1522,23 +1522,36 @@ function AdminSurveyTool() {
       ]),
     ];
 
-    // Render the summary data table
+    // Render the summary data table (remains unchanged)
     autoTable(doc, {
       head: [["Category", "Item", "Count"]],
       body: summaryData,
       startY: 180, // Adjust as needed based on previous sections
-      styles: { fontSize: 10, textColor: "#333" },
+      styles: { fontSize: 9.5, textColor: "#333" },
       headStyles: { fillColor: "#be142e", textColor: "#fff" },
       columnStyles: {
-        0: { cellWidth: 100 },
-        1: { cellWidth: 200 },
-        2: { cellWidth: 100 },
+        0: { cellWidth: 300 },
+        1: { cellWidth: 300 },
+        2: { cellWidth: 150 },
       },
       margin: { top: 5, bottom: 10, left: 40, right: 40 },
     });
 
+    // Add text below Alumni Summary table
+    const afterSummaryY = doc.autoTable.previous.finalY + 20; // Position 20 pts below the table
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.text(
+      "*Individual survey reports are on the next page",
+      40, // Align with the left margin of the table
+      afterSummaryY
+    );
+
+    // Add page break for Alumni Tables
+    doc.addPage();
+
     // Start adding individual responses as tables
-    let startY = doc.autoTable.previous.finalY + 20;
+    let startY = 40; // Directly start at the top of the page or adjust accordingly
 
     filteredResponses.forEach((response, index) => {
       // Default fields for each respondent
@@ -1580,13 +1593,13 @@ function AdminSurveyTool() {
           ...defaultFields.map((field) => ["", field[0], field[1]]),
           ...questionFields.map((field) => ["", field[0], field[1]]),
         ],
-        startY,
-        styles: { fontSize: 10, textColor: "#333" },
+        startY, // Use the dynamic Y position
+        styles: { fontSize: 9.5, textColor: "#333" },
         headStyles: { fillColor: "#be142e", textColor: "#fff" },
         columnStyles: {
           0: { cellWidth: 100 },
-          1: { cellWidth: 200 },
-          2: { cellWidth: 200 },
+          1: { cellWidth: 350 },
+          2: { cellWidth: 300 },
         },
         margin: { top: 5, bottom: 10, left: 40, right: 40 },
       });

@@ -438,6 +438,7 @@ function AdminAccount() {
             <label className="text-sm">Profile Picture <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
             <button
               type="button"
+              title="Delete Profile Picture"
               onClick={() => setIsDeleteModalOpen(true)}
               className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer"
             ></button>

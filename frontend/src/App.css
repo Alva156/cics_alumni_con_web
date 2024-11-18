@@ -424,51 +424,47 @@ cing */
 }
 
 .dropdown-button {
-  background-color: transparent; /* Transparent background */
-  color: #333; /* Dark text */
-  padding: 8px 12px; /* Padding */
-  font-size: 16px; /* Font size */
-  border: 1px solid #ccc; /* Light border */
-  border-radius: 4px; /* Slightly rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+  background-color: transparent;
+  color: #333;
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .dropdown-button:hover {
-  background-color: #4caf50; /* Green background on hover */
-  color: white; /* Change text color to white on hover */
+  background-color: #4caf50;
+  color: white;
 }
 
 .dropdown-content {
-  display: none; /* Hide by default */
-  position: absolute; /* Position below the button */
-  background-color: white; /* White background */
-  border: 1px solid #ccc; /* Light border */
-  border-radius: 4px; /* Rounded corners */
-  min-width: 160px; /* Minimum width */
-  z-index: 1; /* Above other content */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
-
-.dropdown:hover .dropdown-content {
-  display: block; /* Show on hover */
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 160px;
+  z-index: 10;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
 }
 
 .dropdown-content button {
-  color: #333; /* Dark text */
-  padding: 10px; /* Padding */
-  text-decoration: none; /* No underline */
-  display: block; /* Full width */
-  width: 100%; /* Full width */
-  border: none; /* No border */
-  text-align: left; /* Align text to the left */
-  background: none; /* No background */
-  transition: background-color 0.3s; /* Smooth transition */
+  color: #333;
+  padding: 10px;
+  border: none;
+  text-align: left;
+  background: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .dropdown-content button:hover {
-  background-color: #f0f0f0; /* Light gray on hover */
+  background-color: #f0f0f0;
 }
+
 
 /* Mission & Vision Section */
 .mission-vision-section {

@@ -350,13 +350,7 @@ const Homepage = () => {
             {currentPage === 0 ? (
               <div className="carousel-page">
                 <div className="square-container">
-                  <div className="square-item">
-                    <div className="logo companies-logo"></div>
-                    <h3>Companies</h3>
-                    <button onClick={() => handleNavigation("/user-companies")}>
-                      View Companies
-                    </button>
-                  </div>
+                  
                   <div className="square-item">
   <div className="logo newsevents-logo"></div>
   <h3>News/Events</h3>
@@ -365,16 +359,23 @@ const Homepage = () => {
       className="news-button"
       onClick={() => handleNavigation("/user-news")}
     >
-      News
+      View News
     </button>
     <button
       className="events-button"
       onClick={() => handleNavigation("/user-events")}
     >
-      Events
+      View Events
     </button>
   </div>
 </div>
+<div className="square-item">
+                    <div className="logo companies-logo"></div>
+                    <h3>Companies</h3>
+                    <button onClick={() => handleNavigation("/user-companies")}>
+                      View Companies
+                    </button>
+                  </div>
 
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>

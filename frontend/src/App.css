@@ -470,20 +470,22 @@ cing */
   background-color: #f0f0f0; /* Light gray on hover */
 }
 
-/* For desktop version: Buttons side by side */
+/* For desktop version: Buttons stacked on top of each other */
 .buttons-container {
   display: flex;
-  justify-content: space-between; /* Ensure space between buttons */
-  gap: 10px; /* Optional, for spacing between the buttons */
+  flex-direction: column; /* Stack buttons vertically */
+  justify-content: center; /* Align buttons vertically in the center */
+  gap: 5px; /* Space between buttons */
 }
 
 .news-button,
 .events-button {
-  width: 50%; /* Make buttons a bit longer */
+  width: 100%; /* Make buttons take up full width of the container */
   padding: 10px;
   font-size: 16px; /* Adjust as needed */
   cursor: pointer;
   text-align: center;
+  line-height: 1.2; /* Optional: Adjust line height for tighter text spacing */
 }
 
 /* For mobile version: Stack buttons vertically with space around and consistent button width */

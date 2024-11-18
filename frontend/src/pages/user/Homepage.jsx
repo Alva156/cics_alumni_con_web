@@ -357,19 +357,25 @@ const Homepage = () => {
                       View Companies
                     </button>
                   </div>
-                  <div className="py-1">
-  <label className="pt-4 pb-2 text-sm">News/Events</label>
-  <select
-    name="newsEvents"
-    className="select select-bordered select-sm w-full h-10"
-    onChange={(e) => handleNavigation(e.target.value)} // Redirect to the selected path
-  >
-    <option value="">-</option>
-    <option value="/user-news">News</option>
-    <option value="/user-events">Events</option>
-  </select>
-</div>
-
+                  <div className="square-item">
+                    <div className="logo newsevents-logo"></div>
+                    <h3>News/Events</h3>
+                    <div className="dropdown">
+                      <button className="dropdown-button">
+                        View News/Events
+                      </button>
+                      <div className="dropdown-content">
+                        <button onClick={() => handleNavigation("/user-news")}>
+                          News
+                        </button>
+                        <button
+                          onClick={() => handleNavigation("/user-events")}
+                        >
+                          Events
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>
                     <h3>Certifications</h3>

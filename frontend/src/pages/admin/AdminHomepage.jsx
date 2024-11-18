@@ -246,16 +246,7 @@ const AdminHomepage = () => {
             {currentPage === 0 ? (
               <div className="carousel-page">
                 <div className="square-container">
-                  <div className="square-item">
-                    <div className="logo companies-logo"></div>
-                    <h3>Companies</h3>
-                    <button
-                      onClick={() => handleNavigation("/admin/companies")}
-                    >
-                      Manage Companies
-                    </button>
-                  </div>
-                  <div className="square-item">
+                <div className="square-item">
   <div className="logo newsevents-logo"></div>
   <h3>News/Events</h3>
   <div className="buttons-container">
@@ -263,16 +254,23 @@ const AdminHomepage = () => {
       className="news-button"
       onClick={() => handleNavigation("/admin/news")}
     >
-      News
+      Manage News
     </button>
     <button
       className="events-button"
       onClick={() => handleNavigation("/admin/events")}
     >
-      Events
+      Manage Events
     </button>
   </div>
 </div>
+<div className="square-item">
+                    <div className="logo companies-logo"></div>
+                    <h3>Companies</h3>
+                    <button onClick={() => handleNavigation("/admin/companies")}>
+                      Manage Companies
+                    </button>
+                  </div>
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>
                     <h3>Certifications</h3>

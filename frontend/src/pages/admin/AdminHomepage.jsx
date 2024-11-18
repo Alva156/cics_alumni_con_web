@@ -337,7 +337,7 @@ const AdminHomepage = () => {
                     </button>
                   </div>
                   <div className="square-item">
-                    <div className="logo chatbot-logo"></div>
+                    <div className="logo reports-logo"></div>
                     <h3>Reports</h3>
                     <button onClick={() => handleNavigation("/admin/reports")}>
                       View Reports

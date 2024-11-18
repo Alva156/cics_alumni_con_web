@@ -395,6 +395,9 @@ cing */
 .jobs-logo {
   background-image: url("/src/assets/jobs.png");
 }
+.reports-logo {
+  background-image: url("/src/assets/reports.png");
+}
 
 .square-item h3 {
   font-size: 1.2rem;

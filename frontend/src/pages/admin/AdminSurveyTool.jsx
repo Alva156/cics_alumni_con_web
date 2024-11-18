@@ -1732,7 +1732,7 @@ function AdminSurveyTool() {
       <div className="mb-4 relative no-print">
         <input
           type="text"
-          placeholder="Search Company"
+          placeholder="Search Survey"
           className="w-full border border-black rounded-lg px-4 py-2"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}

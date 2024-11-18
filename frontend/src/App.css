@@ -418,57 +418,74 @@ cing */
   background-color: #232323;
 }
 
+/* Dropdown styles */
 .dropdown {
   position: relative;
   display: inline-block;
+  text-align: center;
+  margin-top: 10px;
 }
 
 .dropdown-button {
-  background-color: transparent; /* Transparent background */
-  color: #333; /* Dark text */
-  padding: 8px 12px; /* Padding */
-  font-size: 16px; /* Font size */
-  border: 1px solid #ccc; /* Light border */
-  border-radius: 4px; /* Slightly rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .dropdown-button:hover {
-  background-color: #4caf50; /* Green background on hover */
-  color: white; /* Change text color to white on hover */
+  background-color: #45a049;
 }
 
 .dropdown-content {
-  display: none; /* Hide by default */
-  position: absolute; /* Position below the button */
-  background-color: white; /* White background */
-  border: 1px solid #ccc; /* Light border */
-  border-radius: 4px; /* Rounded corners */
-  min-width: 160px; /* Minimum width */
-  z-index: 1; /* Above other content */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 160px;
+  display: flex;
+  flex-direction: column;
 }
 
-.dropdown:hover .dropdown-content {
-  display: block; /* Show on hover */
+.dropdown-item {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px 15px;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.dropdown-content button {
-  color: #333; /* Dark text */
-  padding: 10px; /* Padding */
-  text-decoration: none; /* No underline */
-  display: block; /* Full width */
-  width: 100%; /* Full width */
-  border: none; /* No border */
-  text-align: left; /* Align text to the left */
-  background: none; /* No background */
-  transition: background-color 0.3s; /* Smooth transition */
+.dropdown-item:hover {
+  background-color: #f0f0f0;
 }
 
-.dropdown-content button:hover {
-  background-color: #f0f0f0; /* Light gray on hover */
+@media (max-width: 768px) {
+  .dropdown {
+    width: 100%;
+    text-align: center;
+  }
+  .dropdown-button {
+    width: 100%;
+  }
+  .dropdown-content {
+    width: auto;
+    left: auto;
+    transform: none;
+  }
 }
+
 
 /* Mission & Vision Section */
 .mission-vision-section {

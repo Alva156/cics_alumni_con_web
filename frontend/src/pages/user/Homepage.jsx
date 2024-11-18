@@ -26,6 +26,17 @@ const Homepage = () => {
   const eventsCarouselRef = useRef(null); // Reference for events carousel
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
+
+  const navigateToPage = (path) => {
+    navigate(path);
+    window.scrollTo(0, 0); // Scroll to the top of the page
+  };
+
 
   const images = [homepage1, homepage2, homepage3];
   const credits = [
@@ -343,114 +354,107 @@ const Homepage = () => {
         </div>
 
         <div className="carousel-container" data-aos="fade-up">
-          <button className="carousel-button prev" onClick={prevPage}>
-            ❮
-          </button>
-          <div className={`carousel-content ${fade ? "fade" : ""}`}>
-            {currentPage === 0 ? (
-              <div className="carousel-page">
-                <div className="square-container">
-                  <div className="square-item">
-                    <div className="logo companies-logo"></div>
-                    <h3>Companies</h3>
-                    <button onClick={() => handleNavigation("/user-companies")}>
-                      View Companies
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo newsevents-logo"></div>
-                    <h3>News/Events</h3>
-                    <div className="dropdown">
-                      <button className="dropdown-button">
-                        View News/Events
-                      </button>
-                      <div className="dropdown-content">
-                        <button onClick={() => handleNavigation("/user-news")}>
-                          News
-                        </button>
-                        <button
-                          onClick={() => handleNavigation("/user-events")}
-                        >
-                          Events
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo certifications-logo"></div>
-                    <h3>Certifications</h3>
-                    <button
-                      onClick={() => handleNavigation("/user-certifications")}
-                    >
-                      View Certifications
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo documents-logo"></div>
-                    <h3>Documents</h3>
-                    <button
-                      onClick={() => handleNavigation("/user-documentrequest")}
-                    >
-                      View Documents
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo jobs-logo"></div>
-                    <h3>Job/Internship</h3>
-                    <button onClick={() => handleNavigation("/user-job")}>
-                      View Jobs/Internships
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="carousel-page">
-                <div className="square-container">
-                  <div className="square-item">
-                    <div className="logo userprofile-logo"></div>
-                    <h3>Profile</h3>
-                    <button
-                      onClick={() => handleNavigation("/user-userprofile")}
-                    >
-                      Go to Profile
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo survey-logo"></div>
-                    <h3>Survey</h3>
-                    <button onClick={() => handleNavigation("/user-survey")}>
-                      Take Survey
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo threads-logo"></div>
-                    <h3>Threads</h3>
-                    <button onClick={() => handleNavigation("/user-threads")}>
-                      View Threads
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo alumni-logo"></div>
-                    <h3>Alumni</h3>
-                    <button onClick={() => handleNavigation("/user-alumni")}>
-                      Alumni Network
-                    </button>
-                  </div>
-                  <div className="square-item">
-                    <div className="logo chatbot-logo"></div>
-                    <h3>FAQs</h3>
-                    <button onClick={() => handleNavigation("/user-chatbot")}>
-                      Ask Questions
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+  <button className="carousel-button prev" onClick={prevPage}>
+    ❮
+  </button>
+  <div className={`carousel-content ${fade ? "fade" : ""}`}>
+    {currentPage === 0 ? (
+      <div className="carousel-page">
+        <div className="square-container">
+          <div className="square-item">
+            <div className="logo companies-logo"></div>
+            <h3>Companies</h3>
+            <button onClick={() => handleNavigation("/user-companies")}>
+              View Companies
+            </button>
           </div>
-          <button className="carousel-button next" onClick={nextPage}>
-            ❯
-          </button>
+          <div className="square-item">
+            <div className="logo newsevents-logo"></div>
+            <h3>News/Events</h3>
+            <div className="dropdown">
+              <button className="dropdown-button">
+                View News/Events
+              </button>
+              <div className="dropdown-content">
+                <button onClick={() => handleNavigation("/user-news")}>
+                  News
+                </button>
+                <button onClick={() => handleNavigation("/user-events")}>
+                  Events
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="square-item">
+            <div className="logo certifications-logo"></div>
+            <h3>Certifications</h3>
+            <button onClick={() => handleNavigation("/user-certifications")}>
+              View Certifications
+            </button>
+          </div>
+          <div className="square-item">
+            <div className="logo documents-logo"></div>
+            <h3>Documents</h3>
+            <button onClick={() => handleNavigation("/user-documentrequest")}>
+              View Documents
+            </button>
+          </div>
+          <div className="square-item">
+            <div className="logo jobs-logo"></div>
+            <h3>Job/Internship</h3>
+            <button onClick={() => handleNavigation("/user-job")}>
+              View Jobs/Internships
+            </button>
+          </div>
         </div>
+      </div>
+    ) : (
+      <div className="carousel-page">
+        <div className="square-container">
+          <div className="square-item">
+            <div className="logo userprofile-logo"></div>
+            <h3>Profile</h3>
+            <button onClick={() => handleNavigation("/user-userprofile")}>
+              Go to Profile
+            </button>
+          </div>
+          <div className="square-item">
+            <div className="logo survey-logo"></div>
+            <h3>Survey</h3>
+            <button onClick={() => handleNavigation("/user-survey")}>
+              Take Survey
+            </button>
+          </div>
+          <div className="square-item">
+            <div className="logo threads-logo"></div>
+            <h3>Threads</h3>
+            <button onClick={() => handleNavigation("/user-threads")}>
+              View Threads
+            </button>
+          </div>
+          <div className="square-item">
+            <div className="logo alumni-logo"></div>
+            <h3>Alumni</h3>
+            <button onClick={() => handleNavigation("/user-alumni")}>
+              Alumni Network
+            </button>
+          </div>
+          <div className="square-item">
+            <div className="logo chatbot-logo"></div>
+            <h3>FAQs</h3>
+            <button onClick={() => handleNavigation("/user-chatbot")}>
+              Ask Questions
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+  <button className="carousel-button next" onClick={nextPage}>
+    ❯
+  </button>
+</div>
+
 
         <div className="mission-vision-section fixed-height" data-aos="fade-up">
           <div className="mission-vision-content">

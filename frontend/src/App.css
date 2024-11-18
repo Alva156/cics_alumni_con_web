@@ -420,41 +420,52 @@ cing */
   display: inline-block;
 }
 
+.dropdown-button {
+  background-color: transparent; /* Transparent background */
+  color: #333; /* Dark text */
+  padding: 8px 12px; /* Padding */
+  font-size: 16px; /* Font size */
+  border: 1px solid #ccc; /* Light border */
+  border-radius: 4px; /* Slightly rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+.dropdown-button:hover {
+  background-color: #4caf50; /* Green background on hover */
+  color: white; /* Change text color to white on hover */
+}
+
 .dropdown-content {
-  display: block; /* Always block, but hide with JS */
-  visibility: hidden; /* Hide by default */
-  opacity: 0; /* Transparent */
-  transition: visibility 0s, opacity 0.3s ease-in-out; /* Smooth fade */
-  position: absolute;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  min-width: 160px;
-  z-index: 1;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  display: none; /* Hide by default */
+  position: absolute; /* Position below the button */
+  background-color: white; /* White background */
+  border: 1px solid #ccc; /* Light border */
+  border-radius: 4px; /* Rounded corners */
+  min-width: 160px; /* Minimum width */
+  z-index: 1; /* Above other content */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.dropdown:hover .dropdown-content {
+  display: block; /* Show on hover */
 }
 
 .dropdown-content button {
-  color: #333;
-  padding: 10px;
-  text-decoration: none;
-  display: block;
-  width: 100%;
-  border: none;
-  text-align: left;
-  background: none;
-  transition: background-color 0.3s;
+  color: #333; /* Dark text */
+  padding: 10px; /* Padding */
+  text-decoration: none; /* No underline */
+  display: block; /* Full width */
+  width: 100%; /* Full width */
+  border: none; /* No border */
+  text-align: left; /* Align text to the left */
+  background: none; /* No background */
+  transition: background-color 0.3s; /* Smooth transition */
 }
 
 .dropdown-content button:hover {
-  background-color: #f0f0f0;
+  background-color: #f0f0f0; /* Light gray on hover */
 }
-
-.dropdown-content.show {
-  visibility: visible;
-  opacity: 1;
-}
-
 
 /* Mission & Vision Section */
 .mission-vision-section {

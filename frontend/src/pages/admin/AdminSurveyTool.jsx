@@ -1632,7 +1632,7 @@ function AdminSurveyTool() {
         margin: { top: 5, bottom: 10, left: 40, right: 40 },
       });
 
-      startY = doc.autoTable.previous.finalY + 20; // Adds space after each response
+      startY = doc.autoTable.previous.finalY + 60; // Adds space after each response
     });
 
     // Add page numbers at the bottom of each page
@@ -1643,7 +1643,7 @@ function AdminSurveyTool() {
       doc.text(
         `Page ${i} of ${pageCount}`,
         doc.internal.pageSize.width / 2,
-        doc.internal.pageSize.height - 20,
+        doc.internal.pageSize.height - 10,
         {
           align: "center",
         }

@@ -26,19 +26,6 @@ const Homepage = () => {
   const eventsCarouselRef = useRef(null); // Reference for events carousel
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
-// Close the dropdown when clicking outside
-useEffect(() => {
-  const handleOutsideClick = (event) => {
-    if (!event.target.closest(".dropdown")) {
-      setIsDropdownOpen(false);
-    }
-  };
-  document.addEventListener("click", handleOutsideClick);
-  return () => document.removeEventListener("click", handleOutsideClick);
-}, []);
-
 
   const images = [homepage1, homepage2, homepage3];
   const credits = [
@@ -371,21 +358,24 @@ useEffect(() => {
                     </button>
                   </div>
                   <div className="square-item">
-  <div className="logo newsevents-logo"></div>
-  <h3>News/Events</h3>
-  <div className="dropdown">
-    <button className="dropdown-button" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-      View News/Events
-    </button>
-    {isDropdownOpen && (
-      <div className="dropdown-content">
-        <button onClick={() => handleNavigation("/user-news")}>News</button>
-        <button onClick={() => handleNavigation("/user-events")}>Events</button>
-      </div>
-    )}
-  </div>
-</div>
-
+                    <div className="logo newsevents-logo"></div>
+                    <h3>News/Events</h3>
+                    <div className="dropdown">
+                      <button className="dropdown-button">
+                        View News/Events
+                      </button>
+                      <div className="dropdown-content">
+                        <button onClick={() => handleNavigation("/user-news")}>
+                          News
+                        </button>
+                        <button
+                          onClick={() => handleNavigation("/user-events")}
+                        >
+                          Events
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>
                     <h3>Certifications</h3>

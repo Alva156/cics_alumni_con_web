@@ -373,17 +373,17 @@ const Homepage = () => {
                         className="dropdown-button"
                         onClick={toggleDropdown}
                       >
-                        Manage News/Events
+                        View News/Events
                       </button>
                       {isDropdownOpen && (
                         <div className="dropdown-content">
                           <button
-                            onClick={() => handleNavigation("/admin/news")}
+                            onClick={() => handleNavigation("/user-news")}
                           >
                             News
                           </button>
                           <button
-                            onClick={() => handleNavigation("/admin/events")}
+                            onClick={() => handleNavigation("/user-events")}
                           >
                             Events
                           </button>

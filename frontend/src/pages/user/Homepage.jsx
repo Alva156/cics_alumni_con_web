@@ -358,24 +358,24 @@ const Homepage = () => {
                     </button>
                   </div>
                   <div className="square-item">
-                    <div className="logo newsevents-logo"></div>
-                    <h3>News/Events</h3>
-                    <div className="dropdown">
-                      <button className="dropdown-button">
-                        View News/Events
-                      </button>
-                      <div className="dropdown-content">
-                        <button onClick={() => handleNavigation("/user-news")}>
-                          News
-                        </button>
-                        <button
-                          onClick={() => handleNavigation("/user-events")}
-                        >
-                          Events
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+  <div className="logo newsevents-logo"></div>
+  <h3>News/Events</h3>
+  <div className="buttons-container">
+    <button
+      className="news-button"
+      onClick={() => handleNavigation("/user-news")}
+    >
+      News
+    </button>
+    <button
+      className="events-button"
+      onClick={() => handleNavigation("/user-events")}
+    >
+      Events
+    </button>
+  </div>
+</div>
+
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>
                     <h3>Certifications</h3>

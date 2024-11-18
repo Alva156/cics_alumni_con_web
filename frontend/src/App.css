@@ -470,6 +470,43 @@ cing */
   background-color: #f0f0f0; /* Light gray on hover */
 }
 
+/* For desktop version: Buttons side by side */
+.buttons-container {
+  display: flex;
+  justify-content: space-between; /* Ensure space between buttons */
+  gap: 10px; /* Optional, for spacing between the buttons */
+}
+
+.news-button,
+.events-button {
+  width: 50%; /* Make buttons a bit longer */
+  padding: 10px;
+  font-size: 16px; /* Adjust as needed */
+  cursor: pointer;
+  text-align: center;
+}
+
+/* For mobile version: Stack buttons vertically with space around */
+@media (max-width: 768px) {
+  .buttons-container {
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 1px; /* Space between buttons */
+    width: 100%; /* Make container full width */
+  }
+
+  .news-button,
+  .events-button {
+    width: 40%; /* Make buttons take up most of the width, but leave space on the sides */
+    padding: 15px; /* Optional: Make padding larger for a better visual appearance */
+    font-size: 16px; /* Optional: Adjust font size for better readability */
+    margin: 0 auto; /* Center the buttons */
+    margin: 0 auto; /* Center the buttons */
+    margin-bottom: 10px; /* Add bottom margin for space between button and square container */
+  
+  }
+}
+
+
 /* Mission & Vision Section */
 .mission-vision-section {
   display: flex;

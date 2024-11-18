@@ -486,7 +486,7 @@ cing */
   text-align: center;
 }
 
-/* For mobile version: Stack buttons vertically with space around */
+/* For mobile version: Stack buttons vertically with space around and consistent button width */
 @media (max-width: 768px) {
   .buttons-container {
     flex-direction: column; /* Stack buttons vertically */
@@ -497,12 +497,11 @@ cing */
   .news-button,
   .events-button {
     width: 40%; /* Make buttons take up most of the width, but leave space on the sides */
+    max-width: 150px; /* Set a max width to prevent buttons from getting too large on wider screens like iPhone XR */
     padding: 15px; /* Optional: Make padding larger for a better visual appearance */
     font-size: 16px; /* Optional: Adjust font size for better readability */
     margin: 0 auto; /* Center the buttons */
-    margin: 0 auto; /* Center the buttons */
     margin-bottom: 10px; /* Add bottom margin for space between button and square container */
-  
   }
 }
 

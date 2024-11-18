@@ -443,7 +443,7 @@ cing */
   border: 1px solid #ccc; /* Light border */
   border-radius: 4px; /* Rounded corners */
   min-width: 160px; /* Minimum width */
-  z-index: 9999;
+  z-index: 1; /* Above other content */
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
@@ -461,15 +461,10 @@ cing */
   text-align: left; /* Align text to the left */
   background: none; /* No background */
   transition: background-color 0.3s; /* Smooth transition */
-  cursor: pointer;
 }
 
 .dropdown-content button:hover {
   background-color: #f0f0f0; /* Light gray on hover */
-}
-
-.dropdown.open .dropdown-content {
-  display: block; /* Show on open */
 }
 
 /* Mission & Vision Section */

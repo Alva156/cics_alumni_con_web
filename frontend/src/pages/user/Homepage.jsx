@@ -26,12 +26,6 @@ const Homepage = () => {
   const eventsCarouselRef = useRef(null); // Reference for events carousel
   const [showLoginMessage, setShowLoginMessage] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-
-const toggleDropdown = () => {
-  setDropdownVisible(!dropdownVisible); // Toggle dropdown visibility
-};
-
 
   const images = [homepage1, homepage2, homepage3];
   const credits = [
@@ -364,25 +358,24 @@ const toggleDropdown = () => {
                     </button>
                   </div>
                   <div className="square-item">
-  <div className="logo newsevents-logo"></div>
-  <h3>News/Events</h3>
-  <div className="dropdown">
-    <button className="dropdown-button" onClick={toggleDropdown}>
-      View News/Events
-    </button>
-    {dropdownVisible && (
-      <div className="dropdown-content">
-        <button onClick={() => handleNavigation("/user-news")}>
-          News
-        </button>
-        <button onClick={() => handleNavigation("/user-events")}>
-          Events
-        </button>
-      </div>
-    )}
-  </div>
-</div>
-
+                    <div className="logo newsevents-logo"></div>
+                    <h3>News/Events</h3>
+                    <div className="dropdown">
+                      <button className="dropdown-button">
+                        View News/Events
+                      </button>
+                      <div className="dropdown-content">
+                        <button onClick={() => handleNavigation("/user-news")}>
+                          News
+                        </button>
+                        <button
+                          onClick={() => handleNavigation("/user-events")}
+                        >
+                          Events
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>
                     <h3>Certifications</h3>

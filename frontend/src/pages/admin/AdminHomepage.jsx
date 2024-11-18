@@ -256,24 +256,23 @@ const AdminHomepage = () => {
                     </button>
                   </div>
                   <div className="square-item">
-                    <div className="logo newsevents-logo"></div>
-                    <h3>News/Events</h3>
-                    <div className="dropdown">
-                      <button className="dropdown-button">
-                        Manage News/Events
-                      </button>
-                      <div className="dropdown-content">
-                        <button onClick={() => handleNavigation("/admin/news")}>
-                          News
-                        </button>
-                        <button
-                          onClick={() => handleNavigation("/admin/events")}
-                        >
-                          Events
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+  <div className="logo newsevents-logo"></div>
+  <h3>News/Events</h3>
+  <div className="buttons-container">
+    <button
+      className="news-button"
+      onClick={() => handleNavigation("/admin/news")}
+    >
+      News
+    </button>
+    <button
+      className="events-button"
+      onClick={() => handleNavigation("/admin/events")}
+    >
+      Events
+    </button>
+  </div>
+</div>
                   <div className="square-item">
                     <div className="logo certifications-logo"></div>
                     <h3>Certifications</h3>

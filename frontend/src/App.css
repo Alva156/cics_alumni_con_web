@@ -498,8 +498,8 @@ cing */
 
   .news-button,
   .events-button {
-    width: 40%; /* Make buttons take up most of the width, but leave space on the sides */
-    max-width: 300px; /* Set a max width to prevent buttons from getting too large on wider screens like iPhone XR */
+    width: 50%; /* Make buttons take up most of the width, but leave space on the sides */
+    max-width: 150px; /* Set a max width to prevent buttons from getting too large on wider screens like iPhone XR */
     padding: 15px; /* Optional: Make padding larger for a better visual appearance */
     font-size: 16px; /* Optional: Adjust font size for better readability */
     margin: 0 auto; /* Center the buttons */

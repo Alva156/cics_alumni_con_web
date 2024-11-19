@@ -190,7 +190,7 @@ function Login() {
                   type="button"
                   onClick={() => navigate("/forgotpassword")}
                 >
-                  Forget Password
+                  Forgot Password
                 </button>
               </div>
 

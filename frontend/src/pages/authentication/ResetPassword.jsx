@@ -58,7 +58,7 @@ function ResetPassword() {
     }
 
     const passwordRegex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*_])[A-Za-z\d!@#$%^&*_]{8,}$/;
 
     if (!passwordRegex.test(newPassword)) {
       setError("Password must meet the complexity requirements.");

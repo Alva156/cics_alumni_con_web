@@ -48,7 +48,7 @@ function Register() {
     const minLength = /.{8,}/; // At least 8 characters
     const upperCase = /[A-Z]/; // At least one uppercase letter
     const digit = /[0-9]/; // At least one digit
-    const specialChar = /[!@#$%^&*(),.?":{}|<>]/; // At least one special character
+    const specialChar = /[_!@#$%^&*(),.?":{}|<>]/; // At least one special character
 
     if (!minLength.test(password)) {
       return "Password must be at least 8 characters long";
@@ -246,11 +246,10 @@ function Register() {
               <label className="block mb-1 text-xs font-medium">
                 Mobile Number *
                 <span className="text-xs font-light italic">
-                      {" "}
-                      ( include country code before your number, e.g.,{" "}
-                      <span className="font-medium">63</span> 9125559207 for PH
-                      )
-                    </span>
+                  {" "}
+                  ( include country code before your number, e.g.,{" "}
+                  <span className="font-medium">63</span> 9125559207 for PH )
+                </span>
               </label>
               <input
                 type="number"

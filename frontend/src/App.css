@@ -507,7 +507,6 @@ cing */
   }
 }
 
-
 /* Mission & Vision Section */
 .mission-vision-section {
   display: flex;
@@ -718,7 +717,7 @@ screens */
 @media print {
   @page {
     size: A3; /* You can change this to 'letter' or other sizes */
-    margin: 5mm; /* Adjust the margins as needed */
+    margin: 10mm 5mm 5mm 5mm !important;
   }
   /* Hide the export button when printing */
   .no-print {

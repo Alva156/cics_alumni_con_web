@@ -1024,6 +1024,27 @@ function UserProfile() {
     e.preventDefault();
     setErrorMessage2("");
 
+    const validatePassword = (password) => {
+      const minLength = /.{8,}/; // At least 8 characters
+      const upperCase = /[A-Z]/; // At least one uppercase letter
+      const digit = /[0-9]/; // At least one digit
+      const specialChar = /[_!@#$%^&*(),.?":{}|<>]/; // At least one special character
+
+      if (!minLength.test(password)) {
+        return "Password must be at least 8 characters long.";
+      }
+      if (!upperCase.test(password)) {
+        return "Password must contain at least one uppercase letter.";
+      }
+      if (!digit.test(password)) {
+        return "Password must contain at least one digit.";
+      }
+      if (!specialChar.test(password)) {
+        return "Password must contain at least one special character.";
+      }
+      return null; // No validation error
+    };
+
     if (!oldPassword || !newPassword || !confirmPassword) {
       setErrorMessage2("All fields are required.");
       setShowErrorMessage2(true);
@@ -1031,11 +1052,9 @@ function UserProfile() {
       return;
     }
 
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-
-    if (!passwordRegex.test(newPassword)) {
-      setErrorMessage2("Password must meet the complexity requirements.");
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      setErrorMessage2(passwordError);
       setShowErrorMessage2(true);
       setTimeout(() => setShowErrorMessage2(false), 3000);
       return;

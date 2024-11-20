@@ -444,11 +444,9 @@ exports.updateProfile = async (req, res) => {
           { new: true, upsert: false }
         );
         if (!updatedUser) {
-          return res
-            .status(404)
-            .json({
-              error: "User not found while updating email or mobile number.",
-            });
+          return res.status(404).json({
+            error: "User not found while updating email or mobile number.",
+          });
         }
       }
 
@@ -540,15 +538,6 @@ exports.changePassword = async (req, res) => {
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: "Old password does not match." });
-    }
-
-    // Check password complexity (optional)
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-    if (!passwordRegex.test(newPassword)) {
-      return res
-        .status(400)
-        .json({ error: "Password must meet the complexity requirements." });
     }
 
     // Hash the new password and update it

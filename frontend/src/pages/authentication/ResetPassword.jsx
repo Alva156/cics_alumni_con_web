@@ -57,11 +57,30 @@ function ResetPassword() {
       return;
     }
 
-    const passwordRegex =
-      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*_])[A-Za-z\d!@#$%^&*_]{8,}$/;
+    const validatePassword = (password) => {
+      const minLength = /.{8,}/; // At least 8 characters
+      const upperCase = /[A-Z]/; // At least one uppercase letter
+      const digit = /[0-9]/; // At least one digit
+      const specialChar = /[_!@#$%^&*(),.?":{}|<>]/; // At least one special character
 
-    if (!passwordRegex.test(newPassword)) {
-      setError("Password must meet the complexity requirements.");
+      if (!minLength.test(password)) {
+        return "Password must be at least 8 characters long";
+      }
+      if (!upperCase.test(password)) {
+        return "Password must contain at least one uppercase letter";
+      }
+      if (!digit.test(password)) {
+        return "Password must contain at least one digit";
+      }
+      if (!specialChar.test(password)) {
+        return "Password must contain at least one special character";
+      }
+      return null; // No validation error
+    };
+
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      setError(passwordError);
       clearErrorAfterDelay();
       return;
     }

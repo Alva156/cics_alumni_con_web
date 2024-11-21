@@ -359,27 +359,29 @@ const NavbarAdmin = () => {
           )}
 
           {isModalVisible && (
-            <dialog id="my_modal_5" className="modal modal-middle " open>
-              {loading && <LoadingSpinner />} {/* Show loading spinner */}
-              <div className="modal-box">
-                <h3 className="font-bold text-lg">Logout</h3>
-                <p className="py-4">Are you sure you want to log out?</p>
-                <div className="modal-action">
-                  <button
-                    className="btn bg-green text-white w-20"
-                    onClick={logout}
-                  >
-                    Yes
-                  </button>
-                  <button
-                    className="btn bg-red text-white w-20"
-                    onClick={closeModal}
-                  >
-                    No
-                  </button>
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+              <dialog id="my_modal_5" className="modal modal-middle " open>
+                {loading && <LoadingSpinner />} {/* Show loading spinner */}
+                <div className="modal-box">
+                  <h3 className="font-bold text-lg">Logout</h3>
+                  <p className="py-4">Are you sure you want to log out?</p>
+                  <div className="modal-action">
+                    <button
+                      className="btn bg-green text-white w-20"
+                      onClick={logout}
+                    >
+                      Yes
+                    </button>
+                    <button
+                      className="btn bg-red text-white w-20"
+                      onClick={closeModal}
+                    >
+                      No
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </dialog>
+              </dialog>
+            </div>
           )}
         </div>
       </div>

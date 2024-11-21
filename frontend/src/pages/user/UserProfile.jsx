@@ -1137,6 +1137,24 @@ function UserProfile() {
     setNewEmail("");
     setOtp("");
   };
+  const modalRef1 = useRef(null);
+  const modalRef2 = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef1.current && !modalRef1.current.contains(event.target)) {
+        closePassModal();
+      }
+      if (modalRef2.current && !modalRef2.current.contains(event.target)) {
+        closeEmailModal();
+      }
+    };
+
+    if (isPassModalOpen || isEmailModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isPassModalOpen, isEmailModalOpen]);
 
   return (
     <>
@@ -1154,7 +1172,10 @@ function UserProfile() {
             </div>
           )}
 
-          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
+          <div
+            ref={modalRef1}
+            className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4"
+          >
             <button
               onClick={closePassModal}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
@@ -1337,7 +1358,29 @@ function UserProfile() {
           )}
 
           {/* Modal Content */}
-          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
+          <div
+            ref={modalRef2}
+            className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4"
+          >
+            <button
+              onClick={closeEmailModal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
             {/* Modal Body */}
             <div className="mb-4">
               <div className="block mb-2 text-sm font-medium">

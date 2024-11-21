@@ -3,6 +3,8 @@ import axios from "axios";
 import sampleidpic from "../../assets/sampleidpic.jpg";
 import blankprofilepic from "../../assets/blankprofilepic.jpg";
 import { Filter } from "bad-words";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function Threads() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -738,7 +740,7 @@ function Threads() {
               {thread.isOwner && (
                 <div className="flex items-center">
                   <div
-                    className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group "
                     onClick={(e) => {
                       e.stopPropagation();
                       openDeleteModal(thread);

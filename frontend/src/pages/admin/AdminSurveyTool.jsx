@@ -1846,7 +1846,7 @@ function AdminSurveyTool() {
                   openDeleteModal(survey); // Open the modal and pass the full survey object
                 }}
               >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
+                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1 ">
                   Delete
                 </span>
               </div>

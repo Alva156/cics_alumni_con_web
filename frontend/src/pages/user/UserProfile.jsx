@@ -1585,20 +1585,24 @@ function UserProfile() {
                           (Allowed formats: JPG, JPEG, PNG, Max size: 5MB)
                         </span>{" "}
                       </label>
+                    </div>
+
+                    <div className="relative mt-2">
+                      <input
+                        type="file"
+                        id="fileInput"
+                        className="file-input file-input-sm file-input-bordered text-xs w-full h-10 pr-10"
+                        onChange={handleImageChange}
+                        accept="image/*"
+                      />
                       <button
                         type="button"
                         title="Delete Profile Picture"
                         onClick={() => setIsDeleteModalPicOpen(true)}
-                        className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 w-7 h-7 rounded-full bg-red flex justify-center items-center cursor-pointer fas fa-trash text-white"
+                        style={{ fontSize: "14px" }}
                       ></button>
                     </div>
-
-                    <input
-                      type="file"
-                      className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mt-2"
-                      onChange={handleImageChange}
-                      accept="image/*"
-                    />
                   </div>
 
                   <div className="py-1">
@@ -1648,7 +1652,9 @@ function UserProfile() {
                       onChange={(e) => setGender(e.target.value)}
                       value={gender}
                     >
-                      <option value="" disabled hidden>Choose</option>
+                      <option value="" disabled hidden>
+                        Choose
+                      </option>
                       <option value="">-</option>
                       <option>Male</option>
                       <option>Female</option>
@@ -1663,7 +1669,9 @@ function UserProfile() {
                       onChange={(e) => setRegion(e.target.value)}
                       value={region}
                     >
-                      <option value="" disabled hidden>Choose</option>
+                      <option value="" disabled hidden>
+                        Choose
+                      </option>
                       <option value="">-</option>
                       <option>NCR</option>
                       <option>CAR</option>
@@ -1707,7 +1715,9 @@ function UserProfile() {
                       name="college"
                       value={college}
                     >
-                      <option value="" disabled hidden>Choose</option>
+                      <option value="" disabled hidden>
+                        Choose
+                      </option>
                       <option value="">-</option>
                       {/* Dynamically render colleges */}
                       {Object.keys(collegePrograms).map((collegeName) => (
@@ -1727,7 +1737,9 @@ function UserProfile() {
                       value={collegeProgram}
                       disabled={!college}
                     >
-                      <option value="" disabled hidden>Choose</option>
+                      <option value="" disabled hidden>
+                        Choose
+                      </option>
                       <option value="">-</option>
                       {/* Dynamically render college programs based on selected college */}
                       {college &&
@@ -1754,9 +1766,9 @@ function UserProfile() {
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">
                       Year Started on College Program{" "}
-                        <span className="text-xs font-light italic">
-                          (1611 - current year)
-                        </span>{" "}
+                      <span className="text-xs font-light italic">
+                        (1611 - current year)
+                      </span>{" "}
                     </label>
                     <input
                       type="number"
@@ -1773,10 +1785,10 @@ function UserProfile() {
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">
-                      Year Graduated on College Program {" "}
-                        <span className="text-xs font-light italic">
-                          (1611 - current year)
-                        </span>{" "}
+                      Year Graduated on College Program{" "}
+                      <span className="text-xs font-light italic">
+                        (1611 - current year)
+                      </span>{" "}
                     </label>
                     <input
                       type="number"
@@ -1831,7 +1843,9 @@ function UserProfile() {
                     onChange={(e) => setEmploymentStatus(e.target.value)}
                     value={employmentStatus}
                   >
-                    <option value="" disabled hidden>Choose</option>
+                    <option value="" disabled hidden>
+                      Choose
+                    </option>
                     <option value="">-</option>
                     <option>Employed</option>
                     <option>Self-employed</option>
@@ -1849,7 +1863,9 @@ function UserProfile() {
                     onChange={(e) => setWorkIndustry(e.target.value)}
                     value={workIndustry}
                   >
-                    <option value="" disabled hidden>Choose</option>
+                    <option value="" disabled hidden>
+                      Choose
+                    </option>
                     <option value="">-</option>
                     <option>Public</option>
                     <option>Private</option>
@@ -1866,7 +1882,9 @@ function UserProfile() {
                     onChange={(e) => setProfessionAlignment(e.target.value)}
                     value={professionAlignment}
                   >
-                    <option value="" disabled hidden>Choose</option>
+                    <option value="" disabled hidden>
+                      Choose
+                    </option>
                     <option value="">-</option>
                     <option>Yes</option>
                     <option>No</option>
@@ -1881,7 +1899,9 @@ function UserProfile() {
                     onChange={(e) => setMaritalStatus(e.target.value)}
                     value={maritalStatus}
                   >
-                    <option value="" disabled hidden>Choose</option>
+                    <option value="" disabled hidden>
+                      Choose
+                    </option>
                     <option value="">-</option>
                     <option>Single</option>
                     <option>Married</option>
@@ -1900,7 +1920,9 @@ function UserProfile() {
                     onChange={(e) => setSalaryRange(e.target.value)}
                     value={salaryRange}
                   >
-                    <option value="" disabled hidden>Choose</option>
+                    <option value="" disabled hidden>
+                      Choose
+                    </option>
                     <option value="">-</option>
                     <option>14K below</option>
                     <option>15-30K</option>
@@ -1920,7 +1942,9 @@ function UserProfile() {
                     onChange={(e) => setPlaceOfEmployment(e.target.value)}
                     value={placeOfEmployment}
                   >
-                    <option value="" disabled hidden>Choose</option>
+                    <option value="" disabled hidden>
+                      Choose
+                    </option>
                     <option value="">-</option>
                     <option>Local</option>
                     <option>International</option>
@@ -2101,13 +2125,23 @@ function UserProfile() {
                             <button
                               type="button"
                               title="Preview Attachment"
-                              className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
+                              className="w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 fas fa-eye text-white"
+                              style={{
+                                fontSize: "11px",
+                                textAlign: "center",
+                                paddingTop: "3px",
+                              }}
                               onClick={() => openPreviewModal(attachment)}
                             ></button>
                             <button
                               type="button"
                               title="Delete Attachment"
-                              className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2"
+                              className="w-5 h-5 rounded-full bg-red flex justify-center items-center cursor-pointer mr-2 fas fa-trash text-white"
+                              style={{
+                                fontSize: "11px",
+                                textAlign: "center",
+                                paddingTop: "4px",
+                              }}
                               onClick={() =>
                                 initiateDeleteAttachment(attachment._id)
                               }

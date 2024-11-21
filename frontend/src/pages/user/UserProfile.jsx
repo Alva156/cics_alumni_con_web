@@ -1648,6 +1648,7 @@ function UserProfile() {
                       onChange={(e) => setGender(e.target.value)}
                       value={gender}
                     >
+                      <option value="" disabled hidden>Choose</option>
                       <option value="">-</option>
                       <option>Male</option>
                       <option>Female</option>
@@ -1662,6 +1663,7 @@ function UserProfile() {
                       onChange={(e) => setRegion(e.target.value)}
                       value={region}
                     >
+                      <option value="" disabled hidden>Choose</option>
                       <option value="">-</option>
                       <option>NCR</option>
                       <option>CAR</option>
@@ -1689,7 +1691,7 @@ function UserProfile() {
                     <label className="pt-4 pb-2 text-sm">Profession</label>
                     <input
                       type="text"
-                      placeholder="Type here"
+                      placeholder="e.g. Web Developer"
                       className="input input-sm input-bordered w-full h-10"
                       name="profession"
                       value={profession}
@@ -1705,6 +1707,7 @@ function UserProfile() {
                       name="college"
                       value={college}
                     >
+                      <option value="" disabled hidden>Choose</option>
                       <option value="">-</option>
                       {/* Dynamically render colleges */}
                       {Object.keys(collegePrograms).map((collegeName) => (
@@ -1724,6 +1727,7 @@ function UserProfile() {
                       value={collegeProgram}
                       disabled={!college}
                     >
+                      <option value="" disabled hidden>Choose</option>
                       <option value="">-</option>
                       {/* Dynamically render college programs based on selected college */}
                       {college &&
@@ -1739,7 +1743,7 @@ function UserProfile() {
                     <label className="pt-4 pb-2 text-sm">Specialization</label>
                     <input
                       type="text"
-                      placeholder="Type here"
+                      placeholder="e.g. Web and Mobile Application Development"
                       className="input input-sm input-bordered w-full h-10"
                       onChange={(e) => setSpecialization(e.target.value)}
                       name="specialization"
@@ -1749,7 +1753,10 @@ function UserProfile() {
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">
-                      Year Started on College Program
+                      Year Started on College Program{" "}
+                        <span className="text-xs font-light italic">
+                          (1611 - current year)
+                        </span>{" "}
                     </label>
                     <input
                       type="number"
@@ -1758,13 +1765,18 @@ function UserProfile() {
                       className="input input-sm input-bordered w-full h-10"
                       name="yearStartedCollege"
                       value={yearStartedCollege}
+                      min="1611"
+                      max={new Date().getFullYear()} // Maximum year as the current year
                       onChange={(e) => setYearStartedCollege(e.target.value)}
                     />
                   </div>
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm">
-                      Year Graduated on College Program
+                      Year Graduated on College Program {" "}
+                        <span className="text-xs font-light italic">
+                          (1611 - current year)
+                        </span>{" "}
                     </label>
                     <input
                       type="number"
@@ -1773,6 +1785,8 @@ function UserProfile() {
                       className="input input-sm input-bordered w-full h-10"
                       name="yearGraduatedCollege"
                       value={yearGraduatedCollege}
+                      min="1611"
+                      max={new Date().getFullYear()} // Maximum year as the current year
                       onChange={(e) => setYearGraduatedCollege(e.target.value)}
                     />
                   </div>
@@ -1783,7 +1797,7 @@ function UserProfile() {
                     </label>
                     <input
                       type="text"
-                      placeholder="Type here"
+                      placeholder="e.g. 2 months"
                       className="input input-sm input-bordered w-full h-10"
                       name="timeToJob"
                       value={timeToJob}
@@ -1817,6 +1831,7 @@ function UserProfile() {
                     onChange={(e) => setEmploymentStatus(e.target.value)}
                     value={employmentStatus}
                   >
+                    <option value="" disabled hidden>Choose</option>
                     <option value="">-</option>
                     <option>Employed</option>
                     <option>Self-employed</option>
@@ -1834,6 +1849,7 @@ function UserProfile() {
                     onChange={(e) => setWorkIndustry(e.target.value)}
                     value={workIndustry}
                   >
+                    <option value="" disabled hidden>Choose</option>
                     <option value="">-</option>
                     <option>Public</option>
                     <option>Private</option>
@@ -1850,6 +1866,7 @@ function UserProfile() {
                     onChange={(e) => setProfessionAlignment(e.target.value)}
                     value={professionAlignment}
                   >
+                    <option value="" disabled hidden>Choose</option>
                     <option value="">-</option>
                     <option>Yes</option>
                     <option>No</option>
@@ -1864,6 +1881,7 @@ function UserProfile() {
                     onChange={(e) => setMaritalStatus(e.target.value)}
                     value={maritalStatus}
                   >
+                    <option value="" disabled hidden>Choose</option>
                     <option value="">-</option>
                     <option>Single</option>
                     <option>Married</option>
@@ -1882,6 +1900,7 @@ function UserProfile() {
                     onChange={(e) => setSalaryRange(e.target.value)}
                     value={salaryRange}
                   >
+                    <option value="" disabled hidden>Choose</option>
                     <option value="">-</option>
                     <option>14K below</option>
                     <option>15-30K</option>
@@ -1901,6 +1920,7 @@ function UserProfile() {
                     onChange={(e) => setPlaceOfEmployment(e.target.value)}
                     value={placeOfEmployment}
                   >
+                    <option value="" disabled hidden>Choose</option>
                     <option value="">-</option>
                     <option>Local</option>
                     <option>International</option>
@@ -1937,7 +1957,7 @@ function UserProfile() {
                   <label className="pt-4 pb-2 text-sm">LinkedIn</label>
                   <input
                     type="text"
-                    placeholder="Type here"
+                    placeholder="e.g. https://www.linkedin.com/in/example-sample-48a636207"
                     className="input input-sm input-bordered w-full h-10"
                     name="linkedIn"
                     value={linkedIn}
@@ -1949,7 +1969,7 @@ function UserProfile() {
                   <label className="pt-4 pb-2 text-sm">Facebook</label>
                   <input
                     type="text"
-                    placeholder="Type here"
+                    placeholder="e.g. https://www.facebook.com/example101/"
                     className="input input-sm input-bordered w-full h-10"
                     name="facebook"
                     value={facebook}
@@ -1961,7 +1981,7 @@ function UserProfile() {
                   <label className="pt-4 pb-2 text-sm">Instagram</label>
                   <input
                     type="text"
-                    placeholder="Type here"
+                    placeholder="e.g. https://www.instagram.com/example101"
                     className="input input-sm input-bordered w-full h-10"
                     name="instagram"
                     value={instagram}
@@ -1975,7 +1995,7 @@ function UserProfile() {
                   </label>
                   <input
                     type="email"
-                    placeholder="Type here"
+                    placeholder="e.g. example@email.com"
                     className="input input-sm input-bordered w-full h-10"
                     name="email"
                     value={email}
@@ -1995,7 +2015,7 @@ function UserProfile() {
                   </label>
                   <input
                     type="tel"
-                    placeholder="Type here"
+                    placeholder="e.g. 639991112399"
                     className="input input-sm input-bordered w-full h-10"
                     name="mobileNumber"
                     value={mobileNumber}
@@ -2007,7 +2027,7 @@ function UserProfile() {
                   <label className="pt-4 pb-2 text-sm">Other Contact</label>
                   <input
                     type="text"
-                    placeholder="Type here"
+                    placeholder="e.g. example@email.com"
                     className="input input-sm input-bordered w-full h-10"
                     name="otherContact"
                     value={otherContact}
@@ -2158,7 +2178,7 @@ function UserProfile() {
                       <label className="pt-4 pb-2 text-sm">School Name</label>
                       <input
                         type="text"
-                        placeholder="Type here"
+                        placeholder="e.g. University of Santo Tomas"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.schoolName}
                         onChange={(e) =>
@@ -2247,7 +2267,7 @@ function UserProfile() {
                       <input
                         type="text"
                         name="schoolName"
-                        placeholder="Type here"
+                        placeholder="e.g. University of Santo Tomas"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.schoolName}
                         onChange={(e) =>
@@ -2262,7 +2282,7 @@ function UserProfile() {
                       <input
                         type="text"
                         name="program"
-                        placeholder="Type here"
+                        placeholder="e.g. Information Technology"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.program}
                         onChange={(e) =>
@@ -2373,7 +2393,7 @@ function UserProfile() {
                       <input
                         type="text"
                         name="companyName"
-                        placeholder="Type here"
+                        placeholder="e.g. Google"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.companyName}
                         onChange={(e) =>
@@ -2387,7 +2407,7 @@ function UserProfile() {
                       <input
                         type="text"
                         name="position"
-                        placeholder="Type here"
+                        placeholder="e.g. Web Developer"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.position}
                         onChange={(e) =>
@@ -2444,7 +2464,7 @@ function UserProfile() {
                       <input
                         type="text"
                         name="remarks"
-                        placeholder="Type here"
+                        placeholder="Type remarks here"
                         className="input input-sm input-bordered w-full h-10"
                         value={section.remarks}
                         onChange={(e) =>

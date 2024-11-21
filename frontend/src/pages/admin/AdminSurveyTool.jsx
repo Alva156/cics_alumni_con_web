@@ -9,6 +9,8 @@ import cicslogo from "../../assets/cicslogo.png";
 import { uniqueId } from "lodash"; // Make sure you import uniqueId
 import { Pie } from "react-chartjs-2";
 import { Bar } from "react-chartjs-2";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -1052,8 +1054,13 @@ function AdminSurveyTool() {
             }
           />
           <button
-            className="ml-2 w-4 h-4 rounded-full bg-[#BE142E]"
+            className="ml-2 rounded-full bg-[#BE142E] fas fa-trash text-white w-5 h-5"
             title="Delete Option"
+            style={{
+              fontSize: "12px",
+              textAlign: "center",
+              paddingTop: "2px",
+            }}
             onClick={() => handleDeleteOption(questionIndex, optionIndex)}
           ></button>
         </div>
@@ -1756,7 +1763,7 @@ function AdminSurveyTool() {
             <p>Are you sure you want to delete this survey?</p>
             <div className="flex justify-end mt-4">
               <button
-                className="btn btn-sm w-24 bg-red text-white mr-2"
+                className="btn btn-sm w-24 bg-red text-white mr-2 "
                 onClick={async () => {
                   await handleDeleteSurvey(selectedSurvey); // Call delete function
                   setIsDeleteModalOpen(false); // Close the modal after deletion
@@ -1840,31 +1847,41 @@ function AdminSurveyTool() {
             <div className="flex items-center">
               {/* Delete Button */}
               <div
-                className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group "
+                title="Delete"
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  paddingTop: "4px",
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   openDeleteModal(survey); // Open the modal and pass the full survey object
                 }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1 ">
-                  Delete
-                </span>
-              </div>
+              ></div>
               {/* Edit Button */}
               <div
-                className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                title="Edit"
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  paddingTop: "4px",
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   openEditModal(survey);
                 }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Edit
-                </span>
-              </div>
+              ></div>
               {/* Publish Button */}
               <div
-                className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                className="fas fa-check text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                title="Publish"
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  paddingTop: "4px",
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   const surveyToToggle = surveys.find(
@@ -1894,11 +1911,7 @@ function AdminSurveyTool() {
                     }
                   }
                 }}
-              >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Publish
-                </span>
-              </div>
+              ></div>
             </div>
           </div>
         ))
@@ -1927,7 +1940,13 @@ function AdminSurveyTool() {
             <div className="flex items-center">
               {/* Unpublish Button */}
               <div
-                className="w-4 h-4 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
+                className="fas fa-ban text-white w-5 h-5 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
+                title="Unpublish"
+                style={{
+                  fontSize: "12px",
+                  textAlign: "center",
+                  paddingTop: "4px",
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   console.log(
@@ -2581,8 +2600,13 @@ function AdminSurveyTool() {
                   </label>
                   {/* Delete Question Button */}
                   <button
-                    className="ml-2 w-4 h-4 rounded-full bg-[#BE142E] text-sm rounded text-white"
+                    className="ml-2 fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] text-sm rounded text-white"
                     title="Delete Question"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "2px",
+                    }}
                     onClick={() => handleDeleteQuestion(questionIndex)}
                   ></button>
                 </div>
@@ -2700,8 +2724,13 @@ function AdminSurveyTool() {
                   </label>
                   {/* Delete Question Button */}
                   <button
-                    className="ml-2 w-4 h-4 rounded-full bg-[#BE142E] text-sm rounded text-white"
+                    className="ml-2 fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] text-sm rounded text-white"
                     title="Delete Question"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "2px",
+                    }}
                     onClick={() => handleDeleteQuestion(questionIndex)}
                   ></button>
                 </div>

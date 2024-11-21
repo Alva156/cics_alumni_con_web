@@ -10,6 +10,19 @@ function Events() {
   const [events, setEvents] = useState([]);
   const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    if (isViewModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isViewModalOpen]);
 
   // Fetch all events from the server
   const fetchEvents = async () => {

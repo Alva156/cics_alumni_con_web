@@ -882,6 +882,7 @@ function AdminSurveyTool() {
   const openViewModal = (survey) => {
     setSelectedSurvey(survey);
     setIsViewModalOpen(true);
+    setIsSurveyReportModalOpen(false);
   };
 
   const openEditModal = (survey) => {
@@ -899,6 +900,31 @@ function AdminSurveyTool() {
     );
     setIsEditModalOpen(true);
   };
+
+  const combinedRef = (element) => {
+    modalRef.current = element;
+    dashboardRef.current = element;
+  };
+  const deleteModalRef = useRef(null);
+  const publishModalRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        (deleteModalRef.current &&
+          !deleteModalRef.current.contains(event.target)) ||
+        (publishModalRef.current &&
+          !publishModalRef.current.contains(event.target))
+      ) {
+        closeModal();
+      }
+    };
+
+    if (isDeleteModalOpen || isPublishModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isDeleteModalOpen, isPublishModalOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -925,6 +951,8 @@ function AdminSurveyTool() {
     setIsEditModalOpen(false);
     setIsAddModalOpen(false);
     setSelectedSurvey(null);
+    setIsDeleteModalOpen(false);
+    setIsPublishModalOpen(false);
   };
 
   const closeSurveyReportModal = () => {
@@ -1720,7 +1748,10 @@ function AdminSurveyTool() {
       )}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+          <div
+            ref={deleteModalRef}
+            className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96"
+          >
             <h2 className="text-2xl mb-4">Delete Survey</h2>
             <p>Are you sure you want to delete this survey?</p>
             <div className="flex justify-end mt-4">
@@ -1930,7 +1961,7 @@ function AdminSurveyTool() {
       {isViewModalOpen && selectedSurvey && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 print-modal ">
           <div
-            ref={(modalRef, dashboardRef)}
+            ref={combinedRef}
             className="bg-white p-6 md:p-8 lg:p-12 rounded-lg max-w-full md:max-w-3xl lg:max-w-4xl w-full h-auto overflow-y-auto max-h-full relative print-content"
           >
             <button
@@ -2744,7 +2775,10 @@ function AdminSurveyTool() {
       {/* Publish/Unpublish Confirmation Modal */}
       {isPublishModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+          <div
+            ref={publishModalRef}
+            className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96"
+          >
             <h2 className="text-2xl mb-4">
               {surveys.find((survey) => survey._id === selectedSurveyId)
                 ?.published

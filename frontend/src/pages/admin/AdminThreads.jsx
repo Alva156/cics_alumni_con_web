@@ -526,16 +526,6 @@ function AdminThreads() {
     setIsAddModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsViewModalOpen(false);
-    setIsEditModalOpen(false);
-    setIsAddModalOpen(false);
-    setIsDeleteModalOpen(false);
-    setIsNotifModalOpen(false);
-    setSelectedThread(null);
-    setThreadToDelete(null);
-  };
-
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredThreads([]);
@@ -576,6 +566,98 @@ function AdminThreads() {
       return 0;
     });
   };
+  const closeModal = () => {
+    setIsViewModalOpen(false);
+    setIsEditModalOpen(false);
+    setIsAddModalOpen(false);
+    setIsDeleteModalOpen(false);
+    setIsNotifModalOpen(false);
+    setIsEditReplyModalOpen(false);
+    setIsDeleteReplyModalOpen(false);
+    setSelectedThread(null);
+    setThreadToDelete(null);
+  };
+
+  const notifModalRef = useRef(null);
+  const viewModalRef = useRef(null);
+  const editModalRef = useRef(null);
+  const addModalRef = useRef(null);
+  const deleteModalRef = useRef(null);
+  const editReplyModalRef = useRef(null);
+  const deleteReplyModalRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      let isOutside = true;
+
+      // Check if click is inside any of the modals
+      if (
+        notifModalRef.current &&
+        notifModalRef.current.contains(event.target)
+      ) {
+        isOutside = false;
+      }
+      if (viewModalRef.current && viewModalRef.current.contains(event.target)) {
+        isOutside = false;
+      }
+      if (editModalRef.current && editModalRef.current.contains(event.target)) {
+        isOutside = false;
+      }
+      if (addModalRef.current && addModalRef.current.contains(event.target)) {
+        isOutside = false;
+      }
+      if (
+        deleteModalRef.current &&
+        deleteModalRef.current.contains(event.target)
+      ) {
+        isOutside = false;
+      }
+      if (
+        editReplyModalRef.current &&
+        editReplyModalRef.current.contains(event.target)
+      ) {
+        isOutside = false;
+      }
+      if (
+        deleteReplyModalRef.current &&
+        deleteReplyModalRef.current.contains(event.target)
+      ) {
+        isOutside = false;
+      }
+
+      if (isOutside) {
+        // Handle modal closures in priority order
+        if (isEditReplyModalOpen) {
+          setIsEditReplyModalOpen(false);
+        } else if (isDeleteReplyModalOpen) {
+          setIsDeleteReplyModalOpen(false);
+        } else if (isNotifModalOpen) {
+          setIsNotifModalOpen(false);
+        } else if (isAddModalOpen) {
+          setIsAddModalOpen(false);
+        } else if (isEditModalOpen) {
+          setIsEditModalOpen(false);
+        } else if (isDeleteModalOpen) {
+          setIsDeleteModalOpen(false);
+        } else if (isViewModalOpen) {
+          setIsViewModalOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [
+    isNotifModalOpen,
+    isAddModalOpen,
+    isEditModalOpen,
+    isDeleteModalOpen,
+    isViewModalOpen,
+    isEditReplyModalOpen,
+    isDeleteReplyModalOpen,
+  ]);
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-0 mb-12">
@@ -817,7 +899,10 @@ function AdminThreads() {
       )}
       {isDeleteReplyModalOpen && replyToDelete && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+          <div
+            ref={deleteReplyModalRef}
+            className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96"
+          >
             <h2 className="text-2xl mb-4">Delete Reply</h2>
             <p>Are you sure you want to delete this reply?</p>
             <div className="flex justify-end mt-4">
@@ -842,7 +927,10 @@ function AdminThreads() {
       )}
       {isEditReplyModalOpen && selectedReply && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
+          <div
+            ref={editReplyModalRef}
+            className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full"
+          >
             <h2 className="text-2xl mb-4">Edit Reply</h2>
             <textarea
               className="w-full border border-black rounded-lg px-4 py-2"
@@ -877,7 +965,10 @@ function AdminThreads() {
       {isViewModalOpen && selectedThread && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           {loading && <LoadingSpinner />} {/* Show loading spinner */}
-          <div className="bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] relative mx-4">
+          <div
+            ref={viewModalRef}
+            className="bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] relative mx-4"
+          >
             {/* Header section */}
             <div className="flex justify-between items-center mb-4">
               <div className="flex items-center">
@@ -1027,7 +1118,10 @@ function AdminThreads() {
       )}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
+          <div
+            ref={editModalRef}
+            className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4"
+          >
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
@@ -1089,8 +1183,11 @@ function AdminThreads() {
         </div>
       )}
       {isDeleteModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            ref={deleteModalRef}
+            className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96"
+          >
             <h2 className="ttext-2xl mb-4">Delete Thread</h2>
             <p>Are you sure you want to delete this thread?</p>
             <div className="flex justify-end mt-4">
@@ -1111,8 +1208,11 @@ function AdminThreads() {
         </div>
       )}
       {isNotifModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div
+            ref={notifModalRef}
+            className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96"
+          >
             <h2 className="text-2xl mb-4">
               {selectedThread?.notifEnabled
                 ? "Turn Off Notifications"
@@ -1147,7 +1247,10 @@ function AdminThreads() {
               <p>{errorMessage}</p>
             </div>
           )}
-          <div className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4">
+          <div
+            ref={addModalRef}
+            className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4"
+          >
             <button
               onClick={closeModal}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"

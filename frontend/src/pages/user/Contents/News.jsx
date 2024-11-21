@@ -10,6 +10,19 @@ function News() {
   const [news, setNews] = useState([]);
   const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    if (isViewModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isViewModalOpen]);
 
   // Fetch all news from the server
   const fetchNews = async () => {

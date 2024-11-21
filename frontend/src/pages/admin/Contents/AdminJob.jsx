@@ -8,11 +8,47 @@ function AdminJobs() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [jobs, setJobs] = useState([]);
   const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const deleteModalRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Handle outside click for delete modal
+      if (
+        deleteModalRef.current &&
+        !deleteModalRef.current.contains(event.target)
+      ) {
+        setIsDeleteModalOpen(false);
+      }
+    };
+
+    if (isDeleteModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isDeleteModalOpen]);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    if (
+      isViewModalOpen ||
+      isEditModalOpen ||
+      isAddModalOpen ||
+      isDeleteModalOpen
+    ) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isViewModalOpen, isEditModalOpen, isAddModalOpen, isDeleteModalOpen]);
   const [showSuccessMessage, setSuccessMessage] = useState(false);
   const [showErrorMessage, setErrorMessage] = useState(false);
   const [showMessage, setshowMessage] = useState("");
@@ -59,6 +95,7 @@ function AdminJobs() {
     setIsViewModalOpen(false);
     setIsEditModalOpen(false);
     setIsAddModalOpen(false);
+    setIsDeleteModalOpen(false);
     setSelectedJobs(null);
   };
 
@@ -503,7 +540,10 @@ function AdminJobs() {
 
       {isDeleteModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+          <div
+            ref={modalRef}
+            className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96"
+          >
             <h2 className="text-2xl mb-4">Delete Jobs</h2>
             <p>Are you sure you want to delete this jobs?</p>
             <div className="flex justify-end mt-4">

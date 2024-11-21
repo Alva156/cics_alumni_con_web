@@ -1137,25 +1137,36 @@ function UserProfile() {
     setNewEmail("");
     setOtp("");
   };
+  const closeDeleteModalPic = () => {
+    setIsDeleteModalPicOpen(false);
+  };
   const modalRef1 = useRef(null);
   const modalRef2 = useRef(null);
+  const modalRef3 = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Close the Password Modal if clicked outside
       if (modalRef1.current && !modalRef1.current.contains(event.target)) {
         closePassModal();
       }
+
+      // Close the Email Modal if clicked outside
       if (modalRef2.current && !modalRef2.current.contains(event.target)) {
         closeEmailModal();
       }
+
+      // Close the Delete Modal if clicked outside
+      if (modalRef3.current && !modalRef3.current.contains(event.target)) {
+        closeDeleteModalPic();
+      }
     };
 
-    if (isPassModalOpen || isEmailModalOpen) {
+    if (isPassModalOpen || isEmailModalOpen || isDeleteModalPicOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       return () =>
         document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [isPassModalOpen, isEmailModalOpen]);
-
+  }, [isPassModalOpen, isEmailModalOpen, isDeleteModalPicOpen]);
   return (
     <>
       {/* Password Modal */}
@@ -1321,7 +1332,10 @@ function UserProfile() {
       )}
       {isDeleteModalPicOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96">
+          <div
+            ref={modalRef3}
+            className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96"
+          >
             <h2 className="text-2xl mb-4">Delete Profile Image</h2>
             <p>Are you sure you want to delete your Profile Image?</p>
             <div className="flex justify-center gap-4 mt-4">

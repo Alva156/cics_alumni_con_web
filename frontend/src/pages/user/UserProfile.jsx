@@ -207,7 +207,7 @@ function UserProfile() {
         setNewEmail(""); // Clear new email input
         setOtp(""); // Clear OTP input
         setValidationMessage(
-          "Email changed successfully! Please log in using your new email."
+          "Email changed successfully! Please sign in using your new email."
         );
         setModalVisible(true);
 
@@ -914,7 +914,7 @@ function UserProfile() {
       if (accountEmail !== initialAccountEmail) {
         setShowValidationMessage(false);
         setValidationMessage(
-          "Email changed successfully! Please log in using your new email."
+          "Email changed successfully! Please sign in using your new email."
         );
         setModalVisible(true); // Show modal
       } else {
@@ -1076,7 +1076,7 @@ function UserProfile() {
 
       if (response.status === 200) {
         setValidationMessage(
-          "Password changed successfully! Please log in using your new password."
+          "Password changed successfully! Please sign in using your new password."
         );
         setModalVisible(true);
         setIsPassModalOpen(false);

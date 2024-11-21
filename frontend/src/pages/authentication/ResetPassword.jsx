@@ -286,7 +286,7 @@ function ResetPassword() {
           <dialog id="my_modal_5" className="modal modal-middle" open>
             <div className="modal-box">
               <h3 className="font-bold text-lg">Reset Password Successful</h3>
-              <p className="py-4">You can now log in with your new password.</p>
+              <p className="py-4">You can now sign in with your new password.</p>
               <div className="modal-action">
                 <button
                   onClick={handleCloseModal}

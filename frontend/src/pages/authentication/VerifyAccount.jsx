@@ -324,7 +324,7 @@ function VerifyAccount() {
             <div className="modal-box">
               <h3 className="font-bold text-lg">Verification Successful</h3>
               <p className="py-4">
-                Your account has been verified successfully. You can now log in.
+                Your account has been verified successfully. You can now sign in.
               </p>
               <div className="modal-action">
                 <button

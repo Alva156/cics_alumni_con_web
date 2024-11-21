@@ -117,7 +117,7 @@ function AdminAccount() {
         setNewEmail(""); // Clear new email input
         setOtp(""); // Clear OTP input
         setValidationMessage2(
-          "Email changed successfully! Please log in using your new email."
+          "Email changed successfully! Please sign in using your new email."
         );
         setModalVisible(true);
 
@@ -308,7 +308,7 @@ function AdminAccount() {
 
       if (response.status === 200) {
         setValidationMessage2(
-          "Password changed successfully! Please log in using your new password."
+          "Password changed successfully! Please sign in using your new password."
         );
         setModalVisible(true);
         setIsPassModalOpen(false);

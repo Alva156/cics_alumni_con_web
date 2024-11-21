@@ -486,27 +486,32 @@ function AdminAccount() {
               className="h-40 w-40 border-2 mb-4"
             />
           )}
-          <div className="flex justify-between items-center pt-4">
+
+          <div className="relative mt-2">
             <label className="text-sm">
               Profile Picture{" "}
               <span className="text-xs font-light italic">
                 (Allowed formats: JPG, JPEG, PNG, Max size: 5MB)
               </span>
             </label>
-            <button
-              type="button"
-              title="Delete Profile Picture"
-              onClick={() => setIsDeleteModalOpen(true)}
-              className="w-4 h-4 rounded-full bg-red flex justify-center items-center cursor-pointer"
-            ></button>
-          </div>
+            <div className="relative mt-2">
+              <input
+                type="file"
+                id="fileInput"
+                className="file-input file-input-sm file-input-bordered text-xs w-full h-10 pr-10"
+                onChange={handleImageChange}
+                accept="image/*"
+              />
 
-          <input
-            type="file"
-            className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mt-2"
-            onChange={handleImageChange}
-            accept="image/*"
-          />
+              <button
+                type="button"
+                title="Delete Profile Picture"
+                onClick={() => setIsDeleteModalOpen(true)}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 w-7 h-7 rounded-full bg-red flex justify-center items-center cursor-pointer fas fa-trash text-white"
+                style={{ fontSize: "14px" }}
+              ></button>
+            </div>
+          </div>
         </div>
 
         <div className="py-1">

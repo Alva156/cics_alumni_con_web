@@ -739,7 +739,7 @@ function Threads() {
               {thread.isOwner && (
                 <div className="flex items-center">
                   <div
-                    className="fas fa-edit text-white w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group "
+                    className="fas fa-trash text-white w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group "
                     title="Delete"
                     onClick={(e) => {
                       e.stopPropagation();

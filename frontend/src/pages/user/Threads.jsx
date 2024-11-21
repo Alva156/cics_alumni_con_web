@@ -739,16 +739,13 @@ function Threads() {
               {thread.isOwner && (
                 <div className="flex items-center">
                   <div
-                    className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group fas fa-edit text-white"
+                    className="fas fa-edit text-white w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group "
+                    title="Delete"
                     onClick={(e) => {
                       e.stopPropagation();
                       openDeleteModal(thread);
                     }}
-                  >
-                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                      Delete
-                    </span>
-                  </div>
+                  ></div>
                   <div
                     className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
                     onClick={(e) => {
@@ -797,38 +794,44 @@ function Threads() {
                 </div>
                 <div className="flex items-center">
                   <div
-                    className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    title="Delete"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "4px",
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       openDeleteModal(thread);
                     }}
-                  >
-                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                      Delete
-                    </span>
-                  </div>
+                  ></div>
                   <div
-                    className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                    className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                    title="Notification"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "4px",
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       openNotifModal(thread);
                     }}
-                  >
-                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                      Notifications
-                    </span>
-                  </div>
+                  ></div>
                   <div
-                    className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    title="Edit"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "4px",
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       openEditModal(thread);
                     }}
-                  >
-                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                      Edit
-                    </span>
-                  </div>
+                  ></div>
                 </div>
               </div>
             ))
@@ -859,38 +862,44 @@ function Threads() {
                 {thread.isOwner && (
                   <div className="flex items-center">
                     <div
-                      className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                      className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                      title="Delete"
+                      style={{
+                        fontSize: "12px",
+                        textAlign: "center",
+                        paddingTop: "4px",
+                      }}
                       onClick={(e) => {
                         e.stopPropagation();
                         openDeleteModal(thread);
                       }}
-                    >
-                      <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                        Delete
-                      </span>
-                    </div>
+                    ></div>
                     <div
-                      className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                      className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                      title="Notification"
+                      style={{
+                        fontSize: "12px",
+                        textAlign: "center",
+                        paddingTop: "4px",
+                      }}
                       onClick={(e) => {
                         e.stopPropagation();
                         openNotifModal(thread);
                       }}
-                    >
-                      <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                        Notifications
-                      </span>
-                    </div>
+                    ></div>
                     <div
-                      className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                      className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                      title="Edit"
+                      style={{
+                        fontSize: "12px",
+                        textAlign: "center",
+                        paddingTop: "4px",
+                      }}
                       onClick={(e) => {
                         e.stopPropagation();
                         openEditModal(thread);
                       }}
-                    >
-                      <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                        Edit
-                      </span>
-                    </div>
+                    ></div>
                   </div>
                 )}
               </div>
@@ -1077,23 +1086,27 @@ function Threads() {
                   {reply.isOwner && (
                     <div className="flex space-x-2">
                       <div
-                        className="w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
+                        className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
+                        title="Delete"
+                        style={{
+                          fontSize: "12px",
+                          textAlign: "center",
+                          paddingTop: "4px",
+                        }}
                         onClick={(e) => {
                           openDeleteReplyModal(reply); // Open delete modal for the specific reply
                         }}
-                      >
-                        <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100">
-                          Delete
-                        </span>
-                      </div>
+                      ></div>
                       <div
-                        className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+                        className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+                        title="Edit"
+                        style={{
+                          fontSize: "12px",
+                          textAlign: "center",
+                          paddingTop: "4px",
+                        }}
                         onClick={() => handleEditReply(reply)}
-                      >
-                        <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 bg-gray-700 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100">
-                          Edit
-                        </span>
-                      </div>
+                      ></div>
                     </div>
                   )}
                 </div>

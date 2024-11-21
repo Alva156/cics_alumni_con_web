@@ -551,6 +551,14 @@ function AdminAccount() {
               Change Account Email
             </button>
           </div>
+          <div className="py-1">
+          <button
+          onClick={openPassModal}
+          className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-fgray text-white px-4 py-2 md:px-6 md:py-3"
+        >
+          Reset Password
+        </button>
+        </div>
         </div>
       </form>
 
@@ -561,12 +569,7 @@ function AdminAccount() {
         >
           Save
         </button>
-        <button
-          onClick={openPassModal}
-          className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-[#E58008] text-white px-4 py-2 md:px-6 md:py-3"
-        >
-          Reset Password
-        </button>
+    
       </div>
       {/* Modal */}
       {modalVisible && (

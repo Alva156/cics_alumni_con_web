@@ -285,10 +285,16 @@ const Homepage = () => {
                 </ul>
               </div>
 
-              <button className="carousel-button prev" onClick={prevNews}>
+              <button
+                className="carousel-button prev w-12 h-12 rounded-full flex justify-center items-center bg-blue-500 text-white"
+                onClick={prevNews}
+              >
                 ❮
               </button>
-              <button className="carousel-button next" onClick={nextNews}>
+              <button
+                className="carousel-button next w-12 h-12 rounded-full flex justify-center items-center bg-blue-500 text-white"
+                onClick={nextNews}
+              >
                 ❯
               </button>
             </div>
@@ -332,10 +338,16 @@ const Homepage = () => {
                 </ul>
               </div>
 
-              <button className="carousel-button prev" onClick={prevEvent}>
+              <button
+                className="carousel-button prev w-12 h-12 rounded-full flex justify-center items-center bg-blue-500 text-white"
+                onClick={prevEvent}
+              >
                 ❮
               </button>
-              <button className="carousel-button next" onClick={nextEvent}>
+              <button
+                className="carousel-button next w-12 h-12 rounded-full flex justify-center items-center bg-blue-500 text-white"
+                onClick={nextEvent}
+              >
                 ❯
               </button>
             </div>
@@ -343,33 +355,36 @@ const Homepage = () => {
         </div>
 
         <div className="carousel-container" data-aos="fade-up">
-          <button className="carousel-button prev" onClick={prevPage}>
+          <button
+            className="carousel-button prev w-12 h-12 rounded-full flex justify-center items-center bg-blue-500 text-white"
+            onClick={prevPage}
+          >
             ❮
           </button>
+
           <div className={`carousel-content ${fade ? "fade" : ""}`}>
             {currentPage === 0 ? (
               <div className="carousel-page">
                 <div className="square-container">
-                  
                   <div className="square-item">
-  <div className="logo newsevents-logo"></div>
-  <h3>News/Events</h3>
-  <div className="buttons-container">
-    <button
-      className="news-button"
-      onClick={() => handleNavigation("/user-news")}
-    >
-      View News
-    </button>
-    <button
-      className="events-button"
-      onClick={() => handleNavigation("/user-events")}
-    >
-      View Events
-    </button>
-  </div>
-</div>
-<div className="square-item">
+                    <div className="logo newsevents-logo"></div>
+                    <h3>News/Events</h3>
+                    <div className="buttons-container">
+                      <button
+                        className="news-button"
+                        onClick={() => handleNavigation("/user-news")}
+                      >
+                        View News
+                      </button>
+                      <button
+                        className="events-button"
+                        onClick={() => handleNavigation("/user-events")}
+                      >
+                        View Events
+                      </button>
+                    </div>
+                  </div>
+                  <div className="square-item">
                     <div className="logo companies-logo"></div>
                     <h3>Companies</h3>
                     <button onClick={() => handleNavigation("/user-companies")}>
@@ -448,7 +463,10 @@ const Homepage = () => {
               </div>
             )}
           </div>
-          <button className="carousel-button next" onClick={nextPage}>
+          <button
+            className="carousel-button next w-12 h-12 rounded-full flex justify-center items-center bg-blue-500 text-white"
+            onClick={nextPage}
+          >
             ❯
           </button>
         </div>
@@ -469,9 +487,13 @@ const Homepage = () => {
             </p>
           </div>
           <div className="image-carousel-container">
-            <button className="carousel-button prev" onClick={prevImage}>
+            <button
+              className="carousel-button prev w-12 h-12 rounded-full flex justify-center items-center bg-blue-500 text-white"
+              onClick={prevImage}
+            >
               ❮
             </button>
+
             <div className="carousel-images">
               {images.map((image, index) => (
                 <div
@@ -511,7 +533,10 @@ const Homepage = () => {
                 </div>
               ))}
             </div>
-            <button className="carousel-button next" onClick={nextImage}>
+            <button
+              className="carousel-button next w-12 h-12 rounded-full flex justify-center items-center bg-blue-500 text-white"
+              onClick={nextImage}
+            >
               ❯
             </button>
 

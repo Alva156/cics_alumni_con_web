@@ -123,7 +123,7 @@ function Login() {
         {loading && <LoadingSpinner />} {/* Show loading spinner */}
         {showLogoutMessage && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
-            <p> Logout success!</p>
+            <p> Signed out successfully!</p>
           </div>
         )}
         {/* Left Form */}

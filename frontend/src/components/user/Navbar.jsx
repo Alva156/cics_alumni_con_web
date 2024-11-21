@@ -337,7 +337,7 @@ const Navbar = () => {
 
           {isTooltipVisible && (
             <div className="absolute top-full mt-1 mr-3.5 md:mr-7 bg-gray-800 text-white text-xxs md:text-xs rounded py-1 px-1.5 z-20">
-              Logout
+              Sign Out
             </div>
           )}
 
@@ -346,8 +346,8 @@ const Navbar = () => {
               <dialog id="my_modal_5" className="modal modal-middle " open>
                 {loading && <LoadingSpinner />} {/* Show loading spinner */}
                 <div className="modal-box">
-                  <h3 className="font-bold text-lg">Logout</h3>
-                  <p className="py-4">Are you sure you want to log out?</p>
+                  <h3 className="font-bold text-lg">Sign Out</h3>
+                  <p className="py-4">Are you sure you want to sign out?</p>
                   <div className="modal-action">
                     <button
                       className="btn bg-green text-white w-20"

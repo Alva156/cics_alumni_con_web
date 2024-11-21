@@ -10,7 +10,7 @@ function AdminEvents() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [events, setEvents] = useState([]);
-  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
+  const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showSuccessMessage, setSuccessMessage] = useState(false);
@@ -237,6 +237,10 @@ function AdminEvents() {
       return a.name.localeCompare(b.name);
     } else if (sortCriteria === "Name (Z-A)") {
       return b.name.localeCompare(a.name);
+    } else if (sortCriteria === "Most Recent") {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    } else if (sortCriteria === "Oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
     }
     return 0;
   });
@@ -278,6 +282,8 @@ function AdminEvents() {
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
+          <option>Most Recent</option>
+          <option>Oldest</option>
         </select>
       </div>
 
@@ -447,7 +453,12 @@ function AdminEvents() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Event Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
+              <label className="block text-sm mb-1">
+                Event Image{" "}
+                <span className="text-xs font-light italic">
+                  (Allowed formats: JPG, JPEG, PNG, Max size: 5MB)
+                </span>
+              </label>
               <input
                 id="events-image"
                 type="file"
@@ -570,7 +581,12 @@ function AdminEvents() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Event Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
+              <label className="block text-sm mb-1">
+                Event Image{" "}
+                <span className="text-xs font-light italic">
+                  (Allowed formats: JPG, JPEG, PNG, Max size: 5MB)
+                </span>
+              </label>
               <input
                 id="events-image"
                 type="file"

@@ -10,7 +10,7 @@ function AdminCompanies() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [companies, setCompanies] = useState([]);
-  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
+  const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showSuccessMessage, setSuccessMessage] = useState(false);
@@ -230,6 +230,10 @@ function AdminCompanies() {
       return a.name.localeCompare(b.name);
     } else if (sortCriteria === "Name (Z-A)") {
       return b.name.localeCompare(a.name);
+    } else if (sortCriteria === "Most Recent") {
+      return new Date(b.createdAt) - new Date(a.createdAt); // Assuming createdAt holds the creation date
+    } else if (sortCriteria === "Oldest") {
+      return new Date(a.createdAt) - new Date(b.createdAt);
     }
     return 0;
   });
@@ -270,6 +274,8 @@ function AdminCompanies() {
         >
           <option>Name (A-Z)</option>
           <option>Name (Z-A)</option>
+          <option>Most Recent</option>
+          <option>Oldest</option>
         </select>
       </div>
       <div className="flex justify-between items-center mb-4">
@@ -435,7 +441,12 @@ function AdminCompanies() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Company Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
+              <label className="block text-sm mb-1">
+                Company Image{" "}
+                <span className="text-xs font-light italic">
+                  (Allowed formats: JPG, JPEG, PNG, Max size: 5MB)
+                </span>
+              </label>
               <input
                 id="company-image" // Add this line
                 type="file"
@@ -556,7 +567,12 @@ function AdminCompanies() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Company Image <span className="text-xs font-light italic">(Allowed formats: JPG, JPEG, PNG, Max size: 5MB)</span></label>
+              <label className="block text-sm mb-1">
+                Company Image{" "}
+                <span className="text-xs font-light italic">
+                  (Allowed formats: JPG, JPEG, PNG, Max size: 5MB)
+                </span>
+              </label>
               <input
                 id="company-image" // Add this line
                 type="file"
@@ -573,7 +589,9 @@ function AdminCompanies() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm mb-1">Website or Contact Details</label>
+              <label className="block text-sm mb-1">
+                Website or Contact Details
+              </label>
               <input
                 id="company-contact"
                 type="text"

@@ -44,7 +44,7 @@ function AdminSurveyTool() {
   const [isSurveyReportModalOpen, setIsSurveyReportModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOption, setSortOption] = useState("Name (A-Z)");
+  const [sortOption, setSortOption] = useState("Most Recent");
   const [openDropdown, setOpenDropdown] = useState(false);
   const [openGenderDropdown, setOpenGenderDropdown] = useState(false);
   const [openRegionDropdown, setOpenRegionDropdown] = useState(false);
@@ -1676,6 +1676,10 @@ function AdminSurveyTool() {
         return (a.responseCount || 0) - (b.responseCount || 0);
       } else if (sortOption === "Responses (Highest-Lowest)") {
         return (b.responseCount || 0) - (a.responseCount || 0);
+      } else if (sortOption === "Most Recent") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      } else if (sortOption === "Oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
       }
       return 0;
     });
@@ -1693,6 +1697,10 @@ function AdminSurveyTool() {
         return (a.responseCount || 0) - (b.responseCount || 0);
       } else if (sortOption === "Responses (Highest-Lowest)") {
         return (b.responseCount || 0) - (a.responseCount || 0);
+      } else if (sortOption === "Most Recent") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      } else if (sortOption === "Oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
       }
       return 0;
     });
@@ -1769,6 +1777,8 @@ function AdminSurveyTool() {
           <option value="Responses (Highest-Lowest)">
             Responses (Highest-Lowest)
           </option>
+          <option value="Most Recent">Most Recent</option>
+          <option value="Oldest">Oldest</option>
         </select>
       </div>
       <div className="flex justify-between items-center mb-4 no-print">

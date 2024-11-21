@@ -12,7 +12,7 @@ function Survey() {
   const [showErrorMessage, setErrorMessage] = useState(false);
   const [showMessage, setshowMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOption, setSortOption] = useState("Name (A-Z)");
+  const [sortOption, setSortOption] = useState("Most Recent");
   const [userResponses, setUserResponses] = useState({});
   const modalRef = useRef(null);
 
@@ -242,6 +242,10 @@ function Survey() {
         return (a.responseCount || 0) - (b.responseCount || 0);
       } else if (sortOption === "Responses (Highest-Lowest)") {
         return (b.responseCount || 0) - (a.responseCount || 0);
+      } else if (sortOption === "Most Recent") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      } else if (sortOption === "Oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
       }
       return 0;
     });
@@ -259,6 +263,10 @@ function Survey() {
         return (a.responseCount || 0) - (b.responseCount || 0);
       } else if (sortOption === "Responses (Highest-Lowest)") {
         return (b.responseCount || 0) - (a.responseCount || 0);
+      } else if (sortOption === "Most Recent") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      } else if (sortOption === "Oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
       }
       return 0;
     });
@@ -310,6 +318,8 @@ function Survey() {
           <option value="Responses (Highest-Lowest)">
             Responses (Highest-Lowest)
           </option>
+          <option value="Most Recent">Most Recent</option>
+          <option value="Oldest">Oldest</option>
         </select>
       </div>
 
@@ -392,21 +402,20 @@ function Survey() {
             ))}
 
             {/* BOTTOM BUTTONS */}
-<div className="flex justify-center gap-2 mt-8">
-  <button
-    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
-    onClick={closeModal}
-  >
-    Cancel
-  </button>
-  <button
-    className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
-    onClick={handleSaveResponse}
-  >
-    Save
-  </button>
-</div>
-
+            <div className="flex justify-center gap-2 mt-8">
+              <button
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-[#3D3C3C] text-white px-4 py-2 md:px-6 md:py-3"
+                onClick={closeModal}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+                onClick={handleSaveResponse}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -22,7 +22,7 @@ function AdminThreads() {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredThreads, setFilteredThreads] = useState([]);
-  const [sortOption, setSortOption] = useState("Title (A-Z)");
+  const [sortOption, setSortOption] = useState("Most Recent");
 
   // replies
 
@@ -568,6 +568,10 @@ function AdminThreads() {
         return a.title.localeCompare(b.title);
       } else if (sortOption === "Title (Z-A)") {
         return b.title.localeCompare(a.title);
+      } else if (sortOption === "Most Recent") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      } else if (sortOption === "Oldest") {
+        return new Date(a.createdAt) - new Date(b.createdAt);
       }
       return 0;
     });
@@ -612,6 +616,8 @@ function AdminThreads() {
         >
           <option>Title (A-Z)</option>
           <option>Title (Z-A)</option>
+          <option>Most Recent</option>
+          <option>Oldest</option>
         </select>
       </div>
 

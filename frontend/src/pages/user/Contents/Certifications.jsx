@@ -8,7 +8,7 @@ function Certifications() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [certifications, setCertifications] = useState([]);
-  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
+  const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
 
   // Fetch all certifications from the server

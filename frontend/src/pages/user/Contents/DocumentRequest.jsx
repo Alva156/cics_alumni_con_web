@@ -7,14 +7,16 @@ import "../../../App.css";
 import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 import { themePlugin } from "@react-pdf-viewer/theme";
-import { DarkIcon, LightIcon } from '@react-pdf-viewer/theme';
-import { fullScreenPlugin } from '@react-pdf-viewer/full-screen';
-import { SpecialZoomLevel } from '@react-pdf-viewer/core';
-import { ExitFullScreenIcon, FullScreenIcon } from '@react-pdf-viewer/full-screen';
-
+import { DarkIcon, LightIcon } from "@react-pdf-viewer/theme";
+import { fullScreenPlugin } from "@react-pdf-viewer/full-screen";
+import { SpecialZoomLevel } from "@react-pdf-viewer/core";
+import {
+  ExitFullScreenIcon,
+  FullScreenIcon,
+} from "@react-pdf-viewer/full-screen";
 
 // Import styles
-import '@react-pdf-viewer/full-screen/lib/styles/index.css';
+import "@react-pdf-viewer/full-screen/lib/styles/index.css";
 
 function Documents() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -22,7 +24,7 @@ function Documents() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [documents, setDocuments] = useState([]);
-  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
+  const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
 
   // Fetch all documents from the server
@@ -110,7 +112,9 @@ function Documents() {
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
-      <h1 className="text-2xl font-medium text-gray-700 mb-6">Document Request Steps</h1>
+      <h1 className="text-2xl font-medium text-gray-700 mb-6">
+        Document Request Steps
+      </h1>
 
       <div className="mb-4 relative">
         <input
@@ -153,19 +157,19 @@ function Documents() {
               document.image.endsWith(".pdf") ? (
                 <div className="overflow-y-hidden object-contain">
                   <Worker workerUrl={pdfWorker}>
-                  <div className="w-full max-h-48 overflow-hidden mb-4">
-                    <Viewer
-                      fileUrl={`${backendUrl}${document.image}`}
-                      renderTextLayer={false}
-                      initialPage={0} // Show the first page only in the preview
-                      style={{
-                        height: "100%",
-                        width: "100%",
-                        objectFit: "contain", // Ensures the PDF fits without stretching
-                      }}
-                    />
-                  </div>
-                </Worker>
+                    <div className="w-full max-h-48 overflow-hidden mb-4">
+                      <Viewer
+                        fileUrl={`${backendUrl}${document.image}`}
+                        renderTextLayer={false}
+                        initialPage={0} // Show the first page only in the preview
+                        style={{
+                          height: "100%",
+                          width: "100%",
+                          objectFit: "contain", // Ensures the PDF fits without stretching
+                        }}
+                      />
+                    </div>
+                  </Worker>
                 </div>
               ) : (
                 <img
@@ -218,20 +222,19 @@ function Documents() {
             <div className="text-md mb-2">{selectedDocument.address}</div>
             {selectedDocument && selectedDocument.image ? (
               selectedDocument.image.endsWith(".pdf") ? (
-                  <Worker workerUrl={pdfWorker}>
-                    <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center px-">
-                      <Viewer
-                        fileUrl={`${backendUrl}${selectedDocument.image}`}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                        plugins={[fullScreenPluginInstance]}
-                      />
-                    </div>
-                  </Worker>
-
+                <Worker workerUrl={pdfWorker}>
+                  <div className="w-full h-[40vh] overflow-auto mb-4 flex items-center justify-center px-">
+                    <Viewer
+                      fileUrl={`${backendUrl}${selectedDocument.image}`}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                      plugins={[fullScreenPluginInstance]}
+                    />
+                  </div>
+                </Worker>
               ) : (
                 <img
                   src={`${backendUrl}${selectedDocument.image}`}
@@ -245,7 +248,7 @@ function Documents() {
               </div>
             )}
             <div className="text-sm mb-4">{selectedDocument.description}</div>
-           
+
             {/* Conditionally render Website or Contact Details */}
             {selectedDocument.contact && (
               <div className="text-sm font-medium mb-2">

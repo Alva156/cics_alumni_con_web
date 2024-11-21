@@ -22,7 +22,7 @@ function Threads() {
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredThreads, setFilteredThreads] = useState([]);
-  const [sortOption, setSortOption] = useState("Title (A-Z)");
+  const [sortOption, setSortOption] = useState("Most Recent");
 
   // replies
 

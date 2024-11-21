@@ -8,7 +8,7 @@ function Events() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [events, setEvents] = useState([]);
-  const [sortCriteria, setSortCriteria] = useState("Name (A-Z)");
+  const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
 
   // Fetch all events from the server

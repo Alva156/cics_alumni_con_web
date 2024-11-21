@@ -105,10 +105,16 @@ const AdminDashboard = () => {
   const createOptions = (stepSize) => ({
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: 0, // Remove any padding from the chart layout
+    },
     scales: {
       x: {
         ticks: {
           display: false,
+        },
+        grid: {
+          display: false, // Optional: Remove grid lines if you want a cleaner look
         },
       },
       y: {

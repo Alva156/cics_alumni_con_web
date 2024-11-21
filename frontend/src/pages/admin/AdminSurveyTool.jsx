@@ -245,6 +245,9 @@ function AdminSurveyTool() {
                   ticks: {
                     display: false,
                   },
+                  grid: {
+                    display: false, // Optional: Remove grid lines if you want a cleaner look
+                  },
                 },
                 y: {
                   beginAtZero: true,
@@ -310,6 +313,9 @@ function AdminSurveyTool() {
                   ticks: {
                     display: false,
                   },
+                  grid: {
+                    display: false, // Optional: Remove grid lines if you want a cleaner look
+                  },
                 },
                 y: {
                   beginAtZero: true,
@@ -374,6 +380,9 @@ function AdminSurveyTool() {
                 x: {
                   ticks: {
                     display: false,
+                  },
+                  grid: {
+                    display: false, // Optional: Remove grid lines if you want a cleaner look
                   },
                 },
                 y: {

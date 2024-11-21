@@ -736,8 +736,8 @@ screens */
 
   /* Adjust chart height for printing */
   .chart {
-    width: 100%; /* Make charts take full width */
     height: auto; /* Adjust height to fit printed page */
+    width: 1400px !important;
   }
   .chart-container {
     page-break-inside: avoid; /* Avoid page breaks within charts */

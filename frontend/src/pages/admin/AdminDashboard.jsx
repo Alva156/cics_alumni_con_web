@@ -377,7 +377,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="chart mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of Alumni per Gender
@@ -387,7 +387,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="chart mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of Alumni per Region
@@ -397,7 +397,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="chart mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of Alumni per College Program
@@ -407,7 +407,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="chart mb-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             Number of Alumni per Specialization
@@ -417,7 +417,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="chart mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Entry Year</div>
           <div className="h-48 mt-8">
@@ -425,7 +425,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="chart mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Batch (Year Graduated)</div>
           <div className="h-48 mt-8">
@@ -433,7 +433,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="chart mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Employment Status</div>
           <div className="h-48 mt-8">
@@ -441,7 +441,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="chart mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Work Industry</div>
           <div className="h-48 mt-8">
@@ -449,12 +449,12 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
+      <div className="chart mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">
             How long it takes to land a job
           </div>
-          <div className="h-48 mt-8">
+          <div className="chart h-48 mt-8">
             <Bar data={data7} options={options2} />
           </div>
         </div>

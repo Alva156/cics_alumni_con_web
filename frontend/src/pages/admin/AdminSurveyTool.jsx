@@ -1964,9 +1964,7 @@ function AdminSurveyTool() {
                   }
                 }}
               >
-                <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Unpublish
-                </span>
+                
               </div>
             </div>
           </div>

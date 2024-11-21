@@ -237,6 +237,23 @@ function AdminAlumni() {
         document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isModalOpen]);
+  const previewModalRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutsidePreview = (event) => {
+      if (
+        previewModalRef.current &&
+        !previewModalRef.current.contains(event.target)
+      ) {
+        closePreviewModal();
+      }
+    };
+
+    if (isPreviewModalOpen) {
+      document.addEventListener("mousedown", handleClickOutsidePreview);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutsidePreview);
+    }
+  }, [isPreviewModalOpen]);
 
   const filteredAlumni = alumni
     .filter((alumni) =>
@@ -664,7 +681,7 @@ function AdminAlumni() {
                 style={{ zIndex: 9999 }}
               >
                 <div
-                  ref={modalRef}
+                  ref={previewModalRef}
                   className="bg-white p-4 sm:p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-3xl h-auto overflow-y-auto max-h-full relative"
                 >
                   <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 text-center">

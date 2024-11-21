@@ -2643,27 +2643,27 @@ function UserProfile() {
                 </div>
 
                 <div className="py-1 w-full">
-  {/* Change Account Email Button */}
-  <button
-    type="button"
-    className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-orange text-white px-4 py-2 md:px-6 md:py-3"
-    onClick={openEmailModal}
-    aria-label="Change Account Email"
-  >
-    Change Account Email
-  </button>
-</div>
+                  {/* Change Account Email Button */}
+                  <button
+                    type="button"
+                    className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-orange text-white px-4 py-2 md:px-6 md:py-3"
+                    onClick={openEmailModal}
+                    aria-label="Change Account Email"
+                  >
+                    Change Account Email
+                  </button>
+                </div>
 
-<div className="py-1 w-full">
-  {/* Reset Password Button */}
-  <button
-    onClick={openPassModal}
-    className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-fgray text-white px-4 py-2 md:px-6 md:py-3"
-  >
-    Reset Password
-  </button>
-</div>
-
+                <div className="py-1 w-full">
+                  {/* Reset Password Button */}
+                  <button
+                    type="button"
+                    onClick={openPassModal}
+                    className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-fgray text-white px-4 py-2 md:px-6 md:py-3"
+                  >
+                    Reset Password
+                  </button>
+                </div>
 
                 <label className="pt-4 text-sm text-white opacity-0">
                   Mobile Number{" "}
@@ -2691,7 +2691,6 @@ function UserProfile() {
           >
             Save
           </button>
-   
         </div>
 
         {/* END OF BOTTOM BUTTONS */}

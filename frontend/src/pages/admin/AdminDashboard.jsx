@@ -106,7 +106,9 @@ const AdminDashboard = () => {
     responsive: true,
     maintainAspectRatio: false,
     layout: {
-      padding: 0, // Remove any padding from the chart layout
+      padding: {
+        right: 30,
+      }, //
     },
     scales: {
       x: {

@@ -53,9 +53,27 @@ const Navbar = () => {
       console.error("Error during logout:", error);
     }
   };
+  const modalRef = useRef(null);
   const closeModal = () => {
     setModalVisible(false);
   };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    if (isModalVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isModalVisible]);
 
   const detailsRef = useRef(null);
   const handleNavigateAndClose = (path) => {
@@ -345,7 +363,7 @@ const Navbar = () => {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
               <dialog id="my_modal_5" className="modal modal-middle " open>
                 {loading && <LoadingSpinner />} {/* Show loading spinner */}
-                <div className="modal-box">
+                <div ref={modalRef} className="modal-box">
                   <h3 className="font-bold text-lg">Sign Out</h3>
                   <p className="py-4">Are you sure you want to sign out?</p>
                   <div className="modal-action">

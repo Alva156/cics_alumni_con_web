@@ -206,7 +206,7 @@ function AdminSurveyTool() {
         <h3 className="text-lg font-semibold mb-2">
           Number of Alumni per College
         </h3>
-        <div className="chart-container w-full">
+        <div className="flex items-center justify-center chart-container w-full">
           <Bar
             data={renderBarChartData(
               getCountByField(survey.responses, "college"),
@@ -274,7 +274,7 @@ function AdminSurveyTool() {
         <h3 className="text-lg font-semibold mb-2">
           Number of Alumni per College Program
         </h3>
-        <div className="chart-container w-full">
+        <div className="flex items-center justify-center chart-container w-full">
           <Bar
             data={renderBarChartData(
               getCountByField(survey.responses, "collegeProgram"),
@@ -342,7 +342,7 @@ function AdminSurveyTool() {
         <h3 className="text-lg font-semibold mb-2">
           Number of Alumni per Batch
         </h3>
-        <div className="chart-container w-full">
+        <div className="flex items-center justify-center chart-container w-full">
           <Bar
             data={renderBarChartData(
               getCountByField(survey.responses, "yearGraduatedCollege"),
@@ -410,7 +410,7 @@ function AdminSurveyTool() {
         <h3 className="text-lg font-semibold mb-2">
           Number of Alumni per Region
         </h3>
-        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container">
+        <div className="flex items-center justify-center w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container">
           <Pie
             data={renderPieChartData(
               getCountByField(survey.responses, "region"),
@@ -459,7 +459,7 @@ function AdminSurveyTool() {
         <h3 className="text-lg font-semibold mb-2">
           Number of Alumni per Gender
         </h3>
-        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container">
+        <div className="flex items-center justify-center w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container">
           <Pie
             data={renderPieChartData(
               getCountByField(survey.responses, "gender"),
@@ -590,7 +590,7 @@ function AdminSurveyTool() {
                   <p>No responses</p>
                 </div>
               ) : (
-                <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container ">
+                <div className="flex items-center justify-center w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mx-auto chart-container ">
                   <Pie
                     data={pieData}
                     options={pieOptions}
@@ -1963,9 +1963,7 @@ function AdminSurveyTool() {
                     handleTogglePublishStatus(survey._id); // Call to handle unpublishing via keyboard
                   }
                 }}
-              >
-                
-              </div>
+              ></div>
             </div>
           </div>
         ))

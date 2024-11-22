@@ -636,75 +636,81 @@ function AdminAccount() {
                 Old Password
               </label>
               <div className="relative">
-          <input
-            type={showOldPassword ? "text" : "password"}
-            name="oldPassword"
-            placeholder="Old Password"
-            className="input input-sm input-bordered w-full h-10 pr-10"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            required
-          />
-          <span
-            className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-            onClick={() => setShowOldPassword(!showOldPassword)}
-          >
-            <FontAwesomeIcon
-              icon={showOldPassword ? faEye : faEyeSlash}
-              className="text-black"
-            />
-          </span>
-        </div>
+                <input
+                  type={showOldPassword ? "text" : "password"}
+                  name="oldPassword"
+                  placeholder="Old Password"
+                  className="input input-sm input-bordered w-full h-10 pr-10"
+                  value={oldPassword}
+                  onChange={(e) => setOldPassword(e.target.value)}
+                  required
+                />
+                {oldPassword && (
+                  <span
+                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                    onClick={() => setShowOldPassword(!showOldPassword)}
+                  >
+                    <FontAwesomeIcon
+                      icon={showOldPassword ? faEye : faEyeSlash}
+                      className="text-black"
+                    />
+                  </span>
+                )}
+              </div>
             </div>
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium">
                 New Password
               </label>
               <div className="relative">
-          <input
-            type={showNewPassword ? "text" : "password"}
-            name="newPassword"
-            placeholder="New Password"
-            className="input input-sm input-bordered w-full h-10 pr-10"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-          />
-          <span
-            className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-            onClick={() => setShowNewPassword(!showNewPassword)}
-          >
-            <FontAwesomeIcon
-              icon={showNewPassword ? faEye : faEyeSlash}
-              className="text-black"
-            />
-          </span>
-        </div>
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  name="newPassword"
+                  placeholder="New Password"
+                  className="input input-sm input-bordered w-full h-10 pr-10"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+                {newPassword && (
+                  <span
+                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                  >
+                    <FontAwesomeIcon
+                      icon={showNewPassword ? faEye : faEyeSlash}
+                      className="text-black"
+                    />
+                  </span>
+                )}
+              </div>
             </div>
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium">
                 Confirm Password
               </label>
               <div className="relative">
-          <input
-            type={showConfirmPassword ? "text" : "password"}
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            className="input input-sm input-bordered w-full h-10 pr-10"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          <span
-            className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          >
-            <FontAwesomeIcon
-              icon={showConfirmPassword ? faEye : faEyeSlash}
-              className="text-black"
-            />
-          </span>
-        </div>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  className="input input-sm input-bordered w-full h-10 pr-10"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                {confirmPassword && (
+                  <span
+                    className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    <FontAwesomeIcon
+                      icon={showConfirmPassword ? faEye : faEyeSlash}
+                      className="text-black"
+                    />
+                  </span>
+                )}
+              </div>
             </div>
             <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
               Password Requirements:

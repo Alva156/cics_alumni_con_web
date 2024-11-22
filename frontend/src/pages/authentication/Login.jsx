@@ -174,15 +174,17 @@ function Login() {
                   className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
                   style={{ height: "40px" }}
                 />
-                <span
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-                  onClick={togglePasswordVisibility}
-                >
-                  <FontAwesomeIcon
-                    icon={showPassword ? faEye : faEyeSlash}
-                    className="text-black"
-                  />
-                </span>
+                {formData.password && (
+                  <span
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+                    onClick={togglePasswordVisibility}
+                  >
+                    <FontAwesomeIcon
+                      icon={showPassword ? faEye : faEyeSlash}
+                      className="text-black"
+                    />
+                  </span>
+                )}
               </div>
 
               <div className="text-sm underline mb-8 block text-left">

@@ -276,15 +276,17 @@ function Register() {
                       className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
                       style={{ height: "30px" }}
                     />
-                    <span
-                      className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
-                      onClick={togglePasswordVisibility}
-                    >
-                      <FontAwesomeIcon
-                        icon={showPassword ? faEye : faEyeSlash}
-                        className="text-black"
-                      />
-                    </span>
+                    {formData.password && (
+                      <span
+                        className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
+                        onClick={togglePasswordVisibility}
+                      >
+                        <FontAwesomeIcon
+                          icon={showPassword ? faEye : faEyeSlash}
+                          className="text-black"
+                        />
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex-1 pl-2">
@@ -301,15 +303,17 @@ function Register() {
                       className="p-2 border border-black bg-[#D9D9D9] w-full pr-10"
                       style={{ height: "30px" }}
                     />
-                    <span
-                      className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
-                      onClick={toggleConfirmPasswordVisibility}
-                    >
-                      <FontAwesomeIcon
-                        icon={showConfirmPassword ? faEye : faEyeSlash}
-                        className="text-black"
-                      />
-                    </span>
+                    {formData.confirmPassword && (
+                      <span
+                        className="absolute inset-y-0 right-0 pr-2 flex items-center text-gray-500 cursor-pointer"
+                        onClick={toggleConfirmPasswordVisibility}
+                      >
+                        <FontAwesomeIcon
+                          icon={showConfirmPassword ? faEye : faEyeSlash}
+                          className="text-black"
+                        />
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

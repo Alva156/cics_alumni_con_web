@@ -204,15 +204,17 @@ function ResetPassword() {
                   onChange={handleChange}
                   style={{ height: "40px" }}
                 />
-                <span
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-                  onClick={togglePasswordVisibility}
-                >
-                  <FontAwesomeIcon
-                    icon={showPassword ? faEye : faEyeSlash}
-                    className="text-black"
-                  />
-                </span>
+                {formData.newPassword && (
+                  <span
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+                    onClick={togglePasswordVisibility}
+                  >
+                    <FontAwesomeIcon
+                      icon={showPassword ? faEye : faEyeSlash}
+                      className="text-black"
+                    />
+                  </span>
+                )}
               </div>
               <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
                 Password Requirements:
@@ -244,15 +246,17 @@ function ResetPassword() {
                   onChange={handleChange}
                   style={{ height: "40px" }}
                 />
-                <span
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
-                  onClick={toggleConfirmPasswordVisibility}
-                >
-                  <FontAwesomeIcon
-                    icon={showConfirmPassword ? faEye : faEyeSlash}
-                    className="text-black"
-                  />
-                </span>
+                {formData.confirmPassword && (
+                  <span
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 cursor-pointer"
+                    onClick={toggleConfirmPasswordVisibility}
+                  >
+                    <FontAwesomeIcon
+                      icon={showConfirmPassword ? faEye : faEyeSlash}
+                      className="text-black"
+                    />
+                  </span>
+                )}
               </div>
 
               <button
@@ -286,7 +290,9 @@ function ResetPassword() {
           <dialog id="my_modal_5" className="modal modal-middle" open>
             <div className="modal-box">
               <h3 className="font-bold text-lg">Reset Password Successful</h3>
-              <p className="py-4">You can now sign in with your new password.</p>
+              <p className="py-4">
+                You can now sign in with your new password.
+              </p>
               <div className="modal-action">
                 <button
                   onClick={handleCloseModal}

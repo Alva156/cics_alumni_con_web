@@ -370,7 +370,6 @@ exports.cancel = async (req, res) => {
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log(`Login attempt: Email: ${email}, Password: ${password}`);
 
     const user = await User.findOne({ email });
     if (!user) {

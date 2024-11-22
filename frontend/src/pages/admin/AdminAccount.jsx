@@ -3,6 +3,8 @@ import axios from "axios";
 import "../../App.css"; // Adjust the path based on your project structure
 import { useNavigate } from "react-router-dom";
 import blankprofilepic from "../../assets/blankprofilepic.jpg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 function AdminAccount() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -33,6 +35,9 @@ function AdminAccount() {
   const [otpSent, setOtpSent] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [profileId, setProfileId] = useState("");
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (timer > 0 && otpSent) {
@@ -630,43 +635,76 @@ function AdminAccount() {
               <label className="block mb-2 text-sm font-medium">
                 Old Password
               </label>
-              <input
-                type="password"
-                name="oldPassword"
-                placeholder="Old Password"
-                className="input input-sm input-bordered w-full h-10"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                required
-              />
+              <div className="relative">
+          <input
+            type={showOldPassword ? "text" : "password"}
+            name="oldPassword"
+            placeholder="Old Password"
+            className="input input-sm input-bordered w-full h-10 pr-10"
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+            required
+          />
+          <span
+            className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+            onClick={() => setShowOldPassword(!showOldPassword)}
+          >
+            <FontAwesomeIcon
+              icon={showOldPassword ? faEye : faEyeSlash}
+              className="text-black"
+            />
+          </span>
+        </div>
             </div>
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium">
                 New Password
               </label>
-              <input
-                type="password"
-                name="newPassword"
-                placeholder="New Password"
-                className="input input-sm input-bordered w-full h-10"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)} // Add this line
-                required
-              />
+              <div className="relative">
+          <input
+            type={showNewPassword ? "text" : "password"}
+            name="newPassword"
+            placeholder="New Password"
+            className="input input-sm input-bordered w-full h-10 pr-10"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            required
+          />
+          <span
+            className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+            onClick={() => setShowNewPassword(!showNewPassword)}
+          >
+            <FontAwesomeIcon
+              icon={showNewPassword ? faEye : faEyeSlash}
+              className="text-black"
+            />
+          </span>
+        </div>
             </div>
             <div className="mb-4">
               <label className="block mb-2 text-sm font-medium">
                 Confirm Password
               </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                className="input input-sm input-bordered w-full h-10"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)} // Add this line
-                required
-              />
+              <div className="relative">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            className="input input-sm input-bordered w-full h-10 pr-10"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          <span
+            className="absolute inset-y-0 right-3 flex items-center cursor-pointer"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <FontAwesomeIcon
+              icon={showConfirmPassword ? faEye : faEyeSlash}
+              className="text-black"
+            />
+          </span>
+        </div>
             </div>
             <p className="text-[0.6rem] mb-1 ml-2 sm:text-xs">
               Password Requirements:

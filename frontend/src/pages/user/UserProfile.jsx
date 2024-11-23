@@ -2375,26 +2375,24 @@ function UserProfile() {
                       />
                     </div>
 
-                    {/* Delete Button */}
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        title="Delete Section"
-                        className="btn btn-sm w-36 bg-red text-white mt-2"
-                        onClick={
-                          () => {
-                            console.log("Profile ID:", profileId);
-                            console.log("Section ID:", section._id); // Use section._id here
+                    {/* Conditionally Render Delete Button */}
+                    {section._id && (
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          title="Delete Section"
+                          className="btn btn-sm w-36 bg-red text-white mt-2"
+                          onClick={() =>
                             initiateDeleteSection(
                               "secondary-section",
                               section._id
-                            );
-                          } // Pass the correct section ID
-                        }
-                      >
-                        Delete
-                      </button>
-                    </div>
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
 
@@ -2479,26 +2477,24 @@ function UserProfile() {
                         placeholder="YYYY"
                       />
                     </div>
-                    {/* Delete Button */}
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        title="Delete Section"
-                        className="btn btn-sm w-36 bg-red text-white mt-2"
-                        onClick={
-                          () => {
-                            console.log("Profile ID:", profileId);
-                            console.log("Section ID:", section._id); // Use section._id here
+                    {/* Conditionally Render Delete Button */}
+                    {section._id && (
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          title="Delete Section"
+                          className="btn btn-sm w-36 bg-red text-white mt-2"
+                          onClick={() =>
                             initiateDeleteSection(
                               "tertiary-section",
                               section._id
-                            );
-                          } // Pass the correct section ID
-                        }
-                      >
-                        Delete
-                      </button>
-                    </div>
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -2629,21 +2625,24 @@ function UserProfile() {
                         }
                       />
                     </div>
-                    {/* Delete Button */}
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        title="Delete Section"
-                        className="btn btn-sm w-36 bg-red text-white mt-2"
-                        onClick={() => {
-                          console.log("Profile ID:", profileId);
-                          console.log("Section ID:", section._id); // Use section._id here
-                          initiateDeleteSection("company-section", section._id);
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </div>
+                    {/* Conditionally Render Delete Button */}
+                    {section._id && (
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          title="Delete Section"
+                          className="btn btn-sm w-36 bg-red text-white mt-2"
+                          onClick={() =>
+                            initiateDeleteSection(
+                              "company-section",
+                              section._id
+                            )
+                          }
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
                 <label className="pt-4 text-sm text-white opacity-0">

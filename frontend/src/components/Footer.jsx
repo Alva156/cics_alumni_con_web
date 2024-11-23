@@ -56,32 +56,40 @@ const Footer = () => {
               1000 Metro Manila
             </address>
             <div className="mt-4">
-              <h4 className="font-semibold text-lg text-gray-300">
+            <h4 className="font-semibold text-lg text-gray-300">
                 Connect with Us:
               </h4>
               <div className="flex space-x-4 mt-2">
-                <a
-                  href="#"
-                  className="hover:text-gray-300 transform hover:scale-110 transition duration-300"
-                >
+              <a
+  href="https://www.facebook.com/UST1611official"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="hover:text-gray-300 transform hover:scale-110 transition duration-300"
+>
                   <FaFacebookF />
                 </a>
                 <a
-                  href="#"
-                  className="hover:text-gray-300 transform hover:scale-110 transition duration-300"
-                >
+  href="https://x.com/UST1611official"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="hover:text-gray-300 transform hover:scale-110 transition duration-300"
+>
                   <FaTwitter />
                 </a>
                 <a
-                  href="#"
-                  className="hover:text-gray-300 transform hover:scale-110 transition duration-300"
-                >
+  href="https://www.instagram.com/ust1611official/"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="hover:text-gray-300 transform hover:scale-110 transition duration-300"
+>
                   <FaInstagram />
                 </a>
                 <a
-                  href="#"
-                  className="hover:text-gray-300 transform hover:scale-110 transition duration-300"
-                >
+  href="https://www.linkedin.com/school/u-of-santo-tomas/"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="hover:text-gray-300 transform hover:scale-110 transition duration-300"
+>
                   <FaLinkedinIn />
                 </a>
               </div>
@@ -142,9 +150,8 @@ const Footer = () => {
       {/* Bottom Footer Section */}
       <div className="bg-[#1a1a1a] text-gray-400 py-6 text-center text-sm">
         <div className="flex justify-center items-center mb-2">
-          <FaRegCopyright className="mr-1" />
           <p>
-            2024. University of Santo Tomas. College of Information and
+          © 2024. University of Santo Tomas. College of Information and
             Computing Sciences.
           </p>
         </div>

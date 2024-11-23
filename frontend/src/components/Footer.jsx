@@ -150,9 +150,8 @@ const Footer = () => {
       {/* Bottom Footer Section */}
       <div className="bg-[#1a1a1a] text-gray-400 py-6 text-center text-sm">
         <div className="flex justify-center items-center mb-2">
-          <FaRegCopyright className="mr-1" />
           <p>
-            2024. University of Santo Tomas. College of Information and
+          © 2024. University of Santo Tomas. College of Information and
             Computing Sciences.
           </p>
         </div>

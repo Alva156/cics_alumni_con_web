@@ -16,7 +16,7 @@ const Header = () => {
             className="h-auto w-auto max-h-14 max-w-full md:max-h-16 mx-4"
           />
         </Link>
-        <div className="col mr-2">
+        <div className="col ml-5">
           <p className="text-black font-light italic text-xs md:text-sm mt-2">
             University of Santo Tomas
           </p>

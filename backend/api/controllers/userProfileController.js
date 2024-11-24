@@ -765,7 +765,7 @@ exports.sendOTP = async (req, res) => {
   `;
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: '"CICS Alumni Connect" <' + process.env.EMAIL_USER + ">",
       to: newEmail,
       subject: "Your OTP Code",
       text: `Your OTP code is ${otp}`,

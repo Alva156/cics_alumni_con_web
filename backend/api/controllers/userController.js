@@ -8,10 +8,12 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const { body, validationResult } = require("express-validator");
+const mongoSanitize = require("mongo-sanitize");
 
 // Helper function to generate a 6-digit OTP
 function generateOTP() {
-  return Math.floor(100000 + Math.random() * 900000); // 6 digit OTP
+  return Math.floor(100000 + Math.random() * 900000);
 }
 
 // Helper function to format date to YYYY-MM-DD
@@ -20,27 +22,47 @@ function formatDateToISO(dateString) {
   return `${year}-${month}-${day}`;
 }
 
-// User registration
 exports.registerUser = async (req, res) => {
   try {
-    const {
-      studentNum,
-      firstName,
-      lastName,
-      birthday,
-      email,
-      mobileNumber,
-      password,
-      confirmPassword,
-    } = req.body;
+    await body("studentNum").optional().trim().run(req);
 
-    // Normalize and trim input values
-    const normalizedFirstName = firstName.trim();
-    const normalizedLastName = lastName.trim();
+    await body("firstName").trim().isLength({ min: 1 }).run(req);
+
+    await body("lastName").trim().isLength({ min: 1 }).run(req);
+
+    await body("birthday").trim().isDate().run(req);
+
+    await body("email").trim().isEmail().normalizeEmail().run(req);
+
+    await body("mobileNumber").trim().run(req);
+
+    await body("password").isLength({ min: 8 }).run(req);
+
+    await body("confirmPassword")
+      .custom((value, { req }) => value === req.body.password)
+      .run(req);
+
+    // Handle validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const sanitizedStudentNum = mongoSanitize(req.body.studentNum);
+    const sanitizedFirstName = mongoSanitize(req.body.firstName);
+    const sanitizedLastName = mongoSanitize(req.body.lastName);
+    const sanitizedBirthday = mongoSanitize(req.body.birthday);
+    const sanitizedEmail = mongoSanitize(req.body.email);
+    const sanitizedMobileNumber = mongoSanitize(req.body.mobileNumber);
+    const sanitizedPassword = mongoSanitize(req.body.password);
+    const sanitizedConfirmPassword = mongoSanitize(req.body.confirmPassword);
+
+    const normalizedFirstName = sanitizedFirstName.trim();
+    const normalizedLastName = sanitizedLastName.trim();
+    const formattedBirthday = formatDateToISO(sanitizedBirthday.trim());
 
     // Check if the email already exists/registered
-    const existingUser = await User.findOne({ email });
-
+    const existingUser = await User.findOne({ email: sanitizedEmail });
     if (existingUser) {
       return res.status(400).json({ msg: "User already exists" });
     }
@@ -49,7 +71,7 @@ exports.registerUser = async (req, res) => {
     const duplicateUser = await User.findOne({
       firstName: { $regex: `^${normalizedFirstName}$`, $options: "i" }, // Case-insensitive match
       lastName: { $regex: `^${normalizedLastName}$`, $options: "i" }, // Case-insensitive match
-      birthday: birthday.trim(),
+      birthday: sanitizedBirthday.trim(),
     });
 
     if (duplicateUser) {
@@ -58,11 +80,8 @@ exports.registerUser = async (req, res) => {
         .json({ msg: "Duplicate accounts are not allowed." });
     }
 
-    // Your existing CSV validation and other logic remain unchanged...
-
     const csvFilePath = path.join(__dirname, "../alumnilist.csv");
 
-    // Read and validate CSV data
     const csvData = await new Promise((resolve, reject) => {
       const results = [];
       fs.createReadStream(csvFilePath)
@@ -78,16 +97,14 @@ exports.registerUser = async (req, res) => {
         });
     });
 
-    const formattedBirthday = formatDateToISO(birthday.trim());
     let matchingRecord;
-
-    if (studentNum && studentNum.trim() !== "") {
+    if (sanitizedStudentNum && sanitizedStudentNum.trim() !== "") {
       matchingRecord = csvData.find(
         (row) =>
           row.studentNum &&
           row.studentNum.trim() !== "0000000000" &&
           row.studentNum.trim() !== "" && // Skip if CSV studentNum is empty
-          row.studentNum.trim() === studentNum.trim() &&
+          row.studentNum.trim() === sanitizedStudentNum.trim() &&
           row.firstName &&
           row.lastName &&
           row.birthday &&
@@ -111,6 +128,7 @@ exports.registerUser = async (req, res) => {
       );
     }
 
+    // If no matching record, return a specific message
     if (!matchingRecord) {
       return res.status(400).json({
         msg: "No matching record found in the alumni list",
@@ -119,13 +137,13 @@ exports.registerUser = async (req, res) => {
 
     // Generate JWT token with user details
     const tokenPayload = {
-      studentNum,
-      firstName,
-      lastName,
-      birthday,
-      email,
-      mobileNumber,
-      password,
+      studentNum: sanitizedStudentNum,
+      firstName: sanitizedFirstName,
+      lastName: sanitizedLastName,
+      birthday: sanitizedBirthday,
+      email: sanitizedEmail,
+      mobileNumber: sanitizedMobileNumber,
+      password: sanitizedPassword,
     };
     const jwtToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
       expiresIn: "10m", // Set token expiry time
@@ -148,6 +166,7 @@ exports.registerUser = async (req, res) => {
     return res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
+
 // Import axios for sending HTTP requests
 const axios = require("axios");
 
@@ -264,7 +283,15 @@ exports.sendOTP = async (req, res) => {
 // Verify OTP
 exports.verifyOTP = async (req, res) => {
   try {
-    const { otp } = req.body; // OTP received from the request body
+    await body("otp").trim().isLength({ min: 6, max: 6 }).isNumeric().run(req);
+
+    // Handle validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const sanitizedOtp = mongoSanitize(req.body.otp);
 
     // Get the token from the cookies
     const token = req.cookies.userToken;
@@ -284,13 +311,26 @@ exports.verifyOTP = async (req, res) => {
       password,
     } = userDetails;
 
+    const sanitizedStudentNum = mongoSanitize(studentNum);
+    const sanitizedFirstName = mongoSanitize(firstName);
+    const sanitizedLastName = mongoSanitize(lastName);
+    const sanitizedBirthday = mongoSanitize(birthday);
+    const sanitizedEmail = mongoSanitize(email);
+    const sanitizedMobileNumber = mongoSanitize(mobileNumber);
+
     // Check for OTP associated with either email or mobile number
     let otpRecord;
-    if (email) {
-      otpRecord = await OTP.findOne({ email, otp });
+    if (sanitizedEmail) {
+      otpRecord = await OTP.findOne({
+        email: sanitizedEmail,
+        otp: sanitizedOtp,
+      });
     }
-    if (!otpRecord && mobileNumber) {
-      otpRecord = await OTP.findOne({ mobileNumber, otp });
+    if (!otpRecord && sanitizedMobileNumber) {
+      otpRecord = await OTP.findOne({
+        mobileNumber: sanitizedMobileNumber,
+        otp: sanitizedOtp,
+      });
     }
 
     // If OTP does not match, return an error
@@ -303,7 +343,9 @@ exports.verifyOTP = async (req, res) => {
 
     // Check if the user already exists to prevent duplicate records
     const existingUser = await User.findOne(
-      email ? { email } : { mobileNumber }
+      sanitizedEmail
+        ? { email: sanitizedEmail }
+        : { mobileNumber: sanitizedMobileNumber }
     );
     if (existingUser) {
       return res.status(400).json({ msg: "User already registered" });
@@ -311,12 +353,12 @@ exports.verifyOTP = async (req, res) => {
 
     // Create a new user record with isVerified set to true
     const newUser = new User({
-      studentNum: studentNum || "N/A", // Adjust as necessary based on your logic
-      firstName,
-      lastName,
-      birthday,
-      email,
-      mobileNumber,
+      studentNum: sanitizedStudentNum || "N/A",
+      firstName: sanitizedFirstName,
+      lastName: sanitizedLastName,
+      birthday: sanitizedBirthday,
+      email: sanitizedEmail,
+      mobileNumber: sanitizedMobileNumber,
       password: hashedPassword,
       isVerified: true,
     });
@@ -326,7 +368,14 @@ exports.verifyOTP = async (req, res) => {
 
     // Send success response along with user details
     return res.status(200).json({
-      user: { studentNum, firstName, lastName, email, mobileNumber, birthday },
+      user: {
+        studentNum: sanitizedStudentNum,
+        firstName: sanitizedFirstName,
+        lastName: sanitizedLastName,
+        email: sanitizedEmail,
+        mobileNumber: sanitizedMobileNumber,
+        birthday: sanitizedBirthday,
+      },
     });
   } catch (err) {
     console.error("Error verifying OTP:", err);
@@ -362,11 +411,36 @@ exports.cancel = async (req, res) => {
       .json({ msg: "Error canceling process", error: error.message });
   }
 };
+
 exports.loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    // Apply validation and sanitization to input fields
+    await body("email")
+      .trim()
+      .isEmail()
+      .withMessage("Invalid email or password")
+      .normalizeEmail()
+      .run(req);
 
-    const user = await User.findOne({ email });
+    await body("password")
+      .trim()
+      .isLength({ min: 8 })
+      .withMessage("Invalid email or password")
+      .run(req);
+
+    // Handle validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      // If there are validation errors, send specific messages based on the field
+      const errorMessages = errors.array().map((error) => error.msg);
+      return res.status(400).json({ msg: errorMessages.join(", ") });
+    }
+
+    const sanitizedEmail = mongoSanitize(req.body.email);
+    const sanitizedPassword = mongoSanitize(req.body.password);
+    console.log("...");
+
+    const user = await User.findOne({ email: sanitizedEmail });
     if (!user) {
       return res.status(400).json({ msg: "Invalid email or password" });
     }
@@ -377,10 +451,12 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Compare the password
+    const isMatch = await bcrypt.compare(sanitizedPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid email or password" });
     }
+
     // Fetch the userProfile to get the profileId
     const userProfile = await UserProfile.findOne({ userId: user._id });
     if (!userProfile) {
@@ -469,19 +545,30 @@ exports.logoutUser = async (req, res) => {
 
 // FORGET PASS
 exports.forgotPassword = async (req, res) => {
-  const { email, mobileNumber } = req.body;
-
   try {
+    await body("email").optional().isEmail().normalizeEmail().run(req);
+
+    await body("mobileNumber").optional().run(req);
+
+    // Handle validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const sanitizedEmail = mongoSanitize(req.body.email);
+    const sanitizedMobileNumber = mongoSanitize(req.body.mobileNumber);
+
     let user;
 
     // Check if email or mobileNumber is provided and search based on that
-    if (email) {
-      user = await User.findOne({ email });
+    if (sanitizedEmail) {
+      user = await User.findOne({ email: sanitizedEmail });
       if (!user) {
         return res.status(400).json({ msg: "Email not found" });
       }
-    } else if (mobileNumber) {
-      user = await User.findOne({ mobileNumber });
+    } else if (sanitizedMobileNumber) {
+      user = await User.findOne({ mobileNumber: sanitizedMobileNumber });
       if (!user) {
         return res.status(400).json({ msg: "Mobile number not found" });
       }
@@ -496,13 +583,15 @@ exports.forgotPassword = async (req, res) => {
 
     // Save the OTP entry associated with either email or mobile number
     const otpEntry = await OTP.findOneAndUpdate(
-      email ? { email } : { mobileNumber }, // use email if provided, otherwise mobileNumber
+      sanitizedEmail
+        ? { email: sanitizedEmail }
+        : { mobileNumber: sanitizedMobileNumber }, // use email if provided, otherwise mobileNumber
       { otp },
       { new: true, upsert: true }
     );
 
     // Send OTP via email if email was provided
-    if (email) {
+    if (sanitizedEmail) {
       const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
@@ -546,7 +635,7 @@ exports.forgotPassword = async (req, res) => {
 
       const mailOptions = {
         from: `"CICS Alumni Connect" <${process.env.EMAIL_USER}>`,
-        to: email,
+        to: sanitizedEmail,
         subject: "Your OTP Code for Password Reset",
         text: `Your OTP code is ${otp}`,
         html: htmlContent,
@@ -556,11 +645,11 @@ exports.forgotPassword = async (req, res) => {
     }
 
     // Send OTP via SMS if mobile number was provided
-    if (mobileNumber) {
+    if (sanitizedMobileNumber) {
       await axios.post(
         "https://app.philsms.com/api/v3/sms/send",
         {
-          recipient: mobileNumber,
+          recipient: sanitizedMobileNumber,
           sender_id: "PhilSMS",
           type: "plain",
           message: `Your OTP to reset your password is ${otp}. Expires in 5 mins.`,
@@ -582,10 +671,31 @@ exports.forgotPassword = async (req, res) => {
 };
 
 exports.verifyOTPPassword = async (req, res) => {
-  const { email, mobileNumber, otp } = req.body;
-
   try {
-    const query = email ? { email, otp } : { mobileNumber, otp };
+    await body("email").optional().isEmail().normalizeEmail().run(req);
+
+    await body("mobileNumber").optional().run(req);
+
+    await body("otp")
+      .isLength({ min: 6, max: 6 })
+      .withMessage("OTP must be 6 digits")
+      .isNumeric()
+      .run(req);
+
+    // Handle validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const sanitizedEmail = mongoSanitize(req.body.email);
+    const sanitizedMobileNumber = mongoSanitize(req.body.mobileNumber);
+    const sanitizedOTP = mongoSanitize(req.body.otp);
+
+    const query = sanitizedEmail
+      ? { email: sanitizedEmail, otp: sanitizedOTP }
+      : { mobileNumber: sanitizedMobileNumber, otp: sanitizedOTP };
+
     const otpRecord = await OTP.findOne(query);
 
     if (!otpRecord) {
@@ -594,9 +704,13 @@ exports.verifyOTPPassword = async (req, res) => {
 
     await OTP.deleteOne(query);
 
-    const token = jwt.sign({ email, mobileNumber }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { email: sanitizedEmail, mobileNumber: sanitizedMobileNumber },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     res.cookie("resetToken", token, {
       httpOnly: true,
@@ -610,7 +724,6 @@ exports.verifyOTPPassword = async (req, res) => {
     return res.status(500).json({ msg: "Server error", error: err.message });
   }
 };
-
 exports.resetPassword = async (req, res) => {
   const token = req.cookies.resetToken;
 
@@ -619,12 +732,19 @@ exports.resetPassword = async (req, res) => {
   }
 
   try {
-    // Verify the JWT token and extract email or mobileNumber
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { email, mobileNumber } = decoded;
-    const { newPassword } = req.body;
 
-    // Find the user based on either email or mobile number
+    await body("newPassword").exists().isLength({ min: 8 }).run(req);
+
+    // Handle validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const sanitizedNewPassword = mongoSanitize(req.body.newPassword);
+
     const user = email
       ? await User.findOne({ email })
       : await User.findOne({ mobileNumber });
@@ -634,12 +754,11 @@ exports.resetPassword = async (req, res) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    const hashedPassword = await bcrypt.hash(sanitizedNewPassword, salt);
 
     user.password = hashedPassword;
     await user.save();
 
-    // Clear the JWT token cookie after the password is reset
     res.clearCookie("resetToken", {
       httpOnly: true,
       secure: true,

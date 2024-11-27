@@ -48,11 +48,20 @@ function ForgotPassword() {
     const seconds = time % 60;
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
-
+  const validateEmail = (email) => {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
+  };
   const handleSendEmailOTP = async () => {
     setLoading(true);
     if (!email) {
       setError("Please enter your email");
+      clearErrorAfterDelay();
+      setLoading(false);
+      return;
+    }
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
       clearErrorAfterDelay();
       setLoading(false);
       return;

@@ -677,6 +677,7 @@ exports.verifyOTPPassword = async (req, res) => {
     await body("mobileNumber").optional().run(req);
 
     await body("otp")
+      .trim()
       .isLength({ min: 6, max: 6 })
       .withMessage("OTP must be 6 digits")
       .isNumeric()

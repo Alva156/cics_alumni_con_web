@@ -241,7 +241,7 @@ exports.sendOTP = async (req, res) => {
       };
 
       await transporter.sendMail(mailOptions);
-      console.log(`OTP ${otp} sent to email: ${email}`);
+      console.log(`OTP sent to email: ${email}`);
     } else if (otpType === "SMS" && mobileNumber) {
       // Generate OTP and save it with the mobile number
       const otp = generateOTP();
@@ -265,7 +265,7 @@ exports.sendOTP = async (req, res) => {
           },
         }
       );
-      console.log(`OTP ${otp} sent to mobile number: ${mobileNumber}`);
+      console.log(`OTP sent to mobile number: ${mobileNumber}`);
     } else {
       return res
         .status(400)

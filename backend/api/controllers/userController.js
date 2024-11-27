@@ -674,7 +674,7 @@ exports.verifyOTPPassword = async (req, res) => {
   try {
     await body("email").optional().isEmail().normalizeEmail().run(req);
 
-    await body("mobileNumber").optional().run(req);
+    await body("mobileNumber").isNumeric().optional().run(req);
 
     await body("otp")
       .trim()

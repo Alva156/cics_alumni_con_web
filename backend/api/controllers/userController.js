@@ -34,7 +34,7 @@ exports.registerUser = async (req, res) => {
 
     await body("email").trim().isEmail().normalizeEmail().run(req);
 
-    await body("mobileNumber").trim().run(req);
+    await body("mobileNumber").isNumeric().trim().run(req);
 
     await body("password").isLength({ min: 8 }).run(req);
 
@@ -548,7 +548,7 @@ exports.forgotPassword = async (req, res) => {
   try {
     await body("email").optional().isEmail().normalizeEmail().run(req);
 
-    await body("mobileNumber").optional().run(req);
+    await body("mobileNumber").isNumeric().optional().run(req);
 
     // Handle validation errors
     const errors = validationResult(req);

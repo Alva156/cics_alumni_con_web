@@ -1916,7 +1916,7 @@ function UserProfile() {
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm text-red">
-                      Year Started on College Program{" "}
+                      Year Started on College Program *{" "}
                       <span className="text-xs font-light italic text-black">
                         (1611 - current year)
                       </span>{" "}
@@ -1937,7 +1937,7 @@ function UserProfile() {
 
                   <div className="py-1">
                     <label className="pt-4 pb-2 text-sm text-red">
-                      Year Graduated on College Program{" "}
+                      Year Graduated on College Program *{" "}
                       <span className="text-xs font-light italic text-black">
                         (1611 - current year)
                       </span>{" "}

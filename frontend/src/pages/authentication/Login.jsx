@@ -148,7 +148,7 @@ function Login() {
                 )}
               </div>
 
-              <label className="block mb-2 mt-6 text-sm font-medium">
+              <label className="block mb-2 mt-6 text-sm font-medium text-red">
                 Email *
               </label>
               <input
@@ -161,7 +161,7 @@ function Login() {
                 style={{ height: "40px" }}
               />
 
-              <label className="block mb-2 text-sm font-medium">
+              <label className="block mb-2 text-sm font-medium text-red">
                 Password *
               </label>
               <div className="relative mb-6">

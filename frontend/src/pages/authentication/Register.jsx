@@ -191,7 +191,7 @@ function Register() {
 
               <div className="flex mb-2">
                 <div className="w-1/2 pr-1">
-                  <label className="block mb-1 text-xs font-medium">
+                  <label className="block mb-1 text-xs font-medium text-red">
                     First Name *
                   </label>
                   <input
@@ -205,7 +205,7 @@ function Register() {
                   />
                 </div>
                 <div className="w-1/2 pl-1">
-                  <label className="block mb-1 text-xs font-medium">
+                  <label className="block mb-1 text-xs font-medium text-red">
                     Last Name *
                   </label>
                   <input
@@ -220,7 +220,7 @@ function Register() {
                 </div>
               </div>
 
-              <label className="block mb-1 text-xs font-medium">
+              <label className="block mb-1 text-xs font-medium text-red">
                 Birthday *
               </label>
               <input
@@ -233,7 +233,7 @@ function Register() {
                 style={{ height: "30px" }}
               />
 
-              <label className="block mb-1 text-xs font-medium">Email *</label>
+              <label className="block mb-1 text-xs font-medium text-red">Email *</label>
               <input
                 type="email"
                 name="email"
@@ -243,12 +243,12 @@ function Register() {
                 className="mb-2 p-2 border border-black bg-[#D9D9D9] w-full"
                 style={{ height: "30px" }}
               />
-              <label className="block mb-1 text-xs font-medium">
+              <label className="block mb-1 text-xs font-medium text-red">
                 Mobile Number *
-                <span className="text-xs font-light italic">
+                <span className="text-xs font-light italic text-black">
                   {" "}
                   ( include country code before your number, e.g.,{" "}
-                  <span className="font-medium">63</span> 9125559207 for PH )
+                  <span className="font-medium ">63</span> 9125559207 for PH )
                 </span>
               </label>
               <input
@@ -263,7 +263,7 @@ function Register() {
 
               <div className="flex mb-2">
                 <div className="flex-1 pr-2">
-                  <label className="block mb-1 text-xs font-medium">
+                  <label className="block mb-1 text-xs font-medium text-red">
                     Password *
                   </label>
                   <div className="relative">
@@ -290,7 +290,7 @@ function Register() {
                   </div>
                 </div>
                 <div className="flex-1 pl-2">
-                  <label className="block mb-1 text-xs font-medium">
+                  <label className="block mb-1 text-xs font-medium text-red">
                     Confirm Password *
                   </label>
                   <div className="relative">

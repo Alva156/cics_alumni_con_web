@@ -789,3 +789,7 @@ screens */
 .rpv-core__text-layer {
   display: none !important;
 }
+
+.datepicker{
+  width: 100%;
+}

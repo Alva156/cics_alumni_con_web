@@ -10,6 +10,8 @@ import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function UserProfile() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -416,6 +418,7 @@ function UserProfile() {
       "Licentiate in Sacred Theology",
       "Bachelor of Sacred Theology",
     ],
+    Others: ["Others"],
   };
 
   const handleCollegeChange = (e) => {
@@ -1741,7 +1744,9 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">First Name *</label>
+                    <label className="pt-4 pb-2 text-sm text-red">
+                      First Name *
+                    </label>
                     <input
                       type="text"
                       placeholder="Type here"
@@ -1754,7 +1759,9 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">Last Name *</label>
+                    <label className="pt-4 pb-2 text-sm text-red">
+                      Last Name *
+                    </label>
                     <input
                       type="text"
                       placeholder="Type here"
@@ -1767,7 +1774,9 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">Birthday *</label>
+                    <label className="pt-4 pb-2 text-sm text-red">
+                      Birthday *
+                    </label>
                     <input
                       type="date"
                       placeholder="Type here"
@@ -1831,12 +1840,19 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">Profession</label>
+                    <label className="pt-4 pb-2 text-sm text-red">
+                      Profession *
+                      <span className="text-xs font-light italic text-black">
+                        {" "}
+                        ( type N/A if not applicable)
+                      </span>
+                    </label>
                     <input
                       type="text"
                       placeholder="e.g. Web Developer"
                       className="input input-sm input-bordered w-full h-10"
                       name="profession"
+                      required
                       value={profession}
                       onChange={(e) => setProfession(e.target.value)}
                     />
@@ -1899,42 +1915,44 @@ function UserProfile() {
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">
+                    <label className="pt-4 pb-2 text-sm text-red">
                       Year Started on College Program{" "}
-                      <span className="text-xs font-light italic">
+                      <span className="text-xs font-light italic text-black">
                         (1611 - current year)
                       </span>{" "}
-                    </label>
-                    <input
-                      type="number"
-                      step="1" // Allow only whole numbers (no decimals)
-                      placeholder="YYYY"
-                      className="input input-sm input-bordered w-full h-10"
-                      name="yearStartedCollege"
-                      value={yearStartedCollege}
-                      min="1611"
-                      max={new Date().getFullYear()} // Maximum year as the current year
-                      onChange={(e) => setYearStartedCollege(e.target.value)}
+                    </label>{" "}
+                    <br />
+                    <DatePicker
+                      selected={yearStartedCollege}
+                      onChange={(date) => setYearStartedCollege(date)}
+                      showYearPicker
+                      dateFormat="yyyy"
+                      style={{ width: "100%" }}
+                      placeholderText="Select Year"
+                      className="datepicker input input-sm input-bordered w-full h-10"
+                      minDate={new Date(1611, 0, 1)} // Start from the year 1611
+                      maxDate={new Date()} // Up to the current year
                     />
                   </div>
 
                   <div className="py-1">
-                    <label className="pt-4 pb-2 text-sm">
+                    <label className="pt-4 pb-2 text-sm text-red">
                       Year Graduated on College Program{" "}
-                      <span className="text-xs font-light italic">
+                      <span className="text-xs font-light italic text-black">
                         (1611 - current year)
                       </span>{" "}
-                    </label>
-                    <input
-                      type="number"
-                      step="1" // Allow only whole numbers (no decimals)
-                      placeholder="YYYY"
-                      className="input input-sm input-bordered w-full h-10"
-                      name="yearGraduatedCollege"
-                      value={yearGraduatedCollege}
-                      min="1611"
-                      max={new Date().getFullYear()} // Maximum year as the current year
-                      onChange={(e) => setYearGraduatedCollege(e.target.value)}
+                    </label>{" "}
+                    <br />
+                    <DatePicker
+                      selected={yearGraduatedCollege}
+                      onChange={(date) => setYearGraduatedCollege(date)}
+                      showYearPicker
+                      dateFormat="yyyy"
+                      placeholderText="Select Year"
+                      className="datepicker input input-sm input-bordered w-full h-10"
+                      minDate={new Date(1611, 0, 1)} // Start from the year 1611
+                      maxDate={new Date()} // Up to the current year
+                      style={{ width: "100%" }}
                     />
                   </div>
 

@@ -790,6 +790,26 @@ screens */
   display: none !important;
 }
 
-.datepicker{
-  width: 100%;
+/* Custom styles for react-datepicker */
+.react-datepicker-wrapper {
+  width: 100% !important; /* Force the wrapper to take full width */
+}
+
+.react-datepicker__input-container {
+  width: 100% !important; /* Ensure input container takes full width */
+}
+
+.react-datepicker__input {
+  width: 100% !important; /* Force the input field to be 100% width */
+}
+
+.react-datepicker__month,
+.react-datepicker__year {
+  max-width: 100% !important; /* Ensure the calendar view is 100% width */
+}
+
+/* Optional: Customizing the calendar view */
+.react-datepicker__triangle {
+  left: 50% !important;
+  transform: translateX(-50%) !important; /* Adjust the arrow position */
 }

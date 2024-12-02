@@ -1927,7 +1927,7 @@ function UserProfile() {
                       onChange={(date) => setYearStartedCollege(date)}
                       showYearPicker
                       dateFormat="yyyy"
-                      style={{ width: "100%" }}
+                      style={{ width: "100% !important" }}
                       placeholderText="Select Year"
                       className="datepicker input input-sm input-bordered w-full h-10"
                       minDate={new Date(1611, 0, 1)} // Start from the year 1611
@@ -2377,32 +2377,44 @@ function UserProfile() {
 
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Started</label>
-                      <input
-                        type="number"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearStarted}
-                        onChange={(e) =>
-                          handleSectionChange("secondary", section._id, e)
-                        }
-                        name="yearStarted"
-                        step="1" // Allow only whole numbers (no decimals)
-                        placeholder="YYYY"
-                      />
+                      <DatePicker
+        selected={section.yearStarted ? new Date(section.yearStarted, 0, 1) : null} // Make sure the selected year is a Date object
+        onChange={(date) =>
+          handleSectionChange("secondary", section._id, {
+            target: {
+              name: "yearStarted",
+              value: date ? date.getFullYear() : "", // Ensure we pass the year part of the date object
+            },
+          })
+        }
+        showYearPicker
+        dateFormat="yyyy"
+        className="input input-sm input-bordered w-full h-10"
+        minDate={new Date(1611, 0, 1)} // Start from the year 1611
+        maxDate={new Date()} // Up to current year
+        placeholderText="Select Year"
+      />
                     </div>
 
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Ended</label>
-                      <input
-                        type="number"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearEnded}
-                        onChange={(e) =>
-                          handleSectionChange("secondary", section._id, e)
-                        }
-                        name="yearEnded"
-                        step="1" // Allow only whole numbers (no decimals)
-                        placeholder="YYYY"
-                      />
+                      <DatePicker
+        selected={section.yearEnded ? new Date(section.yearEnded, 0, 1) : null} // Ensure the selected year is a Date object
+        onChange={(date) =>
+          handleSectionChange("secondary", section._id, {
+            target: {
+              name: "yearEnded",
+              value: date ? date.getFullYear() : "", // Only pass the year part of the date object
+            },
+          })
+        }
+        showYearPicker
+        dateFormat="yyyy"
+        className="input input-sm input-bordered w-full h-10"
+        minDate={new Date(1611, 0, 1)} // Start from the year 1611
+        maxDate={new Date()} // Up to current year
+        placeholderText="Select Year"
+      />
                     </div>
 
                     {/* Conditionally Render Delete Button */}
@@ -2479,33 +2491,45 @@ function UserProfile() {
                     {/* Year Started */}
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Started</label>
-                      <input
-                        type="number"
-                        name="yearStarted"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearStarted}
-                        onChange={(e) =>
-                          handleSectionChange("tertiary", section._id, e)
-                        }
-                        step="1" // Allow only whole numbers (no decimals)
-                        placeholder="YYYY"
-                      />
+                      <DatePicker
+        selected={section.yearStarted ? new Date(section.yearStarted, 0, 1) : null} // Ensure the selected year is a Date object
+        onChange={(date) =>
+          handleSectionChange("tertiary", section._id, {
+            target: {
+              name: "yearStarted",
+              value: date ? date.getFullYear() : "", // Only pass the year part of the date object
+            },
+          })
+        }
+        showYearPicker
+        dateFormat="yyyy"
+        className="input input-sm input-bordered w-full h-10"
+        minDate={new Date(1611, 0, 1)} // Start from the year 1611
+        maxDate={new Date()} // Up to current year
+        placeholderText="Select Year"
+      />
                     </div>
 
                     {/* Year Ended */}
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Ended</label>
-                      <input
-                        type="number"
-                        name="yearEnded"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearEnded}
-                        onChange={(e) =>
-                          handleSectionChange("tertiary", section._id, e)
-                        }
-                        step="1" // Allow only whole numbers (no decimals)
-                        placeholder="YYYY"
-                      />
+                      <DatePicker
+        selected={section.yearEnded ? new Date(section.yearEnded, 0, 1) : null} // Ensure the selected year is a Date object
+        onChange={(date) =>
+          handleSectionChange("tertiary", section._id, {
+            target: {
+              name: "yearEnded",
+              value: date ? date.getFullYear() : "", // Only pass the year part of the date object
+            },
+          })
+        }
+        showYearPicker
+        dateFormat="yyyy"
+        className="input input-sm input-bordered w-full h-10"
+        minDate={new Date(1611, 0, 1)} // Start from the year 1611
+        maxDate={new Date()} // Up to current year
+        placeholderText="Select Year"
+      />
                     </div>
                     {/* Conditionally Render Delete Button */}
                     {section._id && (
@@ -2601,17 +2625,23 @@ function UserProfile() {
                     {/* Year Started */}
                     <div className="py-1">
                       <label className="pt-4 pb-2 text-sm">Year Started</label>
-                      <input
-                        type="number"
-                        name="yearStarted"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearStarted}
-                        onChange={(e) =>
-                          handleSectionChange("company", section._id, e)
-                        }
-                        step="1" // Allow only whole numbers (no decimals)
-                        placeholder="YYYY"
-                      />
+                      <DatePicker
+        selected={section.yearStarted ? new Date(section.yearStarted, 0, 1) : null} // Ensure selected date is a Date object
+        onChange={(date) =>
+          handleSectionChange("company", section._id, {
+            target: {
+              name: "yearStarted",
+              value: date ? date.getFullYear() : "", // Only pass the year part
+            },
+          })
+        }
+        showYearPicker
+        dateFormat="yyyy"
+        className="input input-sm input-bordered w-full h-10"
+        minDate={new Date(1611, 0, 1)} // Start from the year 1611
+        maxDate={new Date()} // Up to current year
+        placeholderText="Select Year"
+      />
                     </div>
                     {/* Year Ended */}
                     <div className="py-1">
@@ -2622,17 +2652,23 @@ function UserProfile() {
                           (Leave blank if still employed)
                         </span>
                       </label>
-                      <input
-                        type="number"
-                        name="yearEnded"
-                        className="input input-sm input-bordered w-full h-10"
-                        value={section.yearEnded}
-                        onChange={(e) =>
-                          handleSectionChange("company", section._id, e)
-                        }
-                        step="1" // Allow only whole numbers (no decimals)
-                        placeholder="YYYY"
-                      />
+                      <DatePicker
+        selected={section.yearEnded ? new Date(section.yearEnded, 0, 1) : null} // Ensure selected date is a Date object
+        onChange={(date) =>
+          handleSectionChange("company", section._id, {
+            target: {
+              name: "yearEnded",
+              value: date ? date.getFullYear() : "", // Only pass the year part
+            },
+          })
+        }
+        showYearPicker
+        dateFormat="yyyy"
+        className="input input-sm input-bordered w-full h-10"
+        minDate={new Date(1611, 0, 1)} // Start from the year 1611
+        maxDate={new Date()} // Up to current year
+        placeholderText="Select Year"
+      />
                     </div>
                     {/* Remarks */}
                     <div className="py-1">

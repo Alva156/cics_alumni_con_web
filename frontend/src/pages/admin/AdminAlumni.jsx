@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import csvpic from "../../assets/formatcsv.png";
 import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js";
 import "../../App.css";
@@ -8,7 +9,8 @@ function AdminAlumni() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [alumni, setAlumni] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); // New modal state
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [isCSVModal, setIsCSVModalOpen] = useState(false);
   const [previewAttachment, setPreviewAttachment] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -223,6 +225,26 @@ function AdminAlumni() {
     setIsModalOpen(false);
     setSelectedAlumni(null);
   };
+  const openCSVModal = () => {
+    setIsCSVModalOpen(true);
+  };
+  const closeCSVModal = () => {
+    setIsCSVModalOpen(false);
+  };
+  const csvModalRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (csvModalRef.current && !csvModalRef.current.contains(event.target)) {
+        closeCSVModal();
+      }
+    };
+
+    if (isCSVModal) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [isCSVModal]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -237,6 +259,7 @@ function AdminAlumni() {
         document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isModalOpen]);
+
   const previewModalRef = useRef(null);
   useEffect(() => {
     const handleClickOutsidePreview = (event) => {
@@ -638,7 +661,20 @@ function AdminAlumni() {
         </div>
       </div>
 
-      <div className="text-lg mb-4">All Alumni</div>
+      <div className="flex justify-between items-center mb-4">
+        <div className="text-lg">All Alumni</div>
+        <div>
+          <button
+            type="button"
+            className="btn btn-sm w-30 md:btn-md md:w-52 lg:w-60 bg-blue text-white px-4 py-2 md:px-6 md:py-3"
+            onClick={openCSVModal}
+            aria-label="Save"
+          >
+            Upload CSV
+          </button>
+        </div>
+      </div>
+
       <hr className="mb-6 border-black" />
 
       {sortedAlumni.length > 0 ? (
@@ -657,7 +693,94 @@ function AdminAlumni() {
       ) : (
         <p>No alumni found.</p>
       )}
-
+      {/* CSV Upload Modal */}
+      {isCSVModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          {/* Modal Content */}
+          <div
+            ref={csvModalRef}
+            className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4"
+          >
+            <button
+              onClick={closeCSVModal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+            {/* Modal Body */}
+            <div className="mb-4">
+              <div className="block mb-2 text-sm font-medium">
+                CSV Upload for Registration
+              </div>
+              <div className="block mb-2 text-sm font-light">
+                Upload a CSV file for user registration. The file will be used
+                to register accounts.{" "}
+                <span className="font-bold">
+                  Before uploading a csv file, make sure its format is like in
+                  the image below.
+                </span>
+              </div>
+              {/* Centering the image */}
+              <div className="flex justify-center items-center mb-8 mt-4">
+                <img
+                  src={csvpic}
+                  alt="CSV format example"
+                  className="w-full max-w-md rounded-md shadow"
+                />
+              </div>
+            </div>
+            <input
+              type="file"
+              name="csvregister"
+              accept="application/pdf"
+              className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-10"
+            />
+            {/* Dummy CSV Files List */}
+            <div className="mb-4">
+              <div className="text-sm font-medium mb-2">Uploaded CSV Files</div>
+              <ul className="list-disc pl-5">
+                <li className="flex items-center justify-between text-sm text-gray-700 mb-2">
+                  user_registration_1.csv
+                  <div
+                    className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer ml-2 relative group"
+                    title="Delete"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "4px",
+                    }}
+                  ></div>
+                </li>
+                <li className="flex items-center justify-between text-sm text-gray-700 mb-2">
+                  user_registration_2.csv
+                  <div
+                    className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer ml-2 relative group"
+                    title="Delete"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "4px",
+                    }}
+                  ></div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Modal */}
       {isModalOpen && selectedAlumni && (
         <div

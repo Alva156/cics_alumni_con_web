@@ -11,6 +11,8 @@ function AdminAlumni() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [isCSVModal, setIsCSVModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [csvFiles, setCsvFiles] = useState([]);
   const [previewAttachment, setPreviewAttachment] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -18,6 +20,13 @@ function AdminAlumni() {
   const [selectedCollege, setSelectedCollege] = useState("");
   const [selectedBatch, setSelectedBatch] = useState("");
   const [previewFileUrl, setPreviewFileUrl] = useState(null);
+  const [validationMessage, setValidationMessage] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showValidationMessage, setShowValidationMessage] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedFileId, setSelectedFileId] = useState(null);
+  const fileInputRef = useRef(null);
 
   const formatDate = (dateString) => {
     if (!dateString || isNaN(new Date(dateString).getTime())) {
@@ -231,20 +240,48 @@ function AdminAlumni() {
   const closeCSVModal = () => {
     setIsCSVModalOpen(false);
   };
-  const csvModalRef = useRef(null);
+  const closeDeleteCSV = () => {
+    setIsDeleteModalOpen(false);
+  };
+
+  const csvDeleteModalRef = useRef(null);
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (csvModalRef.current && !csvModalRef.current.contains(event.target)) {
+    const handleClickOutsideDelete = (event) => {
+      if (
+        csvDeleteModalRef.current &&
+        !csvDeleteModalRef.current.contains(event.target)
+      ) {
+        closeDeleteCSV();
+      }
+    };
+
+    if (isDeleteModalOpen) {
+      document.addEventListener("mousedown", handleClickOutsideDelete);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutsideDelete);
+    }
+  }, [isDeleteModalOpen]);
+
+  const csvModalRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutsideCSV = (event) => {
+      if (
+        csvModalRef.current &&
+        !csvModalRef.current.contains(event.target) &&
+        !isDeleteModalOpen // Prevent closing CSV modal if Delete modal is open
+      ) {
         closeCSVModal();
       }
     };
 
     if (isCSVModal) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutsideCSV);
       return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("mousedown", handleClickOutsideCSV);
     }
-  }, [isCSVModal]);
+  }, [isCSVModal, isDeleteModalOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -299,6 +336,114 @@ function AdminAlumni() {
       : nameB.localeCompare(nameA);
   });
 
+  const fetchCsvFiles = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/users/fetchcsv`, {
+        withCredentials: true,
+      });
+      setCsvFiles(response.data || []);
+    } catch (error) {
+      console.error("Error fetching CSV files:", error);
+      setErrorMessage("Error fetching CSV files.");
+      setShowErrorMessage(true);
+      setTimeout(() => {
+        setShowErrorMessage(false);
+      }, 5000);
+    }
+  };
+
+  const handleCSVFileChange = (event) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file) {
+      setSelectedFile(file);
+    }
+  };
+
+  // Handle the upload of a CSV file
+  const handleCSVUpload = async () => {
+    if (!selectedFile) {
+      setErrorMessage("Please upload a CSV File.");
+      setShowErrorMessage(true);
+      setTimeout(() => {
+        setShowErrorMessage(false);
+      }, 5000);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("csvFile", selectedFile); // Attach the file here
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/users/uploadcsv`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      setCsvFiles(response.data);
+      setValidationMessage("CSV file uploaded successfully!");
+      setShowValidationMessage(true);
+      setTimeout(() => {
+        setShowValidationMessage(false);
+      }, 5000);
+
+      // Reset the selectedFile state after upload
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (error) {
+      console.error("Error uploading CSV file:", error);
+      setErrorMessage(
+        error.response?.data?.msg || "Error occurred while uploading."
+      );
+      setShowErrorMessage(true);
+      setTimeout(() => {
+        setShowErrorMessage(false); // Hide the error message after 5 seconds
+      }, 5000);
+    }
+  };
+
+  // Handle deleting a CSV file
+  const handleDeleteCsvFile = async () => {
+    if (!selectedFileId) {
+      console.error("No file selected for deletion");
+      return;
+    }
+    try {
+      await axios.delete(`${backendUrl}/users/deletecsv/${selectedFileId}`, {
+        withCredentials: true,
+      });
+
+      // Fetch and update the list of CSV files after deletion
+      fetchCsvFiles();
+      setIsDeleteModalOpen(false);
+      setValidationMessage("CSV file deleted successfully!");
+      setShowValidationMessage(true);
+      setTimeout(() => {
+        setShowValidationMessage(false);
+      }, 5000);
+
+      // Reset the selectedFileId after deletion
+      setSelectedFileId(null);
+    } catch (error) {
+      console.error("Error deleting CSV file:", error);
+      setErrorMessage("Error occurred while deleting.");
+      setShowErrorMessage(true);
+      setTimeout(() => {
+        setShowErrorMessage(false);
+      }, 5000);
+    }
+  };
+
+  useEffect(() => {
+    fetchCsvFiles();
+  }, []);
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       <h1 className="text-2xl font-medium text-gray-700 mb-6">Alumni</h1>
@@ -670,7 +815,7 @@ function AdminAlumni() {
             onClick={openCSVModal}
             aria-label="Save"
           >
-            Upload CSV
+            CSV Files for Registration
           </button>
         </div>
       </div>
@@ -693,10 +838,46 @@ function AdminAlumni() {
       ) : (
         <p>No alumni found.</p>
       )}
+
       {/* CSV Upload Modal */}
       {isCSVModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          {/* Modal Content */}
+          {showErrorMessage && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{errorMessage}</p>
+            </div>
+          )}
+
+          {showValidationMessage && (
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green text-white p-4 rounded-lg shadow-lg z-50">
+              <p>{validationMessage}</p>
+            </div>
+          )}
+          {isDeleteModalOpen && selectedFileId && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div
+                ref={csvDeleteModalRef}
+                className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-64 sm:w-96"
+              >
+                <h2 className="text-2xl mb-4">Delete CSV file</h2>
+                <p>Are you sure you want to delete this CSV file?</p>
+                <div className="flex justify-end mt-4">
+                  <button
+                    className="btn btn-sm w-24 bg-red text-white mr-2"
+                    onClick={handleDeleteCsvFile}
+                  >
+                    Delete
+                  </button>
+                  <button
+                    className="btn btn-sm w-24 bg-gray-500 text-white"
+                    onClick={() => setIsDeleteModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div
             ref={csvModalRef}
             className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4"
@@ -720,20 +901,21 @@ function AdminAlumni() {
                 ></path>
               </svg>
             </button>
-            {/* Modal Body */}
+
+            {/* Modal Content */}
             <div className="mb-4">
               <div className="block mb-2 text-sm font-medium">
-                CSV Upload for Registration
+                CSV Files for Registration
               </div>
               <div className="block mb-2 text-sm font-light">
-                Upload a CSV file for user registration. The file will be used
-                to register accounts.{" "}
+                You can upload a CSV file containing alumni credentials,
+                including student number, first name, last name, and birthday,
+                for account registration.
                 <span className="font-bold">
-                  Before uploading a csv file, make sure its format is like in
-                  the image below.
+                  Ensure the CSV file format matches the example shown in the
+                  image below before uploading.
                 </span>
               </div>
-              {/* Centering the image */}
               <div className="flex justify-center items-center mb-8 mt-4">
                 <img
                   src={csvpic}
@@ -742,41 +924,58 @@ function AdminAlumni() {
                 />
               </div>
             </div>
+
+            {/* File input */}
             <input
               type="file"
-              name="csvregister"
-              accept="application/pdf"
-              className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-10"
+              name="csvFile"
+              accept=".csv"
+              className="file-input file-input-sm file-input-bordered text-xs w-full h-10 mb-4"
+              onChange={handleCSVFileChange}
+              ref={fileInputRef}
             />
-            {/* Dummy CSV Files List */}
+            <div className="flex justify-center">
+              <button
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3 mb-6"
+                onClick={handleCSVUpload}
+                aria-label="Save"
+              >
+                Save
+              </button>
+            </div>
+
+            {/* Display uploaded CSV Files */}
             <div className="mb-4">
               <div className="text-sm font-medium mb-2">Uploaded CSV Files</div>
-              <ul className="list-disc pl-5">
-                <li className="flex items-center justify-between text-sm text-gray-700 mb-2">
-                  user_registration_1.csv
-                  <div
-                    className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer ml-2 relative group"
-                    title="Delete"
-                    style={{
-                      fontSize: "12px",
-                      textAlign: "center",
-                      paddingTop: "4px",
-                    }}
-                  ></div>
-                </li>
-                <li className="flex items-center justify-between text-sm text-gray-700 mb-2">
-                  user_registration_2.csv
-                  <div
-                    className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer ml-2 relative group"
-                    title="Delete"
-                    style={{
-                      fontSize: "12px",
-                      textAlign: "center",
-                      paddingTop: "4px",
-                    }}
-                  ></div>
-                </li>
-              </ul>
+              <div className="max-h-30 overflow-y-auto">
+                <ul className="list-disc pl-5">
+                  {csvFiles.length > 0 ? (
+                    csvFiles.map((file) => (
+                      <li
+                        key={file._id}
+                        className="flex items-center justify-between text-sm text-gray-700 mb-2"
+                      >
+                        {file.fileName}
+                        <div
+                          onClick={() => {
+                            setSelectedFileId(file._id);
+                            setIsDeleteModalOpen(true);
+                          }}
+                          className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer ml-2"
+                          title="Delete"
+                          style={{
+                            fontSize: "12px",
+                            textAlign: "center",
+                            paddingTop: "4px",
+                          }}
+                        />
+                      </li>
+                    ))
+                  ) : (
+                    <li>No CSV files uploaded.</li>
+                  )}
+                </ul>
+              </div>
             </div>
           </div>
         </div>

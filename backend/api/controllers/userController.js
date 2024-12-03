@@ -10,6 +10,33 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const mongoSanitize = require("mongo-sanitize");
+const multer = require("multer");
+const CsvFile = require("../models/csvFileModel");
+const moment = require("moment");
+
+// Set up multer storage for CSV files
+const storage = multer.diskStorage({
+  destination: "./uploads/alumni",
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    const filetypes = /csv/;
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    const mimetype = filetypes.test(file.mimetype);
+
+    if (!mimetype || !extname) {
+      return cb(new Error("Only CSV files are allowed"));
+    }
+    cb(null, true);
+  },
+}).single("csvFile");
 
 // Helper function to generate a 6-digit OTP
 function generateOTP() {
@@ -69,8 +96,8 @@ exports.registerUser = async (req, res) => {
 
     // Check for duplicate user by name and birthday
     const duplicateUser = await User.findOne({
-      firstName: { $regex: `^${normalizedFirstName}$`, $options: "i" }, // Case-insensitive match
-      lastName: { $regex: `^${normalizedLastName}$`, $options: "i" }, // Case-insensitive match
+      firstName: { $regex: `^${normalizedFirstName}$`, $options: "i" },
+      lastName: { $regex: `^${normalizedLastName}$`, $options: "i" },
       birthday: sanitizedBirthday.trim(),
     });
 
@@ -80,22 +107,38 @@ exports.registerUser = async (req, res) => {
         .json({ msg: "Duplicate accounts are not allowed." });
     }
 
-    const csvFilePath = path.join(__dirname, "../alumnilist.csv");
+    const csvFolderPath = path.join(__dirname, "../../uploads/alumni");
+    const csvFiles = fs
+      .readdirSync(csvFolderPath)
+      .filter((file) => file.endsWith(".csv"));
 
-    const csvData = await new Promise((resolve, reject) => {
-      const results = [];
-      fs.createReadStream(csvFilePath)
-        .pipe(csv())
-        .on("data", (row) => {
-          results.push(row);
-        })
-        .on("end", () => {
-          resolve(results);
-        })
-        .on("error", (error) => {
-          reject(error);
-        });
-    });
+    if (csvFiles.length === 0) {
+      return res.status(400).json({ msg: "Server Error" });
+    }
+
+    let csvData = [];
+    for (const file of csvFiles) {
+      const filePath = path.join(csvFolderPath, file);
+      const fileData = await new Promise((resolve, reject) => {
+        const results = [];
+        fs.createReadStream(filePath)
+          .pipe(csv())
+          .on("data", (row) => {
+            // Normalize the date format to dd-mm-yyyy for each row
+            if (row.birthday) {
+              row.birthday = moment(row.birthday, [
+                "YYYY-MM-DD",
+                "DD-MM-YYYY",
+                "DD/MM/YYYY",
+              ]).format("YYYY-MM-DD");
+            }
+            results.push(row);
+          })
+          .on("end", () => resolve(results))
+          .on("error", (error) => reject(error));
+      });
+      csvData = csvData.concat(fileData);
+    }
 
     let matchingRecord;
     if (sanitizedStudentNum && sanitizedStudentNum.trim() !== "") {
@@ -769,5 +812,79 @@ exports.resetPassword = async (req, res) => {
     return res.status(200).json({ msg: "Password reset successfully" });
   } catch (err) {
     return res.status(500).json({ msg: "Server error", error: err.message });
+  }
+};
+
+// Alumni CSV Upload
+exports.uploadCsv = async (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res
+          .status(400)
+          .json({ msg: "CSV file must be a maximum of 5MB" });
+      }
+      return res.status(400).json({ msg: err.message });
+    }
+
+    try {
+      const { filename, path: filePath } = req.file;
+
+      // Sanitize filename and file path to prevent injection
+      const sanitizedFileName = mongoSanitize(filename.replace(/^\d+-/, ""));
+      const sanitizedFilePath = mongoSanitize(filePath);
+
+      // Create a new CSV file record
+      const csvFile = new CsvFile({
+        fileName: sanitizedFileName,
+        filePath: sanitizedFilePath,
+      });
+
+      await csvFile.save();
+
+      // Fetch all the CSV files after saving the new one
+      const csvFiles = await CsvFile.find();
+      res.status(201).json(csvFiles);
+    } catch (error) {
+      res.status(500).json({ msg: "Server Error", error: error.message });
+    }
+  });
+};
+
+// Fetch all uploaded CSV files (assuming a single upload at a time)
+exports.getCsvFiles = async (req, res) => {
+  try {
+    const csvFiles = await CsvFile.find();
+    // Sanitize filenames by removing number part before sending to frontend
+    const sanitizedFiles = csvFiles.map((file) => {
+      const sanitizedFileName = file.fileName.replace(/^\d+-/, ""); // Remove number part
+      return { ...file.toObject(), fileName: sanitizedFileName };
+    });
+    res.status(200).json(sanitizedFiles.length > 0 ? sanitizedFiles : []);
+  } catch (error) {
+    res.status(500).json({ msg: "Server Error", error: error.message });
+  }
+};
+
+// Delete a CSV file
+exports.deleteCsv = async (req, res) => {
+  try {
+    const csvFile = await CsvFile.findById(req.params.id);
+
+    if (!csvFile) {
+      return res.status(404).json({ msg: "CSV file not found" });
+    }
+
+    const filePath = path.resolve(csvFile.filePath);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath); // Delete the file
+    }
+
+    await CsvFile.deleteOne({ _id: req.params.id });
+    res.status(200).json({ msg: "CSV file deleted successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ msg: "Error deleting CSV file", error: error.message });
   }
 };

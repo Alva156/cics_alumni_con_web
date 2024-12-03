@@ -14,12 +14,16 @@ const uploadsPath = path.join(__dirname, "uploads");
 const ensureDirectoryExists = (dirPath) => {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
+    console.log(`Folder created: ${dirPath}`);
+  } else {
+    console.log(`Folder already exists: ${dirPath}`);
   }
 };
 
 ensureDirectoryExists(path.join(uploadsPath, "profileimg"));
 ensureDirectoryExists(path.join(uploadsPath, "attachments"));
 ensureDirectoryExists(path.join(uploadsPath, "contents"));
+ensureDirectoryExists(path.join(uploadsPath, "alumni"));
 
 // Middleware
 app.use(cookieParser());
@@ -36,6 +40,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Serve static files from uploads
+app.use("/uploads/alumni", express.static(path.join(uploadsPath, "alumni")));
 app.use(
   "/uploads/profileimg",
   express.static(path.join(uploadsPath, "profileimg"))

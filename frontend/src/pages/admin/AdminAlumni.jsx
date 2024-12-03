@@ -1080,24 +1080,11 @@ function AdminAlumni() {
                         {file.fileName}
                         <div className="flex items-center space-x-2">
                           {/* Wrapper div with flex */}
-                          <div
-                            onClick={() => {
-                              setSelectedFileId(file._id);
-                              setIsDeleteModalOpen(true);
-                            }}
-                            className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer"
-                            title="Delete"
-                            style={{
-                              fontSize: "12px",
-                              textAlign: "center",
-                              paddingTop: "4px",
-                            }}
-                          />
                           <button
                             onClick={() => {
                               handleViewCsvContent(file._id);
                             }}
-                            className="w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 fas fa-eye text-white"
+                            className="w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer fas fa-eye text-white"
                             style={{
                               fontSize: "11px",
                               textAlign: "center",
@@ -1105,6 +1092,19 @@ function AdminAlumni() {
                             }}
                             title="View"
                           ></button>
+                          <div
+                            onClick={() => {
+                              setSelectedFileId(file._id);
+                              setIsDeleteModalOpen(true);
+                            }}
+                            className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center mr-2 items-center cursor-pointer"
+                            title="Delete"
+                            style={{
+                              fontSize: "12px",
+                              textAlign: "center",
+                              paddingTop: "4px",
+                            }}
+                          />
                         </div>
                       </li>
                     ))

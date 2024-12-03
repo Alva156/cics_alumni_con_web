@@ -16,6 +16,7 @@ router.get("/check-auth", authenticateJWT, userController.checkAuth);
 router.post("/uploadcsv", authenticateJWT, userController.uploadCsv);
 router.get("/fetchcsv", authenticateJWT, userController.getCsvFiles);
 router.delete("/deletecsv/:id", authenticateJWT, userController.deleteCsv);
+router.get("/viewcsv/:id", authenticateJWT, userController.viewCsvContent);
 router.get("/protected", authenticateJWT, (req, res) => {
   res.status(200).json({ msg: "Token is valid" });
 });

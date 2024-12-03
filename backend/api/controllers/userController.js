@@ -865,6 +865,31 @@ exports.getCsvFiles = async (req, res) => {
     res.status(500).json({ msg: "Server Error", error: error.message });
   }
 };
+exports.viewCsvContent = async (req, res) => {
+  try {
+    const { id } = req.params; // Get CSV file ID from the request
+    const csvFile = await CsvFile.findById(id); // Find the file by ID
+
+    if (!csvFile) {
+      return res.status(404).json({ msg: "CSV file not found" });
+    }
+
+    const filePath = path.resolve(csvFile.filePath); // Resolve file path
+    const results = [];
+
+    // Use csv-parser to parse the CSV file
+    fs.createReadStream(filePath)
+      .pipe(csv())
+      .on("data", (row) => results.push(row))
+      .on("end", () => {
+        res.status(200).json(results); // Send the CSV data to frontend
+      });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ msg: "Error reading CSV file", error: error.message });
+  }
+};
 
 // Delete a CSV file
 exports.deleteCsv = async (req, res) => {

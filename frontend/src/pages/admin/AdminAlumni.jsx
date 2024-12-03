@@ -27,6 +27,8 @@ function AdminAlumni() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedFileId, setSelectedFileId] = useState(null);
   const fileInputRef = useRef(null);
+  const [isCSVViewModal, setIsCSVViewModalOpen] = useState(false);
+  const [csvFileContent, setCsvFileContent] = useState([]);
 
   const formatDate = (dateString) => {
     if (!dateString || isNaN(new Date(dateString).getTime())) {
@@ -243,6 +245,26 @@ function AdminAlumni() {
   const closeDeleteCSV = () => {
     setIsDeleteModalOpen(false);
   };
+  const closeViewContentCSV = () => {
+    setIsCSVViewModalOpen(false);
+  };
+  const csvCSVViewModalRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutsideViewCSV = (event) => {
+      if (
+        csvCSVViewModalRef.current &&
+        !csvCSVViewModalRef.current.contains(event.target)
+      ) {
+        closeViewContentCSV();
+      }
+    };
+
+    if (isCSVViewModal) {
+      document.addEventListener("mousedown", handleClickOutsideViewCSV);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutsideViewCSV);
+    }
+  }, [isCSVViewModal]);
 
   const csvDeleteModalRef = useRef(null);
 
@@ -270,7 +292,8 @@ function AdminAlumni() {
       if (
         csvModalRef.current &&
         !csvModalRef.current.contains(event.target) &&
-        !isDeleteModalOpen // Prevent closing CSV modal if Delete modal is open
+        !isDeleteModalOpen && // Prevent closing CSV modal if Delete modal is open
+        !isCSVViewModal // Prevent closing CSV modal if Delete modal is open
       ) {
         closeCSVModal();
       }
@@ -281,7 +304,7 @@ function AdminAlumni() {
       return () =>
         document.removeEventListener("mousedown", handleClickOutsideCSV);
     }
-  }, [isCSVModal, isDeleteModalOpen]);
+  }, [isCSVModal, isDeleteModalOpen, isCSVViewModal]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -434,6 +457,25 @@ function AdminAlumni() {
     } catch (error) {
       console.error("Error deleting CSV file:", error);
       setErrorMessage("Error occurred while deleting.");
+      setShowErrorMessage(true);
+      setTimeout(() => {
+        setShowErrorMessage(false);
+      }, 5000);
+    }
+  };
+  const handleViewCsvContent = async (fileId) => {
+    try {
+      const response = await axios.get(
+        `${backendUrl}/users/viewcsv/${fileId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      setCsvFileContent(response.data); // Set the content of the CSV file
+      setIsCSVViewModalOpen(true); // Open the modal
+    } catch (error) {
+      console.error("Error fetching CSV content:", error);
+      setErrorMessage("Error fetching CSV content.");
       setShowErrorMessage(true);
       setTimeout(() => {
         setShowErrorMessage(false);
@@ -853,6 +895,86 @@ function AdminAlumni() {
               <p>{validationMessage}</p>
             </div>
           )}
+          {isCSVViewModal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+              <div
+                ref={csvCSVViewModalRef}
+                className="relative bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] mx-4"
+              >
+                <button
+                  onClick={closeViewContentCSV} // Close the modal
+                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-sm md:text-base lg:text-lg"
+                >
+                  <svg
+                    className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </button>
+
+                {/* Display the CSV content */}
+                <div className="mb-4">
+                  <div className="block mb-2 text-sm font-medium">
+                    CSV File Content
+                  </div>
+                  <div className="block mb-2 text-sm font-light">
+                    Below is the content of the CSV file you selected:
+                  </div>
+
+                  {/* Display CSV content as a table */}
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full table-auto">
+                      <thead>
+                        <tr>
+                          {/* Display table headers based on the CSV content */}
+                          {csvFileContent &&
+                            csvFileContent.length > 0 &&
+                            Object.keys(csvFileContent[0]).map(
+                              (header, index) => (
+                                <th key={index} className="px-4 py-2 text-left">
+                                  {header}
+                                </th>
+                              )
+                            )}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {csvFileContent && csvFileContent.length > 0 ? (
+                          csvFileContent.map((row, index) => (
+                            <tr key={index}>
+                              {Object.values(row).map((value, idx) => (
+                                <td key={idx} className="px-4 py-2">
+                                  {value}
+                                </td>
+                              ))}
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td
+                              colSpan="100%"
+                              className="px-4 py-2 text-center"
+                            >
+                              No data available.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {isDeleteModalOpen && selectedFileId && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
               <div
@@ -956,19 +1078,34 @@ function AdminAlumni() {
                         className="flex items-center justify-between text-sm text-gray-700 mb-2"
                       >
                         {file.fileName}
-                        <div
-                          onClick={() => {
-                            setSelectedFileId(file._id);
-                            setIsDeleteModalOpen(true);
-                          }}
-                          className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer ml-2"
-                          title="Delete"
-                          style={{
-                            fontSize: "12px",
-                            textAlign: "center",
-                            paddingTop: "4px",
-                          }}
-                        />
+                        <div className="flex items-center space-x-2">
+                          {/* Wrapper div with flex */}
+                          <div
+                            onClick={() => {
+                              setSelectedFileId(file._id);
+                              setIsDeleteModalOpen(true);
+                            }}
+                            className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer"
+                            title="Delete"
+                            style={{
+                              fontSize: "12px",
+                              textAlign: "center",
+                              paddingTop: "4px",
+                            }}
+                          />
+                          <button
+                            onClick={() => {
+                              handleViewCsvContent(file._id);
+                            }}
+                            className="w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 fas fa-eye text-white"
+                            style={{
+                              fontSize: "11px",
+                              textAlign: "center",
+                              paddingTop: "3px",
+                            }}
+                            title="View"
+                          ></button>
+                        </div>
                       </li>
                     ))
                   ) : (

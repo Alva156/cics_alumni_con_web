@@ -37,7 +37,7 @@ const upload = multer({
     if (file.fieldname === "profileImage") {
       filetypes = /jpeg|jpg|png/; // Only allow image formats for profile image
     } else if (file.fieldname === "attachments") {
-      filetypes = /jpeg|jpg|png|pdf|doc|docx/; // Allow image and document formats for attachments
+      filetypes = /pdf/; // Allow pdf only formats for attachments
     } else {
       return cb(new Error("Invalid field name."));
     }

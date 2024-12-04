@@ -875,19 +875,33 @@ exports.viewCsvContent = async (req, res) => {
     }
 
     const filePath = path.resolve(csvFile.filePath); // Resolve file path
+
+    // Check if the file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ msg: "File does not exist on the server" });
+    }
+
     const results = [];
 
     // Use csv-parser to parse the CSV file
-    fs.createReadStream(filePath)
+    const readStream = fs.createReadStream(filePath);
+
+    // Handle stream errors
+    readStream
+      .on("error", (err) => {
+        console.error("Stream error:", err.message);
+        res
+          .status(500)
+          .json({ msg: "Error reading CSV file", error: err.message });
+      })
       .pipe(csv())
       .on("data", (row) => results.push(row))
       .on("end", () => {
-        res.status(200).json(results); // Send the CSV data to frontend
+        res.status(200).json(results); // Send the CSV data to the frontend
       });
   } catch (error) {
-    res
-      .status(500)
-      .json({ msg: "Error reading CSV file", error: error.message });
+    console.error("Server error:", error.message);
+    res.status(500).json({ msg: "Server error", error: error.message });
   }
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Bar } from "react-chartjs-2";
+import { Bar, Pie } from "react-chartjs-2";
 import axios from "axios";
 import {
   Chart as ChartJS,
@@ -101,7 +101,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-
+  // for bar
   const createOptions = (stepSize) => ({
     responsive: true,
     maintainAspectRatio: false,
@@ -116,7 +116,7 @@ const AdminDashboard = () => {
           display: false,
         },
         grid: {
-          display: false, // Optional: Remove grid lines if you want a cleaner look
+          display: false,
         },
       },
       y: {
@@ -334,6 +334,39 @@ const AdminDashboard = () => {
       },
     ],
   };
+  // for pie
+  const createPieOptions = () => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: {},
+    plugins: {
+      legend: {
+        display: true,
+        position: "bottom",
+        labels: {
+          generateLabels: (chart) => {
+            const data = chart.data;
+            return data.labels.map((label, i) => {
+              const value = data.datasets[0].data[i] || 0;
+              return {
+                text: `${label} - ${value}`,
+                fillStyle: data.datasets[0].backgroundColor[i],
+                hidden: false,
+                index: i,
+              };
+            });
+          },
+          font: {
+            size: (context) => {
+              const width = context.chart.width;
+              return width > 800 ? 14 : width > 500 ? 12 : 8;
+            },
+          },
+        },
+      },
+    },
+  });
+  const pieOptions = createPieOptions();
   // Function to trigger the browser's print dialog
   const exportToPDF = () => {
     if (dashboardRef.current) {
@@ -390,8 +423,8 @@ const AdminDashboard = () => {
           <div className="text-sm text-black-600">
             Number of Alumni per Gender
           </div>
-          <div className="h-48 mt-8">
-            <Bar data={data9} options={options1} />
+          <div className="flex items-center justify-center h-64 mt-8">
+            <Pie data={data9} options={pieOptions} />
           </div>
         </div>
       </div>
@@ -444,16 +477,16 @@ const AdminDashboard = () => {
       <div className="chart mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Employment Status</div>
-          <div className="h-48 mt-8">
-            <Bar data={data5} options={options1} />
+          <div className="flex items-center justify-center h-64 mt-8">
+            <Pie data={data5} options={pieOptions} />
           </div>
         </div>
       </div>
       <div className="chart mb-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
           <div className="text-sm text-black-600">Work Industry</div>
-          <div className="h-48 mt-8">
-            <Bar data={data6} options={options1} />
+          <div className="flex items-center justify-center h-64 mt-8">
+            <Pie data={data6} options={pieOptions} />
           </div>
         </div>
       </div>

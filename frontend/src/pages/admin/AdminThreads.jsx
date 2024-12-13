@@ -803,7 +803,7 @@ function AdminThreads() {
               {searchTerm.trim() ? "Search Results" : "Pending Threads"}
             </div>
             <hr className="mb-4 border-black" />
-            <div className="h-60 md:h-96 overflow-y-auto">
+            <div className="h-44 md:h-96 overflow-y-auto">
               {searchTerm.trim() ? (
                 filteredThreads.length === 0 ? (
                   <div>No threads match your search.</div>
@@ -887,33 +887,37 @@ function AdminThreads() {
                 )
               ) : (
                 <div>
-                  {pendingThreads.map((thread) => (
-                    <div
-                      key={thread._id}
-                      className="p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors my-2"
-                      onClick={() => openPendingViewModal(thread)}
-                    >
-                      <div>
-                        <div className="text-md font-medium mb-1">
-                          {thread.title}
+                  {pendingThreads.length === 0 ? (
+                    <div>No pending threads.</div>
+                  ) : (
+                    pendingThreads.map((thread) => (
+                      <div
+                        key={thread._id}
+                        className="p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors my-2"
+                        onClick={() => openPendingViewModal(thread)}
+                      >
+                        <div>
+                          <div className="text-md font-medium mb-1">
+                            {thread.title}
+                          </div>
+                          <div className="text-sm text-black-600">
+                            Replies: {thread.replyCount || 0}
+                          </div>
                         </div>
-                        <div className="text-sm text-black-600">
-                          Replies: {thread.replyCount || 0}
+                        <div className="flex justify-center items-center space-y-2 ml-2">
+                          <div
+                            className="fas fa-clock text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer relative group"
+                            title="Pending"
+                            style={{
+                              fontSize: "12px",
+                              textAlign: "center",
+                              paddingTop: "4px",
+                            }}
+                          ></div>
                         </div>
                       </div>
-                      <div className="flex justify-center items-center space-y-2 ml-2">
-                        <div
-                          className="fas fa-clock text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer relative group"
-                          title="Pending"
-                          style={{
-                            fontSize: "12px",
-                            textAlign: "center",
-                            paddingTop: "4px",
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               )}
             </div>
@@ -931,7 +935,7 @@ function AdminThreads() {
               </button>
             </div>
             <hr className="mb-4 border-black" />
-            <div className="h-72 md:h-96 overflow-y-auto">
+            <div className="h-44 md:h-96 overflow-y-auto">
               {myThreads.length === 0 ? (
                 <div>No threads created yet.</div>
               ) : (

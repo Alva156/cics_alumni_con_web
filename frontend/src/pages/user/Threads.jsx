@@ -791,7 +791,7 @@ function Threads() {
               </button>
             </div>
             <hr className="mb-4 border-black" />
-            <div className="h-72 md:h-96 overflow-y-auto">
+            <div className="h-44 md:h-96 overflow-y-auto">
               {searchTerm.trim() ? (
                 filteredThreads.length === 0 ? (
                   <div>No threads match your search.</div>

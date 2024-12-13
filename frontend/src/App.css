@@ -714,48 +714,63 @@ screens */
     margin-bottom: var(--section-spacing); /* Add bottom margin */
   }
 }
+
 @media print {
   @page {
-    size: A3; /* You can change this to 'letter' or other sizes */
+    size: A3; /* Adjust as needed */
     margin: 10mm 5mm 5mm 5mm !important;
   }
-  /* Hide the export button when printing */
-  .no-print {
-    display: none;
-  }
 
-  /* Hide the header when printing */
-  .header {
-    display: none;
-  }
-
-  /* Hide the footer if you have one */
+  /* Hide non-print elements */
+  .no-print,
+  .header,
   .footer {
-    display: none;
+    display: none !important;
   }
 
-  /* Adjust chart height for printing */
-  .chart {
-    height: auto; /* Adjust height to fit printed page */
-    width: 100%;
+  /* Ensure consistent font styles */
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #000; /* Match screen text color */
+    background-color: white; /* Ensure no background issues */
   }
+
+  /* Match the container layout */
+  .text-black {
+    color: black !important; /* Ensure text is black for printing */
+  }
+
+  .chart,
   .chart-container {
-    page-break-inside: avoid; /* Avoid page breaks within charts */
+    width: 100%;
+    height: auto !important;
+    page-break-inside: avoid; /* Prevent charts from breaking across pages */
   }
-  /* Expand modal to fill page */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    gap: 10px;
+  }
+  .grid > div {
+    flex: 1 1 calc(50% - 10px); /* Two columns per row */
+  }
+
+  /* Handle modal expansion */
   .print-modal {
     position: static;
-    background: white;
+    width: 100%;
+    background-color: white;
     overflow: visible;
   }
-  /* Ensure modal content takes full page width for print */
+
   .print-content {
     max-width: 100%;
     width: 100%;
-    height: auto;
-    overflow: visible;
+    margin: 0;
   }
 }
+
 .background-news-container {
   display: flex; /* Aligns children (video and news carousel) in a row */
   width: 100%;

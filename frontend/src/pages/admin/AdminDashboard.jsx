@@ -388,76 +388,83 @@ const AdminDashboard = () => {
           Export to PDF
         </button>
       </div>
-  
-   {/* Row 1 */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
-    <div>
-      <div className="text-sm text-black-600">Number of Users</div>
-      <div className="text-lg font-medium mb-1 mt-2">
-        {dashboardData.numberOfUsers}
+
+      {/* Row 1 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+          <div>
+            <div className="text-sm text-black-600">Number of Users</div>
+            <div className="text-lg font-medium mb-1 mt-2">
+              {dashboardData.numberOfUsers}
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
+          <div>
+            <div className="text-sm text-black-600">
+              Number of Currently Working Alumni
+            </div>
+            <div className="text-lg font-medium mb-1 mt-2">
+              {dashboardData.employedUsers}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div className="mb-4 p-4 border border-black rounded-lg cursor-pointer">
-    <div>
-      <div className="text-sm text-black-600">Number of Currently Working Alumni</div>
-      <div className="text-lg font-medium mb-1 mt-2">
-        {dashboardData.employedUsers}
+      <div className="chart mt-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
+        <div>
+          <div className="text-sm text-black-600">
+            Number of Alumni per College
+          </div>
+          <div className="h-80 mt-8">
+            <Bar data={data2} options={options1} />
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
-
-<div className="chart mt-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
-  <div>
-    <div className="text-sm text-black-600">Number of Alumni per College</div>
-    <div className="h-80 mt-8">
-      <Bar data={data2} options={options1} />
-    </div>
-  </div>
-</div>
-
-     
       {/* Row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div className="chart p-6 border border-black rounded-lg cursor-pointer chart-container">
+        <div className="chart p-6 border border-black rounded-lg cursor-pointer ">
           <div>
-            <div className="text-sm text-black-600">Number of Alumni per College Program</div>
+            <div className="text-sm text-black-600">
+              Number of Alumni per College Program
+            </div>
             <div className="h-48 mt-8">
               <Bar data={data2} options={options1} />
             </div>
           </div>
         </div>
-        <div className="chart p-6 border border-black rounded-lg cursor-pointer chart-container">
+        <div className="chart p-6 border border-black rounded-lg cursor-pointer ">
           <div>
-            <div className="text-sm text-black-600">Number of Alumni per Gender</div>
+            <div className="text-sm text-black-600">
+              Number of Alumni per Gender
+            </div>
             <div className="flex items-center justify-center h-64 mt-8">
               <Pie data={data9} options={pieOptions} />
             </div>
           </div>
         </div>
       </div>
-  
 
       {/* Row 3 */}
       <div className="chart mt-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
-          <div className="text-sm text-black-600">Number of Alumni per Region</div>
+          <div className="text-sm text-black-600">
+            Number of Alumni per Region
+          </div>
           <div className="h-80 mt-8">
             <Bar data={data10} options={options1} />
           </div>
         </div>
       </div>
 
-  
-  
       {/* Row 4 */}
       <div className="chart mt-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
-          <div className="text-sm text-black-600">Number of Alumni per Specialization</div>
+          <div className="text-sm text-black-600">
+            Number of Alumni per Specialization
+          </div>
           <div className="h-48 mt-8">
             <Bar data={data8} options={options1} />
           </div>
@@ -483,7 +490,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-  
+
       {/* Row 6 */}
       <div className="chart mt-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
@@ -493,7 +500,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-  
+
       {/* Row 7 */}
       <div className="chart mt-4 p-6 border border-black rounded-lg cursor-pointer chart-container">
         <div>
@@ -503,13 +510,13 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-  
-      
-  
+
       {/* Row 8 */}
       <div className="chart mt-4 p-4 border border-black rounded-lg cursor-pointer chart-container">
         <div>
-          <div className="text-sm text-black-600">How long it takes to land a job</div>
+          <div className="text-sm text-black-600">
+            How long it takes to land a job
+          </div>
           <div className="chart h-48 mt-8">
             <Bar data={data7} options={options2} />
           </div>
@@ -517,7 +524,6 @@ const AdminDashboard = () => {
       </div>
     </div>
   );
-  
 };
 
 export default AdminDashboard;

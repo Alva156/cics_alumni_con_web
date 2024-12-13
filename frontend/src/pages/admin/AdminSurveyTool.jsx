@@ -1829,76 +1829,62 @@ function AdminSurveyTool() {
         </button>
       </div>
       <hr className="mb-6 border-black no-print" />
-      {filteredAndSortedSurveys.length > 0 ? (
-        filteredAndSortedSurveys.map((survey, index) => (
-          <div
-            key={index}
-            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
-            onClick={() => openViewModal(survey)}
-          >
-            <div className="no-print">
-              <div className="text-md font-medium mb-1">{survey.name}</div>
-              <div className="text-sm text-black-600">
-                {survey.responseCount
-                  ? `${survey.responseCount} responses`
-                  : "No responses recorded."}
+      {/* Grid layout for drafts */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {filteredAndSortedSurveys.length > 0 ? (
+          filteredAndSortedSurveys.map((survey, index) => (
+            <div
+              key={index}
+              className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
+              onClick={() => openViewModal(survey)}
+            >
+              <div className="no-print">
+                <div className="text-md font-medium mb-1">{survey.name}</div>
+                <div className="text-sm text-black-600">
+                  {survey.responseCount
+                    ? `${survey.responseCount} responses`
+                    : "No responses recorded."}
+                </div>
               </div>
-            </div>
-            <div className="flex items-center">
-              {/* Delete Button */}
-              <div
-                className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group "
-                title="Delete"
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  paddingTop: "4px",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openDeleteModal(survey); // Open the modal and pass the full survey object
-                }}
-              ></div>
-              {/* Edit Button */}
-              <div
-                className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-                title="Edit"
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  paddingTop: "4px",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEditModal(survey);
-                }}
-              ></div>
-              {/* Publish Button */}
-              <div
-                className="fas fa-check text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-                title="Publish"
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  paddingTop: "4px",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const surveyToToggle = surveys.find(
-                    (s) => s._id === survey._id
-                  ); // Find the survey
-                  if (surveyToToggle && !surveyToToggle.published) {
-                    setSelectedSurveyId(survey._id); // Set the ID for confirmation
-                    setIsPublishModalOpen(true); // Open the confirmation modal
-                  } else {
-                    handlePublishSurvey(survey._id); // Call the function to handle publishing
-                  }
-                }}
-                role="button" // Make it clear it's a button
-                tabIndex={0} // Make it focusable
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    // Allow activation via keyboard
+              <div className="flex items-center">
+                {/* Delete Button */}
+                <div
+                  className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                  title="Delete"
+                  style={{
+                    fontSize: "12px",
+                    textAlign: "center",
+                    paddingTop: "4px",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openDeleteModal(survey); // Open the modal and pass the full survey object
+                  }}
+                ></div>
+                {/* Edit Button */}
+                <div
+                  className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                  title="Edit"
+                  style={{
+                    fontSize: "12px",
+                    textAlign: "center",
+                    paddingTop: "4px",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEditModal(survey);
+                  }}
+                ></div>
+                {/* Publish Button */}
+                <div
+                  className="fas fa-check text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                  title="Publish"
+                  style={{
+                    fontSize: "12px",
+                    textAlign: "center",
+                    paddingTop: "4px",
+                  }}
+                  onClick={(e) => {
                     e.stopPropagation();
                     const surveyToToggle = surveys.find(
                       (s) => s._id === survey._id
@@ -1909,69 +1895,89 @@ function AdminSurveyTool() {
                     } else {
                       handlePublishSurvey(survey._id); // Call the function to handle publishing
                     }
-                  }
-                }}
-              ></div>
-            </div>
-          </div>
-        ))
-      ) : (
-        <div className="mb-4 text-center text-gray-500 no-print">
-          No unanswered surveys available.
-        </div>
-      )}
-      <div className="text-lg mb-4 no-print">Published Surveys</div>
-      <hr className="mb-6 border-black no-print " />
-      {filteredAndSortedAnsweredSurveys.length > 0 ? (
-        filteredAndSortedAnsweredSurveys.map((survey, index) => (
-          <div
-            key={index}
-            className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
-            onClick={() => openViewModal(survey)} // Update to open ViewModal
-          >
-            <div className="no-print">
-              <div className="text-md font-medium mb-1">{survey.name}</div>
-              <div className="text-sm text-black-600">
-                {survey.responseCount
-                  ? `${survey.responseCount} responses`
-                  : "No responses recorded."}
+                  }}
+                  role="button" // Make it clear it's a button
+                  tabIndex={0} // Make it focusable
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      // Allow activation via keyboard
+                      e.stopPropagation();
+                      const surveyToToggle = surveys.find(
+                        (s) => s._id === survey._id
+                      ); // Find the survey
+                      if (surveyToToggle && !surveyToToggle.published) {
+                        setSelectedSurveyId(survey._id); // Set the ID for confirmation
+                        setIsPublishModalOpen(true); // Open the confirmation modal
+                      } else {
+                        handlePublishSurvey(survey._id); // Call the function to handle publishing
+                      }
+                    }
+                  }}
+                ></div>
               </div>
             </div>
-            <div className="flex items-center">
-              {/* Unpublish Button */}
-              <div
-                className="fas fa-ban text-white w-5 h-5 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
-                title="Unpublish"
-                style={{
-                  fontSize: "12px",
-                  textAlign: "center",
-                  paddingTop: "4px",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log(
-                    "Attempting to unpublish survey with ID:",
-                    survey._id
-                  ); // Log ID
-                  handleTogglePublishStatus(survey._id); // Call to handle unpublishing and show modal if needed
-                }}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.stopPropagation();
-                    handleTogglePublishStatus(survey._id); // Call to handle unpublishing via keyboard
-                  }
-                }}
-              ></div>
-            </div>
+          ))
+        ) : (
+          <div className="mb-4 text-center text-gray-500 no-print">
+            No unanswered surveys available.
           </div>
-        ))
-      ) : (
-        <div className="mb-4 text-center text-gray-500 no-print">
-          No answered surveys available.
-        </div>
-      )}
+        )}
+      </div>
+      <div className="text-lg mb-4 no-print">Published Surveys</div>
+      <hr className="mb-6 border-black no-print" />
+      {/* Grid layout for published surveys */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {filteredAndSortedAnsweredSurveys.length > 0 ? (
+          filteredAndSortedAnsweredSurveys.map((survey, index) => (
+            <div
+              key={index}
+              className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
+              onClick={() => openViewModal(survey)} // Update to open ViewModal
+            >
+              <div className="no-print">
+                <div className="text-md font-medium mb-1">{survey.name}</div>
+                <div className="text-sm text-black-600">
+                  {survey.responseCount
+                    ? `${survey.responseCount} responses`
+                    : "No responses recorded."}
+                </div>
+              </div>
+              <div className="flex items-center">
+                {/* Unpublish Button */}
+                <div
+                  className="fas fa-ban text-white w-5 h-5 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
+                  title="Unpublish"
+                  style={{
+                    fontSize: "12px",
+                    textAlign: "center",
+                    paddingTop: "4px",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    console.log(
+                      "Attempting to unpublish survey with ID:",
+                      survey._id
+                    ); // Log ID
+                    handleTogglePublishStatus(survey._id); // Call to handle unpublishing and show modal if needed
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.stopPropagation();
+                      handleTogglePublishStatus(survey._id); // Call to handle unpublishing via keyboard
+                    }
+                  }}
+                ></div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="mb-4 text-center text-gray-500 no-print">
+            No answered surveys available.
+          </div>
+        )}
+      </div>
       {/* VIEW MODAL */}
       {isViewModalOpen && selectedSurvey && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 print-modal ">

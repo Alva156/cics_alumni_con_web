@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import ReactPaginate from "react-paginate";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
@@ -26,6 +27,10 @@ function Documents() {
   const [documents, setDocuments] = useState([]);
   const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(0);
+    
+  const itemsPerPage = 6;
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -83,6 +88,15 @@ function Documents() {
     }
     return 0;
   });
+
+  const handlePageChange = (selectedPage) => {
+    setCurrentPage(selectedPage.selected);
+  };
+
+  // Paginate the sortedDocuments list
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedDocuments = sortedDocuments.slice(startIndex, endIndex);
 
   const downloadDocument = async (imagePath) => {
     if (!imagePath) {
@@ -160,58 +174,91 @@ function Documents() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sortedDocuments.map((document) => (
-          <div
-            key={document._id}
-            className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => openViewModal(document)}
-          >
-            {document.image ? (
-              document.image.endsWith(".pdf") ? (
-                <div className="overflow-y-hidden object-contain">
-                  <Worker workerUrl={pdfWorker}>
-                    <div className="w-full max-h-48 overflow-hidden mb-4">
-                      <Viewer
-                        fileUrl={`${backendUrl}${document.image}`}
-                        renderTextLayer={false}
-                        initialPage={0} // Show the first page only in the preview
-                        style={{
-                          height: "100%",
-                          width: "100%",
-                          objectFit: "contain", // Ensures the PDF fits without stretching
-                        }}
-                      />
-                    </div>
-                  </Worker>
-                </div>
-              ) : (
-                <img
-                  src={`${backendUrl}${document.image}`}
-                  alt={document.name}
-                  className="w-full h-48 object-cover rounded-t-lg mb-4"
-                />
-              )
-            ) : (
-              <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg mb-4">
-                <span className="text-gray-500">No Image Available</span>
-              </div>
-            )}
-            <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
-              {document.name}
-            </div>
-            <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
-              {document.description.slice(0, 100)}...
-            </p>
-            <a
-              href="#"
-              style={{ color: "#be142e" }}
-              className="text-sm font-medium hover:underline"
+        {paginatedDocuments.length > 0 ? (
+          paginatedDocuments.map((document) => (
+            <div
+              key={document._id}
+              className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => openViewModal(document)}
             >
-              Read More
-            </a>
-          </div>
-        ))}
+              {document.image ? (
+                document.image.endsWith(".pdf") ? (
+                  <div className="overflow-y-hidden object-contain">
+                    <Worker workerUrl={pdfWorker}>
+                      <div className="w-full max-h-48 overflow-hidden mb-4">
+                        <Viewer
+                          fileUrl={`${backendUrl}${document.image}`}
+                          renderTextLayer={false}
+                          initialPage={0} // Show the first page only in the preview
+                          style={{
+                            height: "100%",
+                            width: "100%",
+                            objectFit: "contain", // Ensures the PDF fits without stretching
+                          }}
+                        />
+                      </div>
+                    </Worker>
+                  </div>
+                ) : (
+                  <img
+                    src={`${backendUrl}${document.image}`}
+                    alt={document.name}
+                    className="w-full h-48 object-cover rounded-t-lg mb-4"
+                  />
+                )
+              ) : (
+                <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg mb-4">
+                  <span className="text-gray-500">No Image Available</span>
+                </div>
+              )}
+              <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                {document.name}
+              </div>
+              <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+                {document.description.slice(0, 100)}...
+              </p>
+              <a
+                href="#"
+                style={{ color: "#be142e" }}
+                className="text-sm font-medium hover:underline"
+              >
+                Read More
+              </a>
+            </div>
+          ))
+        ) : (
+          <p>No documents found.</p>
+        )}
       </div>
+
+      <ReactPaginate
+        previousLabel={<button className="w-full h-full">Previous</button>}
+        nextLabel={<button className="w-full h-full">Next</button>}
+        breakLabel={<button className="w-full h-full">...</button>}
+        pageCount={Math.ceil(sortedDocuments.length / itemsPerPage)} // Total number of pages
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageChange}
+        containerClassName={"flex justify-center items-center space-x-2 mt-6"}
+        pageClassName={
+          "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        pageLinkClassName={"w-full h-full flex items-center justify-center"}
+        previousClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        previousLinkClassName={"w-full h-full flex items-center justify-center"}
+        nextClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        nextLinkClassName={"w-full h-full flex items-center justify-center"}
+        breakClassName={
+          "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
+        }
+        breakLinkClassName={"w-full h-full flex items-center justify-center"}
+        activeClassName={"bg-black text-red font-medium"}
+        disabledClassName={"opacity-50 cursor-not-allowed"}
+      />
 
       {/* View Modal */}
       {isViewModalOpen && selectedDocument && (

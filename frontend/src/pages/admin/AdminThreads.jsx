@@ -9,10 +9,12 @@ function AdminThreads() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [myThreads, setMyThreads] = useState([]);
   const [allThreads, setAllThreads] = useState([]);
+  const [pendingThreads, setPendingThreads] = useState([]);
   const [newThread, setNewThread] = useState({ title: "", content: "" });
   const [selectedThread, setSelectedThread] = useState(null);
   const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isPendingViewModalOpen, setPendingIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -169,40 +171,54 @@ function AdminThreads() {
     }
   }, [selectedThread]);
 
+  // Define fetching functions outside of useEffect
+  const fetchAllThreads = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/threads/get`, {
+        withCredentials: true,
+      });
+      // Filter threads with status "approved" for All Threads
+      const approvedThreads = response.data.filter(
+        (thread) => thread.status === "approved"
+      );
+      setAllThreads(approvedThreads);
+    } catch (error) {
+      console.error("Error fetching all threads:", error);
+    }
+  };
+
+  const fetchMyThreads = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/threads/my-threads`, {
+        withCredentials: true,
+      });
+      const userThreads = response.data.filter((thread) =>
+        ["pending", "approved", "rejected"].includes(thread.status)
+      );
+      setMyThreads(userThreads);
+    } catch (error) {
+      console.error("Error fetching my threads:", error);
+    }
+  };
+
+  const fetchPendingThreads = async () => {
+    try {
+      const response = await axios.get(`${backendUrl}/threads/pending`, {
+        withCredentials: true,
+      });
+      setPendingThreads(response.data);
+    } catch (error) {
+      console.error("Error fetching pending threads:", error);
+    }
+  };
+
+  // Call the fetching functions on mount (in a useEffect)
   useEffect(() => {
-    const fetchAllThreads = async () => {
-      try {
-        const response = await axios.get(`${backendUrl}/threads/get`, {
-          withCredentials: true,
-        });
-        // Filter threads with status "approved" for All Threads
-        const approvedThreads = response.data.filter(
-          (thread) => thread.status === "approved"
-        );
-        setAllThreads(approvedThreads);
-      } catch (error) {
-        console.error("Error fetching all threads:", error);
-      }
-    };
-
-    const fetchMyThreads = async () => {
-      try {
-        const response = await axios.get(`${backendUrl}/threads/my-threads`, {
-          withCredentials: true,
-        });
-        // Include threads with statuses "pending", "approved", and "rejected" for My Threads
-        const userThreads = response.data.filter((thread) =>
-          ["pending", "approved", "rejected"].includes(thread.status)
-        );
-        setMyThreads(userThreads);
-      } catch (error) {
-        console.error("Error fetching my threads:", error);
-      }
-    };
-
+    // Initially load threads when the component mounts
     fetchAllThreads();
     fetchMyThreads();
-  }, []);
+    fetchPendingThreads();
+  }, []); // Empty dependency array to run only once on mount
 
   const handleCreateThread = async () => {
     if (!newThread.title || !newThread.content) {
@@ -277,11 +293,13 @@ function AdminThreads() {
         )
       );
 
-      // Update allThreads state and filter based on "approved" status
+      // Update allThreads state
       setAllThreads(
-        allThreads
-          .filter((thread) => thread._id !== selectedThread._id) // Remove outdated thread
-          .concat(updatedThread.status === "approved" ? [updatedThread] : []) // Add updated thread only if approved
+        allThreads.map((thread) =>
+          thread._id === selectedThread._id
+            ? { ...updatedThread, isOwner: thread.isOwner }
+            : thread
+        )
       );
 
       setSelectedThread(null);
@@ -519,6 +537,10 @@ function AdminThreads() {
     setIsViewModalOpen(true);
     fetchReplies(thread._id);
   };
+  const openPendingViewModal = (thread) => {
+    setSelectedThread(thread);
+    setPendingIsViewModalOpen(true);
+  };
 
   const openNotifModal = (thread) => {
     setSelectedThread(thread);
@@ -537,6 +559,52 @@ function AdminThreads() {
   const openAddModal = () => {
     setNewThread({ title: "", content: "" });
     setIsAddModalOpen(true);
+  };
+  const handleUpdateStatus = async (status) => {
+    if (!selectedThread) return;
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/threads/status/${selectedThread._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status }),
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        closeModal();
+        showValidation(`Thread ${status} successfully!`);
+
+        // Optimistically update state
+        setPendingThreads((prevThreads) =>
+          prevThreads.filter((thread) => thread._id !== selectedThread._id)
+        );
+
+        if (status === "approved") {
+          setAllThreads((prevThreads) => [
+            ...prevThreads,
+            { ...selectedThread, status: "approved" },
+          ]);
+        }
+
+        // Refetch threads from server after update
+        fetchAllThreads();
+        fetchPendingThreads();
+      } else {
+        console.error("Error:", data.message);
+        showError(data.message); // Show error if request fails
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      showError(error.message); // Handle fetch call errors
+    }
   };
 
   useEffect(() => {
@@ -584,6 +652,7 @@ function AdminThreads() {
     setIsEditModalOpen(false);
     setIsAddModalOpen(false);
     setIsDeleteModalOpen(false);
+    setPendingIsViewModalOpen(false);
     setIsNotifModalOpen(false);
     setIsEditReplyModalOpen(false);
     setIsDeleteReplyModalOpen(false);
@@ -598,6 +667,7 @@ function AdminThreads() {
   const deleteModalRef = useRef(null);
   const editReplyModalRef = useRef(null);
   const deleteReplyModalRef = useRef(null);
+  const pendingModalRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -632,6 +702,12 @@ function AdminThreads() {
         isOutside = false;
       }
       if (
+        pendingModalRef.current &&
+        pendingModalRef.current.contains(event.target)
+      ) {
+        isOutside = false;
+      }
+      if (
         deleteReplyModalRef.current &&
         deleteReplyModalRef.current.contains(event.target)
       ) {
@@ -654,6 +730,8 @@ function AdminThreads() {
           setIsDeleteModalOpen(false);
         } else if (isViewModalOpen) {
           setIsViewModalOpen(false);
+        } else if (isPendingViewModalOpen) {
+          setPendingIsViewModalOpen(false);
         }
       }
     };
@@ -668,6 +746,7 @@ function AdminThreads() {
     isEditModalOpen,
     isDeleteModalOpen,
     isViewModalOpen,
+    isPendingViewModalOpen,
     isEditReplyModalOpen,
     isDeleteReplyModalOpen,
   ]);
@@ -716,206 +795,290 @@ function AdminThreads() {
         </select>
       </div>
 
-      <div className="flex justify-between items-center mb-4 mt-12">
-        {searchTerm.trim() ? (
-          <div className="text-lg">Search Results:</div>
-        ) : (
-          <div className="text-lg">My Threads</div>
-        )}
-        <button
-          className="btn btn-sm w-36 bg-green text-white"
-          onClick={openAddModal}
-        >
-          + New Thread
-        </button>
-      </div>
-
-      <hr className="mb-6 border-black" />
-
-      {searchTerm.trim() ? (
-        filteredThreads.length === 0 ? (
-          <div>No threads match your search.</div>
-        ) : (
-          sortThreads(filteredThreads).map((thread) => (
-            <div
-              key={thread._id}
-              className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-              onClick={() => openViewModal(thread)}
-            >
-              <div>
-                <div className="text-md font-medium mb-1">{thread.title}</div>
-                <div className="text-sm text-black-600">
-                  Replies: {thread.replyCount || 0}
-                </div>
-              </div>
-              {thread.isOwner && (
-                <div className="flex items-center">
-                  <div
-                    className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-                    title="Delete"
-                    style={{
-                      fontSize: "12px",
-                      textAlign: "center",
-                      paddingTop: "4px",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openDeleteModal(thread);
-                    }}
-                  ></div>
-                  <div
-                    className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openNotifModal(thread);
-                    }}
-                  ></div>
-
-                  <div
-                    className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditModal(thread);
-                    }}
-                  ></div>
-                </div>
-              )}
+      <div className="relative mb-4 mt-12">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 my-4">
+          {/* Pending Threads */}
+          <div className="w-full sm:w-1/3 px-2 mb-6">
+            <div className="text-lg mb-2">
+              {searchTerm.trim() ? "Search Results" : "Pending Threads"}
             </div>
-          ))
-        )
-      ) : (
-        <>
-          {/* My Threads Section */}
-          {myThreads.length === 0 ? (
-            <div>No threads created yet.</div>
-          ) : (
-            sortThreads(myThreads).map((thread) => (
-              <div
-                key={thread._id}
-                className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-                onClick={() => openViewModal(thread)}
-              >
+            <hr className="mb-4 border-black" />
+            {searchTerm.trim() ? (
+              filteredThreads.length === 0 ? (
+                <div>No threads match your search.</div>
+              ) : (
                 <div>
-                  <div className="text-md font-medium mb-1">{thread.title}</div>
-                  <div className="text-sm text-black-600">
-                    Replies: {thread.replyCount || 0}
+                  {sortThreads(filteredThreads).map((thread) => (
+                    <div
+                      key={thread._id}
+                      className="p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors my-2"
+                      onClick={() => openViewModal(thread)}
+                    >
+                      <div>
+                        <div className="text-md font-medium mb-1">
+                          {thread.title}
+                        </div>
+                        <div className="text-sm text-black-600">
+                          Replies: {thread.replyCount || 0}
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-center space-y-2 ml-2">
+                        {thread.isOwner && (
+                          <>
+                            <div
+                              className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
+                              title="Notification"
+                              style={{
+                                fontSize: "12px",
+                                textAlign: "center",
+                                paddingTop: "4px",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openNotifModal(thread);
+                              }}
+                            ></div>
+                            <div
+                              className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2"
+                              title="Edit"
+                              style={{
+                                fontSize: "12px",
+                                textAlign: "center",
+                                paddingTop: "4px",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openEditModal(thread);
+                              }}
+                            ></div>
+                          </>
+                        )}
+                        <div
+                          className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2"
+                          title="Delete"
+                          style={{
+                            fontSize: "12px",
+                            textAlign: "center",
+                            paddingTop: "4px",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openDeleteModal(thread);
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            ) : (
+              <div>
+                {pendingThreads.map((thread) => (
+                  <div
+                    key={thread._id}
+                    className="p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors my-2"
+                    onClick={() => openPendingViewModal(thread)}
+                  >
+                    <div>
+                      <div className="text-md font-medium mb-1">
+                        {thread.title}
+                      </div>
+                      <div className="text-sm text-black-600">
+                        Replies: {thread.replyCount || 0}
+                      </div>
+                    </div>
+                    <div className="flex justify-center items-center space-y-2 ml-2">
+                      <div
+                        className="fas fa-clock text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer relative group"
+                        title="Pending"
+                        style={{
+                          fontSize: "12px",
+                          textAlign: "center",
+                          paddingTop: "4px",
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center">
-                  <div
-                    className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-                    title="Delete"
-                    style={{
-                      fontSize: "12px",
-                      textAlign: "center",
-                      paddingTop: "4px",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openDeleteModal(thread);
-                    }}
-                  ></div>
-                  <div
-                    className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-                    title="Notification"
-                    style={{
-                      fontSize: "12px",
-                      textAlign: "center",
-                      paddingTop: "4px",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openNotifModal(thread);
-                    }}
-                  ></div>
-                  <div
-                    className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-                    title="Edit"
-                    style={{
-                      fontSize: "12px",
-                      textAlign: "center",
-                      paddingTop: "4px",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditModal(thread);
-                    }}
-                  ></div>
-                </div>
+                ))}
               </div>
-            ))
-          )}
-
-          {/* All Threads Section */}
-          <div className="flex justify-between items-center mb-4 mt-12">
-            <div className="text-lg">All Threads</div>
+            )}
           </div>
 
-          <hr className="mb-6 border-black" />
-
-          {allThreads.length === 0 ? (
-            <div>No threads created yet.</div>
-          ) : (
-            sortThreads(allThreads).map((thread) => (
-              <div
-                key={thread._id}
-                className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors"
-                onClick={() => openViewModal(thread)}
+          {/* My Threads */}
+          <div className="w-full sm:w-1/3 px-2 mb-6 relative">
+            <div className="flex flex-wrap sm:flex-nowrap justify-between items-center gap-x-2 mb-2">
+              <div className="text-lg whitespace-nowrap">My Threads</div>
+              <button
+                className="btn btn-xs sm:btn-sm bg-green text-white px-2 py-1 md:px-4 md:py-2 rounded-md"
+                onClick={openAddModal}
               >
-                <div>
-                  <div className="text-md font-medium mb-1">{thread.title}</div>
-                  <div className="text-sm text-black-600">
-                    Replies: {thread.replyCount || 0}
+                + New Thread
+              </button>
+            </div>
+            <hr className="mb-4 border-black" />
+            {myThreads.length === 0 ? (
+              <div>No threads created yet.</div>
+            ) : (
+              <div>
+                {sortThreads(myThreads).map((thread) => (
+                  <div
+                    key={thread._id}
+                    className="p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors my-2"
+                    onClick={() => openViewModal(thread)}
+                  >
+                    <div>
+                      <div className="text-md font-medium mb-1">
+                        {thread.title}
+                      </div>
+                      <div className="text-sm text-black-600">
+                        Replies: {thread.replyCount || 0}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center space-y-2 ml-2">
+                      {thread.status === "pending" && (
+                        <div
+                          className="fas fa-clock text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer mr-2 relative group"
+                          title="Pending"
+                          style={{
+                            fontSize: "12px",
+                            textAlign: "center",
+                            paddingTop: "4px",
+                          }}
+                        ></div>
+                      )}
+                      {thread.status === "rejected" && (
+                        <div
+                          className="fas fa-thumbs-down text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer mr-2 relative group"
+                          title="Rejected"
+                          style={{
+                            fontSize: "12px",
+                            textAlign: "center",
+                            paddingTop: "4px",
+                          }}
+                        ></div>
+                      )}
+
+                      <div
+                        className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                        title="Notification"
+                        style={{
+                          fontSize: "12px",
+                          textAlign: "center",
+                          paddingTop: "4px",
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openNotifModal(thread);
+                        }}
+                      ></div>
+                      <div
+                        className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                        title="Edit"
+                        style={{
+                          fontSize: "12px",
+                          textAlign: "center",
+                          paddingTop: "4px",
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openEditModal(thread);
+                        }}
+                      ></div>
+                      <div
+                        className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                        title="Delete"
+                        style={{
+                          fontSize: "12px",
+                          textAlign: "center",
+                          paddingTop: "4px",
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteModal(thread);
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                </div>
-                {thread.isOwner && (
-                  <div className="flex items-center">
-                    <div
-                      className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
-                      title="Delete"
-                      style={{
-                        fontSize: "12px",
-                        textAlign: "center",
-                        paddingTop: "4px",
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openDeleteModal(thread);
-                      }}
-                    ></div>
-                    <div
-                      className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
-                      title="Notification"
-                      style={{
-                        fontSize: "12px",
-                        textAlign: "center",
-                        paddingTop: "4px",
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openNotifModal(thread);
-                      }}
-                    ></div>
-                    <div
-                      className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
-                      title="Edit"
-                      style={{
-                        fontSize: "12px",
-                        textAlign: "center",
-                        paddingTop: "4px",
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEditModal(thread);
-                      }}
-                    ></div>
-                  </div>
-                )}
+                ))}
               </div>
-            ))
-          )}
-        </>
-      )}
+            )}
+          </div>
+
+          {/* All Threads */}
+          <div className="w-full sm:w-1/3 px-2 mb-6">
+            <div className="text-lg mb-2">All Threads</div>
+            <hr className="mb-4 border-black" />
+            {allThreads.length === 0 ? (
+              <div>No threads created yet.</div>
+            ) : (
+              <div>
+                {sortThreads(allThreads).map((thread) => (
+                  <div
+                    key={thread._id}
+                    className="p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors my-2"
+                    onClick={() => openViewModal(thread)}
+                  >
+                    <div>
+                      <div className="text-md font-medium mb-1">
+                        {thread.title}
+                      </div>
+                      <div className="text-sm text-black-600">
+                        Replies: {thread.replyCount || 0}
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center space-y-2 ml-2">
+                      {thread.isOwner && (
+                        <>
+                          <div
+                            className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                            title="Notification"
+                            style={{
+                              fontSize: "12px",
+                              textAlign: "center",
+                              paddingTop: "4px",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openNotifModal(thread);
+                            }}
+                          ></div>
+                          <div
+                            className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                            title="Edit"
+                            style={{
+                              fontSize: "12px",
+                              textAlign: "center",
+                              paddingTop: "4px",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEditModal(thread);
+                            }}
+                          ></div>
+                        </>
+                      )}
+                      <div
+                        className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
+                        title="Delete"
+                        style={{
+                          fontSize: "12px",
+                          textAlign: "center",
+                          paddingTop: "4px",
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteModal(thread);
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {isDeleteReplyModalOpen && replyToDelete && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
           <div
@@ -981,6 +1144,90 @@ function AdminThreads() {
         </div>
       )}
 
+      {isPendingViewModalOpen && selectedThread && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          {loading && <LoadingSpinner />} {/* Show loading spinner */}
+          <div
+            ref={viewModalRef}
+            className="bg-white p-6 md:p-8 lg:p-12 rounded-lg w-full max-w-md md:max-w-3xl lg:max-w-4xl xl:max-w-5xl h-auto overflow-y-auto max-h-[90vh] relative mx-4"
+          >
+            {/* Header section */}
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center">
+                <img
+                  src={
+                    selectedThread.userProfileId.profileImage
+                      ? `${backendUrl}${selectedThread.userProfileId.profileImage}`
+                      : blankprofilepic
+                  } // Replace with dynamic user avatar
+                  alt="User Avatar"
+                  className="w-14 h-14 mr-3"
+                />
+                <div>
+                  <h2 className="text-md lg:text-xl font-semibold">
+                    {`${selectedThread.userProfileId.firstName} ${selectedThread.userProfileId.lastName}`}
+                  </h2>
+                  <p className="text-gray-500">
+                    {selectedThread.userProfileId.profession}
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    Posted on{" "}
+                    {selectedThread.createdAt
+                      ? new Date(selectedThread.createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )
+                      : null}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={closeModal}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+
+            {/* Thread content */}
+            <div className="border-b border-black mb-4 pb-2">
+              <h3 className="text-lg font-medium">{selectedThread.title}</h3>
+              <p className="mt-2 text-black">{selectedThread.content}</p>
+            </div>
+            <div className="flex justify-center gap-2 mt-4">
+              <button
+                onClick={() => handleUpdateStatus("approved")}
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-green text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Approve
+              </button>
+              <button
+                onClick={() => handleUpdateStatus("rejected")}
+                className="btn btn-sm w-28 md:btn-md md:w-52 lg:w-60 bg-red text-white px-4 py-2 md:px-6 md:py-3"
+              >
+                Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {isViewModalOpen && selectedThread && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           {loading && <LoadingSpinner />} {/* Show loading spinner */}
@@ -1092,20 +1339,21 @@ function AdminThreads() {
                       <p className="text-gray-700">{reply.content}</p>
                     )}
                   </div>
-                  {reply.isOwner && (
-                    <div className="flex space-x-2">
-                      <div
-                        className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
-                        title="Delete"
-                        style={{
-                          fontSize: "12px",
-                          textAlign: "center",
-                          paddingTop: "4px",
-                        }}
-                        onClick={(e) => {
-                          openDeleteReplyModal(reply); // Open delete modal for the specific reply
-                        }}
-                      ></div>
+                  <div className="flex space-x-2">
+                    <div
+                      className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
+                      title="Delete"
+                      style={{
+                        fontSize: "12px",
+                        textAlign: "center",
+                        paddingTop: "4px",
+                      }}
+                      onClick={(e) => {
+                        openDeleteReplyModal(reply); // Open delete modal for the specific reply
+                      }}
+                    ></div>
+
+                    {reply.isOwner && (
                       <div
                         className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
                         title="Edit"
@@ -1116,8 +1364,8 @@ function AdminThreads() {
                         }}
                         onClick={() => handleEditReply(reply)}
                       ></div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               ))}
 

@@ -1,7 +1,7 @@
 const Thread = require("../models/threadsModel");
 const jwt = require("jsonwebtoken");
 const Reply = require("../models/replyModel");
-const User = require("../models/userModel"); // Adjust path as needed
+const User = require("../models/userModel");
 
 exports.createThread = async (req, res) => {
   try {
@@ -11,10 +11,10 @@ exports.createThread = async (req, res) => {
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
-    const userProfileId = decoded.profileId; 
+    const userProfileId = decoded.profileId;
 
     const { title, content } = req.body;
-  
+
     // Fetch the user role based on the userId
     const user = await User.findById(userId);
     if (!user) {
@@ -177,6 +177,25 @@ exports.updateThread = async (req, res) => {
     res.status(500).json({ message: "Error updating thread", error });
   }
 };
+//fetch pending
+exports.getPendingThreads = async (req, res) => {
+  try {
+    const threads = await Thread.find({ status: "pending" })
+      .populate("userProfileId", "firstName lastName profileImage profession")
+      .lean();
+
+    const threadsWithReplyCount = await Promise.all(
+      threads.map(async (thread) => {
+        const replyCount = await Reply.countDocuments({ threadId: thread._id });
+        return { ...thread, replyCount };
+      })
+    );
+
+    res.status(200).json(threadsWithReplyCount);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching pending threads", error });
+  }
+};
 
 // Delete a thread (only the owner can delete)
 exports.deleteThread = async (req, res) => {
@@ -186,8 +205,16 @@ exports.deleteThread = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized, token missing." });
     }
 
+    // Decode the token to extract userProfileId and userId
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userProfileId = decoded.profileId;
+    const userId = decoded.id;
+
+    // Fetch the user from the User collection based on userId
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     // Find the thread by ID
     const thread = await Thread.findById(req.params.id);
@@ -195,8 +222,11 @@ exports.deleteThread = async (req, res) => {
       return res.status(404).json({ message: "Thread not found" });
     }
 
-    // Check if the user is the owner of the thread
-    if (thread.userProfileId.toString() !== userProfileId) {
+    // Check if the user is the owner of the thread or an admin
+    if (
+      thread.userProfileId.toString() !== userProfileId &&
+      user.role !== "admin"
+    ) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
@@ -210,6 +240,7 @@ exports.deleteThread = async (req, res) => {
       .json({ message: "Error deleting thread", error: error.message });
   }
 };
+
 exports.silenceThread = async (req, res) => {
   try {
     const token = req.cookies.token;
@@ -239,5 +270,61 @@ exports.silenceThread = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error updating thread notifications", error });
+  }
+};
+
+exports.updateThreadStatus = async (req, res) => {
+  try {
+    const { status } = req.body; // "approved" or "rejected"
+    const threadId = req.params.id;
+
+    // 1. Extract token from cookies
+    const token = req.cookies.token;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: No token provided" });
+    }
+
+    // 2. Verify token and extract user ID and role
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    // 3. Fetch user details to check if the user is an admin
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 4. Only allow if user is an admin
+    if (user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Forbidden: Only admins can update status" });
+    }
+
+    // 5. Validate the status
+    if (!["approved", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status value" });
+    }
+
+    // 6. Find the thread by ID
+    const thread = await Thread.findById(threadId);
+    if (!thread) {
+      return res.status(404).json({ message: "Thread not found" });
+    }
+
+    // 7. Update the thread status
+    thread.status = status;
+    await thread.save();
+
+    // 8. Return the response with the updated thread
+    res.status(200).json({
+      message: `Thread successfully ${status}`,
+      thread,
+    });
+  } catch (error) {
+    console.error("Error updating thread status:", error);
+    res.status(500).json({ message: "Failed to update thread status", error });
   }
 };

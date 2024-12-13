@@ -2,6 +2,7 @@ const Reply = require("../models/replyModel");
 const Thread = require("../models/threadsModel");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
 
 exports.createReply = async (req, res) => {
   try {
@@ -158,8 +159,20 @@ exports.updateReply = async (req, res) => {
 exports.deleteReply = async (req, res) => {
   try {
     const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: No token provided" });
+    }
+
+    // Decode the token to get the user profile ID and user ID
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const userProfileId = decoded.profileId;
+    const userId = decoded.id;
+
+    // Fetch the user from the User collection based on userId
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
     const reply = await Reply.findById(req.params.id);
 
@@ -167,14 +180,20 @@ exports.deleteReply = async (req, res) => {
       return res.status(404).json({ message: "Reply not found" });
     }
 
-    if (reply.userProfileId.toString() !== userProfileId) {
+    // Check if the user is the owner of the reply or an admin
+    if (
+      reply.userProfileId.toString() !== userProfileId &&
+      user.role !== "admin"
+    ) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
+    // Delete the reply
     await Reply.deleteOne({ _id: req.params.id });
 
     res.status(200).json({ message: "Reply deleted successfully" });
   } catch (error) {
+    console.error("Error during deleting reply:", error);
     res.status(500).json({ message: "Error deleting reply", error });
   }
 };

@@ -9,6 +9,7 @@ function Threads() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [myThreads, setMyThreads] = useState([]);
   const [allThreads, setAllThreads] = useState([]);
+  const [all, setAll] = useState([]);
   const [newThread, setNewThread] = useState({ title: "", content: "" });
   const [selectedThread, setSelectedThread] = useState(null);
   const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
@@ -173,7 +174,11 @@ function Threads() {
       const response = await axios.get(`${backendUrl}/threads/get`, {
         withCredentials: true,
       });
-      // Filter threads with status "approved" for All Threads
+
+      // Set all threads (no filter)
+      setAll(response.data);
+
+      // Filter and set approved threads
       const approvedThreads = response.data.filter(
         (thread) => thread.status === "approved"
       );
@@ -279,6 +284,15 @@ function Threads() {
       // Update allThreads state
       setAllThreads(
         allThreads.map((thread) =>
+          thread._id === selectedThread._id
+            ? { ...updatedThread, isOwner: thread.isOwner }
+            : thread
+        )
+      );
+
+      // Update all state
+      setAll(
+        all.map((thread) =>
           thread._id === selectedThread._id
             ? { ...updatedThread, isOwner: thread.isOwner }
             : thread
@@ -544,7 +558,7 @@ function Threads() {
     if (searchTerm.trim() === "") {
       setFilteredThreads([]);
     } else {
-      const filtered = [...myThreads, ...allThreads]
+      const filtered = [...myThreads, ...all]
         .filter((thread, index, self) => {
           // Check if the user owns the thread
           const isOwned = myThreads.some(
@@ -556,7 +570,7 @@ function Threads() {
             return thread.isOwner;
           }
 
-          // Otherwise, include the thread from allThreads
+          // Otherwise, include the thread from 'all'
           return !self.find((t) => t._id === thread._id && t.isOwner);
         })
         .filter((thread) =>
@@ -564,7 +578,7 @@ function Threads() {
         );
       setFilteredThreads(filtered);
     }
-  }, [searchTerm, myThreads, allThreads]);
+  }, [searchTerm, myThreads, all]);
 
   const sortThreads = (threads) => {
     return threads.sort((a, b) => {

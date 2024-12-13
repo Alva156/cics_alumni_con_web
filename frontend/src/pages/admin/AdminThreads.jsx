@@ -611,7 +611,7 @@ function AdminThreads() {
     if (searchTerm.trim() === "") {
       setFilteredThreads([]);
     } else {
-      const filtered = [...myThreads, ...allThreads]
+      const filtered = [...myThreads, ...allThreads, ...pendingThreads]
         .filter((thread, index, self) => {
           // Check if the user owns the thread
           const isOwned = myThreads.some(
@@ -631,7 +631,7 @@ function AdminThreads() {
         );
       setFilteredThreads(filtered);
     }
-  }, [searchTerm, myThreads, allThreads]);
+  }, [searchTerm, myThreads, allThreads, pendingThreads]);
 
   const sortThreads = (threads) => {
     return threads.sort((a, b) => {
@@ -824,6 +824,17 @@ function AdminThreads() {
                           </div>
                         </div>
                         <div className="flex flex-col items-center space-y-2 ml-2">
+                          {thread.status === "pending" && (
+                            <div
+                              className="fas fa-clock text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer mr-2 relative group"
+                              title="Pending"
+                              style={{
+                                fontSize: "12px",
+                                textAlign: "center",
+                                paddingTop: "4px",
+                              }}
+                            ></div>
+                          )}
                           {thread.isOwner && (
                             <>
                               <div
@@ -854,19 +865,21 @@ function AdminThreads() {
                               ></div>
                             </>
                           )}
-                          <div
-                            className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2"
-                            title="Delete"
-                            style={{
-                              fontSize: "12px",
-                              textAlign: "center",
-                              paddingTop: "4px",
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openDeleteModal(thread);
-                            }}
-                          ></div>
+                          {thread.status !== "pending" && (
+                            <div
+                              className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2"
+                              title="Delete"
+                              style={{
+                                fontSize: "12px",
+                                textAlign: "center",
+                                paddingTop: "4px",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteModal(thread);
+                              }}
+                            ></div>
+                          )}
                         </div>
                       </div>
                     ))}

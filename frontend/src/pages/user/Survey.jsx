@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import ReactPaginate from "react-paginate";
 import axios from "axios";
 
 function Survey() {
@@ -15,6 +16,10 @@ function Survey() {
   const [sortOption, setSortOption] = useState("Most Recent");
   const [userResponses, setUserResponses] = useState({});
   const modalRef = useRef(null);
+  const [currentPageUnanswered, setCurrentPageUnanswered] = useState(0);
+  const [currentPageAnswered, setCurrentPageAnswered] = useState(0);
+    
+  const itemsPerPage = 6;
 
   const openModal = async (survey) => {
     await fetchSurveyById(survey._id);
@@ -271,6 +276,24 @@ function Survey() {
       return 0;
     });
 
+    const handlePageChange = (selectedPage, type) => {
+      if (type === "unanswered") {
+        setCurrentPageUnanswered(selectedPage.selected);
+      } else {
+        setCurrentPageAnswered(selectedPage.selected);
+      }
+    };
+  
+    // Pagination logic for unanswered surveys
+    const startIndexUnanswered = currentPageUnanswered * itemsPerPage;
+    const endIndexUnanswered = startIndexUnanswered + itemsPerPage;
+    const paginatedUnansweredSurveys = filteredAndSortedSurveys.slice(startIndexUnanswered, endIndexUnanswered);
+  
+    // Pagination logic for answered surveys
+    const startIndexAnswered = currentPageAnswered * itemsPerPage;
+    const endIndexAnswered = startIndexAnswered + itemsPerPage;
+    const paginatedAnsweredSurveys = filteredAndSortedAnsweredSurveys.slice(startIndexAnswered, endIndexAnswered);
+
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       {showSuccessMessage && (
@@ -326,7 +349,7 @@ function Survey() {
       <div className="text-lg mb-4">Unanswered</div>
       <hr className="mb-6 border-black" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {filteredAndSortedSurveys.map((survey) => (
+      {paginatedUnansweredSurveys.map((survey) => (
           <div
             key={survey._id}
             className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
@@ -345,10 +368,39 @@ function Survey() {
         ))}
       </div>
 
+      <ReactPaginate
+        previousLabel={<button className="w-full h-full">Previous</button>}
+        nextLabel={<button className="w-full h-full">Next</button>}
+        breakLabel={<button className="w-full h-full">...</button>}
+        pageCount={Math.ceil(filteredAndSortedSurveys.length / itemsPerPage)}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={(selectedPage) => handlePageChange(selectedPage, "unanswered")}
+        containerClassName={"flex justify-center items-center space-x-2 mt-6"}
+        pageClassName={
+          "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        pageLinkClassName={"w-full h-full flex items-center justify-center"}
+        previousClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        previousLinkClassName={"w-full h-full flex items-center justify-center"}
+        nextClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        nextLinkClassName={"w-full h-full flex items-center justify-center"}
+        breakClassName={
+          "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
+        }
+        breakLinkClassName={"w-full h-full flex items-center justify-center"}
+        activeClassName={"bg-black text-red font-medium"}
+        disabledClassName={"opacity-50 cursor-not-allowed"}
+      />
+
       <div className="text-lg mb-4">Answered</div>
       <hr className="mb-6 border-black" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {filteredAndSortedAnsweredSurveys.map((survey) => (
+      {paginatedAnsweredSurveys.map((survey) => (
           <div
             key={survey._id}
             className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
@@ -366,6 +418,35 @@ function Survey() {
           </div>
         ))}
       </div>
+
+      <ReactPaginate
+        previousLabel={<button className="w-full h-full">Previous</button>}
+        nextLabel={<button className="w-full h-full">Next</button>}
+        breakLabel={<button className="w-full h-full">...</button>}
+        pageCount={Math.ceil(filteredAndSortedAnsweredSurveys.length / itemsPerPage)}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={(selectedPage) => handlePageChange(selectedPage, "answered")}
+        containerClassName={"flex justify-center items-center space-x-2 mt-6"}
+        pageClassName={
+          "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        pageLinkClassName={"w-full h-full flex items-center justify-center"}
+        previousClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        previousLinkClassName={"w-full h-full flex items-center justify-center"}
+        nextClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        nextLinkClassName={"w-full h-full flex items-center justify-center"}
+        breakClassName={
+          "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
+        }
+        breakLinkClassName={"w-full h-full flex items-center justify-center"}
+        activeClassName={"bg-black text-red font-medium"}
+        disabledClassName={"opacity-50 cursor-not-allowed"}
+      />
 
       {/* Modal */}
       {isModalOpen && selectedSurvey && (

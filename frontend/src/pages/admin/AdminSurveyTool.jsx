@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import ReactPaginate from "react-paginate";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { CSVLink } from "react-csv";
@@ -59,6 +60,12 @@ function AdminSurveyTool() {
   const [selectedProgram, setSelectedProgram] = useState("All"); // Default "All"
   const [selectedBatchYears, setSelectedBatchYears] = useState([]); // Empty array means "All batch years"
   const [loading, setLoading] = useState(false);
+
+  const [currentPageUnanswered, setCurrentPageUnanswered] = useState(0);
+  const [currentPageAnswered, setCurrentPageAnswered] = useState(0);
+    
+  const itemsPerPage = 6;
+
   const LoadingSpinner = () => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="animate-spin rounded-full h-16 w-16 border-t-8 border-red border-solid border-opacity-75"></div>
@@ -1740,6 +1747,24 @@ function AdminSurveyTool() {
       return 0;
     });
 
+    const handlePageChange = (selectedPage, type) => {
+      if (type === "unanswered") {
+        setCurrentPageUnanswered(selectedPage.selected);
+      } else {
+        setCurrentPageAnswered(selectedPage.selected);
+      }
+    };
+  
+    // Paginate unanswered surveys
+    const startIndexUnanswered = currentPageUnanswered * itemsPerPage;
+    const endIndexUnanswered = startIndexUnanswered + itemsPerPage;
+    const paginatedUnansweredSurveys = filteredAndSortedSurveys.slice(startIndexUnanswered, endIndexUnanswered);
+  
+    // Paginate answered surveys
+    const startIndexAnswered = currentPageAnswered * itemsPerPage;
+    const endIndexAnswered = startIndexAnswered + itemsPerPage;
+    const paginatedAnsweredSurveys = filteredAndSortedAnsweredSurveys.slice(startIndexAnswered, endIndexAnswered);
+
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12 ">
       {loading && <LoadingSpinner />} {/* Show loading spinner */}
@@ -1831,8 +1856,8 @@ function AdminSurveyTool() {
       <hr className="mb-6 border-black no-print" />
       {/* Grid layout for drafts */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {filteredAndSortedSurveys.length > 0 ? (
-          filteredAndSortedSurveys.map((survey, index) => (
+      {paginatedUnansweredSurveys.length > 0 ? (
+          paginatedUnansweredSurveys.map((survey, index) => (
             <div
               key={index}
               className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
@@ -1851,25 +1876,17 @@ function AdminSurveyTool() {
                 <div
                   className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
                   title="Delete"
-                  style={{
-                    fontSize: "12px",
-                    textAlign: "center",
-                    paddingTop: "4px",
-                  }}
+                  style={{ fontSize: "12px", textAlign: "center", paddingTop: "4px" }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    openDeleteModal(survey); // Open the modal and pass the full survey object
+                    openDeleteModal(survey);
                   }}
                 ></div>
                 {/* Edit Button */}
                 <div
                   className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
                   title="Edit"
-                  style={{
-                    fontSize: "12px",
-                    textAlign: "center",
-                    paddingTop: "4px",
-                  }}
+                  style={{ fontSize: "12px", textAlign: "center", paddingTop: "4px" }}
                   onClick={(e) => {
                     e.stopPropagation();
                     openEditModal(survey);
@@ -1879,38 +1896,15 @@ function AdminSurveyTool() {
                 <div
                   className="fas fa-check text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
                   title="Publish"
-                  style={{
-                    fontSize: "12px",
-                    textAlign: "center",
-                    paddingTop: "4px",
-                  }}
+                  style={{ fontSize: "12px", textAlign: "center", paddingTop: "4px" }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    const surveyToToggle = surveys.find(
-                      (s) => s._id === survey._id
-                    ); // Find the survey
+                    const surveyToToggle = surveys.find(s => s._id === survey._id); // Find the survey
                     if (surveyToToggle && !surveyToToggle.published) {
                       setSelectedSurveyId(survey._id); // Set the ID for confirmation
                       setIsPublishModalOpen(true); // Open the confirmation modal
                     } else {
                       handlePublishSurvey(survey._id); // Call the function to handle publishing
-                    }
-                  }}
-                  role="button" // Make it clear it's a button
-                  tabIndex={0} // Make it focusable
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      // Allow activation via keyboard
-                      e.stopPropagation();
-                      const surveyToToggle = surveys.find(
-                        (s) => s._id === survey._id
-                      ); // Find the survey
-                      if (surveyToToggle && !surveyToToggle.published) {
-                        setSelectedSurveyId(survey._id); // Set the ID for confirmation
-                        setIsPublishModalOpen(true); // Open the confirmation modal
-                      } else {
-                        handlePublishSurvey(survey._id); // Call the function to handle publishing
-                      }
                     }
                   }}
                 ></div>
@@ -1919,20 +1913,51 @@ function AdminSurveyTool() {
           ))
         ) : (
           <div className="mb-4 text-center text-gray-500 no-print">
-            No unanswered surveys available.
+            No draft surveys available.
           </div>
         )}
       </div>
+
+      <ReactPaginate
+        previousLabel={<button className="w-full h-full">Previous</button>}
+        nextLabel={<button className="w-full h-full">Next</button>}
+        breakLabel={<button className="w-full h-full">...</button>}
+        pageCount={Math.ceil(filteredAndSortedSurveys.length / itemsPerPage)} // Total pages
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={(selectedPage) => handlePageChange(selectedPage, "unanswered")}
+        containerClassName={"flex justify-center items-center space-x-2 mt-6"}
+        pageClassName={
+          "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        pageLinkClassName={"w-full h-full flex items-center justify-center"}
+        previousClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        previousLinkClassName={"w-full h-full flex items-center justify-center"}
+        nextClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        nextLinkClassName={"w-full h-full flex items-center justify-center"}
+        breakClassName={
+          "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
+        }
+        breakLinkClassName={"w-full h-full flex items-center justify-center"}
+        activeClassName={"bg-black text-red font-medium"}
+        disabledClassName={"opacity-50 cursor-not-allowed"}
+      />
+
+
       <div className="text-lg mb-4 no-print">Published Surveys</div>
       <hr className="mb-6 border-black no-print" />
       {/* Grid layout for published surveys */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {filteredAndSortedAnsweredSurveys.length > 0 ? (
-          filteredAndSortedAnsweredSurveys.map((survey, index) => (
+        {paginatedAnsweredSurveys.length > 0 ? (
+          paginatedAnsweredSurveys.map((survey, index) => (
             <div
               key={index}
               className="mb-4 p-4 border border-black rounded-lg flex justify-between cursor-pointer hover:bg-gray-200 transition-colors no-print"
-              onClick={() => openViewModal(survey)} // Update to open ViewModal
+              onClick={() => openViewModal(survey)}
             >
               <div className="no-print">
                 <div className="text-md font-medium mb-1">{survey.name}</div>
@@ -1947,26 +1972,10 @@ function AdminSurveyTool() {
                 <div
                   className="fas fa-ban text-white w-5 h-5 rounded-full bg-orange flex justify-center items-center cursor-pointer mr-2 relative group"
                   title="Unpublish"
-                  style={{
-                    fontSize: "12px",
-                    textAlign: "center",
-                    paddingTop: "4px",
-                  }}
+                  style={{ fontSize: "12px", textAlign: "center", paddingTop: "4px" }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    console.log(
-                      "Attempting to unpublish survey with ID:",
-                      survey._id
-                    ); // Log ID
-                    handleTogglePublishStatus(survey._id); // Call to handle unpublishing and show modal if needed
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.stopPropagation();
-                      handleTogglePublishStatus(survey._id); // Call to handle unpublishing via keyboard
-                    }
+                    handleTogglePublishStatus(survey._id); // Call to handle unpublishing
                   }}
                 ></div>
               </div>
@@ -1974,10 +1983,40 @@ function AdminSurveyTool() {
           ))
         ) : (
           <div className="mb-4 text-center text-gray-500 no-print">
-            No answered surveys available.
+            No published surveys available.
           </div>
         )}
       </div>
+
+      <ReactPaginate
+        previousLabel={<button className="w-full h-full">Previous</button>}
+        nextLabel={<button className="w-full h-full">Next</button>}
+        breakLabel={<button className="w-full h-full">...</button>}
+        pageCount={Math.ceil(filteredAndSortedAnsweredSurveys.length / itemsPerPage)} // Total pages
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={(selectedPage) => handlePageChange(selectedPage, "answered")}
+        containerClassName={"flex justify-center items-center space-x-2 mt-6"}
+        pageClassName={
+          "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        pageLinkClassName={"w-full h-full flex items-center justify-center"}
+        previousClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        previousLinkClassName={"w-full h-full flex items-center justify-center"}
+        nextClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        nextLinkClassName={"w-full h-full flex items-center justify-center"}
+        breakClassName={
+          "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
+        }
+        breakLinkClassName={"w-full h-full flex items-center justify-center"}
+        activeClassName={"bg-black text-red font-medium"}
+        disabledClassName={"opacity-50 cursor-not-allowed"}
+      />
+
       {/* VIEW MODAL */}
       {isViewModalOpen && selectedSurvey && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 print-modal ">

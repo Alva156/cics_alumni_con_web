@@ -833,19 +833,21 @@ function Threads() {
                               openDeleteModal(thread);
                             }}
                           ></div>
-                          <div
-                            className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
-                            title="Notification"
-                            style={{
-                              fontSize: "12px",
-                              textAlign: "center",
-                              paddingTop: "4px",
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openNotifModal(thread);
-                            }}
-                          ></div>
+                          {thread.status === "approved" && (
+                            <div
+                              className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
+                              title="Notification"
+                              style={{
+                                fontSize: "12px",
+                                textAlign: "center",
+                                paddingTop: "4px",
+                              }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openNotifModal(thread);
+                              }}
+                            ></div>
+                          )}
                           <div
                             className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2"
                             title="Edit"
@@ -907,20 +909,21 @@ function Threads() {
                             }}
                           ></div>
                         )}
-
-                        <div
-                          className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
-                          title="Notification"
-                          style={{
-                            fontSize: "12px",
-                            textAlign: "center",
-                            paddingTop: "4px",
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openNotifModal(thread);
-                          }}
-                        ></div>
+                        {thread.status === "approved" && (
+                          <div
+                            className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2"
+                            title="Notification"
+                            style={{
+                              fontSize: "12px",
+                              textAlign: "center",
+                              paddingTop: "4px",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openNotifModal(thread);
+                            }}
+                          ></div>
+                        )}
                         <div
                           className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2"
                           title="Edit"

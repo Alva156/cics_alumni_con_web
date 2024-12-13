@@ -820,6 +820,8 @@ function UserProfile() {
     // Reset error messages when inputs are valid
     setShowErrorMessage(false);
 
+    const extractYear = (date) => (date instanceof Date ? date.getFullYear() : date);
+
     const userData = {
       firstName,
       lastName,
@@ -830,8 +832,8 @@ function UserProfile() {
       college,
       collegeProgram,
       specialization,
-      yearStartedCollege,
-      yearGraduatedCollege,
+      yearStartedCollege: extractYear(yearStartedCollege), // Save only the year
+      yearGraduatedCollege: extractYear(yearGraduatedCollege), // Save only the year
       timeToJob,
       employmentStatus,
       workIndustry,

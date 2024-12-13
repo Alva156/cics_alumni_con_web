@@ -324,46 +324,48 @@ function Survey() {
       </div>
 
       <div className="text-lg mb-4">Unanswered</div>
-
       <hr className="mb-6 border-black" />
-
-      {filteredAndSortedSurveys.map((survey) => (
-        <div
-          key={survey._id}
-          className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openModal(survey)}
-          aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
-        >
-          <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
-          <p className="text-sm text-gray-600">
-            <span className="font-bold">{survey.responseCount}</span> responses
-          </p>
-        </div>
-      ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {filteredAndSortedSurveys.map((survey) => (
+          <div
+            key={survey._id}
+            className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+            onClick={() => openModal(survey)}
+            aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
+          >
+            <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
+            <p className="text-sm text-gray-600">
+              <span className="font-bold">{survey.responseCount}</span>{" "}
+              responses
+            </p>
+          </div>
+        ))}
+      </div>
 
       <div className="text-lg mb-4">Answered</div>
-
       <hr className="mb-6 border-black" />
-
-      {filteredAndSortedAnsweredSurveys.map((survey) => (
-        <div
-          key={survey._id}
-          className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-          onClick={() => openModal(survey)}
-          aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
-        >
-          <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
-          <p className="text-sm text-gray-600">
-            <span className="font-bold">{survey.responseCount}</span> responses
-          </p>
-        </div>
-      ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {filteredAndSortedAnsweredSurveys.map((survey) => (
+          <div
+            key={survey._id}
+            className="survey-card mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+            onClick={() => openModal(survey)}
+            aria-label={`Survey: ${survey.name}, ${survey.responseCount} responses`}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && openModal(survey)}
+          >
+            <h3 className="text-lg font-semibold mb-1">{survey.name}</h3>
+            <p className="text-sm text-gray-600">
+              <span className="font-bold">{survey.responseCount}</span>{" "}
+              responses
+            </p>
+          </div>
+        ))}
+      </div>
 
       {/* Modal */}
       {isModalOpen && selectedSurvey && (

@@ -4,6 +4,7 @@ import axios from "axios";
 import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js";
 import "../../App.css";
+import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function Alumni() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -651,6 +652,7 @@ function Alumni() {
 
       <div className="text-lg mb-4">All Alumni</div>
       <hr className="mb-6 border-black" />
+      
 
       {/* Use grid layout with two columns */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -658,19 +660,32 @@ function Alumni() {
     paginatedAlumni.map((alumni, index) => (
       <div
         key={index}
-        className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+        className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors flex items-center"
         onClick={() => openModal(alumni)}
       >
-        <div className="text-md font-medium mb-1">
-          {`${alumni.firstName} ${alumni.lastName}`}
+        <img
+          src={
+            alumni.profileImage === null || alumni.profileImage === ""
+              ? blankProfilePic  // If no profile image, show blank profile pic
+              : `${backendUrl}${alumni.profileImage}`  // Otherwise show the uploaded image
+          }
+          alt="Alumni"
+          className="w-16 h-16 border border-gray-300 object-cover mr-4"
+        />
+        <div>
+          <div className="text-md font-medium mb-1">
+            {`${alumni.firstName} ${alumni.lastName}`}
+          </div>
+          <div className="text-sm text-black-600">{alumni.profession}</div>
         </div>
-        <div className="text-sm text-black-600">{alumni.profession}</div>
       </div>
     ))
   ) : (
     <p>No alumni found.</p>
   )}
 </div>
+
+
 
       {/* Pagination Controls */}
       <ReactPaginate

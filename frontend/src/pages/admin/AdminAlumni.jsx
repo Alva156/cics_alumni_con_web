@@ -31,8 +31,8 @@ function AdminAlumni() {
   const [isCSVViewModal, setIsCSVViewModalOpen] = useState(false);
   const [csvFileContent, setCsvFileContent] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  
-    const itemsPerPage = 10;
+
+  const itemsPerPage = 10;
 
   const formatDate = (dateString) => {
     if (!dateString || isNaN(new Date(dateString).getTime())) {
@@ -365,7 +365,10 @@ function AdminAlumni() {
 
   const pageCount = Math.ceil(sortedAlumni.length / itemsPerPage);
   const startIndex = currentPage * itemsPerPage;
-  const currentAlumni = sortedAlumni.slice(startIndex, startIndex + itemsPerPage);
+  const currentAlumni = sortedAlumni.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   // Handle page change
   const handlePageChange = (selectedItem) => {
@@ -877,52 +880,55 @@ function AdminAlumni() {
 
       <hr className="mb-6 border-black" />
 
-      {currentAlumni.length > 0 ? (
-        currentAlumni.map((alumni, index) => (
-          <div
-            key={index}
-            className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-            onClick={() => openModal(alumni)}
-          >
-            <div className="text-md font-medium mb-1">
-              {`${alumni.firstName} ${alumni.lastName}`}
+      {/* Use grid layout to display two columns per row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {currentAlumni.length > 0 ? (
+          currentAlumni.map((alumni, index) => (
+            <div
+              key={index}
+              className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+              onClick={() => openModal(alumni)}
+            >
+              <div className="text-md font-medium mb-1">
+                {`${alumni.firstName} ${alumni.lastName}`}
+              </div>
+              <div className="text-sm text-black-600">{alumni.profession}</div>
             </div>
-            <div className="text-sm text-black-600">{alumni.profession}</div>
-          </div>
-        ))
-      ) : (
-        <p>No alumni found.</p>
-      )}
+          ))
+        ) : (
+          <p>No alumni found.</p>
+        )}
+      </div>
 
       {/* Pagination Controls */}
       <ReactPaginate
-  previousLabel={<button className="w-full h-full">Previous</button>}
-  nextLabel={<button className="w-full h-full">Next</button>}
-  breakLabel={<button className="w-full h-full">...</button>}
-  pageCount={pageCount}
-  marginPagesDisplayed={2}
-  pageRangeDisplayed={5}
-  onPageChange={handlePageChange}
-  containerClassName={"flex justify-center items-center space-x-2 mt-6"}
-  pageClassName={
-    "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
-  }
-  pageLinkClassName={"w-full h-full flex items-center justify-center"}
-  previousClassName={
-    "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
-  }
-  previousLinkClassName={"w-full h-full flex items-center justify-center"}
-  nextClassName={
-    "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
-  }
-  nextLinkClassName={"w-full h-full flex items-center justify-center"}
-  breakClassName={
-    "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
-  }
-  breakLinkClassName={"w-full h-full flex items-center justify-center"}
-  activeClassName={"bg-black text-red font-medium"}
-  disabledClassName={"opacity-50 cursor-not-allowed"}
-/>
+        previousLabel={<button className="w-full h-full">Previous</button>}
+        nextLabel={<button className="w-full h-full">Next</button>}
+        breakLabel={<button className="w-full h-full">...</button>}
+        pageCount={pageCount}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageChange}
+        containerClassName={"flex justify-center items-center space-x-2 mt-6"}
+        pageClassName={
+          "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        pageLinkClassName={"w-full h-full flex items-center justify-center"}
+        previousClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        previousLinkClassName={"w-full h-full flex items-center justify-center"}
+        nextClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        nextLinkClassName={"w-full h-full flex items-center justify-center"}
+        breakClassName={
+          "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
+        }
+        breakLinkClassName={"w-full h-full flex items-center justify-center"}
+        activeClassName={"bg-black text-red font-medium"}
+        disabledClassName={"opacity-50 cursor-not-allowed"}
+      />
 
       {/* CSV Upload Modal */}
       {isCSVModal && (

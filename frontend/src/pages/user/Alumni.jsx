@@ -19,7 +19,7 @@ function Alumni() {
   const [previewFileUrl, setPreviewFileUrl] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const formatDate = (dateString) => {
     if (!dateString || isNaN(new Date(dateString).getTime())) {
@@ -278,17 +278,14 @@ function Alumni() {
       : nameB.localeCompare(nameA);
   });
 
-  const pageCount = Math.ceil(sortedAlumni.length / itemsPerPage);
-  const startIndex = currentPage * itemsPerPage;
-  const currentAlumni = sortedAlumni.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
-
-  // Handle page change
-  const handlePageChange = (selectedItem) => {
-    setCurrentPage(selectedItem.selected);
+  const handlePageChange = (selectedPage) => {
+    setCurrentPage(selectedPage.selected);
   };
+  
+  // Paginate the alumni list
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedAlumni = sortedAlumni.slice(startIndex, endIndex);
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
@@ -657,53 +654,53 @@ function Alumni() {
 
       {/* Use grid layout with two columns */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {sortedAlumni.length > 0 ? (
-          sortedAlumni.map((alumni, index) => (
-            <div
-              key={index}
-              className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
-              onClick={() => openModal(alumni)}
-            >
-              <div className="text-md font-medium mb-1">
-                {`${alumni.firstName} ${alumni.lastName}`}
-              </div>
-              <div className="text-sm text-black-600">{alumni.profession}</div>
-            </div>
-          ))
-        ) : (
-          <p>No alumni found.</p>
-        )}
+  {paginatedAlumni.length > 0 ? (
+    paginatedAlumni.map((alumni, index) => (
+      <div
+        key={index}
+        className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+        onClick={() => openModal(alumni)}
+      >
+        <div className="text-md font-medium mb-1">
+          {`${alumni.firstName} ${alumni.lastName}`}
+        </div>
+        <div className="text-sm text-black-600">{alumni.profession}</div>
       </div>
+    ))
+  ) : (
+    <p>No alumni found.</p>
+  )}
+</div>
 
       {/* Pagination Controls */}
       <ReactPaginate
-        previousLabel={<button className="w-full h-full">Previous</button>}
-        nextLabel={<button className="w-full h-full">Next</button>}
-        breakLabel={<button className="w-full h-full">...</button>}
-        pageCount={pageCount}
-        marginPagesDisplayed={2}
-        pageRangeDisplayed={5}
-        onPageChange={handlePageChange}
-        containerClassName={"flex justify-center items-center space-x-2 mt-6"}
-        pageClassName={
-          "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
-        }
-        pageLinkClassName={"w-full h-full flex items-center justify-center"}
-        previousClassName={
-          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
-        }
-        previousLinkClassName={"w-full h-full flex items-center justify-center"}
-        nextClassName={
-          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
-        }
-        nextLinkClassName={"w-full h-full flex items-center justify-center"}
-        breakClassName={
-          "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
-        }
-        breakLinkClassName={"w-full h-full flex items-center justify-center"}
-        activeClassName={"bg-black text-red font-medium"}
-        disabledClassName={"opacity-50 cursor-not-allowed"}
-      />
+  previousLabel={<button className="w-full h-full">Previous</button>}
+  nextLabel={<button className="w-full h-full">Next</button>}
+  breakLabel={<button className="w-full h-full">...</button>}
+  pageCount={Math.ceil(sortedAlumni.length / itemsPerPage)} // Total pages
+  marginPagesDisplayed={2}
+  pageRangeDisplayed={5}
+  onPageChange={handlePageChange}
+  containerClassName={"flex justify-center items-center space-x-2 mt-6"}
+  pageClassName={
+    "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+  }
+  pageLinkClassName={"w-full h-full flex items-center justify-center"}
+  previousClassName={
+    "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+  }
+  previousLinkClassName={"w-full h-full flex items-center justify-center"}
+  nextClassName={
+    "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+  }
+  nextLinkClassName={"w-full h-full flex items-center justify-center"}
+  breakClassName={
+    "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
+  }
+  breakLinkClassName={"w-full h-full flex items-center justify-center"}
+  activeClassName={"bg-black text-red font-medium"}
+  disabledClassName={"opacity-50 cursor-not-allowed"}
+/>
 
       {/* Modal */}
       {isModalOpen && selectedAlumni && (

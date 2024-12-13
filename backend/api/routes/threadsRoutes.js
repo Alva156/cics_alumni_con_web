@@ -12,6 +12,8 @@ router.get("/get", authenticateJWT, threadController.getAllThreads);
 // Get My threads
 router.get("/my-threads", authenticateJWT, threadController.getUserThreads);
 
+router.get("/pending", authenticateJWT, threadController.getPendingThreads);
+
 // Get a single thread by ID
 router.get("/view/:id", authenticateJWT, threadController.getThreadById);
 
@@ -21,5 +23,10 @@ router.put("/update/:id", authenticateJWT, threadController.updateThread);
 // Delete a thread by ID
 router.delete("/delete/:id", authenticateJWT, threadController.deleteThread);
 router.put("/silence/:id", authenticateJWT, threadController.silenceThread);
+router.put(
+  "/status/:id/",
+  authenticateJWT,
+  threadController.updateThreadStatus
+);
 
 module.exports = router;

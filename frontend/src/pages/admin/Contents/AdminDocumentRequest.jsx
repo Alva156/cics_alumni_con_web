@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import ReactPaginate from "react-paginate";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import axios from "axios";
 import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
@@ -17,6 +18,10 @@ function AdminDocuments() {
   const [sortCriteria, setSortCriteria] = useState("Most Recent");
   const modalRef = useRef(null);
   const deleteModalRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(0);
+    
+  const itemsPerPage = 6;
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Handle outside click for delete modal
@@ -289,6 +294,15 @@ function AdminDocuments() {
     return 0;
   });
 
+  const handlePageChange = (selectedPage) => {
+    setCurrentPage(selectedPage.selected);
+  };
+  
+  // Paginate the filteredDocuments list
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedDocuments = filteredDocuments.slice(startIndex, endIndex);
+
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-8 mb-12">
       {showSuccessMessage && (
@@ -346,83 +360,117 @@ function AdminDocuments() {
       <hr className="mb-6 border-black" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDocuments.map((documents) => (
-          <div
-            key={documents._id}
-            className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer relative" // Added relative position
-            onClick={() => openViewModal(documents)}
-          >
-            {/* Check if document.image exists before rendering */}
-            {documents.image ? (
-              documents.image.endsWith(".pdf") ? (
-                <div className="overflow-y-hidden object-contain">
-                  <Worker workerUrl={pdfWorker}>
-                    <div className="w-full max-h-48 overflow-hidden mb-4">
-                      <Viewer
-                        fileUrl={`${backendUrl}${documents.image}`}
-                        renderTextLayer={false}
-                        initialPage={0} // Show the first page only in the preview
-                        style={{
-                          height: "100%",
-                          width: "100%",
-                          objectFit: "contain", // Ensures the PDF fits without stretching
-                        }}
-                      />
-                    </div>
-                  </Worker>
+  {paginatedDocuments.length > 0 ? (
+    paginatedDocuments.map((documents) => (
+      <div
+        key={documents._id}
+        className="bg-white p-4 border border-gray-300 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer relative"
+        onClick={() => openViewModal(documents)}
+      >
+        {/* Check if document.image exists before rendering */}
+        {documents.image ? (
+          documents.image.endsWith(".pdf") ? (
+            <div className="overflow-y-hidden object-contain">
+              <Worker workerUrl={pdfWorker}>
+                <div className="w-full max-h-48 overflow-hidden mb-4">
+                  <Viewer
+                    fileUrl={`${backendUrl}${documents.image}`}
+                    renderTextLayer={false}
+                    initialPage={0} // Show the first page only in the preview
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                      objectFit: "contain", // Ensures the PDF fits without stretching
+                    }}
+                  />
                 </div>
-              ) : (
-                <img
-                  src={`${backendUrl}${documents.image}`}
-                  alt={documents.name}
-                  className="w-full h-48 object-cover rounded-t-lg mb-4"
-                />
-              )
-            ) : (
-              <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg mb-4">
-                <span className="text-gray-500">No Image Available</span>
-              </div>
-            )}
-
-            <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
-              {documents.name}
+              </Worker>
             </div>
-            <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
-              {documents.description.slice(0, 100)}...
-            </p>
-
-            {/* Button container */}
-            <div className="absolute top-4 right-4 flex space-x-2">
-              <div
-                className="w-8 h-8 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedDocuments(documents);
-                  setIsDeleteModalOpen(true);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Delete
-                </span>
-                <i className="fas fa-trash text-white"></i>{" "}
-                {/* Icon for Delete */}
-              </div>
-              <div
-                className="w-8 h-8 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEditModal(documents);
-                }}
-              >
-                <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                  Edit
-                </span>
-                <i className="fas fa-edit text-white"></i> {/* Icon for Edit */}
-              </div>
-            </div>
+          ) : (
+            <img
+              src={`${backendUrl}${documents.image}`}
+              alt={documents.name}
+              className="w-full h-48 object-cover rounded-t-lg mb-4"
+            />
+          )
+        ) : (
+          <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg mb-4">
+            <span className="text-gray-500">No Image Available</span>
           </div>
-        ))}
+        )}
+
+        <div className="text-md font-semibold text-gray-800 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+          {documents.name}
+        </div>
+        <p className="text-sm text-gray-600 mb-4 overflow-hidden text-ellipsis">
+          {documents.description.slice(0, 100)}...
+        </p>
+
+        {/* Button container */}
+        <div className="absolute top-4 right-4 flex space-x-2">
+          <div
+            className="w-8 h-8 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedDocuments(documents);
+              setIsDeleteModalOpen(true);
+            }}
+          >
+            <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
+              Delete
+            </span>
+            <i className="fas fa-trash text-white"></i>
+          </div>
+          <div
+            className="w-8 h-8 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+            onClick={(e) => {
+              e.stopPropagation();
+              openEditModal(documents);
+            }}
+          >
+            <span className="hidden group-hover:block absolute bottom-10 bg-gray-700 text-white text-xs rounded px-2 py-1">
+              Edit
+            </span>
+            <i className="fas fa-edit text-white"></i>
+          </div>
+        </div>
       </div>
+    ))
+  ) : (
+    <p>No documents found.</p>
+  )}
+</div>
+
+
+      <ReactPaginate
+  previousLabel={<button className="w-full h-full">Previous</button>}
+  nextLabel={<button className="w-full h-full">Next</button>}
+  breakLabel={<button className="w-full h-full">...</button>}
+  pageCount={Math.ceil(filteredDocuments.length / itemsPerPage)} // Total pages
+  marginPagesDisplayed={2}
+  pageRangeDisplayed={5}
+  onPageChange={handlePageChange}
+  containerClassName={"flex justify-center items-center space-x-2 mt-6"}
+  pageClassName={
+    "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+  }
+  pageLinkClassName={"w-full h-full flex items-center justify-center"}
+  previousClassName={
+    "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+  }
+  previousLinkClassName={"w-full h-full flex items-center justify-center"}
+  nextClassName={
+    "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+  }
+  nextLinkClassName={"w-full h-full flex items-center justify-center"}
+  breakClassName={
+    "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
+  }
+  breakLinkClassName={"w-full h-full flex items-center justify-center"}
+  activeClassName={"bg-black text-red font-medium"}
+  disabledClassName={"opacity-50 cursor-not-allowed"}
+/>
+
 
       {/* View Modal */}
       {isViewModalOpen && selectedDocuments && (

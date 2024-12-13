@@ -983,7 +983,7 @@ function Chatbot() {
               <img
                 src={alumniconnectlogo2}
                 alt="Chatbot Avatar"
-                className="w-10 h-10 rounded mr-2" // Adjust size and margin as needed
+                className="w-10 h-10 rounded mr-2"
               />
             )}
             <div
@@ -991,7 +991,7 @@ function Chatbot() {
                 chat.from === "user"
                   ? "bg-gray-400 text-white"
                   : "bg-fgray text-white"
-              } rounded-lg p-4 mb-2 max-w-xs`}
+              } rounded-lg p-4 mb-2 max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl`}
             >
               {Array.isArray(chat.message) ? (
                 <div className="space-y-2">

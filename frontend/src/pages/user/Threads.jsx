@@ -175,7 +175,11 @@ function Threads() {
         const response = await axios.get(`${backendUrl}/threads/get`, {
           withCredentials: true,
         });
-        setAllThreads(response.data);
+        // Filter threads with status "approved" for All Threads
+        const approvedThreads = response.data.filter(
+          (thread) => thread.status === "approved"
+        );
+        setAllThreads(approvedThreads);
       } catch (error) {
         console.error("Error fetching all threads:", error);
       }
@@ -186,7 +190,11 @@ function Threads() {
         const response = await axios.get(`${backendUrl}/threads/my-threads`, {
           withCredentials: true,
         });
-        setMyThreads(response.data);
+        // Include threads with statuses "pending", "approved", and "rejected" for My Threads
+        const userThreads = response.data.filter((thread) =>
+          ["pending", "approved", "rejected"].includes(thread.status)
+        );
+        setMyThreads(userThreads);
       } catch (error) {
         console.error("Error fetching my threads:", error);
       }
@@ -201,7 +209,6 @@ function Threads() {
       showError("Please fill in both the title and content fields.");
       return;
     }
-    // Check for bad words in the title and content
     if (
       filter.isProfane(newThread.title) ||
       filter.isProfane(newThread.content)
@@ -219,11 +226,16 @@ function Threads() {
         { withCredentials: true }
       );
 
-      // Manually set `isOwner` to true for the newly created thread
       const createdThread = { ...response.data.thread, isOwner: true };
 
-      setMyThreads([...myThreads, createdThread]); // Update myThreads
-      setAllThreads([...allThreads, createdThread]); // Update allThreads
+      // Update myThreads state
+      setMyThreads([...myThreads, createdThread]);
+
+      // Only add to allThreads if the status is "approved"
+      if (createdThread.status === "approved") {
+        setAllThreads([...allThreads, createdThread]);
+      }
+
       setNewThread({ title: "", content: "" });
       setIsAddModalOpen(false);
       showValidation("Thread created successfully!");
@@ -231,12 +243,12 @@ function Threads() {
       console.error("Error creating thread:", error);
     }
   };
+
   const handleUpdateThread = async () => {
     if (!selectedThread.title || !selectedThread.content) {
       showError("Please fill in both the title and content fields.");
       return;
     }
-    // Check for bad words in the title and content
     if (
       filter.isProfane(selectedThread.title) ||
       filter.isProfane(selectedThread.content)
@@ -256,20 +268,20 @@ function Threads() {
         { withCredentials: true }
       );
 
-      // Update the `myThreads` state
+      const updatedThread = response.data.thread;
+
+      // Update myThreads state
       setMyThreads(
         myThreads.map((thread) =>
-          thread._id === selectedThread._id ? response.data.thread : thread
+          thread._id === selectedThread._id ? updatedThread : thread
         )
       );
 
-      // Update the `allThreads` state and ensure the `isOwner` field is preserved
+      // Update allThreads state and filter based on "approved" status
       setAllThreads(
-        allThreads.map((thread) =>
-          thread._id === selectedThread._id
-            ? { ...response.data.thread, isOwner: thread.isOwner } // Keep `isOwner` field
-            : thread
-        )
+        allThreads
+          .filter((thread) => thread._id !== selectedThread._id) // Remove outdated thread
+          .concat(updatedThread.status === "approved" ? [updatedThread] : []) // Add updated thread only if approved
       );
 
       setSelectedThread(null);
@@ -659,6 +671,30 @@ function Threads() {
     isEditReplyModalOpen,
     isDeleteReplyModalOpen,
   ]);
+  // to click the icon for note
+  const [isVisible, setIsVisible] = useState(false);
+  const tooltipRef = useRef(null);
+
+  // Toggle the visibility of the tooltip
+  const handleIconClick = () => {
+    setIsVisible(!isVisible);
+  };
+  // Close the tooltip if the user clicks outside of it
+  const handleClickOutside = (event) => {
+    if (tooltipRef.current && !tooltipRef.current.contains(event.target)) {
+      setIsVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    // Add event listener for clicks outside the tooltip
+    document.addEventListener("click", handleClickOutside);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="text-black font-light mx-4 md:mx-8 lg:mx-16 mt-0 mb-12">
@@ -674,7 +710,28 @@ function Threads() {
           </div>
         )}
       </div>
-      <h1 className="text-2xl font-medium text-gray-700 mb-6">Threads</h1>
+      {/* Note to users thing */}
+      <div className="text-2xl font-medium text-gray-700 flex items-center mb-6">
+        Threads
+        {/* Icon with tooltip */}
+        <div className="relative" ref={tooltipRef}>
+          <i
+            className="fa fa-triangle-exclamation text-gray-500 ml-2 cursor-pointer"
+            onClick={handleIconClick} // Add the click handler
+          />
+
+          {/* Tooltip */}
+          {isVisible && (
+            <div className="absolute left-0 ml-8 top-0 w-48 md:w-80 p-3 bg-red text-white text-sm italic rounded shadow-lg transition-opacity duration-300 opacity-100 bg-red-200 z-50">
+              Threads created or updated will be reviewed for approval to ensure
+              they align with our Catholic values and foster a respectful
+              community. Replies to threads may also be deleted if deemed
+              inappropriate. Thank you for your understanding!
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="mb-4 relative">
         <input
           type="text"
@@ -703,7 +760,6 @@ function Threads() {
           <option>Oldest</option>
         </select>
       </div>
-
       <div className="flex justify-between items-center mb-4 mt-12">
         {searchTerm.trim() ? (
           <div className="text-lg">Search Results:</div>
@@ -717,9 +773,7 @@ function Threads() {
           + New Thread
         </button>
       </div>
-
       <hr className="mb-6 border-black" />
-
       {searchTerm.trim() ? (
         filteredThreads.length === 0 ? (
           <div>No threads match your search.</div>
@@ -738,37 +792,67 @@ function Threads() {
               </div>
               {thread.isOwner && (
                 <div className="flex items-center">
+                  {thread.status === "pending" && (
+                    <div
+                      className="fas fa-clock text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer mr-2 relative group"
+                      title="Pending"
+                      style={{
+                        fontSize: "12px",
+                        textAlign: "center",
+                        paddingTop: "4px",
+                      }}
+                    ></div>
+                  )}
+                  {thread.status === "rejected" && (
+                    <div
+                      className="fas fa-thumbs-down text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer mr-2 relative group"
+                      title="Rejected"
+                      style={{
+                        fontSize: "12px",
+                        textAlign: "center",
+                        paddingTop: "4px",
+                      }}
+                    ></div>
+                  )}
                   <div
-                    className="fas fa-trash text-white w-4 h-4 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group "
+                    className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
                     title="Delete"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "4px",
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       openDeleteModal(thread);
                     }}
                   ></div>
                   <div
-                    className="w-4 h-4 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                    className="fas fa-bell text-white w-5 h-5 rounded-full bg-blue flex justify-center items-center cursor-pointer mr-2 relative group"
+                    title="Notification"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "4px",
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       openNotifModal(thread);
                     }}
-                  >
-                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                      Notifications
-                    </span>
-                  </div>
-
+                  ></div>
                   <div
-                    className="w-4 h-4 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer mr-2 relative group"
+                    title="Edit"
+                    style={{
+                      fontSize: "12px",
+                      textAlign: "center",
+                      paddingTop: "4px",
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       openEditModal(thread);
                     }}
-                  >
-                    <span className="hidden group-hover:block absolute bottom-8 bg-gray-700 text-white text-xs rounded px-2 py-1">
-                      Edit
-                    </span>
-                  </div>
+                  ></div>
                 </div>
               )}
             </div>
@@ -793,6 +877,28 @@ function Threads() {
                   </div>
                 </div>
                 <div className="flex items-center">
+                  {thread.status === "pending" && (
+                    <div
+                      className="fas fa-clock text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer mr-2 relative group"
+                      title="Pending"
+                      style={{
+                        fontSize: "12px",
+                        textAlign: "center",
+                        paddingTop: "4px",
+                      }}
+                    ></div>
+                  )}
+                  {thread.status === "rejected" && (
+                    <div
+                      className="fas fa-thumbs-down text-white w-5 h-5 rounded-full bg-yellow-500 flex justify-center items-center cursor-pointer mr-2 relative group"
+                      title="Rejected"
+                      style={{
+                        fontSize: "12px",
+                        textAlign: "center",
+                        paddingTop: "4px",
+                      }}
+                    ></div>
+                  )}
                   <div
                     className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer mr-2 relative group"
                     title="Delete"
@@ -971,7 +1077,6 @@ function Threads() {
           </div>
         </div>
       )}
-
       {isViewModalOpen && selectedThread && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           {loading && <LoadingSpinner />} {/* Show loading spinner */}

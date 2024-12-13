@@ -175,7 +175,11 @@ function AdminThreads() {
         const response = await axios.get(`${backendUrl}/threads/get`, {
           withCredentials: true,
         });
-        setAllThreads(response.data);
+        // Filter threads with status "approved" for All Threads
+        const approvedThreads = response.data.filter(
+          (thread) => thread.status === "approved"
+        );
+        setAllThreads(approvedThreads);
       } catch (error) {
         console.error("Error fetching all threads:", error);
       }
@@ -186,7 +190,11 @@ function AdminThreads() {
         const response = await axios.get(`${backendUrl}/threads/my-threads`, {
           withCredentials: true,
         });
-        setMyThreads(response.data);
+        // Include threads with statuses "pending", "approved", and "rejected" for My Threads
+        const userThreads = response.data.filter((thread) =>
+          ["pending", "approved", "rejected"].includes(thread.status)
+        );
+        setMyThreads(userThreads);
       } catch (error) {
         console.error("Error fetching my threads:", error);
       }
@@ -201,7 +209,6 @@ function AdminThreads() {
       showError("Please fill in both the title and content fields.");
       return;
     }
-    // Check for bad words in the title and content
     if (
       filter.isProfane(newThread.title) ||
       filter.isProfane(newThread.content)
@@ -219,11 +226,16 @@ function AdminThreads() {
         { withCredentials: true }
       );
 
-      // Manually set `isOwner` to true for the newly created thread
       const createdThread = { ...response.data.thread, isOwner: true };
 
-      setMyThreads([...myThreads, createdThread]); // Update myThreads
-      setAllThreads([...allThreads, createdThread]); // Update allThreads
+      // Update myThreads state
+      setMyThreads([...myThreads, createdThread]);
+
+      // Only add to allThreads if the status is "approved"
+      if (createdThread.status === "approved") {
+        setAllThreads([...allThreads, createdThread]);
+      }
+
       setNewThread({ title: "", content: "" });
       setIsAddModalOpen(false);
       showValidation("Thread created successfully!");
@@ -231,12 +243,12 @@ function AdminThreads() {
       console.error("Error creating thread:", error);
     }
   };
+
   const handleUpdateThread = async () => {
     if (!selectedThread.title || !selectedThread.content) {
       showError("Please fill in both the title and content fields.");
       return;
     }
-    // Check for bad words in the title and content
     if (
       filter.isProfane(selectedThread.title) ||
       filter.isProfane(selectedThread.content)
@@ -256,20 +268,20 @@ function AdminThreads() {
         { withCredentials: true }
       );
 
-      // Update the `myThreads` state
+      const updatedThread = response.data.thread;
+
+      // Update myThreads state
       setMyThreads(
         myThreads.map((thread) =>
-          thread._id === selectedThread._id ? response.data.thread : thread
+          thread._id === selectedThread._id ? updatedThread : thread
         )
       );
 
-      // Update the `allThreads` state and ensure the `isOwner` field is preserved
+      // Update allThreads state and filter based on "approved" status
       setAllThreads(
-        allThreads.map((thread) =>
-          thread._id === selectedThread._id
-            ? { ...response.data.thread, isOwner: thread.isOwner } // Keep `isOwner` field
-            : thread
-        )
+        allThreads
+          .filter((thread) => thread._id !== selectedThread._id) // Remove outdated thread
+          .concat(updatedThread.status === "approved" ? [updatedThread] : []) // Add updated thread only if approved
       );
 
       setSelectedThread(null);

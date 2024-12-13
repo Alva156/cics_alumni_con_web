@@ -1,20 +1,35 @@
 const Thread = require("../models/threadsModel");
 const jwt = require("jsonwebtoken");
 const Reply = require("../models/replyModel");
+const User = require("../models/userModel"); // Adjust path as needed
 
-// Create a new thread
 exports.createThread = async (req, res) => {
   try {
     const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: No token provided" });
+    }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userProfileId = decoded.profileId; // Assuming profileId is included in the JWT
+    const userId = decoded.id;
+    const userProfileId = decoded.profileId; 
 
     const { title, content } = req.body;
+  
+    // Fetch the user role based on the userId
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
+    // Determine thread status based on user role
+    const status = user.role === "admin" ? "approved" : "pending";
+
+    // Create the new thread
     const newThread = new Thread({
-      userProfileId, // Use userProfileId
+      userProfileId, // Use userProfileId from the token
       title,
       content,
+      status,
     });
 
     await newThread.save();
@@ -30,6 +45,7 @@ exports.createThread = async (req, res) => {
       thread: populatedThread,
     });
   } catch (error) {
+    console.error("Error during thread creation:", error);
     res.status(500).json({ error: "Failed to create thread" });
   }
 };
@@ -114,7 +130,9 @@ exports.updateThread = async (req, res) => {
   try {
     const token = req.cookies.token;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userProfileId = decoded.profileId;
+
+    const userId = decoded.id; // Extract id from the token
+    const userProfileId = decoded.profileId; // Extract profileId from the token
 
     const { title, content } = req.body;
     const thread = await Thread.findById(req.params.id);
@@ -126,6 +144,15 @@ exports.updateThread = async (req, res) => {
     if (thread.userProfileId.toString() !== userProfileId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
+
+    // Fetch the user role based on the userId
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Determine thread status based on user role
+    thread.status = user.role === "admin" ? "approved" : "pending";
 
     // Update the thread's title and content
     thread.title = title;
@@ -146,6 +173,7 @@ exports.updateThread = async (req, res) => {
       thread: { ...populatedThread, replyCount },
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error updating thread", error });
   }
 };

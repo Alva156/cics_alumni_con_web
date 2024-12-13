@@ -1217,6 +1217,51 @@ function AdminThreads() {
               <h3 className="text-lg font-medium">{selectedThread.title}</h3>
               <p className="mt-2 text-black">{selectedThread.content}</p>
             </div>
+            <div className="space-y-4 max-h-64 overflow-y-auto">
+              {replies.map((reply) => (
+                <div
+                  key={reply._id}
+                  className="p-4 border border-black rounded-lg flex items-start mb-2"
+                >
+                  <img
+                    src={
+                      reply.userProfileId.profileImage
+                        ? `${backendUrl}${reply.userProfileId.profileImage}`
+                        : blankprofilepic
+                    }
+                    alt="User Avatar"
+                    className="w-10 h-10 mr-3"
+                  />
+                  <div className="flex-grow">
+                    <h4 className="font-semibold text-sm">{`${reply.userProfileId.firstName} ${reply.userProfileId.lastName}`}</h4>
+
+                    <p className="text-gray-500 text-xs mb-2">
+                      {reply.createdAt
+                        ? new Date(reply.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            }
+                          )
+                        : ""}{" "}
+                      {/* Only render an empty string if createdAt is not available */}
+                    </p>
+                    <p>{reply.reply}</p>
+                    {editingReplyId === reply._id ? (
+                      <textarea
+                        value={editingReplyContent}
+                        onChange={(e) => setEditingReplyContent(e.target.value)}
+                        className="w-full border border-black rounded-lg p-2"
+                      />
+                    ) : (
+                      <p className="text-gray-700">{reply.content}</p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
             <div className="flex justify-center gap-2 mt-4">
               <button
                 onClick={() => handleUpdateStatus("approved")}

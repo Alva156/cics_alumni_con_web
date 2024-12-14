@@ -1258,6 +1258,16 @@ function Threads() {
                   {reply.isOwner && (
                     <div className="flex space-x-2">
                       <div
+                        className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
+                        title="Edit"
+                        style={{
+                          fontSize: "12px",
+                          textAlign: "center",
+                          paddingTop: "4px",
+                        }}
+                        onClick={() => handleEditReply(reply)}
+                      ></div>
+                      <div
                         className="fas fa-trash text-white w-5 h-5 rounded-full bg-[#BE142E] flex justify-center items-center cursor-pointer relative group"
                         title="Delete"
                         style={{
@@ -1268,16 +1278,6 @@ function Threads() {
                         onClick={(e) => {
                           openDeleteReplyModal(reply); // Open delete modal for the specific reply
                         }}
-                      ></div>
-                      <div
-                        className="fas fa-edit text-white w-5 h-5 rounded-full bg-[#3D3C3C] flex justify-center items-center cursor-pointer relative group"
-                        title="Edit"
-                        style={{
-                          fontSize: "12px",
-                          textAlign: "center",
-                          paddingTop: "4px",
-                        }}
-                        onClick={() => handleEditReply(reply)}
                       ></div>
                     </div>
                   )}

@@ -5,6 +5,7 @@ import csvpic from "../../assets/formatcsv.png";
 import { Worker, Viewer } from "@react-pdf-viewer/core"; // Import Viewer
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.js";
 import "../../App.css";
+import blankprofilepic from "../../assets/blankprofilepic.jpg";
 
 function AdminAlumni() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -883,13 +884,26 @@ function AdminAlumni() {
           paginatedAlumni.map((alumni, index) => (
             <div
               key={index}
-              className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors"
+              className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors flex items-center"
               onClick={() => openModal(alumni)}
             >
-              <div className="text-md font-medium mb-1">
-                {`${alumni.firstName} ${alumni.lastName}`}
+              <img
+                src={
+                  alumni.profileImage && alumni.profileImage.trim()
+                    ? `${backendUrl}${alumni.profileImage}`
+                    : blankprofilepic
+                }
+                alt="Alumni"
+                className="w-16 h-16 border border-gray-300 object-cover mr-4"
+              />
+              <div>
+                <div className="text-md font-medium mb-1">
+                  {`${alumni.firstName} ${alumni.lastName}`}
+                </div>
+                <div className="text-sm text-black-600">
+                  {alumni.profession}
+                </div>
               </div>
-              <div className="text-sm text-black-600">{alumni.profession}</div>
             </div>
           ))
         ) : (
@@ -1251,15 +1265,18 @@ function AdminAlumni() {
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6 min-w-60"
               >
                 <h1 className="text-xl mb-4">Primary Information</h1>
-                {selectedAlumni.profileImage && (
-                  <div className="mb-4">
-                    <img
-                      src={`${backendUrl}${selectedAlumni.profileImage}`}
-                      alt="Alumni"
-                      className="w-32 h-32"
-                    />
-                  </div>
-                )}
+                <div className="mb-4">
+                  <img
+                    src={
+                      selectedAlumni.profileImage &&
+                      selectedAlumni.profileImage.trim() !== ""
+                        ? `${backendUrl}${selectedAlumni.profileImage}`
+                        : blankprofilepic
+                    }
+                    alt="Alumni"
+                    className="w-32 h-32"
+                  />
+                </div>
                 <p className="text-xs mb-1/2">Name</p>
                 <p className="text-s mb-2 font-bold break-words">
                   {`${selectedAlumni.firstName} ${selectedAlumni.lastName}`}

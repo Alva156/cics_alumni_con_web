@@ -282,7 +282,7 @@ function Alumni() {
   const handlePageChange = (selectedPage) => {
     setCurrentPage(selectedPage.selected);
   };
-  
+
   // Paginate the alumni list
   const startIndex = currentPage * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -652,70 +652,69 @@ function Alumni() {
 
       <div className="text-lg mb-4">All Alumni</div>
       <hr className="mb-6 border-black" />
-      
 
       {/* Use grid layout with two columns */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-  {paginatedAlumni.length > 0 ? (
-    paginatedAlumni.map((alumni, index) => (
-      <div
-        key={index}
-        className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors flex items-center"
-        onClick={() => openModal(alumni)}
-      >
-        <img
-          src={
-            alumni.profileImage === null || alumni.profileImage === ""
-              ? blankProfilePic  // If no profile image, show blank profile pic
-              : `${backendUrl}${alumni.profileImage}`  // Otherwise show the uploaded image
-          }
-          alt="Alumni"
-          className="w-16 h-16 border border-gray-300 object-cover mr-4"
-        />
-        <div>
-          <div className="text-md font-medium mb-1">
-            {`${alumni.firstName} ${alumni.lastName}`}
-          </div>
-          <div className="text-sm text-black-600">{alumni.profession}</div>
-        </div>
+        {paginatedAlumni.length > 0 ? (
+          paginatedAlumni.map((alumni, index) => (
+            <div
+              key={index}
+              className="mb-4 p-4 border border-black rounded-lg cursor-pointer hover:bg-gray-200 transition-colors flex items-center"
+              onClick={() => openModal(alumni)}
+            >
+              <img
+                src={
+                  alumni.profileImage && alumni.profileImage.trim()
+                    ? `${backendUrl}${alumni.profileImage}`
+                    : blankprofilepic
+                }
+                alt="Alumni"
+                className="w-16 h-16 border border-gray-300 object-cover mr-4"
+              />
+              <div>
+                <div className="text-md font-medium mb-1">
+                  {`${alumni.firstName} ${alumni.lastName}`}
+                </div>
+                <div className="text-sm text-black-600">
+                  {alumni.profession}
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No alumni found.</p>
+        )}
       </div>
-    ))
-  ) : (
-    <p>No alumni found.</p>
-  )}
-</div>
-
-
 
       {/* Pagination Controls */}
       <ReactPaginate
-  previousLabel={<button className="w-full h-full">Previous</button>}
-  nextLabel={<button className="w-full h-full">Next</button>}
-  breakLabel={<button className="w-full h-full">...</button>}
-  pageCount={Math.ceil(sortedAlumni.length / itemsPerPage)} // Total pages
-  marginPagesDisplayed={2}
-  pageRangeDisplayed={5}
-  onPageChange={handlePageChange}
-  containerClassName={"flex justify-center items-center space-x-2 mt-6"}
-  pageClassName={
-    "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
-  }
-  pageLinkClassName={"w-full h-full flex items-center justify-center"}
-  previousClassName={
-    "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
-  }
-  previousLinkClassName={"w-full h-full flex items-center justify-center"}
-  nextClassName={
-    "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
-  }
-  nextLinkClassName={"w-full h-full flex items-center justify-center"}
-  breakClassName={
-    "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
-  }
-  breakLinkClassName={"w-full h-full flex items-center justify-center"}
-  activeClassName={"bg-black text-red font-medium"}
-  disabledClassName={"opacity-50 cursor-not-allowed"}
-/>
+        previousLabel={<button className="w-full h-full">Previous</button>}
+        nextLabel={<button className="w-full h-full">Next</button>}
+        breakLabel={<button className="w-full h-full">...</button>}
+        pageCount={Math.ceil(sortedAlumni.length / itemsPerPage)} // Total pages
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageChange}
+        containerClassName={"flex justify-center items-center space-x-2 mt-6"}
+        pageClassName={
+          "w-10 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        pageLinkClassName={"w-full h-full flex items-center justify-center"}
+        previousClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        previousLinkClassName={"w-full h-full flex items-center justify-center"}
+        nextClassName={
+          "w-24 h-10 flex items-center justify-center border border-black rounded bg-white cursor-pointer hover:bg-gray-200 transition"
+        }
+        nextLinkClassName={"w-full h-full flex items-center justify-center"}
+        breakClassName={
+          "w-10 h-10 flex items-center justify-center border border-black bg-white cursor-default"
+        }
+        breakLinkClassName={"w-full h-full flex items-center justify-center"}
+        activeClassName={"bg-black text-red font-medium"}
+        disabledClassName={"opacity-50 cursor-not-allowed"}
+      />
 
       {/* Modal */}
       {isModalOpen && selectedAlumni && (
@@ -805,15 +804,18 @@ function Alumni() {
                 className="tab-content bg-base-100 border-base-300 rounded-box p-6 min-w-60"
               >
                 <h1 className="text-xl mb-4">Primary Information</h1>
-                {selectedAlumni.profileImage && (
-                  <div className="mb-4">
-                    <img
-                      src={`${backendUrl}${selectedAlumni.profileImage}`}
-                      alt="Alumni"
-                      className="w-32 h-32"
-                    />
-                  </div>
-                )}
+                <div className="mb-4">
+                  <img
+                    src={
+                      selectedAlumni.profileImage &&
+                      selectedAlumni.profileImage.trim() !== ""
+                        ? `${backendUrl}${selectedAlumni.profileImage}`
+                        : blankprofilepic
+                    }
+                    alt="Alumni"
+                    className="w-32 h-32"
+                  />
+                </div>
                 <p className="text-xs mb-1/2">Name</p>
                 <p className="text-s mb-2 font-bold break-words">
                   {`${selectedAlumni.firstName} ${selectedAlumni.lastName}`}

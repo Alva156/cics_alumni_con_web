@@ -308,29 +308,29 @@ function Alumni() {
         </span>
       </div>
 
-      <div className="flex flex-col md:flex-row mb-6 space-y-4 md:space-y-0 md:space-x-4">
-        <div className="flex flex-col md:flex-row md:items-center">
-          <span className="text-sm">Sort by:</span>
-          <select
-            className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-auto"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-          >
-            <option value="asc">Name (A-Z)</option>
-            <option value="desc">Name (Z-A)</option>
-          </select>
-        </div>
+      <div className="flex flex-col md:flex-row mb-6 gap-4 md:gap-6 flex-wrap">
+  {/* Sort by */}
+  <div className="flex flex-col md:flex-row md:items-center mb-2">
+    <span className="text-sm">Sort by:</span>
+    <select
+      className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-auto"
+      value={sortOrder}
+      onChange={(e) => setSortOrder(e.target.value)}
+    >
+      <option value="asc">Name (A-Z)</option>
+      <option value="desc">Name (Z-A)</option>
+    </select>
+  </div>
 
-        <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
-          <div className="flex flex-col md:flex-row md:items-center">
-            <span className="text-sm">Filter by:</span>
-
-            <select
-              className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-44"
-              value={selectedCollege}
-              onChange={(e) => setSelectedCollege(e.target.value)}
-            >
-              <option value="">All Colleges</option>
+  {/* Filter by */}
+  <div className="flex flex-col md:flex-row md:items-center mb-2">
+    <span className="text-sm">Filter by:</span>
+    <select
+      className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-44"
+      value={selectedCollege}
+      onChange={(e) => setSelectedCollege(e.target.value)}
+    >
+      <option value="">All Colleges</option>
               <option value="UST-AMV College of Accountancy">
                 UST-AMV College of Accountancy
               </option>
@@ -379,16 +379,17 @@ function Alumni() {
               <option value="Faculty of Sacred Theology">
                 Faculty of Sacred Theology
               </option>
-            </select>
-          </div>
+    </select>
+  </div>
 
-          <div className="flex flex-col md:flex-row md:items-center">
-            <select
-              className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-52"
-              value={selectedProgram}
-              onChange={(e) => setSelectedProgram(e.target.value)}
-            >
-              <option value="">All Programs</option>
+  {/* Program */}
+  <div className="flex flex-col md:flex-row md:items-center mb-2">
+    <select
+      className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-52"
+      value={selectedProgram}
+      onChange={(e) => setSelectedProgram(e.target.value)}
+    >
+      <option value="">All Programs</option>
               <option value="Accountancy">Accountancy</option>
               <option value="Accounting Information System">
                 Accounting Information System
@@ -631,12 +632,14 @@ function Alumni() {
               <option value="Bachelor of Sacred Theology">
                 Bachelor of Sacred Theology
               </option>
-            </select>
-          </div>
-          <div className="flex flex-col md:flex-row md:items-center">
-            <select
-              className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-44"
-              value={selectedBatch}
+    </select>
+  </div>
+
+  {/* Batch */}
+  <div className="flex flex-col md:flex-row md:items-center mb-2">
+    <select
+      className="ml-2 border border-black rounded px-3 py-1 text-sm w-full md:w-52"
+      value={selectedBatch}
               onChange={(e) => setSelectedBatch(e.target.value)}
             >
               <option value="">All Batches</option>
@@ -646,9 +649,9 @@ function Alumni() {
                 </option>
               ))}
             </select>
-          </div>
-        </div>
-      </div>
+  </div>
+</div>
+
 
       <div className="text-lg mb-4">All Alumni</div>
       <hr className="mb-6 border-black" />

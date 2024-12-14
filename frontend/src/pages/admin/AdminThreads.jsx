@@ -803,7 +803,7 @@ function AdminThreads() {
               {searchTerm.trim() ? "Search Results" : "Pending Threads"}
             </div>
             <hr className="mb-4 border-black" />
-            <div className="h-44 md:h-96 overflow-y-auto">
+            <div className="h-[11.5rem] md:h-96 overflow-y-auto">
               {searchTerm.trim() ? (
                 filteredThreads.length === 0 ? (
                   <div>No threads match your search.</div>
@@ -956,7 +956,7 @@ function AdminThreads() {
               </button>
             </div>
             <hr className="mb-4 border-black" />
-            <div className="h-44 md:h-96 overflow-y-auto">
+            <div className="h-[11.5rem] md:h-96 overflow-y-auto">
               {myThreads.length === 0 ? (
                 <div>No threads created yet.</div>
               ) : (

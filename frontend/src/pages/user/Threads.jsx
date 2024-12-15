@@ -281,13 +281,21 @@ function Threads() {
         )
       );
 
-      // Update allThreads state
-      setAllThreads(
-        allThreads.map((thread) =>
-          thread._id === selectedThread._id
-            ? { ...updatedThread, isOwner: thread.isOwner }
-            : thread
-        )
+      // Update allThreads
+      setAllThreads((prevThreads) =>
+        prevThreads
+          .filter(
+            (thread) =>
+              thread._id === selectedThread._id
+                ? updatedThread.status !== "pending" // Remove if status is "pending"
+                : true // Keep other threads
+          )
+          .map(
+            (thread) =>
+              thread._id === selectedThread._id
+                ? { ...updatedThread, isOwner: thread.isOwner } // Update if it matches
+                : thread // Keep as is
+          )
       );
 
       // Update all state

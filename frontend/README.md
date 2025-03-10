@@ -7,9 +7,15 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-* TO RUN Frontend:
+# System Screenshots
 
-* After cloning from github perform instructions below
+# Login/Register Interface
+
+![Screenshot](public/Pictures_system/login.jpg)
+
+- TO RUN Frontend:
+
+- After cloning from github perform instructions below
 
 1. MAKE SURE IN TERMINAL, 'cd frontend' FIRST BEFORE EXECUTING INSTRUCTIONS BELOW
 2. `npm install`

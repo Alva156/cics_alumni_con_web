@@ -7,6 +7,7 @@
 ![Screenshot](frontend/public/Pictures_system/register.jpg)
 
 - Admin Interface
+
   ![Screenshot](frontend/public/Pictures_system/adminHomepage.jpg)
   ![Screenshot](frontend/public/Pictures_system/adminDashboard.jpg)
   ![Screenshot](frontend/public/Pictures_system/adminSurveyTool.jpg)
@@ -19,6 +20,7 @@
   ![Screenshot](frontend/public/Pictures_system/addThreads.jpg)
 
   - Contents Page: Same Interface as the Cetifications, Document Request, Job/Internship Referrals, News and Events Pages
+
     ![Screenshot](frontend/public/Pictures_system/companiesAdmin.jpg)
     ![Screenshot](frontend/public/Pictures_system/addCompaniesAdmin.jpg)
 
@@ -28,6 +30,7 @@
   ![Screenshot](frontend/public/Pictures_system/adminAcct.jpg)
 
 - Alumni Interface
+
   ![Screenshot](frontend/public/Pictures_system/alumniHomepage.jpg)
   ![Screenshot](frontend/public/Pictures_system/alumniUserProfile.png)
   ![Screenshot](frontend/public/Pictures_system/alumniUserProfile2.png)
@@ -44,6 +47,7 @@
   ![Screenshot](frontend/public/Pictures_system/addThreads.jpg)
 
   - Contents Page: Same Interface as the Cetifications, Document Request, Job/Internship Referrals, News and Events Pages
+
     ![Screenshot](frontend/public/Pictures_system/adminCompanies.jpg)
 
   ![Screenshot](frontend/public/Pictures_system/viewAlumniPage.jpg)
@@ -52,4 +56,5 @@
   ![Screenshot](frontend/public/Pictures_system/faqs2.jpg)
 
   - Mobile Responsive
+
     ![Screenshot](frontend/public/Pictures_system/mobileRespo.jpg)
